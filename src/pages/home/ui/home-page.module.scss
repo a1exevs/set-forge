@@ -1,0 +1,111 @@
+.container {
+  min-height: 100vh;
+  background: $bg-primary;
+}
+
+.header {
+  background: linear-gradient(135deg, $primary-color 0%, #2563eb 100%);
+  color: white;
+  padding: $spacing-2xl $spacing-lg;
+  text-align: center;
+  box-shadow: $shadow-md;
+
+  h1 {
+    font-size: $font-size-3xl;
+    margin-bottom: $spacing-sm;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-lg;
+  opacity: 0.9;
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-2xl $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2xl;
+}
+
+.section {
+  h2 {
+    margin-bottom: $spacing-lg;
+    color: $text-primary;
+  }
+}
+
+.empty {
+  color: $text-secondary;
+  text-align: center;
+  padding: $spacing-2xl;
+  background: $bg-secondary;
+  border-radius: $radius-lg;
+}
+
+.exerciseList {
+  display: grid;
+  gap: $spacing-lg;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.exerciseCard {
+  background: white;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+}
+
+.exerciseHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+
+  h3 {
+    font-size: $font-size-lg;
+    color: $text-primary;
+  }
+}
+
+.badge {
+  background: $primary-color;
+  color: white;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-md;
+  font-size: $font-size-xs;
+  font-weight: 500;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.description {
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  line-height: 1.5;
+}
+
+.exerciseFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-color;
+}
+
+.date {
+  font-size: $font-size-xs;
+  color: $text-light;
+}
