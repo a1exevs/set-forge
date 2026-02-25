@@ -1,8 +1,8 @@
 import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 
 import { routeTree } from 'src/route-tree.gen';
-import '@testing-library/jest-dom';
 
 describe('App', () => {
   describe('Routing', () => {

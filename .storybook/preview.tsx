@@ -3,7 +3,6 @@ import type { Preview } from '@storybook/react';
 import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router';
 
 import { routeTree } from 'src/route-tree.gen';
-
 import 'src/app/styles/global.scss';
 
 const withRouter: Preview['decorators'][0] = (Story: React.FC, context) => {

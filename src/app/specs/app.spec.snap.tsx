@@ -1,6 +1,5 @@
 import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router';
-import { render } from '@testing-library/react';
-import { screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { routeTree } from 'src/route-tree.gen';
 
