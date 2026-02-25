@@ -1,6 +1,7 @@
 import { FC } from 'react';
 
 import { useWorkoutListStore } from '@entities';
+
 import WorkoutModePageLogicLayer from 'src/pages/workout-mode/ui/workout-mode-page-logic-layer';
 
 type Props = {

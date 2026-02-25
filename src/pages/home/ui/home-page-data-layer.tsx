@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react';
 
 import { useWorkoutListStore, workoutListStorage } from '@entities';
 import { formatDate } from '@shared';
+
 import HomePageLogicLayer from 'src/pages/home/ui/home-page-logic-layer';
 
 const HomePageDataLayer: FC = () => {

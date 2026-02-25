@@ -1,9 +1,10 @@
-import type { CreateExerciseDto, Exercise } from 'src/entities/exercise/model/types';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 import { createSelectors } from '@shared';
+
+import type { CreateExerciseDto, Exercise } from 'src/entities/exercise/model/types';
 
 interface ExerciseState {
   exercises: Exercise[];

@@ -1,10 +1,11 @@
 import type { MuscleGroup } from '@entities';
 import { Listbox } from '@headlessui/react';
 import { ChangeEvent, FC, FormEvent } from 'react';
-import type { ExerciseFormData } from 'src/pages/create-workout/ui/create-workout-page-logic-layer';
 
 import { muscleGroupLabels, muscleGroups } from '@entities';
 import { Button } from '@shared';
+
+import type { ExerciseFormData } from 'src/pages/create-workout/ui/create-workout-page-logic-layer';
 import classes from 'src/pages/create-workout/ui/create-workout-page.module.scss';
 
 type Props = {

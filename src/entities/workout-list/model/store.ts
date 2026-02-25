@@ -1,10 +1,11 @@
-import type { CreateWorkoutListDto, WorkoutList } from 'src/entities/workout-list/model/types';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 import { createSelectors } from '@shared';
+
 import { workoutListStorage } from 'src/entities/workout-list/api';
+import type { CreateWorkoutListDto, WorkoutList } from 'src/entities/workout-list/model/types';
 
 interface WorkoutListState {
   workoutLists: WorkoutList[];

@@ -1,8 +1,9 @@
-import type { Theme, ThemeState } from 'src/shared/theme/model/types';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import { createSelectors } from '@shared';
+
+import type { Theme, ThemeState } from 'src/shared/theme/model/types';
 
 const applyThemeToDocument = (theme: Theme): void => {
   document.documentElement.setAttribute('data-theme', theme);

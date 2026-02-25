@@ -1,6 +1,7 @@
 import { FC } from 'react';
 
 import { type MuscleGroup, useExerciseStore } from '@entities';
+
 import AddExerciseFormLogicLayer from 'src/features/add-exercise/ui/add-exercise-form-logic-layer';
 
 const AddExerciseFormDataLayer: FC = () => {

@@ -2,6 +2,7 @@ import type { MuscleGroup } from '@entities';
 import { ChangeEvent, FC, FormEvent } from 'react';
 
 import { Button } from '@shared';
+
 import classes from 'src/features/add-exercise/ui/add-exercise-form.module.scss';
 
 type Props = {

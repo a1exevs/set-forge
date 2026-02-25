@@ -13,6 +13,14 @@ const importOrderRule: Linter.RulesRecord = {
         ['internal', 'parent', 'sibling', 'index'],
       ],
       'newlines-between': 'always',
+      pathGroups: [
+        {
+          pattern: 'src/**',
+          group: 'internal',
+          position: 'after',
+        },
+      ],
+      pathGroupsExcludedImportTypes: ['builtin', 'external'],
     },
   ],
 };

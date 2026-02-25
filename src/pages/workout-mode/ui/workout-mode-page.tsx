@@ -5,6 +5,7 @@ import { FC } from 'react';
 
 import { muscleGroupLabels } from '@entities';
 import { Button } from '@shared';
+
 import classes from 'src/pages/workout-mode/ui/workout-mode-page.module.scss';
 
 type Props = {

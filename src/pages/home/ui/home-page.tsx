@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { FC, MouseEvent } from 'react';
 
 import { Button } from '@shared';
+
 import classes from 'src/pages/home/ui/home-page.module.scss';
 
 type Props = {
