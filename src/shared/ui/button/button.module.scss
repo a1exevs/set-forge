@@ -2,49 +2,59 @@
   padding: $spacing-sm $spacing-md;
   border: none;
   border-radius: $radius-md;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: $spacing-sm;
+  min-height: 44px;
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
   &.primary {
-    background-color: $primary-color;
-    color: white;
+    background-color: var(--color-primary);
+    color: var(--bg-primary);
 
     &:hover:not(:disabled) {
-      background-color: darken($primary-color, 10%);
+      opacity: 0.9;
+      box-shadow: var(--shadow-md);
     }
   }
 
   &.secondary {
-    background-color: $secondary-color;
-    color: white;
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
 
     &:hover:not(:disabled) {
-      background-color: darken($secondary-color, 15%);
+      background-color: var(--bg-hover);
+      border-color: var(--border-hover);
     }
   }
 
   &.danger {
-    background-color: $danger-color;
+    background-color: var(--color-danger);
     color: white;
 
     &:hover:not(:disabled) {
-      background-color: darken($danger-color, 10%);
+      opacity: 0.9;
+      box-shadow: var(--shadow-md);
     }
   }
 
   &.sm {
     padding: $spacing-xs $spacing-sm;
     font-size: $font-size-sm;
+    min-height: 36px;
   }
 
   &.md {
@@ -55,5 +65,6 @@
   &.lg {
     padding: $spacing-md $spacing-lg;
     font-size: $font-size-lg;
+    min-height: 52px;
   }
 }

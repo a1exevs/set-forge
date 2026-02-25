@@ -1,1 +1,1 @@
-export * from './add-exercise';
+export { AddExerciseForm } from 'src/features/add-exercise';

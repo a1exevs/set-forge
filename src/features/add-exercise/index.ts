@@ -1,1 +1,1 @@
-export { AddExerciseForm } from './ui';
+export { AddExerciseForm } from 'src/features/add-exercise/ui';

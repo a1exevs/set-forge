@@ -1,15 +1,18 @@
-import { FC } from 'react';
-import { AddExerciseForm } from '@features';
+import type { WorkoutList } from '@entities';
+import { Link } from '@tanstack/react-router';
+import { FC, MouseEvent } from 'react';
+
 import { Button } from '@shared';
-import type { Exercise } from '@entities';
-import classes from './home-page.module.scss';
+import classes from 'src/pages/home/ui/home-page.module.scss';
 
 type Props = {
-  exercises: Exercise[];
-  onRemoveExercise: (id: string) => void;
+  workoutLists: WorkoutList[];
+  storageWarning: boolean;
+  onDelete: (id: string, name: string) => void;
+  formatDate: (date: string | null) => string;
 };
 
-const HomePage: FC<Props> = ({ exercises, onRemoveExercise }) => {
+const HomePage: FC<Props> = ({ workoutLists, storageWarning, onDelete, formatDate }) => {
   return (
     <div className={classes.container}>
       <header className={classes.header}>
@@ -17,44 +20,57 @@ const HomePage: FC<Props> = ({ exercises, onRemoveExercise }) => {
         <p className={classes.subtitle}>Track your workout progress</p>
       </header>
 
-      <main className={classes.main}>
-        <section className={classes.section}>
-          <h2>Add Exercise</h2>
-          <AddExerciseForm />
-        </section>
+      {storageWarning && (
+        <div className={classes.warning}>
+          <span className={classes.warningIcon}>⚠️</span>
+          <p>Storage is over 80% full. Consider deleting old workout lists.</p>
+        </div>
+      )}
 
-        <section className={classes.section}>
-          <h2>Your Exercises ({exercises.length})</h2>
-          {exercises.length === 0 ? (
-            <p className={classes.empty}>No exercises yet. Add your first exercise above!</p>
-          ) : (
-            <div className={classes.exerciseList}>
-              {exercises.map((exercise: Exercise) => (
-                <div key={exercise.id} className={classes.exerciseCard}>
-                  <div className={classes.exerciseHeader}>
-                    <h3>{exercise.name}</h3>
-                    <span className={classes.badge}>{exercise.muscleGroup}</span>
+      <main className={classes.main}>
+        <Link to="/create" className={classes.addButton}>
+          <Button size="lg">
+            <span className={classes.addIcon}>+</span>
+            Create Workout List
+          </Button>
+        </Link>
+
+        {workoutLists.length === 0 ? (
+          <div className={classes.empty}>
+            <p>No workout lists yet</p>
+            <p className={classes.emptyHint}>Create your first list to start tracking progress</p>
+          </div>
+        ) : (
+          <div className={classes.listGrid}>
+            {workoutLists.map((list: WorkoutList) => (
+              <div key={list.id} className={classes.card}>
+                <Link to="/workout/$id" params={{ id: list.id }} className={classes.cardLink}>
+                  <div className={classes.cardHeader}>
+                    <h2>{list.name}</h2>
+                    <span className={classes.badge}>{list.exercises.length} ex.</span>
                   </div>
-                  {exercise.description && (
-                    <p className={classes.description}>{exercise.description}</p>
-                  )}
-                  <div className={classes.exerciseFooter}>
-                    <span className={classes.date}>
-                      Added: {new Date(exercise.createdAt).toLocaleDateString()}
-                    </span>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={(): void => onRemoveExercise(exercise.id)}
-                    >
-                      Remove
-                    </Button>
+                  {list.description && <p className={classes.description}>{list.description}</p>}
+                  <div className={classes.cardFooter}>
+                    <span className={classes.date}>Created: {formatDate(list.createdAt)}</span>
+                    {list.lastUsedAt && (
+                      <span className={classes.lastUsed}>Last used: {formatDate(list.lastUsedAt)}</span>
+                    )}
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+                </Link>
+                <button
+                  className={classes.deleteButton}
+                  onClick={(e: MouseEvent<HTMLButtonElement>): void => {
+                    e.preventDefault();
+                    onDelete(list.id, list.name);
+                  }}
+                  aria-label="Delete list"
+                >
+                  🗑️
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );

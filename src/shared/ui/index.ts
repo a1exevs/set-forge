@@ -1,1 +1,1 @@
-export * from './button';
+export { Button } from 'src/shared/ui/button';

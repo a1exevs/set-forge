@@ -1,4 +1,4 @@
-import type { Exercise, CreateExerciseDto } from 'src/entities/exercise/model/types';
+import type { CreateExerciseDto, Exercise } from 'src/entities/exercise/model/types';
 
 export const exerciseApi = {
   async getAll(): Promise<Exercise[]> {
@@ -13,7 +13,8 @@ export const exerciseApi = {
     };
   },
 
-  async delete(id: string): Promise<void> {
+  // TODO: todo Implement when backend is ready
+  async delete(_id: string): Promise<void> {
     return;
   },
 };

@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, FC, PropsWithChildren } from 'react';
-import classes from './button.module.scss';
+
+import classes from 'src/shared/ui/button/button.module.scss';
 
 type Props = PropsWithChildren<
   ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -8,21 +9,8 @@ type Props = PropsWithChildren<
   }
 >;
 
-const Button: FC<Props> = ({
-  children,
-  variant = 'primary',
-  size = 'md',
-  className = '',
-  ...props
-}) => {
-  const classNames: string = [
-    classes.button,
-    classes[variant],
-    classes[size],
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+const Button: FC<Props> = ({ children, variant = 'primary', size = 'md', className = '', ...props }) => {
+  const classNames: string = [classes.button, classes[variant], classes[size], className].filter(Boolean).join(' ');
 
   return (
     <button className={classNames} {...props}>
