@@ -35,6 +35,9 @@ Creates an optimized production build using `tsc && vite build`.
 ### `npm run preview`
 Serves the static files from the `dist` directory.
 
+### `npm run generate:routes`
+Generates the TanStack Router route tree file (`src/route-tree.gen.ts`) from the routes directory. Required before lint in CI since the generated file is not committed.
+
 ### `npm run check-deps`
 ### `npm run upgrade-deps`
 Checks/updates available dependencies to the latest version.
