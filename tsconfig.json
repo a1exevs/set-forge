@@ -28,6 +28,7 @@
 
     /* Path aliases */
     "baseUrl": ".",
+    "rootDir": ".",
     "paths": {
       "src/*": ["./src/*"],
       "@app": ["./src/app"],

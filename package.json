@@ -29,7 +29,7 @@
     "format": "prettier --write \"{src,.storybook,linter,tests,scripts}/**/*.{ts,tsx,css,scss}\"",
     "format:check": "prettier --check \"{src,.storybook,linter,tests,scripts}/**/*.{ts,tsx,css,scss}\"",
     "lint": "eslint --config eslint.config.ts \"{src,.storybook,linter,tests,scripts}/**/*.{ts,tsx}\"",
-    "lint:fix": "eslint \"{src,.storybook,linter,tests,scripts}/**/*.{ts,tsx}\" --fix",
+    "lint:fix": "eslint --config eslint.config.ts \"{src,.storybook,linter,tests,scripts}/**/*.{ts,tsx}\" --fix",
     "test:unit": "cross-env TS_NODE_PROJECT=tsconfig.jest.json jest --config tests/unit/config/config.ts",
     "test:unit-cov": "cross-env TS_NODE_PROJECT=tsconfig.jest.json jest --config tests/unit/config/config.ts --coverage",
     "test:snap": "cross-env TS_NODE_PROJECT=tsconfig.jest.json jest --config tests/snap/config/config.ts",
@@ -48,7 +48,7 @@
     "update-version:minor": "./scripts/update-version.sh minor",
     "update-version:patch": "./scripts/update-version.sh patch",
     "e2e:install": "playwright install --with-deps",
-    "prepare": "husky"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@alexevs/ts-guards": "1.0.9",
