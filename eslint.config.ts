@@ -12,6 +12,9 @@ import unusedVarsRule from './linter/rules/unused-vars-rule';
 import settings from './linter/settings';
 
 export default tsEslint.config(
+  {
+    ignores: ['src/route-tree.gen.ts'],
+  },
   eslintJs.configs.recommended,
   tsEslint.configs.recommended,
   tsEslint.configs.strict,
