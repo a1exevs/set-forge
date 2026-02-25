@@ -27,7 +27,7 @@ const preview: Preview = {
     options: {
       storySort: {
         method: 'alphabetical',
-        order: ['App', 'Pages', 'Common'],
+        order: ['App', 'Pages', 'Widgets', 'Features', 'Entities', 'Shared'],
         locales: '',
       },
     },
