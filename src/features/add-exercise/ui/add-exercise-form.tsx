@@ -1,7 +1,9 @@
-import { ChangeEvent, FC, FormEvent } from 'react';
-import { Button } from '@shared';
 import type { MuscleGroup } from '@entities';
-import classes from './add-exercise-form.module.scss';
+import { ChangeEvent, FC, FormEvent } from 'react';
+
+import { Button } from '@shared';
+
+import classes from 'src/features/add-exercise/ui/add-exercise-form.module.scss';
 
 type Props = {
   name: string;
@@ -14,15 +16,7 @@ type Props = {
   isDisabled: boolean;
 };
 
-const muscleGroups: MuscleGroup[] = [
-  'chest',
-  'back',
-  'legs',
-  'shoulders',
-  'arms',
-  'core',
-  'cardio',
-];
+const muscleGroups: MuscleGroup[] = ['chest', 'back', 'legs', 'shoulders', 'arms', 'core', 'cardio'];
 
 const AddExerciseForm: FC<Props> = ({
   name,

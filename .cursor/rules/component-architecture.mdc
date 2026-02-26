@@ -1,0 +1,32 @@
+---
+description: Component architecture - 3-layer pattern, arrow functions, absolute paths
+alwaysApply: true
+---
+
+# Component Architecture
+
+## Code Style
+
+- Arrow functions + `FC<Props>` + default export at end. Props/children: see component-typing.
+- TS imports: see fsd-architecture.
+- SCSS imports: see styling-guidelines
+
+## 3-Layer Pattern
+
+**Data** (`*-data-layer.tsx`): Stores only. `useStore.use.x()`. Pass to logic. No hooks.
+**Logic** (`*-logic-layer.tsx`): Hooks, handlers, state. No stores.
+**Presentation** (`*.tsx`): Props only. No hooks.
+
+```typescript
+// Data: useStore.use.addExercise(); return <LogicLayer onAdd={...} />;
+// Logic: useState, handleSubmit; return <Presentation {...} />;
+// Presentation: pure props, className={classes.form}
+```
+
+Export: `export { default as X } from 'src/.../x-data-layer'`. No Data → export logic-layer. No Logic → export presentation.
+
+**Skip layers:** No stores → skip Data. No state → skip Logic. Simple → Presentation only.
+
+## File Naming
+
+`component-name-data-layer.tsx`, `component-name-logic-layer.tsx`, `component-name.tsx`, `component-name.module.scss`. See file-naming for kebab-case.

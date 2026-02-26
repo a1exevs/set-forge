@@ -1,18 +1,18 @@
+import type { WorkoutList } from '@entities';
 import { FC } from 'react';
+
 import HomePage from 'src/pages/home/ui/home-page';
-import type { Exercise } from '@entities';
 
 type Props = {
-  exercises: Exercise[];
-  onRemoveExercise: (id: string) => void;
+  workoutLists: WorkoutList[];
+  storageWarning: boolean;
+  onDelete: (id: string, name: string) => void;
+  formatDate: (date: string | null) => string;
 };
 
-const HomePageLogicLayer: FC<Props> = ({ exercises, onRemoveExercise }) => {
+const HomePageLogicLayer: FC<Props> = ({ workoutLists, storageWarning, onDelete, formatDate }) => {
   return (
-    <HomePage 
-      exercises={exercises}
-      onRemoveExercise={onRemoveExercise}
-    />
+    <HomePage workoutLists={workoutLists} storageWarning={storageWarning} onDelete={onDelete} formatDate={formatDate} />
   );
 };
 

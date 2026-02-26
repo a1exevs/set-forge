@@ -1,8 +1,10 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+
 import { createSelectors } from '@shared';
-import type { Exercise, CreateExerciseDto } from 'src/entities/exercise/model/types';
+
+import type { CreateExerciseDto, Exercise } from 'src/entities/exercise/model/types';
 
 interface ExerciseState {
   exercises: Exercise[];
@@ -18,13 +20,13 @@ interface ExerciseState {
 
 const useExerciseStoreBase = create<ExerciseState>()(
   devtools(
-    immer((set) => ({
+    immer(set => ({
       exercises: [],
       isLoading: false,
       error: null,
 
-      addExercise: (dto) =>
-        set((state) => {
+      addExercise: dto =>
+        set(state => {
           const newExercise: Exercise = {
             id: crypto.randomUUID(),
             ...dto,
@@ -33,31 +35,31 @@ const useExerciseStoreBase = create<ExerciseState>()(
           state.exercises.push(newExercise);
         }),
 
-      removeExercise: (id) =>
-        set((state) => {
-          state.exercises = state.exercises.filter((ex) => ex.id !== id);
+      removeExercise: id =>
+        set(state => {
+          state.exercises = state.exercises.filter(ex => ex.id !== id);
         }),
 
       updateExercise: (id, updates) =>
-        set((state) => {
-          const exercise = state.exercises.find((ex) => ex.id === id);
+        set(state => {
+          const exercise = state.exercises.find(ex => ex.id === id);
           if (exercise) {
             Object.assign(exercise, updates);
           }
         }),
 
-      setExercises: (exercises) =>
-        set((state) => {
+      setExercises: exercises =>
+        set(state => {
           state.exercises = exercises;
         }),
 
-      setLoading: (isLoading) =>
-        set((state) => {
+      setLoading: isLoading =>
+        set(state => {
           state.isLoading = isLoading;
         }),
 
-      setError: (error) =>
-        set((state) => {
+      setError: error =>
+        set(state => {
           state.error = error;
         }),
     })),

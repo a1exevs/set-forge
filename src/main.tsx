@@ -1,7 +1,10 @@
+import { RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Providers } from '@app';
-import { HomePage } from '@pages';
+
+import { router } from '@app';
+
+import 'src/shared/ui/styles/global.scss';
 
 const rootElement = document.getElementById('root');
 
@@ -11,8 +14,6 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <Providers>
-      <HomePage />
-    </Providers>
+    <RouterProvider router={router} />
   </StrictMode>,
 );

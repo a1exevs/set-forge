@@ -1,0 +1,19 @@
+{
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "testing": true,
+      "develop": false,
+      "default": false,
+      "feature/*": false,
+      "common/*": false,
+      "improvement/*": false,
+      "bugfix/*": false,
+      "tests/*": false,
+      "refactoring/*": false,
+      "storybook/*": false,
+      "documentation/*": false,
+      "renovate/*": false
+    }
+  }
+}

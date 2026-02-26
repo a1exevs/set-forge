@@ -1,5 +1,6 @@
-import { FC, FormEvent, useState } from 'react';
 import type { MuscleGroup } from '@entities';
+import { FC, FormEvent, useState } from 'react';
+
 import AddExerciseForm from 'src/features/add-exercise/ui/add-exercise-form';
 
 type Props = {
@@ -13,13 +14,13 @@ const AddExerciseFormLogicLayer: FC<Props> = ({ onAdd }) => {
 
   const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
-    
+
     if (!name.trim()) {
       return;
     }
 
     onAdd(name, description, muscleGroup);
-    
+
     setName('');
     setDescription('');
     setMuscleGroup('chest');

@@ -1,0 +1,61 @@
+---
+description: State management with Zustand
+alwaysApply: true
+---
+
+# State Management (Zustand)
+
+## Store Pattern
+
+All stores: `devtools(immer(...))` + `createSelectors`. Middleware order: `devtools` wraps `immer`.
+
+```typescript
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+import { createSelectors } from '@shared';
+
+interface StoreState {
+  data: Data[];
+  addItem: (item: Data) => void;
+}
+
+const useStoreBase = create<StoreState>()(
+  devtools(immer((set) => ({
+    data: [],
+    addItem: (item) => set((state) => { state.data.push(item); }),
+  })), { name: 'StoreName' })
+);
+
+export const useStore = createSelectors(useStoreBase);
+```
+
+## Rules
+
+- **Auto-selectors:** `useStore.use.data()` — not `useStore(s => s.data)`
+- **Immer:** Mutate directly `state.x = y`, avoid spread `[...state.items, item]`
+- **Location:** `entities/X/model/store.ts`, `features/X/model/store.ts`, `shared/X/model/store.ts` (app-level). Pages/widgets rarely need stores.
+- **Usage:** Store only in Data Layer; Logic/Presentation never import stores
+- **DevTools:** Always `{ name: 'StoreName' }`
+- **Type safety:** See typescript-guidelines.
+
+## Async Actions
+
+```typescript
+fetchData: async () => {
+  set((s) => { s.isLoading = true; s.error = null; });
+  try {
+    const data = await api.fetchData();
+    set((s) => { s.data = data; s.isLoading = false; });
+  } catch (e) {
+    set((s) => { s.error = e.message; s.isLoading = false; });
+  }
+}
+```
+
+## Single Source of Truth
+
+- One store per entity/feature
+- No duplicated state across stores
+- Derive computed values, don't store them
+- Keep stores focused

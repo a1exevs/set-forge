@@ -1,521 +1,154 @@
 # Set Forge - Workout Tracker
 
+// TODO logo
+
 ![React](https://img.shields.io/badge/React-18.3-61dafb?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6.0-646cff?logo=vite&logoColor=white)
 ![Zustand](https://img.shields.io/badge/Zustand-5.0-443e38)
+![TanStack Router](https://img.shields.io/badge/TanStack%20Router-1.160-FF4154)
 ![FSD](https://img.shields.io/badge/Architecture-FSD-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-A modern workout tracking application built with React, TypeScript, and Feature-Sliced Design architecture.
+# Description
+A workout planning and strength tracking app that lets you build exercise lists, log sets and weights, rate perceived effort, and visualize progress over time.
 
-## 🚀 Technology Stack
+## NPM version
+v10.9.3
 
-### Core
-- **React** 18.3+ - UI library
-- **TypeScript** 5.7+ - Static typing with strict mode
-- **Vite** 6.0+ - Build tool and dev server
-- **Zustand** 5.0+ - State management with immer and devtools
-- **SCSS Modules** - Scoped styling
+## Node version
+v20.9.0. Use NVM:
+1. nvm current - check current version of Node
+2. nvm list - show list of available Node versions
+3. nvm install <version> - to install and use Node version.
+4. nvm use <version> - set version of Node as current version
 
-### UI & Visualization
-- **Headless UI** 2.2+ - Accessible UI components (wrapped for replaceability)
-- **Recharts** 2.15+ - Charts for workout progress visualization
+## Available Scripts
+In the project directory, you can run:
 
-### Development
-- **ESLint** - Code linting
-- **TypeScript ESLint** - TypeScript-specific linting rules
+### `npm run dev`
+Starts the application in development mode using `vite`.
 
-## 📋 Requirements
+### `npm run build`
+Creates an optimized production build using `tsc && vite build`.
 
-- **Node.js**: 22.20.0
-- **npm**: 10.9.3
+### `npm run preview`
+Serves the static files from the `dist` directory.
 
-## 🏗️ Architecture
+### `npm run check-deps`
+### `npm run upgrade-deps`
+Checks/updates available dependencies to the latest version.
 
-This project follows **Feature-Sliced Design (FSD)** methodology, organizing code by business logic and responsibility layers.
+### `npm run format`
+Formats code using Prettier for TypeScript, TSX, and CSS, SCSS files.
 
-### FSD Layers
+### `npm run format:check`
+Checks code format using Prettier for TypeScript, TSX, and CSS, SCSS files.
 
-```
-src/
-├── app/              # Application initialization, providers, global styles
-├── pages/            # Page-level components (routing)
-├── widgets/          # Composite UI blocks
-├── features/         # User scenarios and business features
-├── entities/         # Business entities and domain models
-└── shared/           # Reusable code, UI kit, utilities
-```
+### `npm run lint`
+Runs ESLint for static code analysis on TypeScript and TSX files.
 
-### Layer Hierarchy
+### `npm run lint:fix`
+Fixes errors found by ESLint in TypeScript and TSX files.
 
-Layers can only import from layers below them:
-```
-app → pages → widgets → features → entities → shared
-```
+### `npm test:unit`
+Runs unit tests using the Jest configuration.
 
-### Segments
+### `npm test:unit-cov`
+Runs unit tests with coverage calculation option.
 
-Each layer (except `shared`) contains **slices** (feature/entity names), which contain **segments**:
+### `npm test:snap`
+Runs snapshot tests using the Jest configuration.
 
-- `ui/` - UI components
-- `model/` - Business logic, types, stores
-- `api/` - API interactions
+### `npm test:snap-cov`
+Runs snapshot tests with coverage calculation option.
 
-### Import Rules
+### `npm test:snap-update`
+Updates snap-data of snapshot tests.
 
-**✅ Cross-layer imports (single-word aliases only):**
-```typescript
-import { Button, createSelectors } from '@shared';
-import { Exercise, useExerciseStore } from '@entities';
-import { AddExerciseForm } from '@features';
-```
+### `npm test:e2e`
+Executes e2e tests (Playwright)
 
-**❌ Nested path imports (forbidden):**
-```typescript
-// WRONG - don't do this
-import { Button } from '@shared/ui';
-import { useExerciseStore } from '@entities/exercise';
-```
+### `npm test`
+Sequentially executes unit tests, snapshot tests, integration tests, e2e tests.
 
-**✅ Intra-layer imports (full absolute paths):**
-```typescript
-import { AddExerciseFormLogicLayer } from 'src/features/add-exercise/ui/add-exercise-form-logic-layer';
-```
+### `npm storybook`
+Runs Storybook in development mode on port 6006.
 
-### Public API Exports
+### `npm build-storybook`
+Builds a static version of Storybook for deployment.
 
-Each layer has a root `index.ts` that re-exports all public APIs:
+### `npm chromatic`
+Runs Chromatic to check for visual changes in components and exits with a code 0 even if changes are detected.
 
-```typescript
-// src/shared/index.ts
-export * from './ui';
-export * from './api';
-export * from './lib';
+### `npm docs`
+Generates comprehensive documentation using TypeDoc.
 
-// src/entities/index.ts
-export * from './exercise';
-// ... other entities
-```
+### `npm version:major`
+Increments the major version in `package.json` and `src/app/manifest.json`.  
+For example, changes `"version": "1.2.3"` to `"version": "2.0.0"`.
 
-## 🎨 Code Style
+### `npm version:minor`
+Increments the minor version in `package.json` and `src/app/manifest.json`.  
+For example, changes `"version": "1.2.3"` to `"version": "1.3.0"`.
 
-### Arrow Functions Only with FC Type
+### `npm version:patch`
+Increments the patch version in `package.json` and `src/app/manifest.json`.  
+For example, changes `"version": "1.2.3"` to `"version": "1.2.4"`.
 
-All components MUST use arrow functions with `FC` type annotation and default export at the end:
+### `npm update-version:major`
+Automates the process of merging branches, increasing the major-version in the package.json file and manifest file, and committing the changes to the designated branch. This ensures the version is updated consistently and the changes are easily trackable in the repository.
 
-```typescript
-// ✅ CORRECT
-import { FC } from 'react';
+### `npm update-version:minor`
+Automates the process of merging branches, increasing the minor-version in the package.json file and manifest file, and committing the changes to the designated branch. This ensures the version is updated consistently and the changes are easily trackable in the repository.
 
-const ComponentName: FC = () => {
-  return <div>Content</div>;
-};
+### `npm update-version:patch`
+Automates the process of merging branches, increasing the patch-version in the package.json file and manifest file, and committing the changes to the designated branch. This ensures the version is updated consistently and the changes are easily trackable in the repository.
 
-export default ComponentName;
+### `npm e2e:install`
+Installs Playwright deps.
 
-// ❌ WRONG - don't use function declarations
-export default function ComponentName() {
-  return <div>Content</div>;
-}
+### `npm run prepare`
+Automatically runs after dependencies installation to set up git hooks through husky.
 
-// ❌ WRONG - missing FC type annotation
-const ComponentName = () => {
-  return <div>Content</div>;
-};
-```
-
-### Absolute Paths for Intra-Layer Imports
-
-Within the same layer, use absolute paths starting with `src/`:
-
-```typescript
-// ✅ CORRECT - TypeScript imports use absolute paths
-import Component from 'src/features/feature-name/ui/component';
-
-// ❌ WRONG - no relative imports for TypeScript
-import Component from './component';
-```
-
-Cross-layer imports continue to use aliases:
-```typescript
-import { Button } from '@shared';
-import { Exercise } from '@entities';
-```
-
-### SCSS Imports (Exception)
-
-SCSS module imports are the **only exception** to the absolute path rule:
-
-```typescript
-// ✅ CORRECT - TypeScript imports use absolute paths
-import Component from 'src/features/feature-name/ui/component';
-
-// ✅ CORRECT - SCSS imports use relative paths, import as 'classes'
-import classes from './component.module.scss';
-
-// ❌ WRONG - SCSS cannot use absolute paths
-import classes from 'src/features/feature-name/ui/component.module.scss';
-```
-
-**SCSS File Location:**
-- Always place `.module.scss` file in the **same directory** as the component
-- Naming convention: `component-name.module.scss`
-
-**Reasoning:**
-- Vite/Rollup build tools require relative paths for CSS/SCSS modules
-- This is a technical limitation, not a style preference
-
-### Props Type Definition
-
-**Use `type` for props, NOT `interface`, and always use `FC<Props>`:**
-
-```typescript
-// ✅ CORRECT
-import { FC } from 'react';
-
-type Props = {
-  name: string;
-  onClick: () => void;
-};
-
-const Component: FC<Props> = ({ name, onClick }) => {
-  return <div onClick={onClick}>{name}</div>;
-};
-
-export default Component;
-
-// ❌ WRONG - using interface for props
-interface ComponentProps {
-  name: string;
-}
-```
-
-**For components with children, use `PropsWithChildren` and `FC`:**
-
-```typescript
-import { FC, PropsWithChildren } from 'react';
-
-// Just children
-const Wrapper: FC<PropsWithChildren> = ({ children }) => {
-  return <div>{children}</div>;
-};
-
-// Children + other props
-type Props = PropsWithChildren<{
-  title: string;
-}>;
-
-const Modal: FC<Props> = ({ children, title }) => {
-  return <div>{title}{children}</div>;
-};
-```
-
-**Interfaces are ONLY for business entities:**
-
-```typescript
-interface Exercise {
-  id: string;
-  name: string;
-  createdAt: Date;
-}
-```
-
-## 🧩 Component Architecture
-
-Components follow a **3-layer pattern** for separation of concerns:
-
-### Component Typing Requirements
-
-**ALL components MUST:**
-1. Use `FC<Props>` type annotation from React
-2. Have explicit return types for all functions and callbacks (including `void`)
-3. Have explicit types for all inline callbacks in JSX
-
-### 1. Data Layer (`*-data-layer.tsx`)
-Connects to stores, fetches data, manages subscriptions.
-
-```typescript
-// add-exercise-form-data-layer.tsx
-import { FC } from 'react';
-import { useExerciseStore } from '@entities';
-import AddExerciseFormLogicLayer from 'src/features/add-exercise/ui/add-exercise-form-logic-layer';
-
-const AddExerciseFormDataLayer: FC = () => {
-  const addExercise = useExerciseStore.use.addExercise();
-  
-  return <AddExerciseFormLogicLayer onAdd={addExercise} />;
-};
-
-export default AddExerciseFormDataLayer;
-```
-
-### 2. Logic Layer (`*-logic-layer.tsx`)
-Handles hooks, state, event handlers, business logic.
-
-```typescript
-// add-exercise-form-logic-layer.tsx
-import { FC, FormEvent, useState } from 'react';
-import AddExerciseForm from 'src/features/add-exercise/ui/add-exercise-form';
-
-type Props = {
-  onAdd: (name: string) => void;
-};
-
-const AddExerciseFormLogicLayer: FC<Props> = ({ onAdd }) => {
-  const [name, setName] = useState<string>('');
-  
-  const handleSubmit = (e: FormEvent): void => {
-    e.preventDefault();
-    onAdd(name);
-    setName('');
-  };
-  
-  return <AddExerciseForm name={name} onSubmit={handleSubmit} />;
-};
-
-export default AddExerciseFormLogicLayer;
-```
-
-### 3. Presentation Layer (`*.tsx`)
-Pure presentational component, receives props, renders UI.
-
-```typescript
-// add-exercise-form.tsx
-import { ChangeEvent, FC, FormEvent } from 'react';
-import { Button } from '@shared';
-import classes from './add-exercise-form.module.scss';
-
-type Props = {
-  name: string;
-  onSubmit: (e: FormEvent) => void;
-};
-
-const AddExerciseForm: FC<Props> = ({ name, onSubmit }) => {
-  return (
-    <form className={classes.form} onSubmit={onSubmit}>
-      <input 
-        value={name}
-        onChange={(e: ChangeEvent<HTMLInputElement>): void => console.log(e.target.value)}
-      />
-      <Button type="submit">Submit</Button>
-    </form>
-  );
-};
-
-export default AddExerciseForm;
-```
-
-**Notes:**
-- Components use **arrow functions** with **`FC<Props>` type** and **default exports at the end**
-- **ALL functions must have explicit return types** (including `void`)
-- **Inline callbacks in JSX must have explicit parameter and return types**
-- Use **absolute paths** for intra-layer imports (e.g., `src/features/...`)
-- Use **path aliases** for cross-layer imports (e.g., `@shared`, `@entities`)
-- Props use **`type`**, not `interface` (interfaces only for business entities)
-- Local props named simply `Props`
-- The data layer is re-exported as the main component name
-- Not all layers are required (e.g., data layer can be skipped if no store access needed)
-
-## 🗄️ State Management (Zustand)
-
-All stores follow a consistent pattern with middleware:
-
-### Store Creation
-
-```typescript
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
-import { createSelectors } from '@shared';
-
-interface State {
-  items: Item[];
-  addItem: (item: Item) => void;
-}
-
-const useStoreBase = create<State>()(
-  devtools(
-    immer((set) => ({
-      items: [],
-      addItem: (item) => set((state) => {
-        state.items.push(item); // mutate with immer
-      }),
-    })),
-    { name: 'StoreName' }
-  )
-);
-
-export const useStore = createSelectors(useStoreBase);
-```
-
-### Auto-Selectors Usage
-
-The `createSelectors` utility generates type-safe selectors:
-
-```typescript
-// ❌ Without auto-selectors
-const items = useStore((state) => state.items);
-const addItem = useStore((state) => state.addItem);
-
-// ✅ With auto-selectors
-const items = useStore.use.items();
-const addItem = useStore.use.addItem();
-```
-
-### Middleware Benefits
-
-- **immer**: Simplifies immutable updates with mutable-style code
-- **devtools**: Redux DevTools integration for debugging
-- **createSelectors**: Auto-generated type-safe selectors
-
-## 📦 Project Structure Example
-
-```
-src/
-├── app/
-│   ├── index.tsx              # App root exports
-│   ├── providers/
-│   │   └── index.tsx          # App providers
-│   └── styles/
-│       ├── global.scss        # Global styles
-│       └── variables.scss     # SCSS variables
-│
-├── pages/
-│   ├── index.ts               # Layer root
-│   └── home/
-│       ├── index.ts           # Slice exports
-│       └── ui/
-│           └── home-page.tsx  # Page component
-│
-├── widgets/
-│   └── index.ts               # Layer root
-│
-├── features/
-│   ├── index.ts               # Layer root
-│   └── add-exercise/
-│       ├── index.ts           # Slice exports
-│       └── ui/
-│           ├── index.ts       # Segment exports
-│           ├── add-exercise-form-data-layer.tsx
-│           ├── add-exercise-form-logic-layer.tsx
-│           └── add-exercise-form.tsx
-│
-├── entities/
-│   ├── index.ts               # Layer root
-│   └── exercise/
-│       ├── index.ts           # Slice exports
-│       ├── model/
-│       │   ├── index.ts       # Segment exports
-│       │   ├── types.ts       # TypeScript types
-│       │   └── store.ts       # Zustand store
-│       └── api/
-│           └── index.ts       # API functions
-│
-└── shared/
-    ├── index.ts               # Layer root
-    ├── ui/
-    │   ├── index.ts           # Segment exports
-    │   └── button/
-    │       ├── index.ts
-    │       ├── button.tsx
-    │       └── button.module.scss
-    ├── api/
-    │   └── index.ts
-    └── lib/
-        ├── index.ts
-        └── create-selectors.ts
-```
-
-## 🎨 Styling
-
-- **SCSS Modules** for component-scoped styles
-- Global variables in `src/app/styles/variables.scss`
-- Global styles in `src/app/styles/global.scss`
-
-## 🚦 Getting Started
-
-### Installation
-
-```bash
-npm install
-```
-
-### Development
-
-```bash
-npm run dev
-```
-
-The app will be available at `http://localhost:5173`
-
-### Build
-
-```bash
-npm run build
-```
-
-### Preview Production Build
-
-```bash
-npm run preview
-```
-
-### Lint
-
-```bash
-npm run lint
-```
-
-## 📐 TypeScript Configuration
-
-TypeScript is configured with **strict mode** enabled:
-
-- `strict: true`
-- `noImplicitAny: true`
-- `strictNullChecks: true`
-- `noUnusedLocals: true`
-- `noUnusedParameters: true`
-- `noImplicitReturns: true`
-- `noFallthroughCasesInSwitch: true`
-
-**No `any` types allowed** - all code must be properly typed.
-
-## 🔧 Path Aliases
-
-Configured in `tsconfig.json` and `vite.config.ts`:
-
-- `@app` → `src/app`
-- `@pages` → `src/pages`
-- `@widgets` → `src/widgets`
-- `@features` → `src/features`
-- `@entities` → `src/entities`
-- `@shared` → `src/shared`
-
-## 📊 Charting
-
-**Recharts** is used for workout progress visualization:
-- Time-series charts for tracking progress
-- Fully typed with TypeScript
-- Responsive and customizable
-
-## 🔄 Future Enhancements
-
-- React Router for multi-page navigation
-- Workout session tracking
-- Progress charts and analytics
-- Data persistence (localStorage/API)
-- Authentication
-- Dark mode
-
-## 📝 License
-
-MIT - See LICENSE file for details
-
-## 👤 Author
-
-Alexander Evstafiadi
-
----
-
-Built with ❤️ using Feature-Sliced Design
+## Features
+- Create workout lists with multiple exercises
+- Track progress in interactive workout mode
+- Real-time progress bars with gradient fills
+- Double tap to mark sets complete
+- Data persistence in localStorage with 80% warning
+- Dark theme by default (light theme ready)
+- Mobile-first responsive design
+- Touch-friendly UI (min 44px tap targets)
+
+## Release steps
+1) run npm run update-version:patch (or :minor, :major)
+2) create PR with message "[Common] Version increase vX.X.X" from "common/version-increase" into "develop"
+3) create PR with message "[Testing] Release vX.X.X" from "develop" into "testing"
+4) go to [Vercel project](https://vercel.com/a1exevs-projects/set-forge/deployments),
+   wait for the test server update to complete and make sure everything is working
+5) create PR with message "Release vX.X.X" from "testing" into "main"
+6) go to [Vercel project](https://vercel.com/a1exevs-projects/set-forge/deployments),
+   wait for the production server update to complete, go to the [production site](TODO) and make sure everything is working
+7) go to [Github Repo Home page](https://github.com/a1exevs/set-forge) -> Tags -> Releases -> Draft a new release.
+
+   a) create a new tag via "Choose a tag" autocomplete
+
+   b) select "develop" branch as a target
+
+   c) click the "Generate release notes" button, remove unnecessary notes if necessary, check PR messages and correct the messages if necessary (via PR editing)
+
+   d) select "main" branch as a target
+
+   e) click the "Publish release"
+8) checkout "testing" and pull, then merge "main" into "testing" and push
+9) checkout "develop" and pull, then merge "testing" into "develop" and push
+10) update RELEASE-NOTES.md with using generated notes in step 7, create PR with from "common/release-notes-update-vX.X.X" to "develop" message "[Common] RELEASE-NOTES.md update vX.X.X"
+
+## Repository
+Link to repository https://github.com/a1exevs/set-forge.
+
+Link to project https://github.com/users/a1exevs/projects/9
+
+## Useful links
+Nu Html Checker - https://validator.w3.org/nu/
