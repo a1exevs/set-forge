@@ -38,3 +38,11 @@ build
 # Test coverage
 coverage
 *.coveragerc
+
+# TanStack Router cache
+.tanstack/
+
+test-results
+playwright-report
+docs
+storybook-static

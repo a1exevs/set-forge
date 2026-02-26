@@ -1,0 +1,153 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`App Page with route / matches snapshot, route / 1`] = `
+<div>
+  <div
+    class="container"
+  >
+    <header
+      class="header"
+    >
+      <h1>
+        Set Forge
+      </h1>
+      <p
+        class="subtitle"
+      >
+        Track your workout progress
+      </p>
+    </header>
+    <main
+      class="main"
+    >
+      <a
+        class="addButton"
+        href="/create"
+      >
+        <button
+          class="button primary lg"
+        >
+          <span
+            class="addIcon"
+          >
+            +
+          </span>
+          Create Workout List
+        </button>
+      </a>
+      <div
+        class="empty"
+      >
+        <p>
+          No workout lists yet
+        </p>
+        <p
+          class="emptyHint"
+        >
+          Create your first list to start tracking progress
+        </p>
+      </div>
+    </main>
+  </div>
+</div>
+`;
+
+exports[`App Page with route / matches snapshot, route /create 1`] = `
+<div>
+  <div
+    class="container"
+  >
+    <header
+      class="header"
+    >
+      <h1>
+        New Workout List
+      </h1>
+    </header>
+    <main
+      class="main"
+    >
+      <form
+        class="form"
+      >
+        <div
+          class="section"
+        >
+          <div
+            class="field"
+          >
+            <label
+              class="label"
+              for="name"
+            >
+              List Name *
+            </label>
+            <input
+              class="input"
+              id="name"
+              placeholder="e.g., Push Day"
+              required=""
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            class="field"
+          >
+            <label
+              class="label"
+              for="description"
+            >
+              Description
+            </label>
+            <textarea
+              class="textarea"
+              id="description"
+              placeholder="Chest, shoulders, triceps"
+              rows="2"
+            />
+          </div>
+        </div>
+        <div
+          class="section"
+        >
+          <div
+            class="sectionHeader"
+          >
+            <h2>
+              Exercises
+            </h2>
+            <button
+              class="button primary sm"
+              type="button"
+            >
+              + Add Exercise
+            </button>
+          </div>
+          <p
+            class="emptyExercises"
+          >
+            Add exercises to your list
+          </p>
+        </div>
+        <div
+          class="actions"
+        >
+          <button
+            class="button secondary md"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="button primary md"
+            type="submit"
+          >
+            Create List
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+`;
