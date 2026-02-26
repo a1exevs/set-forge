@@ -2,8 +2,9 @@ import { RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { router } from '@app/router';
-import 'src/app/styles/global.scss';
+import { router } from '@app';
+
+import 'src/shared/ui/styles/global.scss';
 
 const rootElement = document.getElementById('root');
 

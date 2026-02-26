@@ -1,12 +1,12 @@
 .container {
   min-height: 100vh;
-  background-color: var(--bg-primary);
+  background-color: $bg-primary;
 }
 
 .header {
-  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+  background: linear-gradient(135deg, $bg-secondary, $bg-tertiary);
   padding: $spacing-lg $spacing-md $spacing-xl;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid $border-color;
 }
 
 .headerTop {
@@ -17,7 +17,7 @@
 }
 
 .backButton {
-  color: var(--color-primary);
+  color: $primary-color;
   font-size: $font-size-base;
   font-weight: 600;
   text-decoration: none;
@@ -29,37 +29,37 @@
   align-items: center;
 
   &:hover {
-    background-color: var(--bg-hover);
+    background-color: $bg-hover;
   }
 }
 
 .resetButton {
   background: transparent;
-  border: 1px solid var(--border-color);
+  border: 1px solid $border-color;
   border-radius: $radius-md;
   padding: $spacing-sm $spacing-md;
-  color: var(--text-secondary);
+  color: $text-secondary;
   font-size: $font-size-sm;
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 44px;
 
   &:hover {
-    background-color: var(--bg-hover);
-    border-color: var(--border-hover);
+    background-color: $bg-hover;
+    border-color: $border-hover;
   }
 }
 
 .header h1 {
   font-size: $font-size-2xl;
-  color: var(--text-primary);
+  color: $text-primary;
   margin-bottom: $spacing-xs;
   text-align: center;
 }
 
 .description {
   text-align: center;
-  color: var(--text-secondary);
+  color: $text-secondary;
   font-size: $font-size-sm;
   margin-bottom: $spacing-lg;
 }
@@ -73,21 +73,21 @@
   display: flex;
   justify-content: space-between;
   font-size: $font-size-sm;
-  color: var(--text-secondary);
+  color: $text-secondary;
   margin-bottom: $spacing-xs;
   font-weight: 600;
 }
 
 .progressBarWrapper {
   height: 8px;
-  background-color: var(--progress-bg);
+  background-color: $progress-bg;
   border-radius: $radius-lg;
   overflow: hidden;
 }
 
 .progressBarFill {
   height: 100%;
-  background: linear-gradient(90deg, var(--progress-fill-start), var(--progress-fill-end));
+  background: linear-gradient(90deg, $progress-fill-start, $progress-fill-end);
   border-radius: $radius-lg;
   transition: width 0.3s ease;
 }
@@ -105,8 +105,8 @@
 }
 
 .exerciseCard {
-  background-color: var(--bg-elevated);
-  border: 2px solid var(--border-color);
+  background-color: $bg-elevated;
+  border: 2px solid $border-color;
   border-radius: $radius-lg;
   padding: $spacing-lg;
   cursor: pointer;
@@ -115,12 +115,12 @@
 
   &:active {
     transform: scale(0.98);
-    border-color: var(--color-primary);
+    border-color: $primary-color;
   }
 
   &.completed {
-    border-color: var(--color-success);
-    background: linear-gradient(135deg, var(--bg-elevated), rgba(52, 211, 153, 0.05));
+    border-color: $success-color;
+    background: linear-gradient(135deg, $bg-elevated, rgba(52, 211, 153, 0.05));
   }
 }
 
@@ -137,7 +137,7 @@
 
   h3 {
     font-size: $font-size-lg;
-    color: var(--text-primary);
+    color: $text-primary;
     margin-bottom: $spacing-xs;
   }
 }
@@ -145,7 +145,7 @@
 .muscleBadge {
   display: inline-block;
   background-color: rgba(96, 165, 250, 0.15);
-  color: var(--color-primary);
+  color: $primary-color;
   padding: $spacing-xs $spacing-sm;
   border-radius: $radius-md;
   font-size: $font-size-xs;
@@ -154,7 +154,7 @@
 
 .checkmark {
   font-size: $font-size-2xl;
-  color: var(--color-success);
+  color: $success-color;
   font-weight: bold;
 }
 
@@ -201,7 +201,7 @@
 .detailLabel {
   display: block;
   font-size: $font-size-xs;
-  color: var(--text-tertiary);
+  color: $text-tertiary;
   margin-bottom: $spacing-xs;
 }
 
@@ -209,12 +209,12 @@
   display: block;
   font-size: $font-size-lg;
   font-weight: 600;
-  color: var(--text-primary);
+  color: $text-primary;
 }
 
 .progressBarContainer {
   height: 12px;
-  background-color: var(--progress-bg);
+  background-color: $progress-bg;
   border-radius: $radius-lg;
   overflow: hidden;
   margin-bottom: $spacing-sm;
@@ -222,19 +222,19 @@
 
 .progressBar {
   height: 100%;
-  background: linear-gradient(90deg, var(--progress-fill-start), var(--progress-fill-end));
+  background: linear-gradient(90deg, $progress-fill-start, $progress-fill-end);
   border-radius: $radius-lg;
   transition: width 0.3s ease;
 
   &.progressCompleted {
-    background: var(--color-success);
+    background: $success-color;
   }
 }
 
 .hint {
   text-align: center;
   font-size: $font-size-xs;
-  color: var(--text-tertiary);
+  color: $text-tertiary;
   margin: 0;
 }
 
@@ -248,7 +248,7 @@
   text-align: center;
 
   h2 {
-    color: var(--text-primary);
+    color: $text-primary;
     margin-bottom: $spacing-lg;
   }
 }
@@ -265,9 +265,9 @@
 
   .exerciseCard {
     &:hover {
-      border-color: var(--color-primary);
+      border-color: $primary-color;
       transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+      box-shadow: $shadow-md;
     }
   }
 }

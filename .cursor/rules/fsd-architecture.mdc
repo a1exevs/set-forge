@@ -81,6 +81,12 @@ export type { Exercise, MuscleGroup, CreateExerciseDto } from 'src/entities/exer
 
 ```
 src/
+├── app/
+│    ├── index.ts
+│    └── model/
+│        ├── router
+│        ├── routes
+│        └── index.ts
 ├── entities/
 │   ├── index.ts
 │   └── exercise/
@@ -104,11 +110,12 @@ src/
     ├── index.ts
     ├── ui/
     │   ├── index.ts
-    │   └── button/
-    │       ├── index.ts
+    │   └── button
     │       ├── button.tsx
     │       └── button.module.scss
-    └── lib/
+    └── model/
         ├── index.ts
-        └── create-selectors.ts
+        └── helpers
+            ├── stores.ts
+            └── dates.ts
 ```

@@ -9,7 +9,7 @@ type Props = PropsWithChildren<
   }
 >;
 
-const Button: FC<Props> = ({ children, variant = 'primary', size = 'md', className = '', ...props }) => {
+const Button: FC<Props> = ({ children, variant = 'primary', size = 'md', className = undefined, ...props }) => {
   const classNames: string = [classes.button, classes[variant], classes[size], className].filter(Boolean).join(' ');
 
   return (

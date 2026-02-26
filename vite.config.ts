@@ -11,7 +11,7 @@ export default defineConfig({
   },
   plugins: [
     TanStackRouterVite({
-      routesDirectory: './src/app/routes',
+      routesDirectory: './src/app/model/routes',
       generatedRouteTree: './src/route-tree.gen.ts',
     }),
     react(),
@@ -30,7 +30,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@use "${path.resolve(__dirname, './src/app/styles/variables.scss').replace(/\\/g, '/')}" as *;`,
+        additionalData: `@use "${path.resolve(__dirname, './src/shared/ui/styles/variables.scss').replace(/\\/g, '/')}" as *;`,
       },
     },
   },

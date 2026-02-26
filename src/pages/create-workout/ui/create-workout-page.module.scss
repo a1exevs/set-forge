@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  background-color: var(--bg-primary);
+  background-color: $bg-primary;
   padding: $spacing-md;
   padding-bottom: $spacing-2xl;
 }
@@ -11,7 +11,7 @@
 
   h1 {
     font-size: $font-size-2xl;
-    color: var(--text-primary);
+    color: $text-primary;
   }
 }
 
@@ -27,8 +27,8 @@
 }
 
 .section {
-  background-color: var(--bg-elevated);
-  border: 1px solid var(--border-color);
+  background-color: $bg-elevated;
+  border: 1px solid $border-color;
   border-radius: $radius-lg;
   padding: $spacing-lg;
 }
@@ -41,7 +41,7 @@
 
   h2 {
     font-size: $font-size-xl;
-    color: var(--text-primary);
+    color: $text-primary;
   }
 }
 
@@ -57,7 +57,7 @@
   display: block;
   font-size: $font-size-sm;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: $text-secondary;
   margin-bottom: $spacing-xs;
 }
 
@@ -66,21 +66,21 @@
 .inputSmall {
   width: 100%;
   padding: $spacing-sm $spacing-md;
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
+  background-color: $bg-tertiary;
+  border: 1px solid $border-color;
   border-radius: $radius-md;
-  color: var(--text-primary);
+  color: $text-primary;
   font-size: 16px; // Prevent iOS zoom
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: var(--color-primary);
+    border-color: $primary-color;
     box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
   }
 
   &::placeholder {
-    color: var(--text-tertiary);
+    color: $text-tertiary;
   }
 }
 
@@ -96,7 +96,7 @@
 
 .emptyExercises {
   text-align: center;
-  color: var(--text-tertiary);
+  color: $text-tertiary;
   font-size: $font-size-sm;
   padding: $spacing-xl 0;
 }
@@ -108,8 +108,8 @@
 }
 
 .exerciseCard {
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
+  background-color: $bg-tertiary;
+  border: 1px solid $border-color;
   border-radius: $radius-md;
   padding: $spacing-md;
   position: relative;
@@ -125,8 +125,8 @@
 .exerciseNumber {
   font-size: $font-size-sm;
   font-weight: 600;
-  color: var(--color-primary);
-  background-color: var(--bg-primary);
+  color: $primary-color;
+  background-color: $bg-primary;
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -137,12 +137,12 @@
 
 .removeButton {
   background: transparent;
-  border: 1px solid var(--border-color);
+  border: 1px solid $border-color;
   border-radius: $radius-md;
   padding: $spacing-xs $spacing-sm;
   cursor: pointer;
   font-size: $font-size-lg;
-  color: var(--text-tertiary);
+  color: $text-tertiary;
   transition: all 0.2s ease;
   min-width: 44px;
   min-height: 44px;
@@ -151,8 +151,8 @@
   justify-content: center;
 
   &:hover {
-    background: var(--color-danger);
-    border-color: var(--color-danger);
+    background: $danger-color;
+    border-color: $danger-color;
     color: white;
   }
 }
@@ -171,10 +171,10 @@
 .listboxButton {
   width: 100%;
   padding: $spacing-sm $spacing-md;
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
+  background-color: $bg-tertiary;
+  border: 1px solid $border-color;
   border-radius: $radius-md;
-  color: var(--text-primary);
+  color: $text-primary;
   font-size: 16px;
   text-align: left;
   cursor: pointer;
@@ -185,7 +185,7 @@
 
   &:focus {
     outline: none;
-    border-color: var(--color-primary);
+    border-color: $primary-color;
     box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
   }
 }
@@ -195,10 +195,10 @@
   z-index: 10;
   width: 100%;
   margin-top: $spacing-xs;
-  background-color: var(--bg-elevated);
-  border: 1px solid var(--border-color);
+  background-color: $bg-elevated;
+  border: 1px solid $border-color;
   border-radius: $radius-md;
-  box-shadow: var(--shadow-lg);
+  box-shadow: $shadow-lg;
   max-height: 200px;
   overflow-y: auto;
   padding: $spacing-xs;
@@ -216,11 +216,11 @@
 
 .optionText {
   &.active {
-    background-color: var(--bg-hover);
+    background-color: $bg-hover;
   }
 
   &.selected {
-    color: var(--color-primary);
+    color: $primary-color;
     font-weight: 600;
   }
 }

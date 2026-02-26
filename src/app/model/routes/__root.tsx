@@ -1,9 +1,9 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { FC, useEffect } from 'react';
 
 import { useWorkoutListStore } from '@entities';
 
-const RootComponent = (): JSX.Element => {
+const RootComponent: FC = () => {
   const loadFromStorage = useWorkoutListStore.use.loadFromStorage();
   const workoutLists = useWorkoutListStore.use.workoutLists();
 

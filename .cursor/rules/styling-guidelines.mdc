@@ -32,7 +32,7 @@ import classes from './component-name.module.scss';
 
 ```scss
 // ✅ CORRECT
-@use 'src/app/styles/themes.scss';
+@use 'src/shared/ui/styles/themes.scss';
 
 // ❌ WRONG
 @use './themes.scss';
@@ -56,7 +56,7 @@ Use **camelCase** in `.module.scss`:
 
 ## Variables
 
-See `src/app/styles/variables.scss`: `$spacing-*`, `$primary-color`, `$radius-*`, `$shadow-*`, `$font-size-*`, etc.
+See `src/shared/ui/styles/variables.scss`: `$spacing-*`, `$primary-color`, `$radius-*`, `$shadow-*`, `$font-size-*`, etc.
 
 ## Patterns
 
@@ -68,7 +68,7 @@ See `src/app/styles/variables.scss`: `$spacing-*`, `$primary-color`, `$radius-*`
 - **Transitions:** `transition: all 0.2s ease-in-out`
 - **Z-index:** Define `$z-modal`, `$z-dropdown` in variables
 
-No inline styles. Global styles only in `src/app/styles/global.scss`.
+No inline styles. Global styles only in `src/shared/ui/styles/global.scss`.
 
 ## Shared UI
 

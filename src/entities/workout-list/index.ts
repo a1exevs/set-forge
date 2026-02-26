@@ -1,6 +1,8 @@
+export { workoutListStorage, type IWorkoutListStorage, type StorageStats } from 'src/entities/workout-list/api';
+
+// model
 export {
   useWorkoutListStore,
-  workoutListStorage,
   type WorkoutList,
   type WorkoutExercise,
   type CreateWorkoutListDto,
