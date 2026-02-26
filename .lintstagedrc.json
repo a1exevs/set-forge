@@ -1,0 +1,9 @@
+{
+  "**/*.{ts,tsx}": [
+    "prettier --write",
+    "eslint --config eslint.config.ts src .storybook linter tests scripts --fix"
+  ],
+  "{src/.storybook}/**/*.{css,scss}": [
+    "prettier --write"
+  ]
+}

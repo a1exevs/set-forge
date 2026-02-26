@@ -1,0 +1,121 @@
+---
+description: Feature-Sliced Design architecture rules
+alwaysApply: true
+---
+
+# Feature-Sliced Design Architecture Rules
+
+## Project Structure
+
+Uses **Feature-Sliced Design (FSD)**. Layer hierarchy:
+
+```
+app → pages → widgets → features → entities → shared
+```
+
+Layers import only downward. Per layer (except shared): slices → segments.
+
+**Layers:**
+- **app/** - Init, providers, global styles
+- **pages/** - Page components (routing)
+- **widgets/** - Composite UI blocks
+- **features/** - User interactions, business features
+- **entities/** - Business entities, domain models
+- **shared/** - Utilities, UI components, API clients
+
+**Segments:** `ui/` (components), `model/` (logic, types, stores), `api/` (API)
+
+## Import Rules
+
+**Cross-layer — single-word aliases only:**
+
+```typescript
+// ✅ CORRECT
+import { Button, createSelectors } from '@shared';
+import { Exercise, useExerciseStore } from '@entities';
+import { AddExerciseForm } from '@features';
+
+// ❌ WRONG
+import { Button } from '@shared/ui';
+import { Exercise } from '@entities/exercise';
+import { useExerciseStore } from '@entities/exercise/model';
+```
+
+**Intra-layer — absolute paths from `src/`:**
+
+```typescript
+// ✅ CORRECT
+import { AddExerciseFormLogicLayer } from 'src/features/add-exercise/ui/add-exercise-form-logic-layer';
+```
+
+## Public API Exports
+
+Every layer, slice, and segment MUST have `index.ts` re-exporting public API. Use explicit named exports (`export { X } from '...'`), NOT `export *`. Export only what consumers need.
+
+```typescript
+// Layer root: src/pages/index.ts
+export { HomePage } from 'src/pages/home';
+export { CreateWorkoutPage } from 'src/pages/create-workout';
+export { WorkoutModePage } from 'src/pages/workout-mode';
+
+// Slice: src/entities/exercise/index.ts
+export { useExerciseStore } from 'src/entities/exercise/model';
+export { exerciseApi } from 'src/entities/exercise/api';
+export type { Exercise, MuscleGroup, CreateExerciseDto } from 'src/entities/exercise/model';
+
+// Segment: src/entities/exercise/model/index.ts
+export { useExerciseStore } from 'src/entities/exercise/model/store';
+export type { Exercise, MuscleGroup, CreateExerciseDto } from 'src/entities/exercise/model/types';
+```
+
+## When Creating New Code
+
+1. Pick correct layer
+2. Create or use slice
+3. Organize by segments (ui, model, api)
+4. Add `index.ts` at each level
+5. Export only public API via index
+6. Use single-word imports from other layers
+
+## Example Structure
+
+```
+src/
+├── app/
+│    ├── index.ts
+│    └── model/
+│        ├── router
+│        ├── routes
+│        └── index.ts
+├── entities/
+│   ├── index.ts
+│   └── exercise/
+│       ├── index.ts
+│       ├── model/
+│       │   ├── index.ts
+│       │   ├── types.ts
+│       │   └── store.ts
+│       └── api/
+│           └── index.ts
+├── features/
+│   ├── index.ts
+│   └── add-exercise/
+│       ├── index.ts
+│       └── ui/
+│           ├── index.ts
+│           ├── add-exercise-form-data-layer.tsx
+│           ├── add-exercise-form-logic-layer.tsx
+│           └── add-exercise-form.tsx
+└── shared/
+    ├── index.ts
+    ├── ui/
+    │   ├── index.ts
+    │   └── button
+    │       ├── button.tsx
+    │       └── button.module.scss
+    └── model/
+        ├── index.ts
+        └── helpers
+            ├── stores.ts
+            └── dates.ts
+```

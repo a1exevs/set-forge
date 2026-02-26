@@ -1,13 +1,24 @@
-import { defineConfig } from 'vite';
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { defineConfig } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  server: {
+    port: 5173,
+    strictPort: true,
+  },
+  plugins: [
+    TanStackRouterVite({
+      routesDirectory: './src/app/model/routes',
+      generatedRouteTree: './src/route-tree.gen.ts',
+    }),
+    react(),
+  ],
   resolve: {
     alias: {
-      'src': path.resolve(__dirname, './src'),
+      src: path.resolve(__dirname, './src'),
       '@app': path.resolve(__dirname, './src/app'),
       '@pages': path.resolve(__dirname, './src/pages'),
       '@widgets': path.resolve(__dirname, './src/widgets'),
@@ -19,7 +30,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@use "${path.resolve(__dirname, './src/app/styles/variables.scss').replace(/\\/g, '/')}" as *;`,
+        additionalData: `@use "${path.resolve(__dirname, './src/shared/ui/styles/variables.scss').replace(/\\/g, '/')}" as *;`,
       },
     },
   },

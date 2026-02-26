@@ -1,0 +1,75 @@
+---
+description: SCSS modules and styling guidelines
+alwaysApply: true
+---
+
+# Styling Guidelines
+
+## SCSS Modules
+
+Component-scoped styling. File `component-name.module.scss` MUST be in the same directory as the component.
+
+```
+component/
+├── component-name.tsx
+├── component-name.module.scss  ✓
+└── component-name-logic-layer.tsx
+```
+
+## Imports
+
+**TS/TSX importing `.module.scss` — use absolute path from `src/`, import as `classes`:**
+
+```typescript
+// ✅ CORRECT
+import classes from 'src/features/feature-name/ui/component-name.module.scss';
+
+// ❌ WRONG
+import classes from './component-name.module.scss';
+```
+
+**SCSS internal imports (@use) — absolute path from `src/`:**
+
+```scss
+// ✅ CORRECT
+@use 'src/shared/ui/styles/themes.scss';
+
+// ❌ WRONG
+@use './themes.scss';
+```
+
+**Variables:** Auto-imported via Vite. Do NOT manually import `variables.scss`.
+
+## Class Naming
+
+Use **camelCase** in `.module.scss`:
+
+```scss
+// ✅ CORRECT
+.container { }
+.primaryButton { }
+.cardHeader { }
+
+// ❌ WRONG
+.primary-button { }
+```
+
+## Variables
+
+See `src/shared/ui/styles/variables.scss`: `$spacing-*`, `$primary-color`, `$radius-*`, `$shadow-*`, `$font-size-*`, etc.
+
+## Patterns
+
+- **Nesting:** `&:hover`, `&.modifier`, `&Header` (BEM-like)
+- **Multiple classes:** use template literals with `classes.button`, `classes.primary`
+- **Conditional:** `isActive ? classes.active : ''` inside template literal
+- **Responsive:** `@media (min-width: 768px)` in SCSS
+- **Layout:** Flexbox (`display: flex`, `gap`) or Grid (`grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))`)
+- **Transitions:** `transition: all 0.2s ease-in-out`
+- **Z-index:** Define `$z-modal`, `$z-dropdown` in variables
+
+No inline styles. Global styles only in `src/shared/ui/styles/global.scss`.
+
+## Shared UI
+
+Components in `src/shared/ui/` must have their own `.module.scss` and be reusable.

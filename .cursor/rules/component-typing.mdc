@@ -1,0 +1,33 @@
+---
+description: React.FC requirement and explicit typing for components
+alwaysApply: true
+---
+
+# Component Typing Rules
+
+## Components
+
+- **ALL** components MUST use `FC<Props>` (or `FC<PropsWithChildren>` for children).
+- Props: `type Props = { ... }` (never `interface`).
+- Import `FC` from react in every component file.
+
+```typescript
+// ✅
+const Component: FC<Props> = ({ name }) => <div>{name}</div>;
+const Wrapper: FC<PropsWithChildren> = ({ children }) => <div>{children}</div>;
+```
+
+## Functions & Callbacks
+
+Explicit return types: see typescript-guidelines (Explicit Return Types).
+
+## Inline Callbacks in JSX
+
+- **ALL** inline callbacks MUST have explicit param and return types.
+
+```typescript
+// ✅
+onChange={(e: ChangeEvent<HTMLInputElement>): void => setValue(e.target.value)}
+onClick={(): void => doSomething()}
+{items.map((item: Item) => <div key={item.id}>{item.name}</div>)}
+```

@@ -1,0 +1,78 @@
+---
+description: File naming conventions - kebab-case for all files
+alwaysApply: true
+---
+
+# File Naming Conventions
+
+All files in this project MUST use **kebab-case** (lowercase with hyphens).
+
+## Rules
+
+### Files
+
+```
+✅ CORRECT:
+- home-page.tsx
+- add-exercise-form.tsx
+- workout-list-store.ts
+- storage.service.ts
+- button.module.scss
+- create-selectors.ts
+
+❌ WRONG:
+- HomePage.tsx (PascalCase)
+- addExerciseForm.tsx (camelCase)
+- WorkoutListStore.ts (PascalCase)
+- storageService.ts (camelCase)
+- ButtonModule.scss (PascalCase)
+```
+
+### TanStack Router Exception
+
+Dynamic route parameters use `$` prefix:
+```
+✅ CORRECT: routes/workout/$id.tsx
+```
+
+### Import Variable Naming
+
+When importing routes, use simple, concise names without redundant suffixes:
+
+```typescript
+// ✅ CORRECT - simple, concise names
+import { Route as rootRoute } from 'src/app/routes/__root';
+import { Route as indexRoute } from 'src/app/routes/index';
+import { Route as createRoute } from 'src/app/routes/create';
+import { Route as workoutRoute } from 'src/app/routes/workout/$id';
+
+// ❌ WRONG - verbose, redundant suffixes
+import { Route as workoutIdRoute } from 'src/app/routes/workout/$id';
+import { Route as createWorkoutListRoute } from 'src/app/routes/create';
+```
+
+**Principle:** Import variable names should be concise and match the essence of the file, not replicate the full path or dynamic parameters.
+
+## Import Conventions in Index Files
+
+**Index files (index.ts/index.tsx) MUST use absolute paths from `src/` (not aliases, not relative).** Re-exports: same pattern as FSD public API.
+
+```typescript
+// ✅ CORRECT
+import { routeTree } from 'src/route-tree.gen';
+
+// ❌ WRONG - don't use aliases in index files
+import { routeTree } from '@app/route-tree.gen';
+
+// ❌ WRONG - don't use relative paths
+import { routeTree } from './route-tree.gen';
+```
+
+**Rationale:** Aliases can cause circular dependencies in index files. Absolute paths from `src/` are explicit and avoid ambiguity.
+
+## Rationale
+
+- **Consistency**: All files follow the same pattern
+- **Cross-platform**: Works on case-sensitive and case-insensitive filesystems
+- **Readability**: Hyphens clearly separate words
+- **Standard**: Common in web development (URLs, CSS classes)
