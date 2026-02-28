@@ -1,6 +1,10 @@
 # code-review
 
-Act as a senior software engineer. Perform a rigorous code review of the staged changes. Focus on:
+Act as a senior software engineer. Perform a rigorous code review of the changes since the last commit.
+
+**Important:** First run `git diff HEAD` to get all changes (staged + unstaged) since the last commit. Review ONLY the changed lines (the diff), not the entire files.
+
+Focus on:
 1. Potential bugs, edge cases, and logical errors.
 2. Code style, readability, and adherence to DRY/SOLID principles.
 3. Security vulnerabilities (leaked secrets, injection points).

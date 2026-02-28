@@ -1,0 +1,64 @@
+.dialogRoot {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+}
+
+.dialogBackdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.9;
+
+  &[data-closed] {
+    opacity: 0;
+  }
+
+  &[data-enter],
+  &[data-leave] {
+    transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.dialogPanel {
+  position: relative;
+  z-index: 1;
+  max-width: 95vw;
+  max-height: 95vh;
+  overflow: auto;
+
+  &:focus {
+    outline: none;
+  }
+
+  &[data-closed] {
+    opacity: 0;
+  }
+
+  &[data-enter],
+  &[data-leave] {
+    transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@media (min-width: 600px) {
+  .dialogOverlay {
+    padding: 16px;
+  }
+
+  .dialogPanel {
+    max-width: 90vw;
+    max-height: 90vh;
+  }
+}
