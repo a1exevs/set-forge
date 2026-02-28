@@ -27,7 +27,7 @@ const config: Config = {
   setupFiles: [setupTestsEnvPath],
   setupFilesAfterEnv: [setupTestingLibraryPath],
   transform: {
-    '^.+\\.[jt]sx?$': ['ts-jest', { tsconfig: 'tsconfig.jest.json' }],
+    '^.+\\.[jt]sx?$': ['ts-jest', { tsconfig: 'tsconfig.spec.json' }],
   },
   collectCoverageFrom: ['**/*.(j|t)sx'],
   coverageDirectory: `${COVERAGE_DIR_NAME}/${UNIT_TESTS_COVERAGE_DIR_NAME}`,
