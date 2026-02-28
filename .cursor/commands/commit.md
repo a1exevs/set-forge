@@ -20,8 +20,11 @@ Available types: feature, bugfix, common, improvement, storybook, tests, documen
    Example for /commit bugfix:
    [Bugfix] Resolving null pointer in User Profile
    Handling edge cases when user avatar is missing. Preventing application crash during initial login.
-4. FINAL ACTION
+4. APPROVAL REQUIRED
    Analyze staged changes (or all changes if none are staged).
    Present the generated message and ask: "Shall I commit these changes to <current-branch>?"
+   STOP and wait for explicit user approval. Do NOT proceed with the commit until the user confirms.
+5. FINAL ACTION
+   Only after user approval: execute the commit with the approved message.
 
 This command will be available in chat with /commit <type>
