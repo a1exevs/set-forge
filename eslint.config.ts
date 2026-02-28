@@ -29,6 +29,7 @@ export default tsEslint.config(
       ...importOrderRule,
       ...sortImportsRule,
       ...absoluteImportPathRule,
+      'no-console': 'error',
     },
   },
   {
@@ -59,6 +60,7 @@ export default tsEslint.config(
     files: ['scripts/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': 'off',
+      'no-console': 'off',
     },
   },
 );
