@@ -54,7 +54,9 @@
     "dist",
     "build",
     "coverage",
-    "storybook-static"
+    "storybook-static",
+    "**/*.spec.*",
+    "**/specs/**"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
