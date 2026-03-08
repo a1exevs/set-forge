@@ -87,7 +87,7 @@ const CreateWorkoutPageLogicLayer: FC<Props> = ({ onAddWorkoutList }) => {
     const dto: CreateWorkoutListDto = {
       name: name.trim(),
       description: description.trim(),
-      exercises: exercises.map(({ ...ex }) => ex),
+      exercises: exercises.map(({ tempId: _, ...ex }) => ex),
     };
 
     onAddWorkoutList(dto);

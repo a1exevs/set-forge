@@ -69,8 +69,8 @@ const WorkoutModePage: FC<Props> = ({
       <main className={classes.main}>
         <div className={classes.exerciseList}>
           {currentWorkout.exercises.map((exercise: WorkoutExercise) => {
-            const progress = (exercise.completedSets / exercise.sets) * 100;
-            const isCompleted = exercise.completedSets === exercise.sets;
+            const progress = exercise.sets > 0 ? (exercise.completedSets / exercise.sets) * 100 : 0;
+            const isCompleted = exercise.sets > 0 && exercise.completedSets === exercise.sets;
 
             return (
               <div

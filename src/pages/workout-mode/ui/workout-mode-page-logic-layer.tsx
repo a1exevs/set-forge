@@ -85,7 +85,9 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     }
 
     const totalExercises = currentWorkout.exercises.length;
-    const completedExercises = currentWorkout.exercises.filter(ex => ex.completedSets === ex.sets).length;
+    const completedExercises = currentWorkout.exercises.filter(
+      ex => ex.sets > 0 && ex.completedSets === ex.sets,
+    ).length;
     const overallProgress = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0;
 
     return { totalExercises, completedExercises, overallProgress };
