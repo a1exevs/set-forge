@@ -1,7 +1,9 @@
-import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router';
-import { render, screen } from '@testing-library/react';
+import { createMemoryHistory, createRouter } from '@tanstack/react-router';
+import { screen } from '@testing-library/react';
 
+import { renderApp } from 'src/app/model/specs/test-utils';
 import { routeTree } from 'src/route-tree.gen';
+
 
 describe('App', () => {
   describe(`Page with route /`, () => {
@@ -11,7 +13,7 @@ describe('App', () => {
         defaultPreload: 'intent',
         history: createMemoryHistory({ initialEntries: ['/'] }),
       });
-      const { container } = render(<RouterProvider router={testRouter} />);
+      const { container } = renderApp(testRouter);
       await screen.findByText('Set Forge');
       expect(container).toMatchSnapshot();
     });
@@ -21,7 +23,7 @@ describe('App', () => {
         defaultPreload: 'intent',
         history: createMemoryHistory({ initialEntries: ['/create'] }),
       });
-      const { container } = render(<RouterProvider router={testRouter} />);
+      const { container } = renderApp(testRouter);
       await screen.findByText('New Workout List');
       expect(container).toMatchSnapshot();
     });

@@ -17,7 +17,7 @@ A workout planning and strength tracking app that lets you build exercise lists,
 v10.9.3
 
 ## Node version
-v20.9.0. Use NVM:
+v22.20.0. Use NVM:
 1. nvm current - check current version of Node
 2. nvm list - show list of available Node versions
 3. nvm install <version> - to install and use Node version.

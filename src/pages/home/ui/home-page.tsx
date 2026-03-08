@@ -9,7 +9,7 @@ import classes from 'src/pages/home/ui/home-page.module.scss';
 type Props = {
   workoutLists: WorkoutList[];
   storageWarning: boolean;
-  onDelete: (id: string, name: string) => void;
+  onDelete: (id: string, name: string) => void | Promise<void>;
   formatDate: (date: string | null) => string;
 };
 

@@ -2,6 +2,8 @@ import type { CreateWorkoutListDto, MuscleGroup } from '@entities';
 import { useNavigate } from '@tanstack/react-router';
 import { FC, FormEvent, useState } from 'react';
 
+import { useConfirm } from '@shared';
+
 import CreateWorkoutPage from 'src/pages/create-workout/ui/create-workout-page';
 
 export type ExerciseFormData = {
@@ -18,6 +20,7 @@ type Props = {
 };
 
 const CreateWorkoutPageLogicLayer: FC<Props> = ({ onAddWorkoutList }) => {
+  const confirmDialog = useConfirm();
   const navigate = useNavigate();
   const [name, setName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
@@ -49,23 +52,35 @@ const CreateWorkoutPageLogicLayer: FC<Props> = ({ onAddWorkoutList }) => {
     setExercises(exercises.map(ex => (ex.tempId === tempId ? { ...ex, [field]: value } : ex)));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
     if (!name.trim()) {
-      alert('Please enter a list name');
+      await confirmDialog({
+        title: 'Please enter a list name',
+        hideCancelButton: true,
+        confirmationText: 'Ok',
+      });
       return;
     }
 
     if (exercises.length === 0) {
-      alert('Please add at least one exercise');
+      await confirmDialog({
+        title: 'Please add at least one exercise',
+        hideCancelButton: true,
+        confirmationText: 'Ok',
+      });
       return;
     }
 
     const invalidExercise = exercises.find(ex => !ex.name.trim() || ex.weight < 0 || ex.reps <= 0 || ex.sets <= 0);
 
     if (invalidExercise) {
-      alert('Please check exercise data validity');
+      await confirmDialog({
+        title: 'Please check exercise data validity',
+        hideCancelButton: true,
+        confirmationText: 'Ok',
+      });
       return;
     }
 
