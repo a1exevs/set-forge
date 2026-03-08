@@ -1,6 +1,8 @@
 import type { WorkoutList } from '@entities';
 import { FC, useEffect, useRef, useState } from 'react';
 
+import { useConfirm } from '@shared';
+
 import WorkoutModePage from 'src/pages/workout-mode/ui/workout-mode-page';
 
 type Props = {
@@ -20,6 +22,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   updateWorkoutProgress,
   resetAllProgress,
 }) => {
+  const confirmDialog = useConfirm();
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
   const lastTapRef = useRef<Record<string, number>>({});
 
@@ -60,10 +63,18 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     }
   };
 
-  const handleResetAll = (): void => {
-    if (!currentWorkout) return;
+  const handleResetAll = async (): Promise<void> => {
+    if (!currentWorkout) {
+      return;
+    }
 
-    if (confirm('Reset all progress?')) {
+    const ok = await confirmDialog({
+      title: 'Reset all progress?',
+      description: 'All completed sets will be reset.',
+      confirmationText: 'Reset',
+      cancellationText: 'Cancel',
+    });
+    if (ok) {
       resetAllProgress(currentWorkout.id);
     }
   };

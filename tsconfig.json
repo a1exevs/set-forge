@@ -25,6 +25,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
+    "allowSyntheticDefaultImports": true,
 
     /* Path aliases */
     "baseUrl": ".",
@@ -46,7 +47,7 @@
       "storybook-dir/*": [
         "./.storybook/*"
       ]
-    }
+    },
   },
   "include": ["src"],
   "exclude": [
