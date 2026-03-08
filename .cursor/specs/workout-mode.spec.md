@@ -21,7 +21,7 @@ Page for running a workout from a selected workout list: display exercises, doub
 
 ### Display
 
-6. `currentWorkout === null`: render «Workout list not found» + «Back to Home» button.
+6. `currentWorkout === null`: render `NotFoundMessage` widget (from `widgets/not-found-message`): «Workout list not found» + «Back to Home» link.
 7. Otherwise: header with name, description, overall progress (completed/total exercises, %), list of exercise cards.
 
 ### Set marking (double-tap)
@@ -112,7 +112,7 @@ type Props = {
 |-----------|------------|
 | Routing | TanStack Router (`useParams`, `Link`) |
 | State | Zustand, `currentWorkout` in store |
-| UI | React 18, Headless UI (`Transition`), SCSS Modules |
+| UI | React 18, Headless UI (`Transition`), SCSS Modules, NotFoundMessage (from `widgets/not-found-message`) |
 | Dialogs | `useConfirm` |
 | Animation | `Transition` for checkmark when exercise completes |
 
@@ -136,6 +136,7 @@ type Props = {
 | `useWorkoutListStore.use.updateWorkoutProgress(listId, exerciseId)` | action | +1 completedSets |
 | `useWorkoutListStore.use.resetAllProgress(listId)` | action | Zero completedSets |
 | `workoutListStorage.getList(id)` | method | Get list by id |
+| `NotFoundMessage` | widget | From `widgets/not-found-message` |
 | Route | — | `/workout/$id` |
 
 ### Public exports
@@ -148,7 +149,7 @@ type Props = {
 
 | Scenario | Handling |
 |----------|-----------|
-| `currentWorkout === null` | «Workout list not found» + Link to home |
+| `currentWorkout === null` | Render `NotFoundMessage` widget + Link to home |
 | Non-existent `id` | `getList(id)` returns `null` → `currentWorkout` stays `null` |
 | `exercise.completedSets >= exercise.sets` | Click does not increase completedSets |
 | Double-tap < 300ms | Treated as single action, `handleExerciseClick` runs |

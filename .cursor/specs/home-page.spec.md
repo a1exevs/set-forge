@@ -2,7 +2,7 @@
 
 ## Overview
 
-The home page displays a list of workout lists, allows navigation to create a new one or to workout mode, and to delete a list. It warns when storage is nearly full.
+The home page displays a list of workout lists, allows navigation to create a new one or to workout mode, and to edit or delete a list via dot-dot-dot menu. It warns when storage is nearly full.
 
 ---
 
@@ -11,7 +11,7 @@ The home page displays a list of workout lists, allows navigation to create a ne
 ### Initialization
 
 1. `HomePageDataLayer` mounts.
-2. Subscribes to `useWorkoutListStore.use.workoutLists()`, `loadFromStorage`, `deleteWorkoutList`, `getUsagePercentageAsync`.
+2. Subscribes to `useWorkoutListStore.use.workoutLists()`, `loadFromStorage`, `deleteWorkoutList`, `getUsagePercentageAsync`. Passes `onEdit` (navigate to `/edit/$id`) and `onDelete` handlers.
 3. Passes data to `HomePageLogicLayer`.
 
 ### Data loading
@@ -29,14 +29,15 @@ The home page displays a list of workout lists, allows navigation to create a ne
 ### Display
 
 10. Empty list: render block «No workout lists yet» with hint.
-11. Non-empty: render card grid. Each card is a `Link` to `/workout/$id`, containing name, badge with exercise count, description (if present), created/lastUsed dates, delete button.
+11. Non-empty: render card grid. Each card is a `Link` to `/workout/$id`, containing name, badge with exercise count, description (if present), created/lastUsed dates, dot-dot-dot menu button (see [shared-components.spec.md](shared-components.spec.md)).
 
-### Deletion
+### Menu actions (Edit / Delete)
 
-12. Click on delete button triggers `onDelete(id, name)`.
-13. `handleDelete` opens confirm dialog via `useConfirm()` with title/description.
-14. On confirmation, `deleteWorkoutList(id)` is called.
-15. Store: `workoutListStorage.deleteList(id)`, filter `workoutLists`, when `currentWorkout?.id === id` — `currentWorkout = null`.
+12. Dot-dot-dot menu in top right of each card. Items: Edit, Delete (in that order).
+13. **Edit**: `onEdit(id)` → `navigate({ to: '/edit/$id', params: { id } })`.
+14. **Delete**: `onDelete(id, name)` → `handleDelete` opens confirm dialog via `useConfirm()` with title/description.
+15. On confirmation, `deleteWorkoutList(id)` is called.
+16. Store: `workoutListStorage.deleteList(id)`, filter `workoutLists`, when `currentWorkout?.id === id` — `currentWorkout = null`.
 
 ---
 
@@ -55,6 +56,7 @@ The home page displays a list of workout lists, allows navigation to create a ne
 type Props = {
   workoutLists: WorkoutList[];
   storageWarning: boolean;
+  onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void | Promise<void>;
   formatDate: (date: string | null) => string;
 };
@@ -67,6 +69,7 @@ type Props = {
   loadFromStorage: () => void;
   workoutLists: WorkoutList[];
   deleteWorkoutList: (id: string) => void;
+  onEdit: (id: string) => void;
   formatDate: (date: string | null) => string;
   getUsagePercentageAsync: () => Promise<number>;
 };
@@ -85,7 +88,7 @@ type Props = {
 |-----------|------------|
 | Routing | TanStack Router (`Link`, `to`) |
 | State | Zustand + Immer + DevTools, `createSelectors` |
-| UI | React 18, FC, SCSS Modules |
+| UI | React 18, FC, SCSS Modules, MenuButton (see [shared-components.spec.md](shared-components.spec.md)) |
 | Dialogs | `useConfirm` (ConfirmDialogProvider) |
 | Storage | `workoutListStorage` (LocalStorage, key `workout-lists`) |
 
@@ -109,7 +112,7 @@ type Props = {
 | `workoutListStorage.getUsagePercentageAsync()` | method | Storage usage percentage |
 | `formatDate(date)` | function | Date formatting |
 | `useConfirm()` | hook | Open confirm dialog |
-| Routes | — | `/` (home), `/create`, `/workout/$id` |
+| Routes | — | `/` (home), `/create`, `/edit/$id`, `/workout/$id` |
 
 ### Page public exports
 

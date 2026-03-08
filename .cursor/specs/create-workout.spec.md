@@ -2,7 +2,7 @@
 
 ## Overview
 
-Page for creating a new workout list: form with name, description fields and a dynamic list of exercises (name, muscleGroup, weight, reps, sets). Validation before save, navigation to home on success.
+Page for creating a new workout list. Uses shared widget `workout-list-form` in Create mode. Form with name, description fields and a dynamic list of exercises (name, muscleGroup, weight, reps, sets). Validation before save, navigation to home on success.
 
 ---
 
@@ -12,39 +12,40 @@ Page for creating a new workout list: form with name, description fields and a d
 
 1. `CreateWorkoutPageDataLayer` mounts.
 2. Subscribes to `useWorkoutListStore.use.addWorkoutList()`.
-3. Passes `onAddWorkoutList={addWorkoutList}` to `CreateWorkoutPageLogicLayer`.
+3. Passes `onAddWorkoutList={addWorkoutList}` to `WorkoutListForm` widget with `mode="create"`.
+4. Create page is a thin wrapper around `widgets/workout-list-form`; form logic lives in the widget.
 
-### Form state
+### Form state (in WorkoutListForm widget)
 
-4. `useState`: `name`, `description`, `exercises` (array of `ExerciseFormData`).
-5. `ExerciseFormData`: `tempId`, `name`, `muscleGroup`, `weight`, `reps`, `sets`.
-6. When adding exercise: `crypto.randomUUID()` for `tempId`, defaults: `muscleGroup: 'chest'`, `weight: 0`, `reps: 10`, `sets: 3`.
+5. `useState`: `name`, `description`, `exercises` (array of `ExerciseFormData`).
+6. `ExerciseFormData`: `tempId`, `name`, `muscleGroup`, `weight`, `reps`, `sets`.
+7. When adding exercise: `crypto.randomUUID()` for `tempId`, defaults: `muscleGroup: 'chest'`, `weight: 0`, `reps: 10`, `sets: 3`.
 
 ### Exercise CRUD
 
-7. `addExercise`: push new element to `exercises`.
-8. `removeExercise(tempId)`: filter by `tempId`.
-9. `updateExercise(tempId, field, value)`: `map` with field replacement for element with `tempId`.
+8. `addExercise`: push new element to `exercises`.
+9. `removeExercise(tempId)`: filter by `tempId`.
+10. `updateExercise(tempId, field, value)`: `map` with field replacement for element with `tempId`.
 
 ### Validation and submit
 
-10. `handleSubmit`:
+11. `handleSubmit`:
     - `e.preventDefault()`.
     - `!name.trim()` → confirm dialog «Please enter a list name», return.
     - `exercises.length === 0` → confirm «Please add at least one exercise», return.
     - Check: `exercises.find(ex => !ex.name.trim() || ex.weight < 0 || ex.reps <= 0 || ex.sets <= 0)` → confirm «Please check exercise data validity», return.
-11. Build DTO: `name.trim()`, `description.trim()`, `exercises` (without `tempId`; `id` and `completedSets` are added in store).
-12. `onAddWorkoutList(dto)` → store creates `WorkoutList`, saves to storage, pushes to `workoutLists`.
-13. `navigate({ to: '/' })`.
+12. Build DTO: `name.trim()`, `description.trim()`, `exercises` (without `tempId`; `id` and `completedSets` are added in store).
+13. `onAddWorkoutList(dto)` → store creates `WorkoutList`, saves to storage, pushes to `workoutLists`.
+14. `navigate({ to: '/' })`.
 
 ### Cancel
 
-14. `handleCancel` → `navigate({ to: '/' })`.
+15. `handleCancel` → `navigate({ to: '/' })`.
 
 ### Render
 
-15. Empty `exercises`: text «Add exercises to your list».
-16. Non-empty: cards with Listbox for muscleGroup, inputs for name/weight/reps/sets, remove button.
+16. Empty `exercises`: text «Add exercises to your list».
+17. Non-empty: cards with Listbox for muscleGroup, inputs for name/weight/reps/sets, remove button.
 
 ---
 
@@ -115,7 +116,8 @@ type Props = {
 
 ### Patterns
 
-- 3-layer: Data → Logic → Presentation
+- 3-layer: Data (page) → Logic (widget) → Presentation (widget)
+- Form logic in `widgets/workout-list-form`; Create page is thin wrapper with `mode="create"`
 - Logic layer: all validation, navigation, form state
 - Presentation: props only, controlled inputs
 
@@ -130,6 +132,7 @@ type Props = {
 | `useWorkoutListStore.use.addWorkoutList(dto)` | action | Create and save workout list |
 | `muscleGroupLabels`, `muscleGroups` | constants | Dictionary and array of muscle groups |
 | `useConfirm()` | hook | Confirm dialog |
+| `WorkoutListForm` | widget | From `widgets/workout-list-form` |
 | Route | — | `/create` |
 
 ### Public exports

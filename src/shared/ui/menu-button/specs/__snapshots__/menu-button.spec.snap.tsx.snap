@@ -1,0 +1,89 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`MenuButton matches snapshot when closed 1`] = `
+<div>
+  <button
+    aria-expanded="false"
+    aria-haspopup="menu"
+    aria-label="Open menu"
+    class="trigger"
+    data-headlessui-state=""
+    id="headlessui-menu-button-:r2:"
+    type="button"
+  >
+    <span
+      aria-hidden="true"
+      class="icon"
+    >
+      ⋮
+    </span>
+  </button>
+</div>
+`;
+
+exports[`MenuButton matches snapshot when opened 1`] = `
+<body>
+  <div>
+    <button
+      aria-controls="headlessui-menu-items-:r9:"
+      aria-expanded="true"
+      aria-haspopup="menu"
+      aria-label="Open menu"
+      class="trigger"
+      data-active=""
+      data-headlessui-state="open active hover"
+      data-hover=""
+      data-open=""
+      id="headlessui-menu-button-:r8:"
+      type="button"
+    >
+      <span
+        aria-hidden="true"
+        class="icon"
+      >
+        ⋮
+      </span>
+    </button>
+  </div>
+  <div
+    id="headlessui-portal-root"
+  >
+    <div
+      data-headlessui-portal=""
+    >
+      <div
+        aria-labelledby="headlessui-menu-button-:r8:"
+        class="items"
+        data-anchor="bottom start"
+        data-headlessui-state="open"
+        data-open=""
+        id="headlessui-menu-items-:r9:"
+        role="menu"
+        style="position: absolute; left: 0px; top: 0px; --button-width: 0px; overflow: auto; max-width: 0px; max-height: min(var(--anchor-max-height, 100vh), 0px);"
+        tabindex="0"
+      >
+        <button
+          class="item"
+          data-headlessui-state=""
+          id="headlessui-menu-item-:rc:"
+          role="menuitem"
+          tabindex="-1"
+          type="button"
+        >
+          Edit
+        </button>
+        <button
+          class="item"
+          data-headlessui-state=""
+          id="headlessui-menu-item-:rd:"
+          role="menuitem"
+          tabindex="-1"
+          type="button"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+`;
