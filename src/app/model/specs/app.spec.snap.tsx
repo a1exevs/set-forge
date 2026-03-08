@@ -4,7 +4,6 @@ import { screen } from '@testing-library/react';
 import { renderApp } from 'src/app/model/specs/test-utils';
 import { routeTree } from 'src/route-tree.gen';
 
-
 describe('App', () => {
   describe(`Page with route /`, () => {
     it(`matches snapshot, route /`, async () => {
