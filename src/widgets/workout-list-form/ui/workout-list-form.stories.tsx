@@ -1,4 +1,5 @@
 import type { Meta } from '@storybook/react';
+import { createMemoryHistory, createRootRoute, createRouter, RouterProvider } from '@tanstack/react-router';
 import type { ReactElement } from 'react';
 
 import { ConfirmDialogProvider } from '@shared';
@@ -74,6 +75,18 @@ const renderWithProvider = (
   </ConfirmDialogProvider>
 );
 
+/** Edit mode no data renders NotFoundMessage with Link — needs RouterProvider */
+const renderEditModeNoDataWithRouter = (): ReactElement => {
+  const rootRoute = createRootRoute({
+    component: (): ReactElement => renderWithProvider(editModeNoDataArgs),
+  });
+  const router = createRouter({
+    routeTree: rootRoute,
+    history: createMemoryHistory({ initialEntries: ['/'] }),
+  });
+  return <RouterProvider router={router} />;
+};
+
 export const CreateModeDesktop4k = buildDesktop4KStoryObj<typeof meta>({
   render: () => renderWithProvider(createModeArgs),
 });
@@ -107,17 +120,17 @@ export const EditModeMobile = buildMobileStoryObj<typeof meta>({
 });
 
 export const EditModeNoDataDesktop4k = buildDesktop4KStoryObj<typeof meta>({
-  render: () => renderWithProvider(editModeNoDataArgs),
+  render: renderEditModeNoDataWithRouter,
 });
 
 export const EditModeNoDataDesktop = buildDesktopStoryObj<typeof meta>({
-  render: () => renderWithProvider(editModeNoDataArgs),
+  render: renderEditModeNoDataWithRouter,
 });
 
 export const EditModeNoDataTablet = buildTabletStoryObj<typeof meta>({
-  render: () => renderWithProvider(editModeNoDataArgs),
+  render: renderEditModeNoDataWithRouter,
 });
 
 export const EditModeNoDataMobile = buildMobileStoryObj<typeof meta>({
-  render: () => renderWithProvider(editModeNoDataArgs),
+  render: renderEditModeNoDataWithRouter,
 });
