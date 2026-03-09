@@ -34,18 +34,23 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   }, [id, setCurrentWorkout, clearCurrentWorkout]);
 
   const handleExerciseClick = (exerciseId: string): void => {
-    if (!currentWorkout) return;
+    if (!currentWorkout) {
+      return;
+    }
 
     const exercise = currentWorkout.exercises.find(ex => ex.id === exerciseId);
-    if (!exercise) return;
+    if (!exercise) {
+      return;
+    }
 
-    if (exercise.completedSets < exercise.sets) {
-      updateWorkoutProgress(currentWorkout.id, exerciseId);
+    if (exercise.completedSets >= exercise.sets) {
+      return;
+    }
+    updateWorkoutProgress(currentWorkout.id, exerciseId);
 
-      if (exercise.completedSets + 1 === exercise.sets) {
-        setJustCompleted(exerciseId);
-        setTimeout((): void => setJustCompleted(null), 1000);
-      }
+    if (exercise.completedSets + 1 === exercise.sets) {
+      setJustCompleted(exerciseId);
+      setTimeout((): void => setJustCompleted(null), 1000);
     }
   };
 

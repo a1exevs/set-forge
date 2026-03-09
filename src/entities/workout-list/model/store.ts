@@ -5,7 +5,12 @@ import { immer } from 'zustand/middleware/immer';
 import { createSelectors } from '@shared';
 
 import { workoutListStorage } from 'src/entities/workout-list/api';
-import type { CreateWorkoutListDto, WorkoutList } from 'src/entities/workout-list/model/types';
+import type {
+  CreateWorkoutListDto,
+  UpdateWorkoutListDto,
+  WorkoutExercise,
+  WorkoutList,
+} from 'src/entities/workout-list/model/types';
 
 interface WorkoutListState {
   workoutLists: WorkoutList[];
@@ -14,13 +19,15 @@ interface WorkoutListState {
   error: string | null;
 
   loadFromStorage: () => void;
-  addWorkoutList: (dto: CreateWorkoutListDto) => void;
+  addWorkoutList: (dto: CreateWorkoutListDto) => boolean;
+  updateWorkoutList: (id: string, dto: UpdateWorkoutListDto) => void;
   deleteWorkoutList: (id: string) => void;
   updateWorkoutProgress: (listId: string, exerciseId: string) => void;
   setCurrentWorkout: (id: string) => void;
   clearCurrentWorkout: () => void;
   resetExerciseProgress: (listId: string, exerciseId: string) => void;
   resetAllProgress: (listId: string) => void;
+  getUsagePercentageAsync: () => Promise<number>;
 }
 
 const useWorkoutListStoreBase = create<WorkoutListState>()(
@@ -35,6 +42,7 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
         try {
           const lists = workoutListStorage.getAllLists();
           set(state => {
+            state.error = null;
             state.workoutLists = lists;
             state.isLoading = false;
           });
@@ -63,11 +71,71 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
         try {
           workoutListStorage.saveList(newList);
           set(state => {
+            state.error = null;
             state.workoutLists.push(newList);
           });
+          return true;
         } catch (error) {
           set(state => {
             state.error = error instanceof Error ? error.message : 'Failed to save workout list';
+          });
+          return false;
+        }
+      },
+
+      updateWorkoutList: (id, dto) => {
+        const existing = workoutListStorage.getList(id);
+        if (!existing) {
+          set(state => {
+            state.error = 'Workout list not found';
+          });
+          return;
+        }
+        const exercises: WorkoutExercise[] = dto.exercises.map(ex => {
+          if (ex.id !== undefined && ex.completedSets !== undefined) {
+            return {
+              id: ex.id,
+              name: ex.name,
+              muscleGroup: ex.muscleGroup,
+              weight: ex.weight,
+              reps: ex.reps,
+              sets: ex.sets,
+              completedSets: ex.completedSets,
+            };
+          }
+          return {
+            id: crypto.randomUUID(),
+            name: ex.name,
+            muscleGroup: ex.muscleGroup,
+            weight: ex.weight,
+            reps: ex.reps,
+            sets: ex.sets,
+            completedSets: 0,
+          };
+        });
+
+        const updated: WorkoutList = {
+          ...existing,
+          name: dto.name,
+          description: dto.description,
+          exercises,
+        };
+
+        try {
+          workoutListStorage.saveList(updated);
+          set(state => {
+            state.error = null;
+            const idx = state.workoutLists.findIndex(l => l.id === id);
+            if (idx >= 0) {
+              state.workoutLists[idx] = updated;
+            }
+            if (state.currentWorkout?.id === id) {
+              state.currentWorkout = updated;
+            }
+          });
+        } catch (error) {
+          set(state => {
+            state.error = error instanceof Error ? error.message : 'Failed to update workout list';
           });
         }
       },
@@ -76,6 +144,7 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
         try {
           workoutListStorage.deleteList(id);
           set(state => {
+            state.error = null;
             state.workoutLists = state.workoutLists.filter(list => list.id !== id);
             if (state.currentWorkout?.id === id) {
               state.currentWorkout = null;
@@ -91,10 +160,14 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
       updateWorkoutProgress: (listId, exerciseId) => {
         set(state => {
           const list = state.workoutLists.find(l => l.id === listId);
-          if (!list) return;
+          if (!list) {
+            return;
+          }
 
           const exercise = list.exercises.find(ex => ex.id === exerciseId);
-          if (!exercise) return;
+          if (!exercise) {
+            return;
+          }
 
           if (exercise.completedSets < exercise.sets) {
             exercise.completedSets += 1;
@@ -112,6 +185,7 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
 
           try {
             workoutListStorage.saveList(list);
+            state.error = null;
           } catch (error) {
             state.error = error instanceof Error ? error.message : 'Failed to update progress';
           }
@@ -145,6 +219,7 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
 
           try {
             workoutListStorage.saveList(list);
+            state.error = null;
           } catch (error) {
             state.error = error instanceof Error ? error.message : 'Failed to reset progress';
           }
@@ -162,10 +237,14 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
 
           try {
             workoutListStorage.saveList(list);
+            state.error = null;
           } catch (error) {
             state.error = error instanceof Error ? error.message : 'Failed to reset progress';
           }
         });
+      },
+      getUsagePercentageAsync: () => {
+        return workoutListStorage.getUsagePercentageAsync();
       },
     })),
     { name: 'WorkoutListStore' },

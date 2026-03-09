@@ -109,7 +109,7 @@ type Props = {
 | `useWorkoutListStore.use.workoutLists()` | selector | List of workout lists |
 | `useWorkoutListStore.use.loadFromStorage()` | action | Load from storage |
 | `useWorkoutListStore.use.deleteWorkoutList(id)` | action | Delete list |
-| `workoutListStorage.getUsagePercentageAsync()` | method | Storage usage percentage |
+| `useWorkoutListStore.use.getUsagePercentageAsync()` | action | Storage usage percentage |
 | `formatDate(date)` | function | Date formatting |
 | `useConfirm()` | hook | Open confirm dialog |
 | Routes | — | `/` (home), `/create`, `/edit/$id`, `/workout/$id` |

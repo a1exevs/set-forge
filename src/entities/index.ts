@@ -9,7 +9,6 @@ export {
 } from 'src/entities/exercise';
 export {
   useWorkoutListStore,
-  workoutListStorage,
   type WorkoutList,
   type WorkoutExercise,
   type CreateWorkoutListDto,

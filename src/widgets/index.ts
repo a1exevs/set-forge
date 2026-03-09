@@ -1,2 +1,1 @@
-// Widgets will be added here
-export {};
+export { WorkoutListForm } from 'src/widgets/workout-list-form';

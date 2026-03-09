@@ -1,6 +1,6 @@
-import { FC, useCallback } from 'react';
+import { FC } from 'react';
 
-import { useWorkoutListStore, workoutListStorage } from '@entities';
+import { useWorkoutListStore } from '@entities';
 import { formatDate } from '@shared';
 
 import HomePageLogicLayer from 'src/pages/home/ui/home-page-logic-layer';
@@ -9,7 +9,7 @@ const HomePageDataLayer: FC = () => {
   const workoutLists = useWorkoutListStore.use.workoutLists();
   const loadFromStorage = useWorkoutListStore.use.loadFromStorage();
   const deleteWorkoutList = useWorkoutListStore.use.deleteWorkoutList();
-  const getUsagePercentageAsync = useCallback((): Promise<number> => workoutListStorage.getUsagePercentageAsync(), []);
+  const getUsagePercentageAsync = useWorkoutListStore.use.getUsagePercentageAsync();
 
   return (
     <HomePageLogicLayer
