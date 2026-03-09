@@ -5,10 +5,12 @@ import { ChangeEvent, FC, FormEvent } from 'react';
 import { muscleGroupLabels, muscleGroups } from '@entities';
 import { Button } from '@shared';
 
-import type { ExerciseFormData } from 'src/pages/create-workout/ui/create-workout-page-logic-layer';
-import classes from 'src/pages/create-workout/ui/create-workout-page.module.scss';
+import type { ExerciseFormData } from 'src/widgets/workout-list-form/model';
+import classes from 'src/widgets/workout-list-form/ui/workout-list-form.module.scss';
 
 type Props = {
+  title: string;
+  submitButtonText: string;
   name: string;
   description: string;
   exercises: ExerciseFormData[];
@@ -25,7 +27,9 @@ type Props = {
   onCancel: () => void;
 };
 
-const CreateWorkoutPage: FC<Props> = ({
+const WorkoutListForm: FC<Props> = ({
+  title,
+  submitButtonText,
   name,
   description,
   exercises,
@@ -40,7 +44,7 @@ const CreateWorkoutPage: FC<Props> = ({
   return (
     <div className={classes.container}>
       <header className={classes.header}>
-        <h1>New Workout List</h1>
+        <h1>{title}</h1>
       </header>
 
       <main className={classes.main}>
@@ -196,7 +200,7 @@ const CreateWorkoutPage: FC<Props> = ({
             <Button type="button" variant="secondary" onClick={onCancel}>
               Cancel
             </Button>
-            <Button type="submit">Create List</Button>
+            <Button type="submit">{submitButtonText}</Button>
           </div>
         </form>
       </main>
@@ -204,4 +208,4 @@ const CreateWorkoutPage: FC<Props> = ({
   );
 };
 
-export default CreateWorkoutPage;
+export default WorkoutListForm;
