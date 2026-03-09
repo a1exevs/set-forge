@@ -4,7 +4,7 @@ import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
 
 import { muscleGroupLabels } from '@entities';
-import { Button } from '@shared';
+import { NotFoundMessage } from '@widgets';
 
 import classes from 'src/pages/workout-mode/ui/workout-mode-page.module.scss';
 
@@ -30,12 +30,7 @@ const WorkoutModePage: FC<Props> = ({
   if (!currentWorkout) {
     return (
       <div className={classes.container}>
-        <div className={classes.notFound}>
-          <h2>Workout list not found</h2>
-          <Link to="/">
-            <Button>Back to Home</Button>
-          </Link>
-        </div>
+        <NotFoundMessage title="Workout list not found" />
       </div>
     );
   }
@@ -69,8 +64,8 @@ const WorkoutModePage: FC<Props> = ({
       <main className={classes.main}>
         <div className={classes.exerciseList}>
           {currentWorkout.exercises.map((exercise: WorkoutExercise) => {
-            const progress = (exercise.completedSets / exercise.sets) * 100;
-            const isCompleted = exercise.completedSets === exercise.sets;
+            const progress = exercise.sets > 0 ? (exercise.completedSets / exercise.sets) * 100 : 0;
+            const isCompleted = exercise.sets > 0 && exercise.completedSets === exercise.sets;
 
             return (
               <div

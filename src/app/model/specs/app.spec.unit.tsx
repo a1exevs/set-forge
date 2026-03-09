@@ -1,7 +1,7 @@
-import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router';
-import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { createMemoryHistory, createRouter } from '@tanstack/react-router';
+import { screen } from '@testing-library/react';
 
+import { renderApp } from 'src/app/model/specs/test-utils';
 import { routeTree } from 'src/route-tree.gen';
 
 describe('App', () => {
@@ -12,7 +12,7 @@ describe('App', () => {
         defaultPreload: 'intent',
         history: createMemoryHistory({ initialEntries: ['/'] }),
       });
-      render(<RouterProvider router={testRouter} />);
+      renderApp(testRouter);
 
       const heading = await screen.findByText('Set Forge');
       expect(heading).toBeInTheDocument();
@@ -27,7 +27,7 @@ describe('App', () => {
         defaultPreload: 'intent',
         history: createMemoryHistory({ initialEntries: ['/create'] }),
       });
-      render(<RouterProvider router={testRouter} />);
+      renderApp(testRouter);
 
       const heading = await screen.findByText('New Workout List');
       expect(heading).toBeInTheDocument();
@@ -39,7 +39,19 @@ describe('App', () => {
         defaultPreload: 'intent',
         history: createMemoryHistory({ initialEntries: ['/workout/non-existent-id'] }),
       });
-      render(<RouterProvider router={testRouter} />);
+      renderApp(testRouter);
+
+      const notFoundHeading = await screen.findByText('Workout list not found');
+      expect(notFoundHeading).toBeInTheDocument();
+    });
+
+    it('renders EditWorkoutPage at /edit/:id with NotFoundMessage when id does not exist', async () => {
+      const testRouter = createRouter({
+        routeTree,
+        defaultPreload: 'intent',
+        history: createMemoryHistory({ initialEntries: ['/edit/non-existent-id'] }),
+      });
+      renderApp(testRouter);
 
       const notFoundHeading = await screen.findByText('Workout list not found');
       expect(notFoundHeading).toBeInTheDocument();

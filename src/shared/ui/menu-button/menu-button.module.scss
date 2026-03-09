@@ -1,0 +1,66 @@
+.trigger {
+  padding: $spacing-xs $spacing-sm;
+  border: none;
+  border-radius: $radius-md;
+  background-color: transparent;
+  color: $text-primary;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  min-width: 36px;
+
+  &:focus {
+    outline: none;
+  }
+
+  &[data-hover] {
+    background-color: $bg-hover;
+  }
+
+  &[data-focus] {
+    background-color: $bg-hover;
+  }
+}
+
+.icon {
+  font-size: $font-size-lg;
+  line-height: 1;
+}
+
+.items {
+  z-index: $z-dropdown;
+  min-width: 140px;
+  padding: $spacing-xs;
+  margin-top: $spacing-xs;
+  background-color: $bg-elevated;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.item {
+  padding: $spacing-sm $spacing-md;
+  border: none;
+  border-radius: $radius-sm;
+  background: none;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+
+  &:focus {
+    outline: none;
+  }
+
+  &[data-hover],
+  &[data-focus] {
+    background-color: $bg-hover;
+  }
+}

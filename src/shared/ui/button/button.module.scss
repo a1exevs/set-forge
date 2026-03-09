@@ -11,12 +11,12 @@
   gap: $spacing-sm;
   min-height: 44px;
 
-  &:disabled {
+  &[data-disabled] {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
-  &:active:not(:disabled) {
+  &[data-active]:not([data-disabled]) {
     transform: scale(0.97);
   }
 
@@ -24,7 +24,7 @@
     background-color: $primary-color;
     color: $bg-primary;
 
-    &:hover:not(:disabled) {
+    &[data-hover]:not([data-disabled]) {
       opacity: 0.9;
       box-shadow: $shadow-md;
     }
@@ -35,7 +35,7 @@
     color: $text-primary;
     border: 1px solid $border-color;
 
-    &:hover:not(:disabled) {
+    &[data-hover]:not([data-disabled]) {
       background-color: $bg-hover;
       border-color: $border-hover;
     }
@@ -45,7 +45,7 @@
     background-color: $danger-color;
     color: white;
 
-    &:hover:not(:disabled) {
+    &[data-hover]:not([data-disabled]) {
       opacity: 0.9;
       box-shadow: $shadow-md;
     }

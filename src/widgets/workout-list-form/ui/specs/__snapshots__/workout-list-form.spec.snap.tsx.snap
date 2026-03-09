@@ -1,0 +1,886 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`WorkoutListForm matches snapshot for create mode (empty) 1`] = `
+<div>
+  <div
+    class="container"
+  >
+    <header
+      class="header"
+    >
+      <h1>
+        New Workout List
+      </h1>
+    </header>
+    <main
+      class="main"
+    >
+      <form
+        class="form"
+      >
+        <div
+          class="section"
+        >
+          <div
+            class="field"
+          >
+            <label
+              class="label"
+              for="name"
+            >
+              List Name *
+            </label>
+            <input
+              class="input"
+              id="name"
+              placeholder="e.g., Push Day"
+              required=""
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            class="field"
+          >
+            <label
+              class="label"
+              for="description"
+            >
+              Description
+            </label>
+            <textarea
+              class="textarea"
+              id="description"
+              placeholder="Chest, shoulders, triceps"
+              rows="2"
+            />
+          </div>
+        </div>
+        <div
+          class="section"
+        >
+          <div
+            class="sectionHeader"
+          >
+            <h2>
+              Exercises
+            </h2>
+            <button
+              class="button primary sm"
+              data-headlessui-state=""
+              type="button"
+            >
+              + Add Exercise
+            </button>
+          </div>
+          <p
+            class="emptyExercises"
+          >
+            Add exercises to your list
+          </p>
+        </div>
+        <div
+          class="actions"
+        >
+          <button
+            class="button secondary md"
+            data-headlessui-state=""
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="button primary md"
+            data-headlessui-state=""
+            type="submit"
+          >
+            Create List
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+`;
+
+exports[`WorkoutListForm matches snapshot for create mode (with exercises) 1`] = `
+<div>
+  <div
+    class="container"
+  >
+    <header
+      class="header"
+    >
+      <h1>
+        New Workout List
+      </h1>
+    </header>
+    <main
+      class="main"
+    >
+      <form
+        class="form"
+      >
+        <div
+          class="section"
+        >
+          <div
+            class="field"
+          >
+            <label
+              class="label"
+              for="name"
+            >
+              List Name *
+            </label>
+            <input
+              class="input"
+              id="name"
+              placeholder="e.g., Push Day"
+              required=""
+              type="text"
+              value="Push Day"
+            />
+          </div>
+          <div
+            class="field"
+          >
+            <label
+              class="label"
+              for="description"
+            >
+              Description
+            </label>
+            <textarea
+              class="textarea"
+              id="description"
+              placeholder="Chest, shoulders, triceps"
+              rows="2"
+            >
+              Chest focus
+            </textarea>
+          </div>
+        </div>
+        <div
+          class="section"
+        >
+          <div
+            class="sectionHeader"
+          >
+            <h2>
+              Exercises
+            </h2>
+            <button
+              class="button primary sm"
+              data-headlessui-state=""
+              type="button"
+            >
+              + Add Exercise
+            </button>
+          </div>
+          <div
+            class="exerciseList"
+          >
+            <div
+              class="exerciseCard"
+            >
+              <div
+                class="exerciseHeader"
+              >
+                <span
+                  class="exerciseNumber"
+                >
+                  1
+                </span>
+                <button
+                  aria-label="Remove exercise"
+                  class="removeButton"
+                  type="button"
+                >
+                  ✕
+                </button>
+              </div>
+              <div
+                class="field"
+              >
+                <label
+                  class="label"
+                >
+                  Name *
+                </label>
+                <input
+                  class="input"
+                  placeholder="Bench Press"
+                  required=""
+                  type="text"
+                  value="Bench Press"
+                />
+              </div>
+              <div
+                class="field"
+              >
+                <label
+                  class="label"
+                >
+                  Muscle Group
+                </label>
+                <div
+                  class="listboxWrapper"
+                  data-headlessui-state=""
+                >
+                  <button
+                    aria-expanded="false"
+                    aria-haspopup="listbox"
+                    class="listboxButton"
+                    data-headlessui-state=""
+                    id="headlessui-listbox-button-:r2:"
+                    type="button"
+                  >
+                    Chest
+                  </button>
+                </div>
+              </div>
+              <div
+                class="fieldRow"
+              >
+                <div
+                  class="field"
+                >
+                  <label
+                    class="label"
+                  >
+                    Weight (kg)
+                  </label>
+                  <input
+                    class="inputSmall"
+                    min="0"
+                    step="0.5"
+                    type="number"
+                    value="80"
+                  />
+                </div>
+                <div
+                  class="field"
+                >
+                  <label
+                    class="label"
+                  >
+                    Reps
+                  </label>
+                  <input
+                    class="inputSmall"
+                    min="1"
+                    type="number"
+                    value="10"
+                  />
+                </div>
+                <div
+                  class="field"
+                >
+                  <label
+                    class="label"
+                  >
+                    Sets
+                  </label>
+                  <input
+                    class="inputSmall"
+                    min="1"
+                    type="number"
+                    value="3"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="actions"
+        >
+          <button
+            class="button secondary md"
+            data-headlessui-state=""
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="button primary md"
+            data-headlessui-state=""
+            type="submit"
+          >
+            Create List
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+`;
+
+exports[`WorkoutListForm matches snapshot for edit mode (multiple exercises) 1`] = `
+<div>
+  <div
+    class="container"
+  >
+    <header
+      class="header"
+    >
+      <h1>
+        Editing Full Body
+      </h1>
+    </header>
+    <main
+      class="main"
+    >
+      <form
+        class="form"
+      >
+        <div
+          class="section"
+        >
+          <div
+            class="field"
+          >
+            <label
+              class="label"
+              for="name"
+            >
+              List Name *
+            </label>
+            <input
+              class="input"
+              id="name"
+              placeholder="e.g., Push Day"
+              required=""
+              type="text"
+              value="Full Body"
+            />
+          </div>
+          <div
+            class="field"
+          >
+            <label
+              class="label"
+              for="description"
+            >
+              Description
+            </label>
+            <textarea
+              class="textarea"
+              id="description"
+              placeholder="Chest, shoulders, triceps"
+              rows="2"
+            >
+              Chest, shoulders, triceps
+            </textarea>
+          </div>
+        </div>
+        <div
+          class="section"
+        >
+          <div
+            class="sectionHeader"
+          >
+            <h2>
+              Exercises
+            </h2>
+            <button
+              class="button primary sm"
+              data-headlessui-state=""
+              type="button"
+            >
+              + Add Exercise
+            </button>
+          </div>
+          <div
+            class="exerciseList"
+          >
+            <div
+              class="exerciseCard"
+            >
+              <div
+                class="exerciseHeader"
+              >
+                <span
+                  class="exerciseNumber"
+                >
+                  1
+                </span>
+                <button
+                  aria-label="Remove exercise"
+                  class="removeButton"
+                  type="button"
+                >
+                  ✕
+                </button>
+              </div>
+              <div
+                class="field"
+              >
+                <label
+                  class="label"
+                >
+                  Name *
+                </label>
+                <input
+                  class="input"
+                  placeholder="Bench Press"
+                  required=""
+                  type="text"
+                  value="Bench Press"
+                />
+              </div>
+              <div
+                class="field"
+              >
+                <label
+                  class="label"
+                >
+                  Muscle Group
+                </label>
+                <div
+                  class="listboxWrapper"
+                  data-headlessui-state=""
+                >
+                  <button
+                    aria-expanded="false"
+                    aria-haspopup="listbox"
+                    class="listboxButton"
+                    data-headlessui-state=""
+                    id="headlessui-listbox-button-:re:"
+                    type="button"
+                  >
+                    Chest
+                  </button>
+                </div>
+              </div>
+              <div
+                class="fieldRow"
+              >
+                <div
+                  class="field"
+                >
+                  <label
+                    class="label"
+                  >
+                    Weight (kg)
+                  </label>
+                  <input
+                    class="inputSmall"
+                    min="0"
+                    step="0.5"
+                    type="number"
+                    value="80"
+                  />
+                </div>
+                <div
+                  class="field"
+                >
+                  <label
+                    class="label"
+                  >
+                    Reps
+                  </label>
+                  <input
+                    class="inputSmall"
+                    min="1"
+                    type="number"
+                    value="10"
+                  />
+                </div>
+                <div
+                  class="field"
+                >
+                  <label
+                    class="label"
+                  >
+                    Sets
+                  </label>
+                  <input
+                    class="inputSmall"
+                    min="1"
+                    type="number"
+                    value="3"
+                  />
+                </div>
+              </div>
+            </div>
+            <div
+              class="exerciseCard"
+            >
+              <div
+                class="exerciseHeader"
+              >
+                <span
+                  class="exerciseNumber"
+                >
+                  2
+                </span>
+                <button
+                  aria-label="Remove exercise"
+                  class="removeButton"
+                  type="button"
+                >
+                  ✕
+                </button>
+              </div>
+              <div
+                class="field"
+              >
+                <label
+                  class="label"
+                >
+                  Name *
+                </label>
+                <input
+                  class="input"
+                  placeholder="Bench Press"
+                  required=""
+                  type="text"
+                  value="Overhead Press"
+                />
+              </div>
+              <div
+                class="field"
+              >
+                <label
+                  class="label"
+                >
+                  Muscle Group
+                </label>
+                <div
+                  class="listboxWrapper"
+                  data-headlessui-state=""
+                >
+                  <button
+                    aria-expanded="false"
+                    aria-haspopup="listbox"
+                    class="listboxButton"
+                    data-headlessui-state=""
+                    id="headlessui-listbox-button-:rk:"
+                    type="button"
+                  >
+                    Shoulders
+                  </button>
+                </div>
+              </div>
+              <div
+                class="fieldRow"
+              >
+                <div
+                  class="field"
+                >
+                  <label
+                    class="label"
+                  >
+                    Weight (kg)
+                  </label>
+                  <input
+                    class="inputSmall"
+                    min="0"
+                    step="0.5"
+                    type="number"
+                    value="50"
+                  />
+                </div>
+                <div
+                  class="field"
+                >
+                  <label
+                    class="label"
+                  >
+                    Reps
+                  </label>
+                  <input
+                    class="inputSmall"
+                    min="1"
+                    type="number"
+                    value="8"
+                  />
+                </div>
+                <div
+                  class="field"
+                >
+                  <label
+                    class="label"
+                  >
+                    Sets
+                  </label>
+                  <input
+                    class="inputSmall"
+                    min="1"
+                    type="number"
+                    value="4"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="actions"
+        >
+          <button
+            class="button secondary md"
+            data-headlessui-state=""
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="button primary md"
+            data-headlessui-state=""
+            type="submit"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+`;
+
+exports[`WorkoutListForm matches snapshot for edit mode (single exercise) 1`] = `
+<div>
+  <div
+    class="container"
+  >
+    <header
+      class="header"
+    >
+      <h1>
+        Editing Push Day
+      </h1>
+    </header>
+    <main
+      class="main"
+    >
+      <form
+        class="form"
+      >
+        <div
+          class="section"
+        >
+          <div
+            class="field"
+          >
+            <label
+              class="label"
+              for="name"
+            >
+              List Name *
+            </label>
+            <input
+              class="input"
+              id="name"
+              placeholder="e.g., Push Day"
+              required=""
+              type="text"
+              value="Push Day"
+            />
+          </div>
+          <div
+            class="field"
+          >
+            <label
+              class="label"
+              for="description"
+            >
+              Description
+            </label>
+            <textarea
+              class="textarea"
+              id="description"
+              placeholder="Chest, shoulders, triceps"
+              rows="2"
+            >
+              Chest focus
+            </textarea>
+          </div>
+        </div>
+        <div
+          class="section"
+        >
+          <div
+            class="sectionHeader"
+          >
+            <h2>
+              Exercises
+            </h2>
+            <button
+              class="button primary sm"
+              data-headlessui-state=""
+              type="button"
+            >
+              + Add Exercise
+            </button>
+          </div>
+          <div
+            class="exerciseList"
+          >
+            <div
+              class="exerciseCard"
+            >
+              <div
+                class="exerciseHeader"
+              >
+                <span
+                  class="exerciseNumber"
+                >
+                  1
+                </span>
+                <button
+                  aria-label="Remove exercise"
+                  class="removeButton"
+                  type="button"
+                >
+                  ✕
+                </button>
+              </div>
+              <div
+                class="field"
+              >
+                <label
+                  class="label"
+                >
+                  Name *
+                </label>
+                <input
+                  class="input"
+                  placeholder="Bench Press"
+                  required=""
+                  type="text"
+                  value="Bench Press"
+                />
+              </div>
+              <div
+                class="field"
+              >
+                <label
+                  class="label"
+                >
+                  Muscle Group
+                </label>
+                <div
+                  class="listboxWrapper"
+                  data-headlessui-state=""
+                >
+                  <button
+                    aria-expanded="false"
+                    aria-haspopup="listbox"
+                    class="listboxButton"
+                    data-headlessui-state=""
+                    id="headlessui-listbox-button-:r8:"
+                    type="button"
+                  >
+                    Chest
+                  </button>
+                </div>
+              </div>
+              <div
+                class="fieldRow"
+              >
+                <div
+                  class="field"
+                >
+                  <label
+                    class="label"
+                  >
+                    Weight (kg)
+                  </label>
+                  <input
+                    class="inputSmall"
+                    min="0"
+                    step="0.5"
+                    type="number"
+                    value="80"
+                  />
+                </div>
+                <div
+                  class="field"
+                >
+                  <label
+                    class="label"
+                  >
+                    Reps
+                  </label>
+                  <input
+                    class="inputSmall"
+                    min="1"
+                    type="number"
+                    value="10"
+                  />
+                </div>
+                <div
+                  class="field"
+                >
+                  <label
+                    class="label"
+                  >
+                    Sets
+                  </label>
+                  <input
+                    class="inputSmall"
+                    min="1"
+                    type="number"
+                    value="3"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="actions"
+        >
+          <button
+            class="button secondary md"
+            data-headlessui-state=""
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="button primary md"
+            data-headlessui-state=""
+            type="submit"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+`;
+
+exports[`WorkoutListForm matches snapshot for edit mode without initialData 1`] = `
+<div>
+  <div
+    class="container"
+  >
+    <div
+      class="container"
+    >
+      <h2
+        class="title"
+      >
+        Workout list not found
+      </h2>
+      <a
+        class="link"
+        href="/"
+      >
+        <button
+          class="button primary md"
+          data-headlessui-state=""
+          type="button"
+        >
+          Back to Home
+        </button>
+      </a>
+    </div>
+  </div>
+</div>
+`;

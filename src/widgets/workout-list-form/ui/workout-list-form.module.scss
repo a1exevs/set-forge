@@ -5,6 +5,13 @@
   padding-bottom: $spacing-2xl;
 }
 
+.errorMessage {
+  text-align: center;
+  color: $danger-color;
+  font-size: $font-size-lg;
+  margin-bottom: $spacing-lg;
+}
+
 .header {
   text-align: center;
   padding: $spacing-lg 0;

@@ -13,7 +13,7 @@ alwaysApply: true
 
 ## 3-Layer Pattern
 
-**Data** (`*-data-layer.tsx`): Stores only. `useStore.use.x()`. Pass to logic. No hooks.
+**Data** (`*-data-layer.tsx`): Stores only. `useStore.use.x()`. Pass to logic. No business logic. Optimization hooks (`useCallback`, `useMemo`) allowed for stable references.
 **Logic** (`*-logic-layer.tsx`): Hooks, handlers, state. No stores.
 **Presentation** (`*.tsx`): Props only. No hooks.
 

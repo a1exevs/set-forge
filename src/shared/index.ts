@@ -13,4 +13,4 @@ export {
 } from 'src/shared/model';
 
 // ui
-export { Button } from 'src/shared/ui';
+export { Button, ConfirmDialogProvider, MenuButton, useConfirm } from 'src/shared/ui';

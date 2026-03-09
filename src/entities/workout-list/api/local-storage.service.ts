@@ -8,9 +8,9 @@ class LocalStorageService implements IWorkoutListStorage {
   private getStorageData(): WorkoutList[] {
     try {
       const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
-    } catch (error) {
-      console.error('Error reading from localStorage:', error);
+      const parsed = data ? JSON.parse(data) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
       return [];
     }
   }
@@ -18,8 +18,7 @@ class LocalStorageService implements IWorkoutListStorage {
   private setStorageData(lists: WorkoutList[]): void {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(lists));
-    } catch (error) {
-      console.error('Error writing to localStorage:', error);
+    } catch {
       throw new Error('Failed to save workout list. Storage might be full.');
     }
   }
