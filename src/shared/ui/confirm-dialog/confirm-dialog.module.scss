@@ -1,0 +1,30 @@
+.container {
+  background-color: $bg-primary;
+  padding: $spacing-xl;
+  border-radius: $radius-lg;
+  min-width: 300px;
+  max-width: 500px;
+}
+
+.title {
+  margin: 0 0 $spacing-md 0;
+  color: $text-primary;
+  font-size: $font-size-lg;
+  font-weight: 600;
+}
+
+.description {
+  margin: 0 0 $spacing-lg 0;
+  color: $text-secondary;
+  font-size: $font-size-base;
+}
+
+.buttons {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
+
+  &.singleButton {
+    justify-content: flex-end;
+  }
+}

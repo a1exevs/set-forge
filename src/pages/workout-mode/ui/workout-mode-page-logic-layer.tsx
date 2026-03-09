@@ -1,6 +1,8 @@
 import type { WorkoutList } from '@entities';
 import { FC, useEffect, useRef, useState } from 'react';
 
+import { useConfirm } from '@shared';
+
 import WorkoutModePage from 'src/pages/workout-mode/ui/workout-mode-page';
 
 type Props = {
@@ -20,6 +22,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   updateWorkoutProgress,
   resetAllProgress,
 }) => {
+  const confirmDialog = useConfirm();
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
   const lastTapRef = useRef<Record<string, number>>({});
 
@@ -31,18 +34,23 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   }, [id, setCurrentWorkout, clearCurrentWorkout]);
 
   const handleExerciseClick = (exerciseId: string): void => {
-    if (!currentWorkout) return;
+    if (!currentWorkout) {
+      return;
+    }
 
     const exercise = currentWorkout.exercises.find(ex => ex.id === exerciseId);
-    if (!exercise) return;
+    if (!exercise) {
+      return;
+    }
 
-    if (exercise.completedSets < exercise.sets) {
-      updateWorkoutProgress(currentWorkout.id, exerciseId);
+    if (exercise.completedSets >= exercise.sets) {
+      return;
+    }
+    updateWorkoutProgress(currentWorkout.id, exerciseId);
 
-      if (exercise.completedSets + 1 === exercise.sets) {
-        setJustCompleted(exerciseId);
-        setTimeout((): void => setJustCompleted(null), 1000);
-      }
+    if (exercise.completedSets + 1 === exercise.sets) {
+      setJustCompleted(exerciseId);
+      setTimeout((): void => setJustCompleted(null), 1000);
     }
   };
 
@@ -60,10 +68,18 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     }
   };
 
-  const handleResetAll = (): void => {
-    if (!currentWorkout) return;
+  const handleResetAll = async (): Promise<void> => {
+    if (!currentWorkout) {
+      return;
+    }
 
-    if (confirm('Reset all progress?')) {
+    const ok = await confirmDialog({
+      title: 'Reset all progress?',
+      description: 'All completed sets will be reset.',
+      confirmationText: 'Reset',
+      cancellationText: 'Cancel',
+    });
+    if (ok) {
       resetAllProgress(currentWorkout.id);
     }
   };
@@ -74,7 +90,9 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     }
 
     const totalExercises = currentWorkout.exercises.length;
-    const completedExercises = currentWorkout.exercises.filter(ex => ex.completedSets === ex.sets).length;
+    const completedExercises = currentWorkout.exercises.filter(
+      ex => ex.sets > 0 && ex.completedSets === ex.sets,
+    ).length;
     const overallProgress = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0;
 
     return { totalExercises, completedExercises, overallProgress };

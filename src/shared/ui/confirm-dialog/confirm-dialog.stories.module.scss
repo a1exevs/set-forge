@@ -1,0 +1,15 @@
+.storyWrapper {
+  padding: $spacing-xl;
+  min-height: 100vh;
+  background-color: $bg-tertiary;
+}
+
+.storyTitle {
+  color: $text-primary;
+  margin: 0 0 $spacing-md 0;
+}
+
+.storyText {
+  color: $text-primary;
+  margin: 0 0 $spacing-lg 0;
+}

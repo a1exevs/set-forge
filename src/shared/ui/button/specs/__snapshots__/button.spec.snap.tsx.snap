@@ -1,0 +1,111 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Button matches snapshot for custom className 1`] = `
+<div>
+  <button
+    class="button primary md custom"
+    data-headlessui-state=""
+    type="button"
+  >
+    Custom
+  </button>
+</div>
+`;
+
+exports[`Button matches snapshot for danger variant 1`] = `
+<div>
+  <button
+    class="button danger md"
+    data-headlessui-state=""
+    type="button"
+  >
+    Danger
+  </button>
+</div>
+`;
+
+exports[`Button matches snapshot for default 1`] = `
+<div>
+  <button
+    class="button primary md"
+    data-headlessui-state=""
+    type="button"
+  >
+    Button
+  </button>
+</div>
+`;
+
+exports[`Button matches snapshot for disabled 1`] = `
+<div>
+  <button
+    class="button primary md"
+    data-disabled=""
+    data-headlessui-state="disabled"
+    disabled=""
+    type="button"
+  >
+    Disabled
+  </button>
+</div>
+`;
+
+exports[`Button matches snapshot for lg size 1`] = `
+<div>
+  <button
+    class="button primary lg"
+    data-headlessui-state=""
+    type="button"
+  >
+    Large
+  </button>
+</div>
+`;
+
+exports[`Button matches snapshot for md size 1`] = `
+<div>
+  <button
+    class="button primary md"
+    data-headlessui-state=""
+    type="button"
+  >
+    Medium
+  </button>
+</div>
+`;
+
+exports[`Button matches snapshot for primary variant 1`] = `
+<div>
+  <button
+    class="button primary md"
+    data-headlessui-state=""
+    type="button"
+  >
+    Primary
+  </button>
+</div>
+`;
+
+exports[`Button matches snapshot for secondary variant 1`] = `
+<div>
+  <button
+    class="button secondary md"
+    data-headlessui-state=""
+    type="button"
+  >
+    Secondary
+  </button>
+</div>
+`;
+
+exports[`Button matches snapshot for sm size 1`] = `
+<div>
+  <button
+    class="button primary sm"
+    data-headlessui-state=""
+    type="button"
+  >
+    Small
+  </button>
+</div>
+`;

@@ -2,12 +2,21 @@ import { Controls, Description, Primary, Subtitle, Title } from '@storybook/bloc
 import type { Preview } from '@storybook/react';
 import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router';
 
+import { ConfirmDialogProvider } from '@shared';
+
 import { routeTree } from 'src/route-tree.gen';
 
 import 'src/shared/ui/styles/global.scss';
 
-const withRouter: Preview['decorators'][0] = (Story: React.FC, context) => {
+const withRouterAndProviders: Preview['decorators'][0] = (Story: React.FC, context) => {
   const routerConfig = context.parameters.router as { initialEntries?: string[] } | undefined;
+  const seedEditStorage = context.parameters.seedEditStorage;
+
+  if (Array.isArray(seedEditStorage)) {
+    localStorage.setItem('workout-lists', JSON.stringify(seedEditStorage));
+  } else {
+    localStorage.removeItem('workout-lists');
+  }
 
   if (!routerConfig?.initialEntries) {
     return <Story />;
@@ -18,12 +27,16 @@ const withRouter: Preview['decorators'][0] = (Story: React.FC, context) => {
     history: createMemoryHistory({ initialEntries: routerConfig.initialEntries }),
   });
 
-  return <RouterProvider router={router} />;
+  return (
+    <ConfirmDialogProvider>
+      <RouterProvider router={router} />
+    </ConfirmDialogProvider>
+  );
 };
 
 const preview: Preview = {
   tags: ['autodocs'],
-  decorators: [withRouter],
+  decorators: [withRouterAndProviders],
   parameters: {
     options: {
       storySort: {

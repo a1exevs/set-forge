@@ -26,6 +26,8 @@ exports[`App Page with route / matches snapshot, route / 1`] = `
       >
         <button
           class="button primary lg"
+          data-headlessui-state=""
+          type="button"
         >
           <span
             class="addIcon"
@@ -119,6 +121,7 @@ exports[`App Page with route / matches snapshot, route /create 1`] = `
             </h2>
             <button
               class="button primary sm"
+              data-headlessui-state=""
               type="button"
             >
               + Add Exercise
@@ -135,12 +138,14 @@ exports[`App Page with route / matches snapshot, route /create 1`] = `
         >
           <button
             class="button secondary md"
+            data-headlessui-state=""
             type="button"
           >
             Cancel
           </button>
           <button
             class="button primary md"
+            data-headlessui-state=""
             type="submit"
           >
             Create List

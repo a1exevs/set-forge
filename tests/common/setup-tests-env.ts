@@ -6,6 +6,7 @@ import { TextDecoder, TextEncoder } from 'util';
 const globalAny = global as unknown as {
   TextEncoder: typeof TextEncoder;
   TextDecoder: typeof TextDecoder;
+  ResizeObserver: typeof ResizeObserver;
 };
 
 if (typeof globalAny.TextEncoder === 'undefined') {
@@ -14,4 +15,13 @@ if (typeof globalAny.TextEncoder === 'undefined') {
 
 if (typeof globalAny.TextDecoder === 'undefined') {
   globalAny.TextDecoder = TextDecoder;
+}
+
+// Polyfill ResizeObserver for Headless UI Menu (Floating UI) in jsdom
+if (typeof globalAny.ResizeObserver === 'undefined') {
+  globalAny.ResizeObserver = class ResizeObserver {
+    observe(): void {}
+    unobserve(): void {}
+    disconnect(): void {}
+  };
 }

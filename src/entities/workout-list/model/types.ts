@@ -25,9 +25,11 @@ export interface CreateWorkoutListDto {
   exercises: Omit<WorkoutExercise, 'id' | 'completedSets'>[];
 }
 
+export type UpdateExerciseDto = Omit<WorkoutExercise, 'id' | 'completedSets'> &
+  Partial<Pick<WorkoutExercise, 'id' | 'completedSets'>>;
+
 export interface UpdateWorkoutListDto {
-  name?: string;
-  description?: string;
-  exercises?: WorkoutExercise[];
-  lastUsedAt?: string | null;
+  name: string;
+  description: string;
+  exercises: UpdateExerciseDto[];
 }

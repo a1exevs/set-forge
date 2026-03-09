@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": false,
+    "types": ["jest", "@testing-library/jest-dom"]
+  },
+  "include": ["src/**/*.spec.*", "tests/**/*"],
+  "exclude": ["node_modules", "dist", "build", "coverage"]
+}

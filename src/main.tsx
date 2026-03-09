@@ -3,6 +3,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { router } from '@app';
+import { ConfirmDialogProvider } from '@shared';
 
 import 'src/shared/ui/styles/global.scss';
 
@@ -14,6 +15,8 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ConfirmDialogProvider>
+      <RouterProvider router={router} />
+    </ConfirmDialogProvider>
   </StrictMode>,
 );

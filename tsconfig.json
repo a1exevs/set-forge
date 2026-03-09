@@ -25,6 +25,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
+    "allowSyntheticDefaultImports": true,
 
     /* Path aliases */
     "baseUrl": ".",
@@ -46,7 +47,7 @@
       "storybook-dir/*": [
         "./.storybook/*"
       ]
-    }
+    },
   },
   "include": ["src"],
   "exclude": [
@@ -54,7 +55,9 @@
     "dist",
     "build",
     "coverage",
-    "storybook-static"
+    "storybook-static",
+    "**/*.spec.*",
+    "**/specs/**"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

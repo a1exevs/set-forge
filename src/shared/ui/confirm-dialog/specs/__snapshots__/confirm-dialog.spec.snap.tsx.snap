@@ -1,0 +1,366 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ConfirmDialog matches snapshot with custom button texts 1`] = `
+<body>
+  <div>
+    <button
+      type="button"
+    >
+      Open
+    </button>
+  </div>
+  <div
+    id="headlessui-portal-root"
+  >
+    <div
+      data-headlessui-portal=""
+    >
+      <button
+        aria-hidden="true"
+        data-headlessui-focus-guard="true"
+        style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
+        type="button"
+      />
+      <div>
+        <div
+          aria-label="Reset progress?"
+          aria-modal="true"
+          class="dialogRoot"
+          data-headlessui-state="open"
+          data-open=""
+          id="headlessui-dialog-:ro:"
+          role="dialog"
+          tabindex="-1"
+        >
+          <div
+            aria-hidden="true"
+            class="dialogBackdrop"
+            data-headlessui-state="open"
+            data-open=""
+            style="background-color: rgb(0, 0, 0);"
+          />
+          <div
+            class="dialogOverlay"
+          >
+            <div
+              class="dialogPanel"
+              data-headlessui-state="open"
+              data-open=""
+              id="headlessui-dialog-panel-:rv:"
+            >
+              <div
+                class="container"
+              >
+                <h2
+                  class="title"
+                >
+                  Reset progress?
+                </h2>
+                <p
+                  class="description"
+                >
+                  All completed sets will be reset.
+                </p>
+                <div
+                  class="buttons "
+                >
+                  <button
+                    class="button secondary md"
+                    data-headlessui-state=""
+                    type="button"
+                  >
+                    Keep
+                  </button>
+                  <button
+                    class="button primary md"
+                    data-headlessui-state=""
+                    type="button"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button
+        aria-hidden="true"
+        data-headlessui-focus-guard="true"
+        style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
+        type="button"
+      />
+    </div>
+  </div>
+</body>
+`;
+
+exports[`ConfirmDialog matches snapshot with default options 1`] = `
+<body>
+  <div
+    aria-hidden="true"
+  >
+    <button
+      type="button"
+    >
+      Open
+    </button>
+  </div>
+  <div
+    id="headlessui-portal-root"
+  >
+    <div
+      data-headlessui-portal=""
+    >
+      <button
+        aria-hidden="true"
+        data-headlessui-focus-guard="true"
+        style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
+        type="button"
+      />
+      <div>
+        <div
+          aria-label="Confirm action"
+          aria-modal="true"
+          class="dialogRoot"
+          data-headlessui-state="open"
+          data-open=""
+          id="headlessui-dialog-:r0:"
+          role="dialog"
+          tabindex="-1"
+        >
+          <div
+            aria-hidden="true"
+            class="dialogBackdrop"
+            data-headlessui-state="open"
+            data-open=""
+            style="background-color: rgb(0, 0, 0);"
+          />
+          <div
+            class="dialogOverlay"
+          >
+            <div
+              class="dialogPanel"
+              data-headlessui-state="open"
+              data-open=""
+              id="headlessui-dialog-panel-:r7:"
+            >
+              <div
+                class="container"
+              >
+                <h2
+                  class="title"
+                >
+                  Confirm action
+                </h2>
+                <div
+                  class="buttons "
+                >
+                  <button
+                    class="button secondary md"
+                    data-headlessui-state=""
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    class="button primary md"
+                    data-headlessui-state=""
+                    type="button"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button
+        aria-hidden="true"
+        data-headlessui-focus-guard="true"
+        style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
+        type="button"
+      />
+    </div>
+  </div>
+</body>
+`;
+
+exports[`ConfirmDialog matches snapshot with description 1`] = `
+<body>
+  <div>
+    <button
+      type="button"
+    >
+      Open
+    </button>
+  </div>
+  <div
+    id="headlessui-portal-root"
+  >
+    <div
+      data-headlessui-portal=""
+    >
+      <button
+        aria-hidden="true"
+        data-headlessui-focus-guard="true"
+        style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
+        type="button"
+      />
+      <div>
+        <div
+          aria-label="Delete item?"
+          aria-modal="true"
+          class="dialogRoot"
+          data-headlessui-state="open"
+          data-open=""
+          id="headlessui-dialog-:r8:"
+          role="dialog"
+          tabindex="-1"
+        >
+          <div
+            aria-hidden="true"
+            class="dialogBackdrop"
+            data-headlessui-state="open"
+            data-open=""
+            style="background-color: rgb(0, 0, 0);"
+          />
+          <div
+            class="dialogOverlay"
+          >
+            <div
+              class="dialogPanel"
+              data-headlessui-state="open"
+              data-open=""
+              id="headlessui-dialog-panel-:rf:"
+            >
+              <div
+                class="container"
+              >
+                <h2
+                  class="title"
+                >
+                  Delete item?
+                </h2>
+                <p
+                  class="description"
+                >
+                  This action cannot be undone.
+                </p>
+                <div
+                  class="buttons "
+                >
+                  <button
+                    class="button secondary md"
+                    data-headlessui-state=""
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    class="button primary md"
+                    data-headlessui-state=""
+                    type="button"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button
+        aria-hidden="true"
+        data-headlessui-focus-guard="true"
+        style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
+        type="button"
+      />
+    </div>
+  </div>
+</body>
+`;
+
+exports[`ConfirmDialog matches snapshot with hideCancelButton 1`] = `
+<body>
+  <div>
+    <button
+      type="button"
+    >
+      Open
+    </button>
+  </div>
+  <div
+    id="headlessui-portal-root"
+  >
+    <div
+      data-headlessui-portal=""
+    >
+      <button
+        aria-hidden="true"
+        data-headlessui-focus-guard="true"
+        style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
+        type="button"
+      />
+      <div>
+        <div
+          aria-label="Please enter a list name"
+          aria-modal="true"
+          class="dialogRoot"
+          data-headlessui-state="open"
+          data-open=""
+          id="headlessui-dialog-:rg:"
+          role="dialog"
+          tabindex="-1"
+        >
+          <div
+            aria-hidden="true"
+            class="dialogBackdrop"
+            data-headlessui-state="open"
+            data-open=""
+            style="background-color: rgb(0, 0, 0);"
+          />
+          <div
+            class="dialogOverlay"
+          >
+            <div
+              class="dialogPanel"
+              data-headlessui-state="open"
+              data-open=""
+              id="headlessui-dialog-panel-:rn:"
+            >
+              <div
+                class="container"
+              >
+                <h2
+                  class="title"
+                >
+                  Please enter a list name
+                </h2>
+                <div
+                  class="buttons singleButton"
+                >
+                  <button
+                    class="button primary md"
+                    data-headlessui-state=""
+                    type="button"
+                  >
+                    Ok
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button
+        aria-hidden="true"
+        data-headlessui-focus-guard="true"
+        style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
+        type="button"
+      />
+    </div>
+  </div>
+</body>
+`;
