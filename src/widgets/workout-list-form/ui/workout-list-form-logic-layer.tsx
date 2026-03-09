@@ -1,7 +1,8 @@
 import type { CreateWorkoutListDto, MuscleGroup, UpdateWorkoutListDto, WorkoutList } from '@entities';
 import { FC, FormEvent, useEffect, useState } from 'react';
 
-import { Button, useConfirm } from '@shared';
+import { useConfirm } from '@shared';
+import { NotFoundMessage } from '@widgets';
 
 import type { ExerciseFormData } from 'src/widgets/workout-list-form/model';
 import WorkoutListForm from 'src/widgets/workout-list-form/ui/workout-list-form';
@@ -169,10 +170,7 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
   if (mode === 'edit' && !initialData) {
     return (
       <div className={classes.container}>
-        <p className={classes.errorMessage}>Workout list not found</p>
-        <Button type="button" variant="secondary" onClick={onCancel}>
-          Go back
-        </Button>
+        <NotFoundMessage title="Workout list not found" backToLink="/" />
       </div>
     );
   }

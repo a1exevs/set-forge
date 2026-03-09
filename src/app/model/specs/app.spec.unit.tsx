@@ -44,5 +44,17 @@ describe('App', () => {
       const notFoundHeading = await screen.findByText('Workout list not found');
       expect(notFoundHeading).toBeInTheDocument();
     });
+
+    it('renders EditWorkoutPage at /edit/:id with NotFoundMessage when id does not exist', async () => {
+      const testRouter = createRouter({
+        routeTree,
+        defaultPreload: 'intent',
+        history: createMemoryHistory({ initialEntries: ['/edit/non-existent-id'] }),
+      });
+      renderApp(testRouter);
+
+      const notFoundHeading = await screen.findByText('Workout list not found');
+      expect(notFoundHeading).toBeInTheDocument();
+    });
   });
 });

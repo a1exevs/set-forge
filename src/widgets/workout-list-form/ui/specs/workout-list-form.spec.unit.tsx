@@ -1,8 +1,17 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 
-import { ConfirmDialogProvider } from '@shared';
-import { WorkoutListForm } from '@widgets';
+import ConfirmDialogProvider from 'src/shared/ui/confirm-dialog/confirm-dialog-provider';
+import WorkoutListForm from 'src/widgets/workout-list-form/ui/workout-list-form-logic-layer';
+
+jest.mock('@tanstack/react-router', () => ({
+  Link: ({ to, children, className }: { to: string; children: ReactNode; className?: string }) => (
+    <a href={to} className={className}>
+      {children}
+    </a>
+  ),
+}));
 
 const mockOnSubmit = jest.fn();
 const mockOnCancel = jest.fn();
@@ -68,7 +77,7 @@ describe('WorkoutListForm', () => {
       expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
     });
 
-    it('renders error when edit mode has no initialData', () => {
+    it('renders NotFoundMessage when edit mode has no initialData', () => {
       render(
         <ConfirmDialogProvider>
           <WorkoutListForm {...defaultProps} mode="edit" onSubmit={mockOnSubmit} onCancel={mockOnCancel} />
@@ -76,20 +85,7 @@ describe('WorkoutListForm', () => {
       );
 
       expect(screen.getByText('Workout list not found')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Go back' })).toBeInTheDocument();
-    });
-
-    it('calls onCancel when Go back is clicked in edit mode without initialData', async () => {
-      const user = userEvent.setup();
-      render(
-        <ConfirmDialogProvider>
-          <WorkoutListForm {...defaultProps} mode="edit" onSubmit={mockOnSubmit} onCancel={mockOnCancel} />
-        </ConfirmDialogProvider>,
-      );
-
-      await user.click(screen.getByRole('button', { name: 'Go back' }));
-
-      expect(mockOnCancel).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('link', { name: 'Back to Home' })).toBeInTheDocument();
     });
   });
 

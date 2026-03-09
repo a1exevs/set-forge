@@ -9,6 +9,7 @@ type Props = {
   loadFromStorage: () => void;
   workoutLists: WorkoutList[];
   deleteWorkoutList: (id: string) => void;
+  onEdit: (id: string) => void;
   formatDate: (date: string | null) => string;
   getUsagePercentageAsync: () => Promise<number>;
 };
@@ -16,6 +17,7 @@ type Props = {
 const HomePageLogicLayer: FC<Props> = ({
   workoutLists,
   deleteWorkoutList,
+  onEdit,
   formatDate,
   getUsagePercentageAsync,
   loadFromStorage,
@@ -52,6 +54,7 @@ const HomePageLogicLayer: FC<Props> = ({
     <HomePage
       workoutLists={workoutLists}
       storageWarning={storageWarning}
+      onEdit={onEdit}
       onDelete={handleDelete}
       formatDate={formatDate}
     />

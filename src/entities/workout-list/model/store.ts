@@ -20,7 +20,7 @@ interface WorkoutListState {
 
   loadFromStorage: () => void;
   addWorkoutList: (dto: CreateWorkoutListDto) => boolean;
-  updateWorkoutList: (id: string, dto: UpdateWorkoutListDto) => void;
+  updateWorkoutList: (id: string, dto: UpdateWorkoutListDto) => boolean;
   deleteWorkoutList: (id: string) => void;
   updateWorkoutProgress: (listId: string, exerciseId: string) => void;
   setCurrentWorkout: (id: string) => void;
@@ -89,7 +89,7 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
           set(state => {
             state.error = 'Workout list not found';
           });
-          return;
+          return false;
         }
         const exercises: WorkoutExercise[] = dto.exercises.map(ex => {
           if (ex.id !== undefined && ex.completedSets !== undefined) {
@@ -133,10 +133,12 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
               state.currentWorkout = updated;
             }
           });
+          return true;
         } catch (error) {
           set(state => {
             state.error = error instanceof Error ? error.message : 'Failed to update workout list';
           });
+          return false;
         }
       },
 
@@ -194,11 +196,9 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
 
       setCurrentWorkout: id => {
         const list = workoutListStorage.getList(id);
-        if (list) {
-          set(state => {
-            state.currentWorkout = list;
-          });
-        }
+        set(state => {
+          state.currentWorkout = list ?? null;
+        });
       },
 
       clearCurrentWorkout: () => {

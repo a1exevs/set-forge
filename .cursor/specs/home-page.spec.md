@@ -11,8 +11,8 @@ The home page displays a list of workout lists, allows navigation to create a ne
 ### Initialization
 
 1. `HomePageDataLayer` mounts.
-2. Subscribes to `useWorkoutListStore.use.workoutLists()`, `loadFromStorage`, `deleteWorkoutList`, `getUsagePercentageAsync`. Passes `onEdit` (navigate to `/edit/$id`) and `onDelete` handlers.
-3. Passes data to `HomePageLogicLayer`.
+2. Subscribes to `useWorkoutListStore.use.workoutLists()`, `loadFromStorage`, `deleteWorkoutList`, `getUsagePercentageAsync`. Passes `onEdit` (navigate to `/edit/$id`) and `deleteWorkoutList` to LogicLayer.
+3. `HomePageLogicLayer` creates `onDelete` (`handleDelete`) from `deleteWorkoutList` and `useConfirm`, passes it to Presentation along with other data.
 
 ### Data loading
 
@@ -78,7 +78,7 @@ type Props = {
 ### Relationships
 
 - `workoutLists` — from `useWorkoutListStore.use.workoutLists()`
-- `formatDate` — from `@shared` (`formatDate` from `dates.ts`): `date => date ? new Date(date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) : 'Never'`
+- `formatDate` — from `@shared` (`src/shared/model/helpers/dates.ts`): `date => date ? new Date(date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) : 'Never'`
 
 ---
 

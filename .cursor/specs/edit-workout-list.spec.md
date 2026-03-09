@@ -28,8 +28,8 @@ Ability to edit existing workout lists via dot-dot-dot menu (Edit/Delete) on Hom
 10. Title: «Editing &lt;name&gt;» (e.g., «Editing Push Day»).
 11. Submit button: «Save» (not «Create List»).
 12. Validation: same as Create (name required, at least one exercise, valid exercise data).
-13. On submit: `updateWorkoutList(id, dto)` → store merges with existing list, saves via `workoutListStorage.saveList`.
-14. On success: `navigate({ to: '/' })`.
+13. On submit: `updateWorkoutList(id, dto)` → store merges with existing list, saves via `workoutListStorage.saveList`. Returns `true` on success, `false` on error.
+14. On success (when `updateWorkoutList` returns `true`): `navigate({ to: '/' })`. On error — no navigation.
 
 ### Cancel
 
@@ -86,9 +86,9 @@ type Props = {
 ### not-found-message
 
 - **Location**: `widgets/not-found-message/`
-- **Purpose**: Shared block «Not found» + «Back to Home» link.
-- **Used by**: Edit page, Workout mode page.
-- **Props**: `title?: string` (default «Workout list not found»), `backTo?: string` (default `/`).
+- **Purpose**: Shared block «Not found» + link back (default «Back to Home»).
+- **Used by**: Edit page, Workout mode page, WorkoutListForm.
+- **Props**: `title: string` (required), `backToLink?: string` (default `/`), `backToLabel?: string` (default «Back to Home»).
 
 ---
 
@@ -115,9 +115,9 @@ type Props = {
 | API | Type | Description |
 |-----|------|--------------|
 | `useWorkoutListStore.use.currentWorkout()` | selector | Current workout (set via setCurrentWorkout) |
-| `useWorkoutListStore.use.setCurrentWorkout(id)` | action | Load list from storage into currentWorkout |
+| `useWorkoutListStore.use.setCurrentWorkout(id)` | action | Load list from storage into currentWorkout; when `getList(id)` returns `null`, sets `currentWorkout = null` (ensures NotFoundMessage when navigating from workout mode to non-existent edit id) |
 | `useWorkoutListStore.use.clearCurrentWorkout()` | action | Clear on unmount |
-| `useWorkoutListStore.use.updateWorkoutList(id, dto)` | action | Update and save workout list |
+| `useWorkoutListStore.use.updateWorkoutList(id, dto)` | action | Update and save workout list; returns `true` on success, `false` on error |
 | `MenuButton` | component | From [shared-components.spec.md](shared-components.spec.md) |
 | Route | — | `/edit/$id` |
 
@@ -131,11 +131,12 @@ type Props = {
 
 | Scenario | Handling |
 |---------|----------|
-| Non-existent `id` on `/edit/$id` | Render `NotFoundMessage`, Link to home |
+| Non-existent `id` on `/edit/$id` | `setCurrentWorkout(id)` sets `currentWorkout = null` when list not found; render `NotFoundMessage`, Link to home |
 | Empty name on submit | Confirm «Please enter a list name» |
 | No exercises on submit | Confirm «Please add at least one exercise» |
 | Invalid exercise data | Confirm «Please check exercise data validity» |
-| Error on `updateWorkoutList` | Store writes `state.error`, navigation still runs |
+| Error on `updateWorkoutList` | Store writes `state.error`, returns `false`, navigation does NOT run |
+| `WorkoutListForm` with `mode="edit"` without `initialData` | Render `NotFoundMessage` inside widget |
 | Cancel without changes | Navigate to `/` |
 | New exercise in Edit mode | Generate new `id`, `completedSets: 0` |
 | Removed exercise in Edit mode | Omit from exercises array |

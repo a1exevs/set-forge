@@ -1,9 +1,19 @@
 import { render } from '@testing-library/react';
 import type { ExerciseFormData } from '@widgets/workout-list-form/model';
+import type { ReactNode } from 'react';
 
-import { ConfirmDialogProvider } from '@shared';
-import { WorkoutListForm } from '@widgets';
 import WorkoutListFormPresentation from '@widgets/workout-list-form/ui/workout-list-form';
+
+import ConfirmDialogProvider from 'src/shared/ui/confirm-dialog/confirm-dialog-provider';
+import WorkoutListForm from 'src/widgets/workout-list-form/ui/workout-list-form-logic-layer';
+
+jest.mock('@tanstack/react-router', () => ({
+  Link: ({ to, children, className }: { to: string; children: ReactNode; className?: string }) => (
+    <a href={to} className={className}>
+      {children}
+    </a>
+  ),
+}));
 
 const mockOnSubmit = (): void => undefined;
 const mockOnCancel = (): void => undefined;

@@ -238,21 +238,6 @@
   margin: 0;
 }
 
-.notFound {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: $spacing-xl;
-  text-align: center;
-
-  h2 {
-    color: $text-primary;
-    margin-bottom: $spacing-lg;
-  }
-}
-
 // Tablet and up
 @media (min-width: 768px) {
   .header {

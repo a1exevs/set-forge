@@ -2,18 +2,19 @@ import type { WorkoutList } from '@entities';
 import { Link } from '@tanstack/react-router';
 import { FC, MouseEvent } from 'react';
 
-import { Button } from '@shared';
+import { Button, MenuButton } from '@shared';
 
 import classes from 'src/pages/home/ui/home-page.module.scss';
 
 type Props = {
   workoutLists: WorkoutList[];
   storageWarning: boolean;
+  onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void | Promise<void>;
   formatDate: (date: string | null) => string;
 };
 
-const HomePage: FC<Props> = ({ workoutLists, storageWarning, onDelete, formatDate }) => {
+const HomePage: FC<Props> = ({ workoutLists, storageWarning, onEdit, onDelete, formatDate }) => {
   return (
     <div className={classes.container}>
       <header className={classes.header}>
@@ -49,6 +50,24 @@ const HomePage: FC<Props> = ({ workoutLists, storageWarning, onDelete, formatDat
                   <div className={classes.cardHeader}>
                     <h2>{list.name}</h2>
                     <span className={classes.badge}>{list.exercises.length} ex.</span>
+                    <div
+                      className={classes.menuButton}
+                      onClick={(e: MouseEvent<HTMLDivElement>): void => e.stopPropagation()}
+                    >
+                      <MenuButton
+                        ariaLabel="Workout list actions"
+                        items={[
+                          { id: 'edit', label: 'Edit', onClick: (): void => onEdit(list.id) },
+                          {
+                            id: 'delete',
+                            label: 'Delete',
+                            onClick: (): void => {
+                              onDelete(list.id, list.name);
+                            },
+                          },
+                        ]}
+                      />
+                    </div>
                   </div>
                   {list.description && <p className={classes.description}>{list.description}</p>}
                   <div className={classes.cardFooter}>
@@ -58,16 +77,6 @@ const HomePage: FC<Props> = ({ workoutLists, storageWarning, onDelete, formatDat
                     )}
                   </div>
                 </Link>
-                <button
-                  className={classes.deleteButton}
-                  onClick={(e: MouseEvent<HTMLButtonElement>): void => {
-                    e.preventDefault();
-                    onDelete(list.id, list.name);
-                  }}
-                  aria-label="Delete list"
-                >
-                  🗑️
-                </button>
               </div>
             ))}
           </div>

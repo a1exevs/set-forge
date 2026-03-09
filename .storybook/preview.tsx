@@ -10,6 +10,13 @@ import 'src/shared/ui/styles/global.scss';
 
 const withRouterAndProviders: Preview['decorators'][0] = (Story: React.FC, context) => {
   const routerConfig = context.parameters.router as { initialEntries?: string[] } | undefined;
+  const seedEditStorage = context.parameters.seedEditStorage;
+
+  if (Array.isArray(seedEditStorage)) {
+    localStorage.setItem('workout-lists', JSON.stringify(seedEditStorage));
+  } else {
+    localStorage.removeItem('workout-lists');
+  }
 
   if (!routerConfig?.initialEntries) {
     return <Story />;

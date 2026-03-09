@@ -4,7 +4,7 @@ import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
 
 import { muscleGroupLabels } from '@entities';
-import { Button } from '@shared';
+import { NotFoundMessage } from '@widgets';
 
 import classes from 'src/pages/workout-mode/ui/workout-mode-page.module.scss';
 
@@ -30,12 +30,7 @@ const WorkoutModePage: FC<Props> = ({
   if (!currentWorkout) {
     return (
       <div className={classes.container}>
-        <div className={classes.notFound}>
-          <h2>Workout list not found</h2>
-          <Link to="/">
-            <Button>Back to Home</Button>
-          </Link>
-        </div>
+        <NotFoundMessage title="Workout list not found" />
       </div>
     );
   }

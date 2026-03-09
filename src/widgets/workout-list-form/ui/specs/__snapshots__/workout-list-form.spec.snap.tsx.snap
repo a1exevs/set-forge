@@ -860,18 +860,27 @@ exports[`WorkoutListForm matches snapshot for edit mode without initialData 1`] 
   <div
     class="container"
   >
-    <p
-      class="errorMessage"
+    <div
+      class="container"
     >
-      Workout list not found
-    </p>
-    <button
-      class="button secondary md"
-      data-headlessui-state=""
-      type="button"
-    >
-      Go back
-    </button>
+      <h2
+        class="title"
+      >
+        Workout list not found
+      </h2>
+      <a
+        class="link"
+        href="/"
+      >
+        <button
+          class="button primary md"
+          data-headlessui-state=""
+          type="button"
+        >
+          Back to Home
+        </button>
+      </a>
+    </div>
   </div>
 </div>
 `;
