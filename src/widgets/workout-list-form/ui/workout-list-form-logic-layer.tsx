@@ -4,7 +4,13 @@ import { FC, FormEvent, useEffect, useState } from 'react';
 import { useConfirm } from '@shared';
 import { NotFoundMessage } from '@widgets';
 
-import type { ExerciseFormData } from 'src/widgets/workout-list-form/model';
+import {
+  type ExerciseFormData,
+  getExerciseNumericFieldError,
+  hasInvalidExerciseName,
+  hasInvalidExerciseNumericFields,
+  toExerciseSubmitPayload,
+} from 'src/widgets/workout-list-form/model';
 import WorkoutListForm from 'src/widgets/workout-list-form/ui/workout-list-form';
 import classes from 'src/widgets/workout-list-form/ui/workout-list-form.module.scss';
 
@@ -32,6 +38,7 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
 
   const [name, setName] = useState<string>(() => initialData?.name ?? '');
   const [description, setDescription] = useState<string>(() => initialData?.description ?? '');
+  const [submitAttempted, setSubmitAttempted] = useState<boolean>(false);
   const [exercises, setExercises] = useState<ExerciseFormData[]>(() =>
     (initialData?.exercises ?? []).map(ex => ({
       tempId: ex.id,
@@ -87,80 +94,80 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
+    try {
+      e.preventDefault();
 
-    if (!name.trim()) {
+      if (!name.trim()) {
+        await confirmDialog({
+          title: 'Please enter a list name',
+          hideCancelButton: true,
+          confirmationText: 'Ok',
+        });
+        return;
+      }
+
+      if (exercises.length === 0) {
+        await confirmDialog({
+          title: 'Please add at least one exercise',
+          hideCancelButton: true,
+          confirmationText: 'Ok',
+        });
+        return;
+      }
+
+      const nameInvalid = exercises.some(hasInvalidExerciseName);
+      const numericInvalid = exercises.some(hasInvalidExerciseNumericFields);
+
+      if (nameInvalid || numericInvalid) {
+        setSubmitAttempted(true);
+      }
+
+      if (nameInvalid) {
+        await confirmDialog({
+          title: 'Please check exercise data validity',
+          hideCancelButton: true,
+          confirmationText: 'Ok',
+        });
+        return;
+      }
+
+      if (numericInvalid) {
+        return;
+      }
+
+      setSubmitAttempted(false);
+
+      if (mode === 'create') {
+        const dto: CreateWorkoutListDto = {
+          name: name.trim(),
+          description: description.trim(),
+          exercises: exercises.map(ex => toExerciseSubmitPayload(ex)),
+        };
+        props.onSubmit(dto);
+      } else if (initialData) {
+        const dto: UpdateWorkoutListDto = {
+          name: name.trim(),
+          description: description.trim(),
+          exercises: exercises.map(ex => {
+            const orig = initialData.exercises.find(orig => orig.id === ex.tempId);
+            if (orig) {
+              return {
+                id: orig.id,
+                completedSets: orig.completedSets,
+                ...toExerciseSubmitPayload(ex),
+              };
+            }
+            return toExerciseSubmitPayload(ex);
+          }),
+        };
+        props.onSubmit(dto);
+      }
+    } catch (e: unknown) {
       await confirmDialog({
-        title: 'Please enter a list name',
+        title: `${e instanceof Error ? e.message : `An error occurred while ${mode === 'create' ? 'creating' : 'editing'} the workout list`}`,
         hideCancelButton: true,
         confirmationText: 'Ok',
       });
-      return;
-    }
-
-    if (exercises.length === 0) {
-      await confirmDialog({
-        title: 'Please add at least one exercise',
-        hideCancelButton: true,
-        confirmationText: 'Ok',
-      });
-      return;
-    }
-
-    const invalidExercise = exercises.find(
-      ex =>
-        !ex.name.trim() ||
-        ex.weight < 0 ||
-        Number.isNaN(ex.weight) ||
-        ex.reps <= 0 ||
-        Number.isNaN(ex.reps) ||
-        ex.sets <= 0 ||
-        Number.isNaN(ex.sets),
-    );
-
-    if (invalidExercise) {
-      await confirmDialog({
-        title: 'Please check exercise data validity',
-        hideCancelButton: true,
-        confirmationText: 'Ok',
-      });
-      return;
-    }
-
-    if (mode === 'create') {
-      const dto: CreateWorkoutListDto = {
-        name: name.trim(),
-        description: description.trim(),
-        exercises: exercises.map(({ tempId: _, ...ex }) => ex),
-      };
-      props.onSubmit(dto);
-    } else if (initialData) {
-      const dto: UpdateWorkoutListDto = {
-        name: name.trim(),
-        description: description.trim(),
-        exercises: exercises.map(ex => {
-          const orig = initialData.exercises.find(orig => orig.id === ex.tempId);
-          if (orig) {
-            return {
-              id: orig.id,
-              completedSets: orig.completedSets,
-              name: ex.name,
-              muscleGroup: ex.muscleGroup,
-              weight: ex.weight,
-              reps: ex.reps,
-              sets: ex.sets,
-            };
-          }
-          return {
-            name: ex.name,
-            muscleGroup: ex.muscleGroup,
-            weight: ex.weight,
-            reps: ex.reps,
-            sets: ex.sets,
-          };
-        }),
-      };
-      props.onSubmit(dto);
     }
   };
 
@@ -189,6 +196,8 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
       onUpdateExercise={updateExercise}
       onSubmit={handleSubmit}
       onCancel={onCancel}
+      submitAttempted={submitAttempted}
+      getExerciseNumericFieldError={getExerciseNumericFieldError}
     />
   );
 };
