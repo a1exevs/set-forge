@@ -21,9 +21,7 @@ exports[`WorkoutListForm matches snapshot for create mode (empty) 1`] = `
         <div
           class="section"
         >
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="name"
@@ -39,9 +37,7 @@ exports[`WorkoutListForm matches snapshot for create mode (empty) 1`] = `
               value=""
             />
           </div>
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="description"
@@ -57,7 +53,7 @@ exports[`WorkoutListForm matches snapshot for create mode (empty) 1`] = `
           </div>
         </div>
         <div
-          class="section"
+          class="section section_withoutGap"
         >
           <div
             class="sectionHeader"
@@ -124,9 +120,7 @@ exports[`WorkoutListForm matches snapshot for create mode (with exercises) 1`] =
         <div
           class="section"
         >
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="name"
@@ -142,9 +136,7 @@ exports[`WorkoutListForm matches snapshot for create mode (with exercises) 1`] =
               value="Push Day"
             />
           </div>
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="description"
@@ -162,7 +154,7 @@ exports[`WorkoutListForm matches snapshot for create mode (with exercises) 1`] =
           </div>
         </div>
         <div
-          class="section"
+          class="section section_withoutGap"
         >
           <div
             class="sectionHeader"
@@ -200,9 +192,7 @@ exports[`WorkoutListForm matches snapshot for create mode (with exercises) 1`] =
                   ✕
                 </button>
               </div>
-              <div
-                class="field"
-              >
+              <div>
                 <label
                   class="label"
                 >
@@ -216,9 +206,7 @@ exports[`WorkoutListForm matches snapshot for create mode (with exercises) 1`] =
                   value="Bench Press"
                 />
               </div>
-              <div
-                class="field"
-              >
+              <div>
                 <label
                   class="label"
                 >
@@ -370,9 +358,7 @@ exports[`WorkoutListForm matches snapshot for edit mode (multiple exercises) 1`]
         <div
           class="section"
         >
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="name"
@@ -388,9 +374,7 @@ exports[`WorkoutListForm matches snapshot for edit mode (multiple exercises) 1`]
               value="Full Body"
             />
           </div>
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="description"
@@ -408,7 +392,7 @@ exports[`WorkoutListForm matches snapshot for edit mode (multiple exercises) 1`]
           </div>
         </div>
         <div
-          class="section"
+          class="section section_withoutGap"
         >
           <div
             class="sectionHeader"
@@ -446,9 +430,7 @@ exports[`WorkoutListForm matches snapshot for edit mode (multiple exercises) 1`]
                   ✕
                 </button>
               </div>
-              <div
-                class="field"
-              >
+              <div>
                 <label
                   class="label"
                 >
@@ -462,9 +444,7 @@ exports[`WorkoutListForm matches snapshot for edit mode (multiple exercises) 1`]
                   value="Bench Press"
                 />
               </div>
-              <div
-                class="field"
-              >
+              <div>
                 <label
                   class="label"
                 >
@@ -588,9 +568,7 @@ exports[`WorkoutListForm matches snapshot for edit mode (multiple exercises) 1`]
                   ✕
                 </button>
               </div>
-              <div
-                class="field"
-              >
+              <div>
                 <label
                   class="label"
                 >
@@ -604,9 +582,7 @@ exports[`WorkoutListForm matches snapshot for edit mode (multiple exercises) 1`]
                   value="Overhead Press"
                 />
               </div>
-              <div
-                class="field"
-              >
+              <div>
                 <label
                   class="label"
                 >
@@ -758,9 +734,7 @@ exports[`WorkoutListForm matches snapshot for edit mode (single exercise) 1`] = 
         <div
           class="section"
         >
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="name"
@@ -776,9 +750,7 @@ exports[`WorkoutListForm matches snapshot for edit mode (single exercise) 1`] = 
               value="Push Day"
             />
           </div>
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="description"
@@ -796,7 +768,7 @@ exports[`WorkoutListForm matches snapshot for edit mode (single exercise) 1`] = 
           </div>
         </div>
         <div
-          class="section"
+          class="section section_withoutGap"
         >
           <div
             class="sectionHeader"
@@ -834,9 +806,7 @@ exports[`WorkoutListForm matches snapshot for edit mode (single exercise) 1`] = 
                   ✕
                 </button>
               </div>
-              <div
-                class="field"
-              >
+              <div>
                 <label
                   class="label"
                 >
@@ -850,9 +820,7 @@ exports[`WorkoutListForm matches snapshot for edit mode (single exercise) 1`] = 
                   value="Bench Press"
                 />
               </div>
-              <div
-                class="field"
-              >
+              <div>
                 <label
                   class="label"
                 >

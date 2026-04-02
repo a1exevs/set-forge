@@ -75,9 +75,7 @@ exports[`App Page with route / matches snapshot, route /create 1`] = `
         <div
           class="section"
         >
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="name"
@@ -93,9 +91,7 @@ exports[`App Page with route / matches snapshot, route /create 1`] = `
               value=""
             />
           </div>
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="description"
@@ -111,7 +107,7 @@ exports[`App Page with route / matches snapshot, route /create 1`] = `
           </div>
         </div>
         <div
-          class="section"
+          class="section section_withoutGap"
         >
           <div
             class="sectionHeader"
