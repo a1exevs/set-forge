@@ -3,7 +3,7 @@ import { Listbox } from '@headlessui/react';
 import { ChangeEvent, FC, FormEvent } from 'react';
 
 import { muscleGroupLabels, muscleGroups } from '@entities';
-import { Button } from '@shared';
+import { Button, NumericField } from '@shared';
 
 import type { ExerciseFormData } from 'src/widgets/workout-list-form/model';
 import classes from 'src/widgets/workout-list-form/ui/workout-list-form.module.scss';
@@ -25,6 +25,11 @@ type Props = {
   ) => void;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
+  submitAttempted: boolean;
+  getExerciseNumericFieldError: (
+    exercise: Pick<ExerciseFormData, 'weight' | 'reps' | 'sets'>,
+    field: 'weight' | 'reps' | 'sets',
+  ) => string | undefined;
 };
 
 const WorkoutListForm: FC<Props> = ({
@@ -40,6 +45,8 @@ const WorkoutListForm: FC<Props> = ({
   onUpdateExercise,
   onSubmit,
   onCancel,
+  submitAttempted,
+  getExerciseNumericFieldError,
 }) => {
   return (
     <div className={classes.container}>
@@ -150,45 +157,33 @@ const WorkoutListForm: FC<Props> = ({
                     </div>
 
                     <div className={classes.fieldRow}>
-                      <div className={classes.field}>
-                        <label className={classes.label}>Weight (kg)</label>
-                        <input
-                          type="number"
-                          value={exercise.weight}
-                          onChange={(e: ChangeEvent<HTMLInputElement>): void =>
-                            onUpdateExercise(exercise.tempId, 'weight', Number(e.target.value))
-                          }
-                          className={classes.inputSmall}
-                          min="0"
-                          step="0.5"
-                        />
-                      </div>
-
-                      <div className={classes.field}>
-                        <label className={classes.label}>Reps</label>
-                        <input
-                          type="number"
-                          value={exercise.reps}
-                          onChange={(e: ChangeEvent<HTMLInputElement>): void =>
-                            onUpdateExercise(exercise.tempId, 'reps', Number(e.target.value))
-                          }
-                          className={classes.inputSmall}
-                          min="1"
-                        />
-                      </div>
-
-                      <div className={classes.field}>
-                        <label className={classes.label}>Sets</label>
-                        <input
-                          type="number"
-                          value={exercise.sets}
-                          onChange={(e: ChangeEvent<HTMLInputElement>): void =>
-                            onUpdateExercise(exercise.tempId, 'sets', Number(e.target.value))
-                          }
-                          className={classes.inputSmall}
-                          min="1"
-                        />
-                      </div>
+                      <NumericField
+                        label="Weight (kg)"
+                        id={`weight-${exercise.tempId}`}
+                        value={exercise.weight}
+                        onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'weight', v)}
+                        variant="decimal"
+                        size="sm"
+                        error={submitAttempted ? getExerciseNumericFieldError(exercise, 'weight') : undefined}
+                      />
+                      <NumericField
+                        label="Reps"
+                        id={`reps-${exercise.tempId}`}
+                        value={exercise.reps}
+                        onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'reps', v)}
+                        variant="integer"
+                        size="sm"
+                        error={submitAttempted ? getExerciseNumericFieldError(exercise, 'reps') : undefined}
+                      />
+                      <NumericField
+                        label="Sets"
+                        id={`sets-${exercise.tempId}`}
+                        value={exercise.sets}
+                        onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'sets', v)}
+                        variant="integer"
+                        size="sm"
+                        error={submitAttempted ? getExerciseNumericFieldError(exercise, 'sets') : undefined}
+                      />
                     </div>
                   </div>
                 ))}

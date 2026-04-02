@@ -98,7 +98,9 @@ describe('WorkoutListForm', () => {
       );
 
       const form = container.querySelector('form');
-      if (form) fireEvent.submit(form);
+      if (form) {
+        fireEvent.submit(form);
+      }
 
       await waitFor((): void => {
         expect(screen.getByText('Please enter a list name')).toBeInTheDocument();
@@ -137,12 +139,42 @@ describe('WorkoutListForm', () => {
       await user.click(screen.getByRole('button', { name: '+ Add Exercise' }));
 
       const form = container.querySelector('form');
-      if (form) fireEvent.submit(form);
+      if (form) {
+        fireEvent.submit(form);
+      }
 
       await waitFor((): void => {
         expect(screen.getByText('Please check exercise data validity')).toBeInTheDocument();
       });
 
+      expect(mockOnSubmit).not.toHaveBeenCalled();
+    });
+
+    it('shows inline error when reps cleared and does not open numeric validity dialog', async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <ConfirmDialogProvider>
+          <WorkoutListForm {...defaultProps} />
+        </ConfirmDialogProvider>,
+      );
+
+      await user.type(screen.getByPlaceholderText(/Push Day/), 'My List');
+      await user.click(screen.getByRole('button', { name: '+ Add Exercise' }));
+      await user.type(screen.getByPlaceholderText('Bench Press'), 'Bench Press');
+
+      const repsInput = screen.getByRole('textbox', { name: /^reps$/i });
+      await user.clear(repsInput);
+
+      const form = container.querySelector('form');
+      if (form) {
+        fireEvent.submit(form);
+      }
+
+      await waitFor((): void => {
+        expect(screen.getByText('Enter a valid number of reps')).toBeInTheDocument();
+      });
+
+      expect(screen.queryByText('Please check exercise data validity')).not.toBeInTheDocument();
       expect(mockOnSubmit).not.toHaveBeenCalled();
     });
   });

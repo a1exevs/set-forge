@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import WorkoutListFormPresentation from '@widgets/workout-list-form/ui/workout-list-form';
 
 import ConfirmDialogProvider from 'src/shared/ui/confirm-dialog/confirm-dialog-provider';
+import { getExerciseNumericFieldError } from 'src/widgets/workout-list-form/model';
 import WorkoutListForm from 'src/widgets/workout-list-form/ui/workout-list-form-logic-layer';
 
 jest.mock('@tanstack/react-router', () => ({
@@ -102,6 +103,8 @@ describe('WorkoutListForm', () => {
           onUpdateExercise={(): void => undefined}
           onSubmit={(): void => undefined}
           onCancel={(): void => undefined}
+          submitAttempted={false}
+          getExerciseNumericFieldError={getExerciseNumericFieldError}
         />
       </ConfirmDialogProvider>,
     );
