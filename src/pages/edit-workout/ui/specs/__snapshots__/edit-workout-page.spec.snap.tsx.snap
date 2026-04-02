@@ -142,48 +142,80 @@ exports[`EditWorkoutPage matches snapshot when list exists 1`] = `
               >
                 <div
                   class="field"
+                  data-headlessui-state=""
                 >
                   <label
                     class="label"
+                    data-headlessui-state=""
+                    for="weight-ex-1"
+                    id="headlessui-label-:r7:"
                   >
                     Weight (kg)
                   </label>
                   <input
-                    class="inputSmall"
-                    min="0"
-                    step="0.5"
-                    type="number"
+                    aria-labelledby="headlessui-label-:r7:"
+                    class="input inputSm "
+                    data-headlessui-state=""
+                    id="weight-ex-1"
+                    inputmode="decimal"
+                    type="text"
                     value="80"
+                  />
+                  <span
+                    hidden=""
+                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
                   />
                 </div>
                 <div
                   class="field"
+                  data-headlessui-state=""
                 >
                   <label
                     class="label"
+                    data-headlessui-state=""
+                    for="reps-ex-1"
+                    id="headlessui-label-:ra:"
                   >
                     Reps
                   </label>
                   <input
-                    class="inputSmall"
-                    min="1"
-                    type="number"
+                    aria-labelledby="headlessui-label-:ra:"
+                    class="input inputSm "
+                    data-headlessui-state=""
+                    id="reps-ex-1"
+                    inputmode="numeric"
+                    type="text"
                     value="10"
+                  />
+                  <span
+                    hidden=""
+                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
                   />
                 </div>
                 <div
                   class="field"
+                  data-headlessui-state=""
                 >
                   <label
                     class="label"
+                    data-headlessui-state=""
+                    for="sets-ex-1"
+                    id="headlessui-label-:rd:"
                   >
                     Sets
                   </label>
                   <input
-                    class="inputSmall"
-                    min="1"
-                    type="number"
+                    aria-labelledby="headlessui-label-:rd:"
+                    class="input inputSm "
+                    data-headlessui-state=""
+                    id="sets-ex-1"
+                    inputmode="numeric"
+                    type="text"
                     value="3"
+                  />
+                  <span
+                    hidden=""
+                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
                   />
                 </div>
               </div>

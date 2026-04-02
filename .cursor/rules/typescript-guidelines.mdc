@@ -56,3 +56,23 @@ export type { Exercise, MuscleGroup } from './types';
 - Create type guards (`value is T`) for runtime checks
 - Type React event handlers explicitly (FormEvent, ChangeEvent, MouseEvent)
 - Follow `@typescript-eslint` strict rules
+
+## Control flow (`if` / `else`)
+
+- **`if`, `else if`, and `else`** MUST use **curly braces** always, even for a single statement (`return`, one function call, etc.).
+- Put the **body on its own lines** inside the block — do not write one-line `if (x) foo();`.
+
+```typescript
+// BAD
+if (!value) return;
+if (el) doThing(el);
+
+// GOOD
+if (!value) {
+  return;
+}
+
+if (el) {
+  doThing(el);
+}
+```

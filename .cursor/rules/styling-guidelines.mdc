@@ -68,7 +68,7 @@ See `src/shared/ui/styles/variables.scss`: `$spacing-*`, `$primary-color`, `$rad
 - **Transitions:** `transition: all 0.2s ease-in-out`
 - **Z-index:** Define `$z-modal`, `$z-dropdown` in variables
 
-No inline styles. Global styles only in `src/shared/ui/styles/global.scss`.
+No inline styles. Inline styles can only be used for Story Book Story wrappers in .stories.tsx-files. Global styles only in `src/shared/ui/styles/global.scss`.
 
 ## Shared UI
 
