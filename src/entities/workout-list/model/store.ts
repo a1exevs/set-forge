@@ -210,11 +210,20 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
       resetExerciseProgress: (listId, exerciseId) => {
         set(state => {
           const list = state.workoutLists.find(l => l.id === listId);
-          if (!list) return;
+          if (!list) {
+            return;
+          }
 
           const exercise = list.exercises.find(ex => ex.id === exerciseId);
           if (exercise) {
             exercise.completedSets = 0;
+          }
+
+          if (state.currentWorkout?.id === listId) {
+            const currentExercise = state.currentWorkout.exercises.find(ex => ex.id === exerciseId);
+            if (currentExercise) {
+              currentExercise.completedSets = 0;
+            }
           }
 
           try {
@@ -229,11 +238,19 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
       resetAllProgress: listId => {
         set(state => {
           const list = state.workoutLists.find(l => l.id === listId);
-          if (!list) return;
+          if (!list) {
+            return;
+          }
 
           list.exercises.forEach(exercise => {
             exercise.completedSets = 0;
           });
+
+          if (state.currentWorkout?.id === listId) {
+            state.currentWorkout.exercises.forEach(exercise => {
+              exercise.completedSets = 0;
+            });
+          }
 
           try {
             workoutListStorage.saveList(list);
