@@ -57,7 +57,7 @@ const WorkoutListForm: FC<Props> = ({
       <main className={classes.main}>
         <form className={classes.form} onSubmit={onSubmit}>
           <div className={classes.section}>
-            <div className={classes.field}>
+            <div>
               <label htmlFor="name" className={classes.label}>
                 List Name *
               </label>
@@ -72,7 +72,7 @@ const WorkoutListForm: FC<Props> = ({
               />
             </div>
 
-            <div className={classes.field}>
+            <div>
               <label htmlFor="description" className={classes.label}>
                 Description
               </label>
@@ -87,7 +87,7 @@ const WorkoutListForm: FC<Props> = ({
             </div>
           </div>
 
-          <div className={classes.section}>
+          <div className={`${classes.section} ${classes.section_withoutGap}`}>
             <div className={classes.sectionHeader}>
               <h2>Exercises</h2>
               <Button type="button" onClick={onAddExercise} size="sm">
@@ -113,7 +113,7 @@ const WorkoutListForm: FC<Props> = ({
                       </button>
                     </div>
 
-                    <div className={classes.field}>
+                    <div>
                       <label className={classes.label}>Name *</label>
                       <input
                         type="text"
@@ -127,7 +127,7 @@ const WorkoutListForm: FC<Props> = ({
                       />
                     </div>
 
-                    <div className={classes.field}>
+                    <div>
                       <label className={classes.label}>Muscle Group</label>
                       <Listbox
                         value={exercise.muscleGroup}
