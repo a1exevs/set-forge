@@ -34,10 +34,16 @@
 }
 
 .section {
+  display: flex;
+  flex-direction: column;
   background-color: $bg-elevated;
   border: 1px solid $border-color;
   border-radius: $radius-lg;
   padding: $spacing-lg;
+  gap: $spacing-md;
+  &_withoutGap {
+    gap: 0;
+  }
 }
 
 .sectionHeader {
@@ -49,14 +55,6 @@
   h2 {
     font-size: $font-size-xl;
     color: $text-primary;
-  }
-}
-
-.field {
-  margin-bottom: $spacing-md;
-
-  &:last-child {
-    margin-bottom: 0;
   }
 }
 
@@ -115,18 +113,20 @@
 }
 
 .exerciseCard {
+  display: flex;
+  flex-direction: column;
   background-color: $bg-tertiary;
   border: 1px solid $border-color;
   border-radius: $radius-md;
   padding: $spacing-md;
   position: relative;
+  gap: $spacing-md;
 }
 
 .exerciseHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: $spacing-md;
 }
 
 .exerciseNumber {

@@ -6,6 +6,7 @@ import tsEslint from 'typescript-eslint';
 import languageOptions from './linter/language-options';
 import plugins from './linter/plugins';
 import absoluteImportPathRule from './linter/rules/absolute-import-path-rule';
+import curlyRule from './linter/rules/curly-rule';
 import importOrderRule from './linter/rules/import-order-rule';
 import sortImportsRule from './linter/rules/sort-imports-rule';
 import unusedVarsRule from './linter/rules/unused-vars-rule';
@@ -29,6 +30,7 @@ export default tsEslint.config(
       ...importOrderRule,
       ...sortImportsRule,
       ...absoluteImportPathRule,
+      ...curlyRule,
       'no-console': 'error',
     },
   },

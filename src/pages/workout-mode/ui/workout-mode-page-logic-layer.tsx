@@ -1,9 +1,16 @@
 import type { WorkoutList } from '@entities';
+import confetti from 'canvas-confetti';
 import { FC, useEffect, useRef, useState } from 'react';
 
 import { useConfirm } from '@shared';
 
 import WorkoutModePage from 'src/pages/workout-mode/ui/workout-mode-page';
+
+const fireWorkoutCompleteConfetti = (): void => {
+  void confetti({ particleCount: 110, spread: 72, origin: { y: 0.62 } });
+  void confetti({ particleCount: 70, angle: 55, spread: 58, origin: { x: 0, y: 0.62 } });
+  void confetti({ particleCount: 70, angle: 125, spread: 58, origin: { x: 1, y: 0.62 } });
+};
 
 type Props = {
   id: string;
@@ -25,6 +32,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   const confirmDialog = useConfirm();
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
   const lastTapRef = useRef<Record<string, number>>({});
+  const prevCompletedExercisesRef = useRef<number | null>(null);
 
   useEffect((): (() => void) => {
     if (id) {
@@ -99,6 +107,21 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   };
 
   const { totalExercises, completedExercises, overallProgress } = calculateProgress();
+
+  useEffect((): void => {
+    prevCompletedExercisesRef.current = null;
+  }, [id]);
+
+  useEffect((): void => {
+    if (!currentWorkout || currentWorkout.id !== id) {
+      return;
+    }
+    const prev = prevCompletedExercisesRef.current;
+    if (totalExercises > 0 && prev !== null && prev < totalExercises && completedExercises === totalExercises) {
+      fireWorkoutCompleteConfetti();
+    }
+    prevCompletedExercisesRef.current = completedExercises;
+  }, [id, currentWorkout, completedExercises, totalExercises]);
 
   return (
     <WorkoutModePage
