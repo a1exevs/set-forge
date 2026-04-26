@@ -1,6 +1,6 @@
 ---
 description: Component architecture - 3-layer pattern, arrow functions, absolute paths
-alwaysApply: true
+globs: ["client/**"]
 ---
 
 # Component Architecture

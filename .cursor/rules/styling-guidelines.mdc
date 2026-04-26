@@ -1,6 +1,6 @@
 ---
 description: SCSS modules and styling guidelines
-alwaysApply: true
+globs: ["client/**"]
 ---
 
 # Styling Guidelines
