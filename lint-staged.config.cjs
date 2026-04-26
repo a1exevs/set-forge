@@ -35,11 +35,11 @@ module.exports = {
     }
     const rel = toClientRelativePosix(files);
     return [
-      `prettier --write ${files.map((f) => JSON.stringify(f)).join(' ')}`,
+      `prettier --ignore-path client/.prettierignore --write ${files.map((f) => JSON.stringify(f)).join(' ')}`,
       `npm exec -w @set-forge/client -- eslint --config eslint.config.ts --fix ${rel.map(quoteFileArg).join(' ')}`,
     ];
   },
-  'client/{src,.storybook}/**/*.{css,scss}': ['prettier --write'],
+  'client/{src,.storybook}/**/*.{css,scss}': ['prettier --ignore-path client/.prettierignore --write'],
   'scripts/**/*.{ts,tsx}': ['prettier --config client/.prettierrc.cjs --write'],
   'server/**/*.md': ['prettier --write'],
 };
