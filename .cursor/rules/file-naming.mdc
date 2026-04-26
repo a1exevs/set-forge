@@ -1,6 +1,6 @@
 ---
 description: File naming conventions - kebab-case for all files
-alwaysApply: true
+globs: ["client/**", "server/**"]
 ---
 
 # File Naming Conventions

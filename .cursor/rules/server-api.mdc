@@ -1,0 +1,8 @@
+---
+description: Backend / API conventions (placeholder until server code exists)
+globs: ["server/**"]
+---
+
+# Server workspace
+
+Reserved for `@set-forge/server`. When this package gains code, extend this file with API style, validation, persistence, and error-handling rules consistent with the monorepo.

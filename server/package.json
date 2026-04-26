@@ -1,0 +1,6 @@
+{
+  "name": "@set-forge/server",
+  "version": "0.2.1",
+  "private": true,
+  "description": "Reserved for future Set Forge API / backend."
+}
