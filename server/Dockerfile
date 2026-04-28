@@ -4,7 +4,7 @@ ENV HUSKY=0
 COPY package.json package-lock.json ./
 COPY server/package.json ./server/package.json
 COPY client/package.json ./client/package.json
-RUN npm ci --workspace @set-forge/server --include-workspace-root --legacy-peer-deps
+RUN npm ci --workspace @set-forge/server --include-workspace-root
 
 FROM deps AS build
 WORKDIR /app
@@ -17,6 +17,6 @@ ENV NODE_ENV=production
 ENV HUSKY=0
 COPY package.json package-lock.json ./
 COPY server/package.json ./server/package.json
-RUN npm ci --workspace @set-forge/server --omit=dev --legacy-peer-deps
+RUN npm ci --workspace @set-forge/server --omit=dev
 COPY --from=build /app/server/dist ./server/dist
 CMD ["node", "server/dist/src/main"]
