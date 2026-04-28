@@ -16,6 +16,8 @@ jobs:
         run: |
           npm ci
           npm run e2e:install
+        env:
+          HUSKY: 0
 
       - name: E2E tests
         run: npm run test:e2e
