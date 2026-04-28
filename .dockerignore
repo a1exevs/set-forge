@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+**/dist
+**/coverage
+.git
+.cursor
+.idea
+server/_stub
+client/.storybook-static
+*.log
+**/.env*
+server/.development.env
+server/.production.env
