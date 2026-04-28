@@ -1,0 +1,33 @@
+For start DB You must:
+    - install mysql-server on your server;
+    - create mysql user with name sowa-server and database sowa_db
+    (
+        (in mysql)
+        CREATE USER 'sowa-server'@'localhost' IDENTIFIED BY 'password';
+        GRANT ALL PRIVILEGES ON *.* TO 'sowa-server'@'localhost' WITH GRANT OPTION;
+        CREATE DATABASE sowa_db DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+    );
+    - use backup from ./backup.db.sql.gz
+    (
+        (in terminal)
+        gunzip backup_db.sql.gz
+        mysql -u sowa-server -p sowa_db < ./backup_db.sql
+    );
+    - for creating db-dump you can use command:
+        mysqldump -u sowa-server -p sowa_db | gzip > backup_db.sql.gz
+    - create files .production.env and .development.env with content shown below.
+
+SERVER_URL=http://localhost
+CLIENT_URL=http://localhost:3000
+PORT=7000
+
+MYSQL_HOST=localhost
+MYSQL_USER=sowa-server
+MYSQL_DB=sowa_db
+MYSQL_PASSWORD=<PASSWORK>
+MYSQL_PORT=3306
+
+SERVER_STATIC=static
+JWT_SECRET_KEY=1234
+SESSION_SECRET_KEY=1234
+SERVER_LOGS=logs
