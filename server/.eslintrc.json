@@ -1,0 +1,145 @@
+{
+  "root": true,
+  "env": {
+    "browser": false,
+    "es2021": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/**/*.ts",
+        "test/**/*.ts"
+      ],
+      "excludedFiles": [
+        "src/**/*.spec.ts",
+        "test/**/*.e2e-spec.ts"
+      ],
+      "plugins": [
+        "@typescript-eslint",
+        "nestjs",
+        "prettier"
+      ],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:import/recommended",
+        "airbnb-base",
+        "plugin:nestjs/recommended",
+        "plugin:prettier/recommended",
+        "prettier"
+      ],
+      "rules": {
+        "nestjs/use-validation-pipe": "off",
+        "no-undef": "off",
+        "no-unused-vars": "off",
+        "no-param-reassign": "off",
+        "@typescript-eslint/no-namespace": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/ban-types": "off",
+        "import/prefer-default-export": "off",
+        "no-useless-constructor": "off",
+        "no-empty-function": "off",
+        "@typescript-eslint/no-unused-vars": "error",
+        "max-classes-per-file": "off",
+        "no-use-before-define": "off",
+        "no-plusplus": "off",
+        "prefer-destructuring": "off",
+        "class-methods-use-this": "off",
+        "import/no-extraneous-dependencies": "off",
+        "no-console": "error",
+        "func-names": "off",
+        "no-underscore-dangle": "off",
+        "lines-between-class-members": "off"
+      },
+      "settings": {
+        "import/resolver": {
+          "alias": {
+            "map": [
+              [
+                "@root",
+                "./"
+              ],
+              [
+                "@src",
+                "./src"
+              ],
+              [
+                "@auth",
+                "./src/auth"
+              ],
+              [
+                "@common",
+                "./src/common"
+              ],
+              [
+                "@files",
+                "./src/files"
+              ],
+              [
+                "@followers",
+                "./src/followers"
+              ],
+              [
+                "@logger",
+                "./src/logger"
+              ],
+              [
+                "@posts",
+                "./src/posts"
+              ],
+              [
+                "@profiles",
+                "./src/profiles"
+              ],
+              [
+                "@roles",
+                "./src/roles"
+              ],
+              [
+                "@security",
+                "./src/security"
+              ],
+              [
+                "@users",
+                "./src/users"
+              ],
+              [
+                "@test",
+                "./test"
+              ],
+              [
+                "@assets",
+                "./src/assets"
+              ]
+            ],
+            "extensions": [
+              ".ts"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "files": [
+        "src/**/*.spec.ts"
+      ],
+      "plugins": [
+        "prettier"
+      ],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended",
+        "prettier"
+      ],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    }
+  ]
+}

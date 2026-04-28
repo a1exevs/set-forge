@@ -1,0 +1,17 @@
+// Ubuntu 18.04:
+// Issue: nodemon internal watch failed: enospc: system limit for number of file watchers reached,
+// Fix: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+
+{
+  "watch": [
+    "src"
+  ],
+  "verbose": true,
+  "ignore": [
+    "*.spec.ts",
+    "*.e2e-spec.ts"
+  ],
+  "exec": "npm run start:dev",
+  "ext": "*.ts",
+  "delay": 300
+}
