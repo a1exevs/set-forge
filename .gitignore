@@ -30,8 +30,8 @@ dist-ssr
 .env.development.local
 .env.test.local
 .env.production.local
-server/.development.env
-server/.production.env
+.development.env
+.production.env
 
 # Build output
 build
