@@ -60,7 +60,7 @@ export class FilesService {
       }
       fs.writeFileSync(path.join(dirForSaving, fileName), file.buffer);
 
-      const filePath = `${dirForSaving}/${fileName}`;
+      const filePath = path.join(dirForSaving, fileName);
       const fileURL = this.getStaticFileURLFromStaticFileFullPath(filePath);
 
       return { filePath, fileURL };
@@ -111,11 +111,10 @@ export class FilesService {
   }
 
   private async compressImage(filePath: string): Promise<{ filePath: string; fileURL: string }> {
-    const list = filePath.split('/');
-    const fileName = list[list.length - 1];
-    const fileDir = filePath.replace(fileName, '');
+    const fileName = path.basename(filePath);
+    const fileDir = path.dirname(filePath);
     const compressFileName = COMPRESS_IMAGE_NAME_PREFIX + fileName;
-    const compressFilePath = fileDir + compressFileName;
+    const compressFilePath = path.join(fileDir, compressFileName);
 
     try {
       await sharp(filePath)
@@ -137,10 +136,12 @@ export class FilesService {
     if (!serverStaticDir || !PORT || !SERVER_URL) {
       return '';
     }
-    const list = fullFilePath.split(serverStaticDir);
-    if (list.length !== 2) {
+    const staticRoot = path.resolve(__dirname, '../../', serverStaticDir);
+    const relative = path.relative(staticRoot, fullFilePath);
+    if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) {
       return '';
     }
-    return `${SERVER_URL}:${PORT}${list[1]}`;
+    const urlPath = relative.split(path.sep).join('/');
+    return `${SERVER_URL}:${PORT}/${urlPath}`;
   }
 }

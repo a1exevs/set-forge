@@ -1,11 +1,17 @@
-# Set Forge — monorepo
+# Set Forge
+
+<!-- TODO: logo -->
+
+## Description
+
+A workout planning and strength tracking project that lets you build exercise lists, log sets and weights, rate perceived effort, and visualize progress over time.
 
 Workspaces:
 
-| Package | Path | Description |
-|--------|------|-------------|
+| Package | Path | Description          |
+|--------|------|----------------------|
 | **@set-forge/client** | [`client/`](client/) | React / Vite web app |
-| **@set-forge/server** | [`server/`](server/) | Reserved for future API / backend |
+| **@set-forge/server** | [`server/`](server/) | Nest API / backend   |
 
 Shared release notes: [`RELEASE-NOTES.md`](RELEASE-NOTES.md) (repository root).
 
@@ -23,33 +29,76 @@ npm install
 
 This installs npm workspaces (`client`, `server`), hoists dependencies, and runs **`prepare`** (Husky git hooks).
 
-## Daily commands
+## Available scripts
 
-All scripts are defined in the **root** [`package.json`](package.json) and forward to `@set-forge/client` where needed:
+Run from the **repository root**. Names mirror `package.json` workspaces and shared tooling.
 
-```bash
-npm run dev
-npm run build
-npm run test
-npm run lint
-npm run storybook
-```
+### Client (`@set-forge/client`)
 
-Formatting:
+| Command | Description |
+|--------|-------------|
+| `npm run client:dev` | Vite dev server |
+| `npm run client:build` | Production build (`tsc && vite build`) |
+| `npm run client:preview` | Preview production build (`client/dist`) |
+| `npm run client:format` / `npm run client:format:check` | Prettier |
+| `npm run client:lint` / `npm run client:lint:fix` | ESLint |
+| `npm run client:test:unit` / `npm run client:test:unit-cov` | Jest unit tests |
+| `npm run client:test:snap` / `npm run client:test:snap-cov` / `npm run client:test:snap-update` | Snapshot tests |
+| `npm run client:test:e2e` | Playwright |
+| `npm run client:test` | Full client test script |
+| `npm run client:storybook` / `npm run client:build-storybook` | Storybook |
+| `npm run client:chromatic` | Chromatic |
+| `npm run client:docs` | TypeDoc |
+| `npm run client:e2e:install` | Install Playwright browsers |
+| `npm run client:check-deps` / `npm run client:upgrade-deps` | Dependency maintenance |
 
-- `npm run format` / `npm run format:check` — Prettier for the **client** workspace (see [`client/package.json`](client/package.json)).
-- `npm run format:root` / `npm run format:root:check` — Prettier for root [`scripts/`](scripts/) TypeScript (same [`client/.prettierrc.cjs`](client/.prettierrc.cjs) as the client; **Project build** CI runs `format:root:check`).
+### Server (`@set-forge/server`)
 
-Details and stack badges: [`client/README.md`](client/README.md).
+| Command | Description |
+|--------|-------------|
+| `npm run server:start` | Nest `start` (production env) |
+| `npm run server:start:dev` | Nest `start --watch` (development) |
+| `npm run server:start:debug` | Nest debug + watch |
+| `npm run server:start:prod` | Run `dist/src/main` |
+| `npm run server:build` | TypeScript compile |
+| `npm run server:format` / `npm run server:format:check` | Prettier |
+| `npm run server:lint` / `npm run server:lint:fix` | ESLint |
+| `npm run server:test:unit` / `npm run server:test:unit-watch` / `npm run server:test:unit-cov` / `npm run server:test:unit-debug` | Jest unit tests |
+| `npm run server:test:e2e` | Jest e2e |
+| `npm run server:check-deps` / `npm run server:upgrade-deps` | Dependency maintenance |
 
-## Version bumps (monorepo)
+### Docker & database
 
-These scripts live **only in the root** `package.json`:
+| Command | Description |
+|--------|-------------|
+| `npm run db:up` | `docker compose --profile dev up -d mysql-dev` |
+| `npm run db:down` | `docker compose --profile dev down` |
+| `npm run db:logs` | MySQL logs (`-f`) |
+| `npm run prod:up` | Production compose up (`--build -d`): MySQL + server + client (nginx) |
+| `npm run prod:down` | Production compose down |
+| `npm run prod:logs` | Server + MySQL logs (`-f`) |
 
-| Script | Effect |
-|--------|--------|
-| `npm run version:patch` / `version:minor` / `version:major` | Bumps the `version` field in **`client/package.json`** and **`server/package.json`** together (same semver). |
-| `npm run update-version:patch` / `update-version:minor` / `update-version:major` | Runs the branch workflow in [`scripts/update-version.sh`](scripts/update-version.sh) (merge flow + `version:*` + commit). Requires a Unix shell (e.g. Git Bash on Windows). |
+#### Production topology (`--profile prod`)
+
+A single `npm run prod:up` builds and starts three containers:
+
+- `mysql` — no host port (API reaches it as `mysql:3306` on the compose network only).
+- **Dev:** `mysql-dev` (profile `dev`) maps `127.0.0.1:${MYSQL_PUBLIC_PORT:-3306}` for tools on the host (`npm run db:up`).
+- `server-prod` — Nest API, **internal-only** (no host port; reachable inside the compose network as `server-prod:5000`).
+- `client-prod` — nginx (image built from [`client/Dockerfile`](client/Dockerfile)) serving the built SPA on host port `${CLIENT_PUBLIC_PORT:-8080}` (mapped to port 80 inside the container). nginx also reverse-proxies `/api/` to `server-prod:5000` (see [`client/nginx.conf`](client/nginx.conf)).
+
+MySQL data uses **separate Docker volumes**: `mysql_data_dev` for `mysql-dev` (profile `dev`) and `mysql_data_prod` for `mysql` (profile `prod`), so local and production database files are not shared.
+
+After `npm run prod:up` the app is reachable at `http://localhost:8080/` (or `http://<vds-ip>:8080/`). Set `CLIENT_PUBLIC_PORT=80` in a root `.env` or your environment on Linux VDS if you want `http://<vds-ip>/` without a port suffix. The API is same-origin under that host, e.g. `http://localhost:8080/api/1.0/...` (no CORS).
+
+### Root tooling
+
+| Command | Description |
+|--------|-------------|
+| `npm run prepare` | Husky install (runs automatically after `npm install` unless `HUSKY=0`) |
+| `npm run format:root` / `npm run format:root:check` | Prettier for `scripts/**/*.{ts,tsx}` |
+| `npm run version:patch` / `npm run version:minor` / `npm run version:major` | Bump version via `scripts/increase-version.ts` |
+| `npm run update-version:patch` / `npm run update-version:minor` / `npm run update-version:major` | Version branch workflow (`scripts/update-version.sh`) |
 
 ## Release steps
 
@@ -63,6 +112,29 @@ These scripts live **only in the root** `package.json`:
 8. Merge `main` back into `testing` and push; merge `testing` into `develop` and push.
 9. Update [`RELEASE-NOTES.md`](RELEASE-NOTES.md) using generated notes, then open a PR from `common/release-notes-update-vX.X.X` to `develop` with message `[Common] RELEASE-NOTES.md update vX.X.X`.
 
+## Environment used for verification
+
+- Node: `v22.20.0`
+- npm: `10.9.3`
+- Docker: `28.0.4`
+- Docker Compose: `v2.34.0-desktop.1`
+
+## Features
+
+- Create workout lists with multiple exercises
+- Track progress in interactive workout mode
+- Real-time progress bars with gradient fills
+- Double tap to mark sets complete
+- Data persistence in localStorage with 80% warning
+- Dark theme by default (light theme ready)
+- Mobile-first responsive design
+- Touch-friendly UI (min 44px tap targets)
+
 ## Repository
 
-- https://github.com/a1exevs/set-forge
+- Repository: https://github.com/a1exevs/set-forge
+- Project board: https://github.com/users/a1exevs/projects/9
+
+## Useful links
+
+- Nu Html Checker — https://validator.w3.org/nu/

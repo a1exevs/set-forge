@@ -2,7 +2,7 @@ import * as session from 'express-session';
 import { DataTypes, Sequelize } from 'sequelize';
 
 type SessionData = session.SessionData;
-type SessionCallback<T = SessionData | null> = (err?: unknown, session?: T) => void;
+type SessionCallback<T = SessionData | null> = (err?: unknown, sessionData?: T) => void;
 
 type SessionAttributes = {
   sid: string;
@@ -52,7 +52,7 @@ export class SequelizeSessionStore extends session.Store {
 
   override get(sid: string, callback: SessionCallback) {
     this.SessionModel.findByPk(sid)
-      .then((record) => {
+      .then(record => {
         if (!record) {
           callback(undefined, null);
           return;
@@ -68,7 +68,7 @@ export class SequelizeSessionStore extends session.Store {
         const parsed = JSON.parse(record.get('data') as string) as SessionData;
         callback(undefined, parsed);
       })
-      .catch((error) => callback(error));
+      .catch(error => callback(error));
   }
 
   override set(sid: string, userSession: SessionData, callback?: (err?: unknown) => void) {
@@ -81,7 +81,7 @@ export class SequelizeSessionStore extends session.Store {
 
     this.SessionModel.upsert(payload)
       .then(() => callback?.())
-      .catch((error) => callback?.(error));
+      .catch(error => callback?.(error));
   }
 
   override destroy(sid: string, callback?: (err?: unknown) => void) {
@@ -89,7 +89,7 @@ export class SequelizeSessionStore extends session.Store {
       where: { sid },
     })
       .then(() => callback?.())
-      .catch((error) => callback?.(error));
+      .catch(error => callback?.(error));
   }
 
   override touch(sid: string, userSession: SessionData, callback?: (err?: unknown) => void) {
@@ -104,7 +104,7 @@ export class SequelizeSessionStore extends session.Store {
       },
     )
       .then(() => callback?.())
-      .catch((error) => callback?.(error));
+      .catch(error => callback?.(error));
   }
 
   private resolveExpiresAt(userSession: SessionData) {

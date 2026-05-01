@@ -26,12 +26,16 @@ jobs:
 
       - name: Styling
         run: |
-          npm run format:check
           npm run format:root:check
-          npm run lint
+          npm run client:format:check
+          npm run client:lint
+          npm run server:format:check
+          npm run server:lint
 
       - name: Project build
-        run: npm run build
+        run: |
+          npm run client:build
+          npm run server:build
 
-      - name: Storybook build
-        run: npm run build-storybook
+      - name: Client Storybook build
+        run: npm run client:build-storybook

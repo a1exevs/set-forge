@@ -7,6 +7,9 @@ node_modules
 .idea
 server/_stub
 client/.storybook-static
+client/playwright-report
+client/test-results
+client/.cache
 *.log
 **/.env*
 server/.development.env

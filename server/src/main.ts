@@ -15,14 +15,19 @@ import * as session from 'express-session';
 import { Sequelize } from 'sequelize';
 
 import { SequelizeSessionStore } from '@src/security/sequelize-session.store';
+import { ensureAuthSecretsConfigured } from '@common/utils/ensure-auth-secrets';
 
 async function start() {
+  ensureAuthSecretsConfigured();
+
   const PORT = process.env.PORT || 5000;
   const CLIENT_URL = process.env.CLIENT_URL || undefined;
 
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   setupLogger(app);
-  setupDocsModule(app);
+  if (process.env.NODE_ENV !== 'production') {
+    setupDocsModule(app);
+  }
 
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
@@ -69,6 +74,7 @@ function setupLogger(app: INestApplication) {
 }
 
 async function setupSession(app: INestApplication) {
+  // TODO(refactor): use the NestJS SequelizeModule connection for SequelizeSessionStore instead of a second Sequelize pool (duplicate MYSQL_* config and connections).
   const sequelize = new Sequelize({
     dialect: 'mysql',
     host: process.env.MYSQL_HOST,
@@ -85,7 +91,7 @@ async function setupSession(app: INestApplication) {
 
   app.use(
     session({
-      secret: process.env.SESSION_SECRET_KEY || 'my-secret',
+      secret: process.env.SESSION_SECRET_KEY,
       resave: false,
       saveUninitialized: false,
       store: sessionStore,
@@ -93,4 +99,8 @@ async function setupSession(app: INestApplication) {
   );
 }
 
-start();
+start().catch(err => {
+  // eslint-disable-next-line no-console
+  console.error(err);
+  process.exit(1);
+});

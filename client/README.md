@@ -1,12 +1,12 @@
-# @set-forge/client — Set Forge UI
+# @set-forge/client — Set Forge Web Client
 
-Workout planning and strength tracking app (React, Vite, TanStack Router, FSD). This package lives under `client/` in the monorepo.
+Workout planning and strength tracking web app (React, Vite, TanStack Router, FSD). This package lives under `client/` in the monorepo.
 
 **Monorepo setup, versioning, and releases:** see the [root README](../README.md).
 
 ---
 
-// TODO logo
+<!-- TODO: logo -->
 
 ![React](https://img.shields.io/badge/React-18.3-61dafb?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white)
@@ -18,7 +18,7 @@ Workout planning and strength tracking app (React, Vite, TanStack Router, FSD). 
 
 ## Description
 
-A workout planning and strength tracking app that lets you build exercise lists, log sets and weights, rate perceived effort, and visualize progress over time.
+A workout planning and strength tracking web-app that lets you build exercise lists, log sets and weights, rate perceived effort, and visualize progress over time.
 
 ## Prerequisites
 
@@ -33,7 +33,6 @@ Run these **from the repository root** (they delegate to this workspace):
 | `npm run dev` | Vite dev server |
 | `npm run build` | `tsc && vite build` |
 | `npm run preview` | Preview production build (`client/dist`) |
-| `npm run check-deps` / `npm run upgrade-deps` | Dependency maintenance |
 | `npm run format` / `npm run format:check` | Prettier |
 | `npm run lint` / `npm run lint:fix` | ESLint |
 | `npm run test:unit` / `npm run test:unit-cov` | Jest unit tests |
@@ -44,23 +43,9 @@ Run these **from the repository root** (they delegate to this workspace):
 | `npm run chromatic` | Chromatic |
 | `npm run docs` | TypeDoc |
 | `npm run e2e:install` | Playwright browsers |
+| `npm run check-deps` / `npm run upgrade-deps` | Dependency maintenance |
 
-## Features
+## Environment used for verification
 
-- Create workout lists with multiple exercises
-- Track progress in interactive workout mode
-- Real-time progress bars with gradient fills
-- Double tap to mark sets complete
-- Data persistence in localStorage with 80% warning
-- Dark theme by default (light theme ready)
-- Mobile-first responsive design
-- Touch-friendly UI (min 44px tap targets)
-
-## Repository
-
-- Repository: https://github.com/a1exevs/set-forge
-- Project board: https://github.com/users/a1exevs/projects/9
-
-## Useful links
-
-- Nu Html Checker — https://validator.w3.org/nu/
+- Node: `v22.20.0`
+- npm: `10.9.3`

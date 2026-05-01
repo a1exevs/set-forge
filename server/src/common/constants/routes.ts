@@ -6,4 +6,5 @@ export const Routes = {
   ENDPOINT_ROLES: 'roles',
   ENDPOINT_SECURITY: 'security',
   ENDPOINT_USERS: 'users',
+  HEALTH: 'health',
 };

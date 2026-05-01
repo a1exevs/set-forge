@@ -12,6 +12,7 @@ import { ProfilesModule, UserCommonInfo, UserContact, UserAvatar } from '@src/pr
 import { LoggerModule } from '@src/logger';
 import { SecurityModule } from '@src/security';
 import { FollowersModule, Follower } from '@src/followers';
+import { HealthModule } from '@src/health/health.module';
 
 import * as path from 'path';
 
@@ -19,6 +20,7 @@ import * as path from 'path';
   controllers: [],
   providers: [],
   imports: [
+    HealthModule,
     ConfigModule.forRoot({
       envFilePath: `.${process.env.NODE_ENV}.env`,
     }),

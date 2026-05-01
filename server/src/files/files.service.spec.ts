@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus } from '@nestjs/common';
 import { existsSync } from 'fs';
+import * as path from 'path';
 
 import { COMPRESS_IMAGE_NAME_PREFIX, FilesService } from '@files/files.service';
 import {
@@ -60,9 +61,9 @@ describe('FilesService', () => {
         fileDir,
       );
       const url = process.env.SERVER_URL + ':' + process.env.PORT + '/';
-      const originalImagePathDividedArr = originalImagePath.split('/');
+      const originalImagePathDividedArr = originalImagePath.split(path.sep).filter(Boolean);
       const originalImageUrlDividedArr = originalImageURL.split('/');
-      const smallImagePathDividedArr = smallImagePath.split('/');
+      const smallImagePathDividedArr = smallImagePath.split(path.sep).filter(Boolean);
       const smallImageUrlDividedArr = smallImageURL.split('/');
       expect(existsSync(originalImagePath)).toBe(true);
       expect(existsSync(smallImagePath)).toBe(true);
@@ -82,9 +83,9 @@ describe('FilesService', () => {
       const { originalImageURL, originalImagePath, smallImageURL, smallImagePath } = await filesService.addJPEGFile(
         file,
       );
-      const originalImagePathDividedArr = originalImagePath.split('/');
+      const originalImagePathDividedArr = originalImagePath.split(path.sep).filter(Boolean);
       const originalImageUrlDividedArr = originalImageURL.split('/');
-      const smallImagePathDividedArr = smallImagePath.split('/');
+      const smallImagePathDividedArr = smallImagePath.split(path.sep).filter(Boolean);
       const smallImageUrlDividedArr = smallImageURL.split('/');
       expect(existsSync(originalImagePath)).toBe(true);
       expect(existsSync(smallImagePath)).toBe(true);
@@ -133,7 +134,7 @@ describe('FilesService', () => {
       const fileDir = 'fileDir';
       const url = process.env.SERVER_URL + ':' + process.env.PORT + '/';
       const { filePath, fileURL } = await filesService.createFile(file, fileName, fileExtension, fileDir);
-      const filePathDividedArr = filePath.split('/');
+      const filePathDividedArr = filePath.split(path.sep).filter(Boolean);
       const fileURLDividedArr = fileURL.split('/');
       expect(existsSync(filePath)).toBe(true);
       expect(fileURL.includes(url)).toBe(true);
@@ -146,7 +147,7 @@ describe('FilesService', () => {
       const file = loadTestFile(TEST_FILE_PATH, 20000000, 'image/jpeg', TEST_FILE_ORIGINAL_NAME);
       const url = process.env.SERVER_URL + ':' + process.env.PORT + '/';
       const { filePath, fileURL } = await filesService.createFile(file);
-      const filePathDividedArr = filePath.split('/');
+      const filePathDividedArr = filePath.split(path.sep).filter(Boolean);
       const fileURLDividedArr = fileURL.split('/');
       expect(existsSync(filePath)).toBe(true);
       expect(fileURL.includes(url)).toBe(true);

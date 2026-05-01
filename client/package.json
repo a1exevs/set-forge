@@ -1,7 +1,7 @@
 {
   "name": "@set-forge/client",
   "version": "0.2.1",
-  "description": "A workout planning and strength tracking app that lets you build exercise lists, log sets and weights, rate perceived effort, and visualize progress over time.",
+  "description": "A workout planning and strength tracking web-app that lets you build exercise lists, log sets and weights, rate perceived effort, and visualize progress over time.",
   "private": true,
   "author": "AlexEvs",
   "bugs": {
@@ -24,8 +24,6 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "check-deps": "npm outdated",
-    "upgrade-deps": "npm upgrade --latest",
     "format": "prettier --write \"{src,.storybook,linter,tests}/**/*.{ts,tsx,css,scss}\"",
     "format:check": "prettier --check \"{src,.storybook,linter,tests}/**/*.{ts,tsx,css,scss}\"",
     "lint": "eslint --config eslint.config.ts src .storybook linter tests",
@@ -41,7 +39,9 @@
     "build-storybook": "storybook build",
     "chromatic": "chromatic --exit-zero-on-changes",
     "docs": "typedoc",
-    "e2e:install": "playwright install --with-deps"
+    "e2e:install": "playwright install --with-deps",
+    "check-deps": "npm outdated",
+    "upgrade-deps": "npm upgrade --latest"
   },
   "dependencies": {
     "@alexevs/ts-guards": "1.0.9",
