@@ -12,9 +12,9 @@ export const mockUsers = (count: number): Partial<User>[] => {
 };
 
 export const mockGetUsersResponse = (): GetUsersResponse.Data => {
-  const user1: GetUsersResponse.User = { id: 1, email: 'email1', status: 'status1', followed: false, avatar: null };
-  const user2: GetUsersResponse.User = { id: 2, email: 'email2', status: 'status2', followed: true, avatar: null };
-  const user3: GetUsersResponse.User = { id: 3, email: 'email3', status: 'status3', followed: true, avatar: null };
+  const user1: GetUsersResponse.User = { id: 1, email: 'email1', status: 'status1', avatar: null };
+  const user2: GetUsersResponse.User = { id: 2, email: 'email2', status: 'status2', avatar: null };
+  const user3: GetUsersResponse.User = { id: 3, email: 'email3', status: 'status3', avatar: null };
   const items = [user1, user2, user3];
   return { totalCount: items.length, items };
 };

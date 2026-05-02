@@ -8,11 +8,9 @@ import { ProfilesService } from '@profiles/profiles.service';
 import { UsersService } from '@users/users.service';
 import { User } from '@users/users.model';
 import { RolesService } from '@roles/roles.service';
-import { FollowersService } from '@followers/followers.service';
 import { Role } from '@roles/roles.model';
 import { CreateUserRequest, AddRoleRequest, BanUserRequest, SetUserStatusRequest } from '@users/dto';
 import { mockUsers } from '@test/unit/helpers';
-import { Follower } from '@followers/followers.model';
 import { sendPseudoError } from '@test/unit/helpers';
 import { ErrorMessages } from '@common/constants';
 import { GetProfileResponse } from '@profiles/dto';
@@ -24,7 +22,6 @@ describe('UsersService', () => {
   let usersService: UsersService;
   let model: typeof User;
   let rolesService: RolesService;
-  let followersService: FollowersService;
   let profilesService: ProfilesService;
 
   beforeEach(async () => {
@@ -52,12 +49,6 @@ describe('UsersService', () => {
           },
         },
         {
-          provide: FollowersService,
-          useValue: {
-            findFollowRows: jest.fn(x => x),
-          },
-        },
-        {
           provide: ProfilesService,
           useValue: {
             getUserProfile: jest.fn(x => x),
@@ -68,7 +59,6 @@ describe('UsersService', () => {
     usersService = moduleRef.get<UsersService>(UsersService);
     model = moduleRef.get<typeof User>(getModelToken(User));
     rolesService = moduleRef.get<RolesService>(RolesService);
-    followersService = moduleRef.get<FollowersService>(FollowersService);
     profilesService = moduleRef.get<ProfilesService>(ProfilesService);
   });
 
@@ -81,9 +71,6 @@ describe('UsersService', () => {
     });
     it('RolesService - should be defined', () => {
       expect(rolesService).toBeDefined();
-    });
-    it('FollowersService - should be defined', () => {
-      expect(followersService).toBeDefined();
     });
     it('ProfilesService - should be defined', () => {
       expect(profilesService).toBeDefined();
@@ -158,33 +145,23 @@ describe('UsersService', () => {
       const users = mockUsers(10);
       const page = 1;
       const count = 10;
-      const userId = users[0].id;
       jest.spyOn(model, 'findAll').mockImplementation(() => {
         return Promise.resolve(users as User[]);
       });
       jest.spyOn(model, 'count').mockImplementation(() => {
         return Promise.resolve(users.length);
       });
-      const mockFollowRows: Partial<Follower>[] = [{ followerId: userId, userId: users[1].id }];
-      jest.spyOn(followersService, 'findFollowRows').mockImplementation(() => {
-        return Promise.resolve(mockFollowRows as Follower[]);
-      });
       jest.spyOn(profilesService, 'getUserProfile').mockImplementation((userId: number) => {
         return Promise.resolve({
           photos: { small: `small${userId}`, large: `large${userId}` },
         } as GetProfileResponse.Dto);
       });
-      const result = await usersService.getUsers(page, count, userId);
+      const result = await usersService.getUsers(page, count);
 
       expect(result.totalCount).toBe(users.length);
       expect(model.findAll).toBeCalledTimes(1);
       expect(model.findAll).toBeCalledWith({ offset: (page - 1) * count, limit: count });
       expect(model.count).toBeCalledTimes(1);
-      expect(followersService.findFollowRows).toBeCalledTimes(1);
-      expect(followersService.findFollowRows).toBeCalledWith(
-        userId,
-        users.map(user => user.id),
-      );
       expect(profilesService.getUserProfile).toBeCalledTimes(users.length);
       expect(profilesService.getUserProfile).toBeCalledWith(users[0].id);
       expect(profilesService.getUserProfile).toBeCalledWith(users[users.length - 1].id);

@@ -1,5 +1,3 @@
-import 'module-alias/register';
-
 import '@root/string.extensions';
 
 import { NestFactory } from '@nestjs/core';

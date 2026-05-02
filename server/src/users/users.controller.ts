@@ -33,12 +33,8 @@ export class UsersController {
   @ApiForbiddenResponse({ description: Docs.ru.GET_USERS_FORBIDDEN })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @Get()
-  getUsers(
-    @Query() queryParams: GetUsersQuery.Swagger.GetUsersQueryParams,
-    @Req() request,
-  ): Promise<GetUsersResponse.Data> {
-    const userId = request.user.id;
-    return this.usersService.getUsers(queryParams.page ?? 1, queryParams.count ?? 10, userId);
+  getUsers(@Query() queryParams: GetUsersQuery.Swagger.GetUsersQueryParams): Promise<GetUsersResponse.Data> {
+    return this.usersService.getUsers(queryParams.page ?? 1, queryParams.count ?? 10);
   }
 
   @ApiOperation({ summary: Docs.ru.ADD_ROLE_ENDPOINT })

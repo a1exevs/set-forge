@@ -12,7 +12,6 @@ describe('GetUsersResponse', () => {
       id: 1,
       email: 'email',
       status: 'status',
-      followed: true,
       avatar,
     });
     const data = new GetUsersResponse.Data({

@@ -55,32 +55,28 @@ describe('UsersController', () => {
 
   describe('UsersController - getUsers', () => {
     it('should be successful result', async () => {
-      const userId = 1;
-      const req = { user: { id: userId } };
       const queryParams: GetUsersQuery.Params = { page: 1, count: 3 };
       const mockResponse = mockGetUsersResponse();
       jest.spyOn(usersService, 'getUsers').mockImplementation(() => {
         return Promise.resolve(mockResponse);
       });
 
-      const result = await usersController.getUsers(queryParams, req);
+      const result = await usersController.getUsers(queryParams);
 
       expect(usersService.getUsers).toBeCalledTimes(1);
-      expect(usersService.getUsers).toBeCalledWith(queryParams.page, queryParams.count, userId);
+      expect(usersService.getUsers).toBeCalledWith(queryParams.page, queryParams.count);
       expect(result).toEqual(mockResponse);
     });
     it('should be successful result (with default query params)', async () => {
-      const userId = 1;
-      const req = { user: { id: userId } };
       const mockResponse = mockGetUsersResponse();
       jest.spyOn(usersService, 'getUsers').mockImplementation(() => {
         return Promise.resolve(mockResponse);
       });
 
-      const result = await usersController.getUsers({ page: null, count: null }, req);
+      const result = await usersController.getUsers({ page: null, count: null });
 
       expect(usersService.getUsers).toBeCalledTimes(1);
-      expect(usersService.getUsers).toBeCalledWith(1, 10, userId);
+      expect(usersService.getUsers).toBeCalledWith(1, 10);
       expect(result).toEqual(mockResponse);
     });
   });

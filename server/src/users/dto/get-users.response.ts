@@ -20,16 +20,12 @@ export namespace GetUsersResponse {
     readonly status: string;
 
     @ApiProperty()
-    readonly followed: boolean;
-
-    @ApiProperty()
     readonly avatar: Avatar;
 
     constructor(props: User) {
       this.id = props.id;
       this.email = props.email;
       this.status = props.status;
-      this.followed = props.followed;
       this.avatar = props.avatar;
     }
   }

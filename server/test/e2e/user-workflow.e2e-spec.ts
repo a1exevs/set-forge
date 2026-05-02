@@ -651,7 +651,6 @@ describe('User workflow', () => {
             const users = response.body.items;
             const user = users.find(user => user.id === user2Id);
             expect(user).toBeDefined();
-            expect(user.followed).toBe(true);
           });
       });
     });
@@ -726,7 +725,6 @@ describe('User workflow', () => {
             const users = response.body.items;
             const user = users.find(user => user.id === user2Id);
             expect(user).toBeDefined();
-            expect(user.followed).toBe(false);
           });
       });
     });

@@ -26,9 +26,6 @@
     "@files/(.*)$": [
       "<rootDir>/src/files/$1"
     ],
-    "@followers/(.*)$": [
-      "<rootDir>/src/followers/$1"
-    ],
     "@logger/(.*)$": [
       "<rootDir>/src/logger/$1"
     ],

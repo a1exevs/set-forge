@@ -6,12 +6,10 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { UsersModule, User, UserRole } from '@src/users';
 import { RolesModule, Role } from '@src/roles';
 import { AuthModule, RefreshToken } from '@src/auth';
-import { PostsModule, Post } from '@src/posts';
 import { FilesModule } from '@src/files';
 import { ProfilesModule, UserCommonInfo, UserContact, UserAvatar } from '@src/profiles';
 import { LoggerModule } from '@src/logger';
 import { SecurityModule } from '@src/security';
-import { FollowersModule, Follower } from '@src/followers';
 import { HealthModule } from '@src/health/health.module';
 
 import * as path from 'path';
@@ -34,18 +32,16 @@ import * as path from 'path';
       username: process.env.MYSQL_USER,
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DB,
-      models: [User, Role, UserRole, Post, RefreshToken, UserCommonInfo, UserContact, UserAvatar, Follower],
+      models: [User, Role, UserRole, RefreshToken, UserCommonInfo, UserContact, UserAvatar],
       autoLoadModels: true,
     }),
     UsersModule,
     RolesModule,
     AuthModule,
-    PostsModule,
     FilesModule,
     ProfilesModule,
     LoggerModule,
     SecurityModule,
-    FollowersModule,
   ],
 })
 export class AppModule {}

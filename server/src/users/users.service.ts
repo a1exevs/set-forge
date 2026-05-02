@@ -5,7 +5,6 @@ import { FindOptions } from 'sequelize';
 import { User } from '@users/users.model';
 import { CreateUserRequest, AddRoleRequest, BanUserRequest, SetUserStatusRequest, GetUsersResponse } from '@users/dto';
 import { RolesService } from '@roles/roles.service';
-import { FollowersService } from '@followers/followers.service';
 import { ProfilesService } from '@profiles/profiles.service';
 import { ErrorMessages } from '@common/constants';
 
@@ -14,7 +13,6 @@ export class UsersService {
   constructor(
     @InjectModel(User) private userRepository: typeof User,
     private roleService: RolesService,
-    private followersService: FollowersService,
     private profilesService: ProfilesService,
   ) {}
 
@@ -38,15 +36,12 @@ export class UsersService {
     return user;
   }
 
-  async getUsers(page: number, count: number, userId: number): Promise<GetUsersResponse.Data> {
+  async getUsers(page: number, count: number): Promise<GetUsersResponse.Data> {
     const users: User[] = await this.userRepository.findAll({
       offset: Number((page - 1) * count),
       limit: Number(count),
     });
     const totalCount = await this.userRepository.count();
-
-    const userIds = users.map(user => user.id);
-    const followRows = await this.followersService.findFollowRows(userId, userIds);
 
     const userItems = await Promise.all(
       users.map(async (user): Promise<GetUsersResponse.User> => {
@@ -55,7 +50,6 @@ export class UsersService {
           id: user.id,
           email: user.email,
           status: user.status,
-          followed: followRows.some(row => row.userId === user.id),
           avatar: profile.photos,
         });
       }),
