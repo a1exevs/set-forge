@@ -22,9 +22,9 @@ CLIENT_URL=http://localhost:3000
 PORT=7000
 
 MYSQL_HOST=localhost
-MYSQL_USER=sowa-server
-MYSQL_DB=sowa_db
-MYSQL_PASSWORD=<PASSWORK>
+MYSQL_USER=change_me_db_user
+MYSQL_DB=change_me_db
+MYSQL_PASSWORD=change_me_db_password
 MYSQL_PORT=3306
 
 SERVER_STATIC=static
