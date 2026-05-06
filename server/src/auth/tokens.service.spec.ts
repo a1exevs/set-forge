@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SignOptions } from 'jsonwebtoken';
 import { HttpStatus } from '@nestjs/common';
 
@@ -115,11 +116,21 @@ describe('TokensService', () => {
         },
       ],
       imports: [
-        JwtModule.register({
-          secret: process.env.JWT_SECRET_KEY,
-          signOptions: {
-            expiresIn: '600s',
+        ConfigModule.forRoot({ isGlobal: true, ignoreEnvFile: true }),
+        JwtModule.registerAsync({
+          useFactory: (config: ConfigService) => {
+            const secret = config.get<string>('JWT_SECRET_KEY');
+            if (typeof secret !== 'string' || !secret.trim()) {
+              throw new Error('JWT_SECRET_KEY must be set for TokensService unit tests (see test-environment.ts).');
+            }
+            return {
+              secret: secret.trim(),
+              signOptions: {
+                expiresIn: '600s',
+              },
+            };
           },
+          inject: [ConfigService],
         }),
       ],
     }).compile();

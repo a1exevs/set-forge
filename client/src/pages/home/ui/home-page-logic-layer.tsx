@@ -12,6 +12,9 @@ type Props = {
   onEdit: (id: string) => void;
   formatDate: (date: string | null) => string;
   getUsagePercentageAsync: () => Promise<number>;
+  userEmail: string;
+  avatarLetter: string;
+  onLogout: () => void | Promise<void>;
 };
 
 const HomePageLogicLayer: FC<Props> = ({
@@ -21,6 +24,9 @@ const HomePageLogicLayer: FC<Props> = ({
   formatDate,
   getUsagePercentageAsync,
   loadFromStorage,
+  userEmail,
+  avatarLetter,
+  onLogout,
 }) => {
   const [storageWarning, setStorageWarning] = useState<boolean>(false);
 
@@ -57,6 +63,9 @@ const HomePageLogicLayer: FC<Props> = ({
       onEdit={onEdit}
       onDelete={handleDelete}
       formatDate={formatDate}
+      userEmail={userEmail}
+      avatarLetter={avatarLetter}
+      onLogout={onLogout}
     />
   );
 };

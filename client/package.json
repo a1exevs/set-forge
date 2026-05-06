@@ -46,6 +46,7 @@
   "dependencies": {
     "@alexevs/ts-guards": "1.0.9",
     "@headlessui/react": "2.2.0",
+    "@tanstack/react-query": "5.62.8",
     "@tanstack/react-router": "1.161.3",
     "canvas-confetti": "1.9.3",
     "immer": "10.1.1",

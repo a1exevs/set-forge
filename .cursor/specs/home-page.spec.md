@@ -2,7 +2,16 @@
 
 ## Overview
 
-The home page displays a list of workout lists, allows navigation to create a new one or to workout mode, and to edit or delete a list via dot-dot-dot menu. It warns when storage is nearly full.
+The home page displays a list of workout lists, allows navigation to create a new one or to workout mode, and to edit or delete a list via dot-dot-dot menu. It warns when storage is nearly full. The page requires an authenticated session (see [auth-session.spec.md](auth-session.spec.md)).
+
+---
+
+## App header (authenticated)
+
+1. Top **header** row: **left** — circular **user avatar** (placeholder for future image). Inside the circle: **first letter of the email local-part** in uppercase (text before `@`; if empty, use `?`).
+2. **Right** (or remaining header area): existing title block «Set Forge» / subtitle «Track your workout progress» (layout: avatar left, titles to the right of the avatar on the same row, consistent spacing).
+3. Avatar is the trigger for **Headless UI `Menu`** (`UserAvatarMenu`, see [shared-components.spec.md](shared-components.spec.md)): menu item **Logout**.
+4. **Logout**: `DELETE /auth/logout` via session API — on success clear access token, session query cache, navigate to `/login`.
 
 ---
 
@@ -59,6 +68,8 @@ type Props = {
   onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void | Promise<void>;
   formatDate: (date: string | null) => string;
+  userEmail: string;
+  onLogout: () => void | Promise<void>;
 };
 ```
 
@@ -87,8 +98,8 @@ type Props = {
 | Category | Technology |
 |-----------|------------|
 | Routing | TanStack Router (`Link`, `to`) |
-| State | Zustand + Immer + DevTools, `createSelectors` |
-| UI | React 18, FC, SCSS Modules, MenuButton (see [shared-components.spec.md](shared-components.spec.md)) |
+| State | Zustand + Immer + DevTools, `createSelectors`; session user from `@entities` / TanStack Query |
+| UI | React 18, FC, SCSS Modules, MenuButton (see [shared-components.spec.md](shared-components.spec.md)), UserAvatarMenu |
 | Dialogs | `useConfirm` (ConfirmDialogProvider) |
 | Storage | `workoutListStorage` (LocalStorage, key `workout-lists`) |
 
@@ -112,7 +123,8 @@ type Props = {
 | `useWorkoutListStore.use.getUsagePercentageAsync()` | action | Storage usage percentage |
 | `formatDate(date)` | function | Date formatting |
 | `useConfirm()` | hook | Open confirm dialog |
-| Routes | — | `/` (home), `/create`, `/edit/$id`, `/workout/$id` |
+| Routes | — | `/` (home), `/create`, `/edit/$id`, `/workout/$id`, `/login`, `/register` (public) |
+| `userEmail` / `onLogout` | props | Passed from data layer from session query and logout mutation |
 
 ### Page public exports
 

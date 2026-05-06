@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 
-import { useWorkoutListStore } from '@entities';
+import { emailToAvatarLetter, useCurrentUserQuery, useLogoutMutation, useWorkoutListStore } from '@entities';
 import { formatDate } from '@shared';
 
 import HomePageLogicLayer from 'src/pages/home/ui/home-page-logic-layer';
@@ -12,6 +12,11 @@ const HomePageDataLayer: FC = () => {
   const loadFromStorage = useWorkoutListStore.use.loadFromStorage();
   const deleteWorkoutList = useWorkoutListStore.use.deleteWorkoutList();
   const getUsagePercentageAsync = useWorkoutListStore.use.getUsagePercentageAsync();
+  const { data: user } = useCurrentUserQuery(true);
+  const logoutMutation = useLogoutMutation();
+
+  const userEmail = user?.email ?? '';
+  const avatarLetter = user ? emailToAvatarLetter(user.email) : '?';
 
   return (
     <HomePageLogicLayer
@@ -23,6 +28,11 @@ const HomePageDataLayer: FC = () => {
       formatDate={formatDate}
       getUsagePercentageAsync={getUsagePercentageAsync}
       loadFromStorage={loadFromStorage}
+      userEmail={userEmail}
+      avatarLetter={avatarLetter}
+      onLogout={(): void => {
+        logoutMutation.mutate();
+      }}
     />
   );
 };

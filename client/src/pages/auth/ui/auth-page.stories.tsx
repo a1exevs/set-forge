@@ -1,0 +1,51 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
+import type { FormEvent } from 'react';
+
+import AuthPage from 'src/pages/auth/ui/auth-page';
+
+const meta = {
+  title: 'Pages/AuthPage',
+  component: AuthPage,
+  args: {
+    activeTab: 'login',
+    email: '',
+    password: '',
+    captcha: '',
+    captchaImageUrl: null,
+    showCaptcha: false,
+    emailError: null,
+    passwordError: null,
+    captchaError: null,
+    formError: null,
+    isSubmitting: false,
+    onEmailChange: fn(),
+    onPasswordChange: fn(),
+    onCaptchaChange: fn(),
+    onSubmit: fn((e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+    }),
+    redirectSearch: {},
+  },
+} satisfies Meta<typeof AuthPage>;
+
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+
+export const LoginTab: Story = {
+  args: { activeTab: 'login' },
+};
+
+export const RegisterTab: Story = {
+  args: { activeTab: 'register' },
+};
+
+export const WithCaptcha: Story = {
+  args: {
+    activeTab: 'login',
+    showCaptcha: true,
+    captchaImageUrl: 'https://placehold.co/200x60/png?text=Captcha',
+    formError: 'Please complete the captcha',
+  },
+};

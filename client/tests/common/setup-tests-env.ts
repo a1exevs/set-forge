@@ -1,5 +1,9 @@
 process.env.ENV = 'tests';
 
+jest.mock('src/shared/api/api-base-url', () => ({
+  getApiBaseUrl: (): string => 'http://localhost:5000/api/1.0',
+}));
+
 // Polyfill TextEncoder/TextDecoder for environments where they are missing (e.g., Jest + jsdom)
 import { TextDecoder, TextEncoder } from 'util';
 

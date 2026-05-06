@@ -1,9 +1,7 @@
-import { createMemoryHistory, createRouter } from '@tanstack/react-router';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { renderApp } from 'src/app/model/specs/test-utils';
-import { routeTree } from 'src/route-tree.gen';
+import { createTestQueryClient, createTestRouter, renderApp } from 'src/app/model/specs/test-utils';
 
 const TEST_LIST_ID = 'test-list-1';
 const TEST_LIST = {
@@ -36,12 +34,9 @@ describe('EditWorkoutPage', () => {
 
   describe('rendering', () => {
     it('renders NotFoundMessage when id does not exist', async () => {
-      const testRouter = createRouter({
-        routeTree,
-        defaultPreload: 'intent',
-        history: createMemoryHistory({ initialEntries: ['/edit/non-existent-id'] }),
-      });
-      renderApp(testRouter);
+      const queryClient = createTestQueryClient();
+      const testRouter = createTestRouter('/edit/non-existent-id', queryClient);
+      renderApp(testRouter, queryClient);
 
       const heading = await screen.findByText('Workout list not found');
       expect(heading).toBeInTheDocument();
@@ -50,12 +45,9 @@ describe('EditWorkoutPage', () => {
 
     it('renders WorkoutListForm when list exists in storage', async () => {
       seedStorage();
-      const testRouter = createRouter({
-        routeTree,
-        defaultPreload: 'intent',
-        history: createMemoryHistory({ initialEntries: [`/edit/${TEST_LIST_ID}`] }),
-      });
-      renderApp(testRouter);
+      const queryClient = createTestQueryClient();
+      const testRouter = createTestRouter(`/edit/${TEST_LIST_ID}`, queryClient);
+      renderApp(testRouter, queryClient);
 
       const heading = await screen.findByRole('heading', { name: /Editing Push Day/ });
       expect(heading).toBeInTheDocument();
@@ -67,12 +59,9 @@ describe('EditWorkoutPage', () => {
   describe('interactions', () => {
     it('navigates to home when Cancel is clicked', async () => {
       seedStorage();
-      const testRouter = createRouter({
-        routeTree,
-        defaultPreload: 'intent',
-        history: createMemoryHistory({ initialEntries: [`/edit/${TEST_LIST_ID}`] }),
-      });
-      renderApp(testRouter);
+      const queryClient = createTestQueryClient();
+      const testRouter = createTestRouter(`/edit/${TEST_LIST_ID}`, queryClient);
+      renderApp(testRouter, queryClient);
 
       const cancelButton = await screen.findByRole('button', { name: 'Cancel' });
       const user = userEvent.setup();

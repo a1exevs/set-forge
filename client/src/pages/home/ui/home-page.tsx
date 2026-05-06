@@ -2,7 +2,7 @@ import type { WorkoutList } from '@entities';
 import { Link } from '@tanstack/react-router';
 import { FC, MouseEvent } from 'react';
 
-import { Button, MenuButton } from '@shared';
+import { Button, MenuButton, UserAvatarMenu } from '@shared';
 
 import classes from 'src/pages/home/ui/home-page.module.scss';
 
@@ -12,14 +12,35 @@ type Props = {
   onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void | Promise<void>;
   formatDate: (date: string | null) => string;
+  userEmail: string;
+  avatarLetter: string;
+  onLogout: () => void | Promise<void>;
 };
 
-const HomePage: FC<Props> = ({ workoutLists, storageWarning, onEdit, onDelete, formatDate }) => {
+const HomePage: FC<Props> = ({
+  workoutLists,
+  storageWarning,
+  onEdit,
+  onDelete,
+  formatDate,
+  userEmail,
+  avatarLetter,
+  onLogout,
+}) => {
   return (
     <div className={classes.container}>
       <header className={classes.header}>
-        <h1>Set Forge</h1>
-        <p className={classes.subtitle}>Track your workout progress</p>
+        <div className={classes.headerTop}>
+          <UserAvatarMenu
+            letter={avatarLetter}
+            ariaLabel={userEmail ? `Account menu for ${userEmail}` : 'Account menu'}
+            items={[{ id: 'logout', label: 'Log out', onClick: (): void => void onLogout() }]}
+          />
+          <div className={classes.headerTitles}>
+            <h1>Set Forge</h1>
+            <p className={classes.subtitle}>Track your workout progress</p>
+          </div>
+        </div>
       </header>
 
       {storageWarning && (

@@ -1,8 +1,6 @@
-import { createMemoryHistory, createRouter } from '@tanstack/react-router';
 import { screen } from '@testing-library/react';
 
-import { renderApp } from 'src/app/model/specs/test-utils';
-import { routeTree } from 'src/route-tree.gen';
+import { createTestQueryClient, createTestRouter, renderApp } from 'src/app/model/specs/test-utils';
 
 const TEST_LIST_ID = 'test-list-1';
 const TEST_LIST = {
@@ -30,12 +28,9 @@ describe('EditWorkoutPage', () => {
   });
 
   it('matches snapshot when list not found', async () => {
-    const testRouter = createRouter({
-      routeTree,
-      defaultPreload: 'intent',
-      history: createMemoryHistory({ initialEntries: ['/edit/non-existent-id'] }),
-    });
-    const { container } = renderApp(testRouter);
+    const queryClient = createTestQueryClient();
+    const testRouter = createTestRouter('/edit/non-existent-id', queryClient);
+    const { container } = renderApp(testRouter, queryClient);
 
     await screen.findByText('Workout list not found');
     expect(container).toMatchSnapshot();
@@ -43,12 +38,9 @@ describe('EditWorkoutPage', () => {
 
   it('matches snapshot when list exists', async () => {
     localStorage.setItem('workout-lists', JSON.stringify([TEST_LIST]));
-    const testRouter = createRouter({
-      routeTree,
-      defaultPreload: 'intent',
-      history: createMemoryHistory({ initialEntries: [`/edit/${TEST_LIST_ID}`] }),
-    });
-    const { container } = renderApp(testRouter);
+    const queryClient = createTestQueryClient();
+    const testRouter = createTestRouter(`/edit/${TEST_LIST_ID}`, queryClient);
+    const { container } = renderApp(testRouter, queryClient);
 
     await screen.findByRole('heading', { name: /Editing Push Day/ });
     expect(container).toMatchSnapshot();

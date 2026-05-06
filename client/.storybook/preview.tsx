@@ -1,5 +1,6 @@
 import { Controls, Description, Primary, Subtitle, Title } from '@storybook/blocks';
 import type { Preview } from '@storybook/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router';
 
 import { ConfirmDialogProvider } from '@shared';
@@ -22,15 +23,26 @@ const withRouterAndProviders: Preview['decorators'][0] = (Story: React.FC, conte
     return <Story />;
   }
 
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
   const router = createRouter({
     routeTree,
+    context: { queryClient },
     history: createMemoryHistory({ initialEntries: routerConfig.initialEntries }),
+    defaultPreload: 'intent',
   });
 
   return (
-    <ConfirmDialogProvider>
-      <RouterProvider router={router} />
-    </ConfirmDialogProvider>
+    <QueryClientProvider client={queryClient}>
+      <ConfirmDialogProvider>
+        <RouterProvider router={router} context={{ queryClient }} />
+      </ConfirmDialogProvider>
+    </QueryClientProvider>
   );
 };
 

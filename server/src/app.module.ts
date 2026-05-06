@@ -20,6 +20,7 @@ import * as path from 'path';
   imports: [
     HealthModule,
     ConfigModule.forRoot({
+      isGlobal: true,
       envFilePath: `.${process.env.NODE_ENV}.env`,
     }),
     ServeStaticModule.forRoot({

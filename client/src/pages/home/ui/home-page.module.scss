@@ -5,19 +5,37 @@
 }
 
 .header {
-  text-align: center;
   padding: $spacing-lg 0 $spacing-xl;
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.headerTitles {
+  text-align: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 56px - $spacing-md);
 
   h1 {
     font-size: $font-size-3xl;
     color: $text-primary;
-    margin-bottom: $spacing-xs;
+    margin: 0 0 $spacing-xs;
   }
 }
 
 .subtitle {
   font-size: $font-size-base;
   color: $text-secondary;
+  margin: 0;
 }
 
 .warning {

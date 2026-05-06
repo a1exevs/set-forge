@@ -42,10 +42,10 @@ async function start() {
 
 function setupDocsModule(app: INestApplication) {
   const docConfig = new DocumentBuilder()
-    .setTitle('SOWA-Server')
-    .setDescription('This is an API for messengers SOWA')
+    .setTitle('Set Forge API')
+    .setDescription('This is an API for Set Forge project')
     .setVersion('1.0.0')
-    .addTag('SOWA')
+    .addTag('Set Forge')
     .build();
   const document = SwaggerModule.createDocument(app, docConfig);
   SwaggerModule.setup('/api/docs', app, document);
@@ -60,7 +60,7 @@ function setupCORS(app: INestApplication, whiteList: string[]) {
         callback(new Error('Not allowed by CORS'), false);
       }
     },
-    allowedHeaders: 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Observe',
+    allowedHeaders: 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Observe, Authorization',
     methods: 'GET,PUT,POST,DELETE,UPDATE,OPTIONS',
     credentials: true,
     maxAge: 600,

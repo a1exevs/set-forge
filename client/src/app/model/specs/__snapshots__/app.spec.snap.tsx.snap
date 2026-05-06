@@ -8,14 +8,38 @@ exports[`App Page with route / matches snapshot, route / 1`] = `
     <header
       class="header"
     >
-      <h1>
-        Set Forge
-      </h1>
-      <p
-        class="subtitle"
+      <div
+        class="headerTop"
       >
-        Track your workout progress
-      </p>
+        <button
+          aria-expanded="false"
+          aria-haspopup="menu"
+          aria-label="Account menu"
+          class="trigger"
+          data-headlessui-state=""
+          id="headlessui-menu-button-:r2:"
+          type="button"
+        >
+          <span
+            aria-hidden="true"
+            class="letter"
+          >
+            ?
+          </span>
+        </button>
+        <div
+          class="headerTitles"
+        >
+          <h1>
+            Set Forge
+          </h1>
+          <p
+            class="subtitle"
+          >
+            Track your workout progress
+          </p>
+        </div>
+      </div>
     </header>
     <main
       class="main"

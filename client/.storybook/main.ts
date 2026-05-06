@@ -16,6 +16,7 @@ const config: StorybookConfig = {
         alias: {
           src: path.resolve(__dirname, '../src'),
           'storybook-dir': path.resolve(__dirname, '.'),
+          'src/entities/session/lib/bootstrap-session': path.resolve(__dirname, 'mock-bootstrap-session.ts'),
           // Add other aliases from vite.config.ts if needed
         },
       },
