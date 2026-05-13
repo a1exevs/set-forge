@@ -8,7 +8,10 @@ export function toAbsoluteFromApiOrigin(pathOrUrl: string): string {
   if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
     return pathOrUrl;
   }
-  const origin = new URL(getApiBaseUrl()).origin;
+  const apiBase = getApiBaseUrl();
+  // When the API base is relative (e.g. "/api/1.0" in same-origin prod builds), fall back to the page origin.
+  const origin =
+    apiBase.startsWith('http://') || apiBase.startsWith('https://') ? new URL(apiBase).origin : window.location.origin;
   const path = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`;
   return `${origin}${path}`;
 }

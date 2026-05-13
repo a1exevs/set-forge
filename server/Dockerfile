@@ -20,4 +20,9 @@ COPY package.json package-lock.json ./
 COPY server/package.json ./server/package.json
 RUN npm ci --workspace @set-forge/server --omit=dev
 COPY --from=build /app/server/dist ./dist
+# sequelize-cli reads .sequelizerc from cwd (=/app) and resolves migrations / seeders
+# relative to its __dirname. Layout in the image must mirror that of the repo root,
+# i.e. /app/.sequelizerc + /app/database/{config.js,migrations/,seeders/}.
+COPY server/.sequelizerc ./.sequelizerc
+COPY server/database ./database
 CMD ["node", "dist/src/main"]

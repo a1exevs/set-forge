@@ -25,6 +25,8 @@ From the **repository root**: Node `v22.20.0`, npm `v10.9.3` (see root README). 
 
 Local development typically needs MySQL (see root **Docker** scripts: `db:up` / `db:down`) and env files such as `.development.env` expected by `ConfigModule`.
 
+For the production compose stack, copy `.production.env.example` to `.production.env` before `npm run prod:up`. `SERVER_URL` and `CLIENT_URL` must match the public HTTPS origin served by Caddy (for example `https://localhost` locally or `https://185-10-20-30.sslip.io` on a VDS). The server container keeps a read-only root filesystem; compose mounts persistent writable volumes for `SERVER_STATIC=static` and `SERVER_LOGS=logs`.
+
 ## Available scripts
 
 Run these **from the repository root** (they delegate to this workspace):
@@ -40,9 +42,62 @@ Run these **from the repository root** (they delegate to this workspace):
 | `npm run server:lint` / `npm run server:lint:fix` | ESLint |
 | `npm run server:test:unit` / `npm run server:test:unit-watch` / `npm run server:test:unit-cov` / `npm run server:test:unit-debug` | Jest unit tests |
 | `npm run server:test:e2e` | Jest e2e (`jest-e2e.json`) |
+| `npm run server:db:migrate` / `:undo` / `:undo:all` / `:status` | Sequelize migrations against the **local** DB (uses `server/.development.env`) |
+| `npm run server:db:seed` / `:undo` | Sequelize seeders against the **local** DB |
+| `npm run prod:db:migrate` / `:undo` / `:status` / `prod:db:seed` / `:undo` | Same, but executed inside the running **prod** container (`docker compose exec server-prod ...`) |
 | `npm run server:check-deps` / `npm run server:upgrade-deps` | Dependency maintenance |
 
 You can also run the same script names **from `server/`** after install (for example `npm run start:dev` inside this package).
+
+## Database schema (Sequelize migrations)
+
+The schema is owned by [`sequelize-cli`](https://github.com/sequelize/cli) migrations under `server/database/`. `synchronize` is hard-coded to `false` in `app.module.ts`, so neither dev nor prod will ever auto-create or auto-mutate tables — every change must land as a migration.
+
+Layout:
+
+```
+server/
+  .sequelizerc                  # tells the CLI where config / migrations / seeders live
+  database/
+    config.js                   # reads MYSQL_* from .${NODE_ENV}.env (or already-injected env)
+    migrations/                 # timestamped, run in order, one row per file in `SequelizeMeta`
+    seeders/                    # idempotent default data (e.g. roles)
+```
+
+### Local workflow (against `mysql-dev` from `npm run db:up`)
+
+```bash
+npm run db:up                   # start MySQL container if it is not already up
+npm run server:db:migrate       # create all tables on a fresh DB
+npm run server:db:seed          # insert default `user` / `admin` roles
+npm run server:db:migrate:status
+```
+
+The CLI picks the env file via `database/config.js`: `--env <name>` flag wins, otherwise `NODE_ENV`, otherwise `development`. The corresponding `.<env>.env` next to `server/database/` is loaded (variables already in `process.env` win).
+
+### Production workflow (inside the prod container)
+
+After `npm run prod:up` finishes and the server is healthy, apply migrations / seeds against the prod database **without restarting** the API:
+
+```bash
+npm run prod:db:migrate
+npm run prod:db:seed            # only on first deploy, or when adding new seed data
+npm run prod:db:migrate:status
+```
+
+These wrap `docker compose --profile prod exec server-prod npx sequelize-cli ...`. The container has `database/` and `.sequelizerc` baked in by `server/Dockerfile`, and `MYSQL_*` are injected by the compose `env_file` so no extra mounts are needed.
+
+### Adding a new migration
+
+```bash
+# from the repo root
+cd server
+npx sequelize-cli migration:generate --name add-something
+# edit the generated file in server/database/migrations/
+npm run db:migrate -w @set-forge/server
+```
+
+Keep migrations forward-only and reversible (`up`/`down`). Never edit a migration that has already been applied to a shared DB — write a new one instead.
 
 ## Environment used for verification
 

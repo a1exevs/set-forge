@@ -8,7 +8,9 @@ Client-side authentication aligned with Nest `auth` and `security` modules: regi
 
 ## API contract (base URL)
 
-- Base: `import.meta.env.VITE_API_BASE_URL` (no trailing slash), e.g. `http://localhost:5000/api/1.0`.
+- Base: same-origin `/api/1.0`.
+- In production, Caddy serves HTTPS in front of `client-prod`; nginx in `client-prod` reverse-proxies `/api/` to `server-prod:5000`.
+- In local Vite development, `/api` is proxied to `VITE_DEV_API_PROXY` from `client/.env.local`, or to `http://localhost:5000` by default.
 - All browser requests use `credentials: 'include'` (session cookie `connect.sid`, httpOnly `refreshToken`).
 
 ### Envelope

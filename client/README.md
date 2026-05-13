@@ -45,6 +45,17 @@ Run these **from the repository root** (they delegate to this workspace):
 | `npm run e2e:install` | Playwright browsers |
 | `npm run check-deps` / `npm run upgrade-deps` | Dependency maintenance |
 
+## API base and dev proxy
+
+The client always calls the API through the same-origin `/api/1.0` base path. In the production compose stack, `client-prod` nginx reverse-proxies `/api/` to `server-prod`, while Caddy provides HTTPS in front of nginx.
+
+For local development, Vite proxies `/api` to a backend target:
+
+- Default: `http://localhost:5000`
+- Override: copy [`.env.example`](.env.example) to `.env.local` and set `VITE_DEV_API_PROXY`, for example `https://staging.example.com`
+
+The app intentionally keeps one same-origin API base for both prod and dev.
+
 ## Environment used for verification
 
 - Node: `v22.20.0`

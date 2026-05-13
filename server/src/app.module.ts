@@ -35,6 +35,10 @@ import * as path from 'path';
       database: process.env.MYSQL_DB,
       models: [User, Role, UserRole, RefreshToken, UserCommonInfo, UserContact, UserAvatar],
       autoLoadModels: true,
+      // Schema is owned by sequelize-cli migrations under server/database/migrations.
+      // Keep this `false` in every environment so dev and prod share one source of truth
+      // and accidental model edits never silently mutate the database.
+      synchronize: false,
     }),
     UsersModule,
     RolesModule,

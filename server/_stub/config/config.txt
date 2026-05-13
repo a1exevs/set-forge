@@ -15,19 +15,3 @@ For start DB You must:
     );
     - for creating db-dump you can use command:
         mysqldump -u sowa-server -p sowa_db | gzip > backup_db.sql.gz
-    - create files .production.env and .development.env with content shown below.
-
-SERVER_URL=http://localhost
-CLIENT_URL=http://localhost:5173
-PORT=7000
-
-MYSQL_HOST=localhost
-MYSQL_USER=change_me_db_user
-MYSQL_DB=change_me_db
-MYSQL_PASSWORD=change_me_db_password
-MYSQL_PORT=3306
-
-SERVER_STATIC=static
-JWT_SECRET_KEY=1234
-SESSION_SECRET_KEY=1234
-SERVER_LOGS=logs

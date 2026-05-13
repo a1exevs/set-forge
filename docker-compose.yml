@@ -49,6 +49,13 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+    # Writable mounts for the only two paths the app writes to:
+    #   - SERVER_STATIC=static  → user uploads (avatars, post images) via files.service.ts
+    #   - SERVER_LOGS=logs      → error logs via logger.service.ts
+    # Both live under /app/dist/<name> because __dirname in the compiled code is /app/dist/src/...
+    volumes:
+      - server_static:/app/dist/static
+      - server_logs:/app/dist/logs
     healthcheck:
       test:
         [
@@ -68,10 +75,30 @@ services:
     depends_on:
       server-prod:
         condition: service_healthy
+    expose:
+      - "80"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+  # TLS-terminating reverse proxy in front of client-prod (which serves SPA + proxies /api to server-prod).
+  # SITE_ADDRESS=localhost → Caddy uses its internal CA (HTTPS works without a public domain).
+  # SITE_ADDRESS=<public host> → Caddy auto-issues a Let's Encrypt cert.
+  # HTTP_PORT/HTTPS_PORT let you sidestep ports 80/443 when they are taken on the host (common on Windows).
+  caddy:
+    profiles: ["prod"]
+    image: caddy:2.8-alpine
+    depends_on:
+      - client-prod
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
     ports:
-      # Default 8080: on Windows host port 80 is often reserved (HTTP.sys / excluded ranges).
-      # On a VDS set CLIENT_PUBLIC_PORT=80 in a root `.env` or your environment on Linux VDS if you want the usual HTTP port.
-      - "${CLIENT_PUBLIC_PORT:-8080}:80"
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -79,3 +106,7 @@ services:
 volumes:
   mysql_data_prod:
   mysql_data_dev:
+  caddy_data:
+  caddy_config:
+  server_static:
+  server_logs:

@@ -9,7 +9,7 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
-import { Request, Response } from 'express';
+import { CookieOptions, Request, Response } from 'express';
 
 import { AuthService } from '@auth/auth.service';
 import { LoginRequest, RegisterRequest, AuthenticationResponse, GetCurrentUserResponse } from '@auth/dto';
@@ -118,17 +118,27 @@ export class AuthController {
   @Delete('/logout')
   async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
     const result = await this.authService.logout(request.cookies.refreshToken);
-    response.clearCookie('refreshToken');
+    response.clearCookie('refreshToken', AuthController.refreshCookieBaseOptions());
     return new OperationResultResponse.Dto({ result });
   }
 
   private static setupCookies(response: Response, data: IAuthenticationResult) {
     if ('refreshToken' in data.data.payload) {
       response.cookie('refreshToken', data.data.payload.refreshToken, {
-        httpOnly: true,
+        ...AuthController.refreshCookieBaseOptions(),
         expires: data.data.payload.refreshToken_expiration,
       }); // path: AUTH_PATH
     }
+  }
+
+  // `secure: true` is required for SameSite policies in modern browsers; `localhost` is treated as a secure context, so dev still works.
+  // Using the SAME options for both `cookie` and `clearCookie` is required for the browser to actually drop the cookie on logout.
+  private static refreshCookieBaseOptions(): CookieOptions {
+    return {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    };
   }
 
   private static resetAuthFailedCounter(request) {

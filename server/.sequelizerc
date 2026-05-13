@@ -1,6 +1,15 @@
-const path = require('path');module.exports = {
-   'seeders-path': path.resolve('database', 'seeders'),
-   'migrations-path': path.resolve('database', 'migrations'),
-   'config': path.resolve('database', 'config.js'),
-   'models-path': path.resolve('database', 'models'),
-}
+'use strict';
+
+const path = require('path');
+
+// sequelize-cli reads .sequelizerc from cwd. Because all paths are derived from
+// __dirname here, the same file works in both contexts:
+//   - locally: cwd = ./server  (npm workspace scripts)        → __dirname = <repo>/server
+//   - in prod container: cwd = /app  (image WORKDIR)          → __dirname = /app
+// The Dockerfile copies this file and database/ next to each other so the layout
+// matches what the resolver expects.
+module.exports = {
+  config: path.resolve(__dirname, 'database', 'config.js'),
+  'migrations-path': path.resolve(__dirname, 'database', 'migrations'),
+  'seeders-path': path.resolve(__dirname, 'database', 'seeders'),
+};
