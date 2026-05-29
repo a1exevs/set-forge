@@ -6,23 +6,23 @@ import { defineConfig, loadEnv } from 'vite';
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, __dirname, '');
-  const apiProxyTarget = env.VITE_DEV_API_PROXY || 'http://localhost:5000';
-  const apiProxyOrigin = env.VITE_DEV_API_PROXY ? new URL(apiProxyTarget).origin : undefined;
+  const devServerPort = 5173;
+  const apiProxyTarget = env.VITE_DEV_API_PROXY || 'http://localhost:5001';
+  const devClientOrigin = `http://localhost:${devServerPort}`;
 
   return {
     server: {
-      port: 5173,
+      port: devServerPort,
       strictPort: true,
       proxy: {
         '/api': {
           target: apiProxyTarget,
           changeOrigin: true,
           configure: proxy => {
-            if (!apiProxyOrigin) {
-              return;
-            }
+            // Nest CORS whitelist uses CLIENT_URL (SPA origin). changeOrigin rewrites Host
+            // to the API target; keep Origin aligned with the browser so preflight succeeds.
             proxy.on('proxyReq', proxyReq => {
-              proxyReq.setHeader('Origin', apiProxyOrigin);
+              proxyReq.setHeader('Origin', devClientOrigin);
             });
           },
         },
