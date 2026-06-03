@@ -160,15 +160,8 @@ For local development against `mysql-dev`, the equivalent flow is `npm run db:up
 
 ## Release steps
 
-1. Run `npm run update-version:patch` (or `:minor`, `:major`) from the repo root when using the automated branch script.
-2. Create a PR with message `[Common] Version increase vX.X.X` from `common/version-increase` into `develop`.
-3. Create a PR with message `[Testing] Release vX.X.X` from `develop` into `testing`.
-4. Open the [Vercel project](https://vercel.com/a1exevs-projects/set-forge/deployments), wait for the preview deployment, and verify behavior. **Vercel:** set **Root Directory** to `client` for this repository.
-5. Create a PR with message `Release vX.X.X` from `testing` into `main`.
-6. After production deploy on Vercel, verify the production site.
-7. On GitHub: **Tags → Releases → Draft a new release** — create tag, use `develop` / `main` as documented in your release process, publish.
-8. Merge `main` back into `testing` and push; merge `testing` into `develop` and push.
-9. Update [`RELEASE-NOTES.md`](RELEASE-NOTES.md) using generated notes, then open a PR from `common/release-notes-update-vX.X.X` to `develop` with message `[Common] RELEASE-NOTES.md update vX.X.X`.
+**Full-stack production on [VDS Selectel](https://vds.selectel.ru/):** step-by-step deploy guide — [`DEPLOY-SELECTEL.md`](DEPLOY-SELECTEL.md) (Docker Compose + Caddy + MySQL on Ubuntu).
+// TODO add details after release
 
 ## Environment used for verification
 
