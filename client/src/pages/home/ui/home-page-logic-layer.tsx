@@ -1,17 +1,16 @@
 import type { WorkoutList } from '@entities';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect } from 'react';
 
 import { useConfirm } from '@shared';
 
 import HomePage from 'src/pages/home/ui/home-page';
 
 type Props = {
-  loadFromStorage: () => void;
+  loadLists: () => Promise<void>;
   workoutLists: WorkoutList[];
-  deleteWorkoutList: (id: string) => void;
+  deleteWorkoutList: (id: string) => Promise<void>;
   onEdit: (id: string) => void;
   formatDate: (date: string | null) => string;
-  getUsagePercentageAsync: () => Promise<number>;
   userEmail: string;
   avatarLetter: string;
   onLogout: () => void | Promise<void>;
@@ -22,14 +21,11 @@ const HomePageLogicLayer: FC<Props> = ({
   deleteWorkoutList,
   onEdit,
   formatDate,
-  getUsagePercentageAsync,
-  loadFromStorage,
+  loadLists,
   userEmail,
   avatarLetter,
   onLogout,
 }) => {
-  const [storageWarning, setStorageWarning] = useState<boolean>(false);
-
   const confirmDialog = useConfirm();
 
   const handleDelete = async (id: string, name: string): Promise<void> => {
@@ -40,26 +36,17 @@ const HomePageLogicLayer: FC<Props> = ({
       cancellationText: 'Cancel',
     });
     if (ok) {
-      deleteWorkoutList(id);
+      await deleteWorkoutList(id);
     }
   };
 
   useEffect((): void => {
-    loadFromStorage();
-  }, [loadFromStorage]);
-
-  useEffect((): void => {
-    const checkUsage = async (): Promise<void> => {
-      const percentage = await getUsagePercentageAsync();
-      setStorageWarning(percentage >= 80);
-    };
-    checkUsage();
-  }, [workoutLists, getUsagePercentageAsync]);
+    void loadLists();
+  }, [loadLists]);
 
   return (
     <HomePage
       workoutLists={workoutLists}
-      storageWarning={storageWarning}
       onEdit={onEdit}
       onDelete={handleDelete}
       formatDate={formatDate}

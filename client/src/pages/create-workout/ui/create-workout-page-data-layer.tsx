@@ -12,12 +12,14 @@ const CreateWorkoutPageDataLayer: FC = () => {
     <WorkoutListForm
       mode="create"
       onSubmit={(dto): void => {
-        const success = addWorkoutList(dto);
-        if (!success) {
-          // TODO: Support common toaster
-          return;
-        }
-        navigate({ to: '/' });
+        void (async (): Promise<void> => {
+          const success = await addWorkoutList(dto);
+          if (!success) {
+            // TODO: Support common toaster
+            return;
+          }
+          navigate({ to: '/' });
+        })();
       }}
       onCancel={(): void => {
         navigate({ to: '/' });

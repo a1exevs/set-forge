@@ -8,7 +8,6 @@ import classes from 'src/pages/home/ui/home-page.module.scss';
 
 type Props = {
   workoutLists: WorkoutList[];
-  storageWarning: boolean;
   onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void | Promise<void>;
   formatDate: (date: string | null) => string;
@@ -19,7 +18,6 @@ type Props = {
 
 const HomePage: FC<Props> = ({
   workoutLists,
-  storageWarning,
   onEdit,
   onDelete,
   formatDate,
@@ -42,13 +40,6 @@ const HomePage: FC<Props> = ({
           </div>
         </div>
       </header>
-
-      {storageWarning && (
-        <div className={classes.warning}>
-          <span className={classes.warningIcon}>⚠️</span>
-          <p>Storage is over 80% full. Consider deleting old workout lists.</p>
-        </div>
-      )}
 
       <main className={classes.main}>
         <Link to="/create" className={classes.addButton}>

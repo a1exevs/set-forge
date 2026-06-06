@@ -109,6 +109,10 @@
                 "./src/users"
               ],
               [
+                "@workout-lists",
+                "./src/workout-lists"
+              ],
+              [
                 "@test",
                 "./test"
               ],

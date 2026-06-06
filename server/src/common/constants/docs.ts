@@ -103,5 +103,42 @@ export const Docs = {
     SET_USER_STATUS_ENDPOINT: 'Установить статус пользователю',
     SET_USER_STATUS_UNAUTHORIZED: 'Unauthorized',
     SET_USER_STATUS_FORBIDDEN: 'Forbidden',
+
+    WORKOUT_LISTS_CONTROLLER: 'Списки тренировок',
+
+    GET_WORKOUT_LISTS_ENDPOINT: 'Получение списков тренировок текущего пользователя',
+    GET_WORKOUT_LISTS_SUCCESSFUL_RESULT: 'Workout lists were received successful',
+    GET_WORKOUT_LISTS_UNAUTHORIZED: 'Unauthorized',
+
+    GET_WORKOUT_LIST_ENDPOINT: 'Получение списка тренировки по идентификатору',
+    GET_WORKOUT_LIST_SUCCESSFUL_RESULT: 'Workout list was received successful',
+    GET_WORKOUT_LIST_NOT_FOUND: 'Not found',
+    GET_WORKOUT_LIST_UNAUTHORIZED: 'Unauthorized',
+
+    CREATE_WORKOUT_LIST_ENDPOINT: 'Создание списка тренировки',
+    CREATE_WORKOUT_LIST_SUCCESSFUL_RESULT: 'Workout list was created successful',
+    CREATE_WORKOUT_LIST_BAD_REQUEST: 'Bad request',
+    CREATE_WORKOUT_LIST_UNAUTHORIZED: 'Unauthorized',
+
+    UPDATE_WORKOUT_LIST_ENDPOINT: 'Обновление списка тренировки',
+    UPDATE_WORKOUT_LIST_SUCCESSFUL_RESULT: 'Workout list was updated successful',
+    UPDATE_WORKOUT_LIST_BAD_REQUEST: 'Bad request',
+    UPDATE_WORKOUT_LIST_NOT_FOUND: 'Not found',
+    UPDATE_WORKOUT_LIST_UNAUTHORIZED: 'Unauthorized',
+
+    DELETE_WORKOUT_LIST_ENDPOINT: 'Удаление списка тренировки',
+    DELETE_WORKOUT_LIST_SUCCESSFUL_RESULT: 'Workout list was deleted successful',
+    DELETE_WORKOUT_LIST_NOT_FOUND: 'Not found',
+    DELETE_WORKOUT_LIST_UNAUTHORIZED: 'Unauthorized',
+
+    UPDATE_WORKOUT_PROGRESS_ENDPOINT: 'Отметить выполненный подход упражнения',
+    UPDATE_WORKOUT_PROGRESS_SUCCESSFUL_RESULT: 'Workout progress was updated successful',
+    UPDATE_WORKOUT_PROGRESS_NOT_FOUND: 'Not found',
+    UPDATE_WORKOUT_PROGRESS_UNAUTHORIZED: 'Unauthorized',
+
+    RESET_WORKOUT_PROGRESS_ENDPOINT: 'Сброс прогресса тренировки',
+    RESET_WORKOUT_PROGRESS_SUCCESSFUL_RESULT: 'Workout progress was reset successful',
+    RESET_WORKOUT_PROGRESS_NOT_FOUND: 'Not found',
+    RESET_WORKOUT_PROGRESS_UNAUTHORIZED: 'Unauthorized',
   },
 };

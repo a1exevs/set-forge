@@ -1,4 +1,13 @@
-export { workoutListStorage, type IWorkoutListStorage, type StorageStats } from 'src/entities/workout-list/api';
+// api
+export {
+  fetchWorkoutLists,
+  fetchWorkoutList,
+  createWorkoutList,
+  updateWorkoutList,
+  deleteWorkoutList,
+  incrementExerciseProgress,
+  resetWorkoutProgress,
+} from 'src/entities/workout-list/api';
 
 // model
 export {

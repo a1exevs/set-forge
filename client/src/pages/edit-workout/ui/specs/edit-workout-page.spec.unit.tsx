@@ -2,6 +2,17 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { createTestQueryClient, createTestRouter, renderApp } from 'src/app/model/specs/test-utils';
+import { fetchWorkoutList, updateWorkoutList } from 'src/entities/workout-list/api';
+
+jest.mock('src/entities/workout-list/api', () => ({
+  fetchWorkoutLists: jest.fn().mockResolvedValue([]),
+  fetchWorkoutList: jest.fn(),
+  createWorkoutList: jest.fn(),
+  updateWorkoutList: jest.fn(),
+  deleteWorkoutList: jest.fn(),
+  incrementExerciseProgress: jest.fn(),
+  resetWorkoutProgress: jest.fn(),
+}));
 
 const TEST_LIST_ID = 'test-list-1';
 const TEST_LIST = {
@@ -23,17 +34,16 @@ const TEST_LIST = {
   lastUsedAt: null,
 };
 
-const seedStorage = (): void => {
-  localStorage.setItem('workout-lists', JSON.stringify([TEST_LIST]));
-};
-
 describe('EditWorkoutPage', () => {
   beforeEach((): void => {
-    localStorage.clear();
+    jest.clearAllMocks();
+    (fetchWorkoutList as jest.Mock).mockResolvedValue(TEST_LIST);
+    (updateWorkoutList as jest.Mock).mockResolvedValue(TEST_LIST);
   });
 
   describe('rendering', () => {
     it('renders NotFoundMessage when id does not exist', async () => {
+      (fetchWorkoutList as jest.Mock).mockResolvedValue(null);
       const queryClient = createTestQueryClient();
       const testRouter = createTestRouter('/edit/non-existent-id', queryClient);
       renderApp(testRouter, queryClient);
@@ -43,8 +53,7 @@ describe('EditWorkoutPage', () => {
       expect(screen.getByRole('link', { name: 'Back to Home' })).toBeInTheDocument();
     });
 
-    it('renders WorkoutListForm when list exists in storage', async () => {
-      seedStorage();
+    it('renders WorkoutListForm when list exists', async () => {
       const queryClient = createTestQueryClient();
       const testRouter = createTestRouter(`/edit/${TEST_LIST_ID}`, queryClient);
       renderApp(testRouter, queryClient);
@@ -58,7 +67,6 @@ describe('EditWorkoutPage', () => {
 
   describe('interactions', () => {
     it('navigates to home when Cancel is clicked', async () => {
-      seedStorage();
       const queryClient = createTestQueryClient();
       const testRouter = createTestRouter(`/edit/${TEST_LIST_ID}`, queryClient);
       renderApp(testRouter, queryClient);

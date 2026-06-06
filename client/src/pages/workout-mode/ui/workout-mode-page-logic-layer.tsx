@@ -15,10 +15,10 @@ const fireWorkoutCompleteConfetti = (): void => {
 type Props = {
   id: string;
   currentWorkout: WorkoutList | null;
-  setCurrentWorkout: (id: string) => void;
+  setCurrentWorkout: (id: string) => Promise<void>;
   clearCurrentWorkout: () => void;
-  updateWorkoutProgress: (listId: string, exerciseId: string) => void;
-  resetAllProgress: (listId: string) => void;
+  updateWorkoutProgress: (listId: string, exerciseId: string) => Promise<void>;
+  resetAllProgress: (listId: string) => Promise<void>;
 };
 
 const WorkoutModePageLogicLayer: FC<Props> = ({
@@ -31,14 +31,25 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
 }) => {
   const confirmDialog = useConfirm();
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
+  const [isResolving, setIsResolving] = useState<boolean>(true);
   const lastTapRef = useRef<Record<string, number>>({});
   const prevCompletedExercisesRef = useRef<number | null>(null);
 
   useEffect((): (() => void) => {
-    if (id) {
-      setCurrentWorkout(id);
-    }
-    return clearCurrentWorkout;
+    let active = true;
+    setIsResolving(true);
+    void (async (): Promise<void> => {
+      if (id) {
+        await setCurrentWorkout(id);
+      }
+      if (active) {
+        setIsResolving(false);
+      }
+    })();
+    return (): void => {
+      active = false;
+      clearCurrentWorkout();
+    };
   }, [id, setCurrentWorkout, clearCurrentWorkout]);
 
   const handleExerciseClick = (exerciseId: string): void => {
@@ -54,7 +65,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     if (exercise.completedSets >= exercise.sets) {
       return;
     }
-    updateWorkoutProgress(currentWorkout.id, exerciseId);
+    void updateWorkoutProgress(currentWorkout.id, exerciseId);
 
     if (exercise.completedSets + 1 === exercise.sets) {
       setJustCompleted(exerciseId);
@@ -88,7 +99,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
       cancellationText: 'Cancel',
     });
     if (ok) {
-      resetAllProgress(currentWorkout.id);
+      void resetAllProgress(currentWorkout.id);
     }
   };
 
@@ -122,6 +133,10 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     }
     prevCompletedExercisesRef.current = completedExercises;
   }, [id, currentWorkout, completedExercises, totalExercises]);
+
+  if (isResolving) {
+    return null;
+  }
 
   return (
     <WorkoutModePage

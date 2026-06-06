@@ -9,9 +9,8 @@ import HomePageLogicLayer from 'src/pages/home/ui/home-page-logic-layer';
 const HomePageDataLayer: FC = () => {
   const navigate = useNavigate();
   const workoutLists = useWorkoutListStore.use.workoutLists();
-  const loadFromStorage = useWorkoutListStore.use.loadFromStorage();
+  const loadLists = useWorkoutListStore.use.loadLists();
   const deleteWorkoutList = useWorkoutListStore.use.deleteWorkoutList();
-  const getUsagePercentageAsync = useWorkoutListStore.use.getUsagePercentageAsync();
   const { data: user } = useCurrentUserQuery(true);
   const logoutMutation = useLogoutMutation();
 
@@ -26,8 +25,7 @@ const HomePageDataLayer: FC = () => {
         navigate({ to: '/edit/$id', params: { id } });
       }}
       formatDate={formatDate}
-      getUsagePercentageAsync={getUsagePercentageAsync}
-      loadFromStorage={loadFromStorage}
+      loadLists={loadLists}
       userEmail={userEmail}
       avatarLetter={avatarLetter}
       onLogout={(): void => {

@@ -18,7 +18,7 @@ Ability to edit existing workout lists via dot-dot-dot menu (Edit/Delete) on Hom
 ### Edit page flow
 
 5. Route `/edit/$id` renders `EditWorkoutPage`.
-6. `EditWorkoutPageDataLayer` receives `id` from route params, subscribes to `useWorkoutListStore.use.currentWorkout()`, `useWorkoutListStore.use.setCurrentWorkout()`, `useWorkoutListStore.use.updateWorkoutList()`, `clearCurrentWorkout`. In `useEffect` of `EditWorkoutPageLogicLayer` call `setCurrentWorkout(id)`, cleanup — `clearCurrentWorkout`.
+6. `EditWorkoutPageDataLayer` receives `id` from route params, subscribes to `useWorkoutListStore.use.currentWorkout()`, `useWorkoutListStore.use.setCurrentWorkout()`, `useWorkoutListStore.use.updateWorkoutList()`, `clearCurrentWorkout`. In `useEffect` of `EditWorkoutPageLogicLayer` call `setCurrentWorkout(id)` (async, `GET /workout-lists/:id`), cleanup — `clearCurrentWorkout`.
 7. If `currentWorkout === null`: render `NotFoundMessage` widget («Workout list not found» + «Back to Home»).
 8. Otherwise: render `WorkoutListForm` widget with `mode="edit"`, `initialData={currentWorkout}`, `onSubmit`, `onCancel`.
 
@@ -28,8 +28,8 @@ Ability to edit existing workout lists via dot-dot-dot menu (Edit/Delete) on Hom
 10. Title: «Editing &lt;name&gt;» (e.g., «Editing Push Day»).
 11. Submit button: «Save» (not «Create List»).
 12. Validation: same as Create (name required, at least one exercise, valid exercise data).
-13. On submit: `updateWorkoutList(id, dto)` → store merges with existing list, saves via `workoutListStorage.saveList`. Returns `true` on success, `false` on error.
-14. On success (when `updateWorkoutList` returns `true`): `navigate({ to: '/' })`. On error — no navigation.
+13. On submit: `updateWorkoutList(id, dto)` → store calls `PUT /workout-lists/:id`; the server reconciles exercises and returns the updated list, which the store stores. Returns `Promise<true>` on success, `Promise<false>` on error.
+14. On success (when awaited `updateWorkoutList` resolves `true`): `navigate({ to: '/' })`. On error — no navigation.
 
 ### Cancel
 
@@ -53,8 +53,8 @@ interface UpdateWorkoutListDto {
 ```
 
 - Existing exercises: include `id` and `completedSets` from original.
-- New exercises: omit `id` and `completedSets` — store generates `id`, sets `completedSets: 0`.
-- Removed exercises: omit from array.
+- New exercises: omit `id` and `completedSets` — the server generates `id`, sets `completedSets: 0`.
+- Removed exercises: omit from array (the server deletes their rows).
 
 ### Props EditWorkoutPage (Presentation)
 
@@ -115,9 +115,9 @@ type Props = {
 | API | Type | Description |
 |-----|------|--------------|
 | `useWorkoutListStore.use.currentWorkout()` | selector | Current workout (set via setCurrentWorkout) |
-| `useWorkoutListStore.use.setCurrentWorkout(id)` | action | Load list from storage into currentWorkout; when `getList(id)` returns `null`, sets `currentWorkout = null` (ensures NotFoundMessage when navigating from workout mode to non-existent edit id) |
+| `useWorkoutListStore.use.setCurrentWorkout(id)` | action | Load list from API (`GET /workout-lists/:id`) into currentWorkout; on 404/not owned, sets `currentWorkout = null` (ensures NotFoundMessage when navigating to a non-existent edit id) |
 | `useWorkoutListStore.use.clearCurrentWorkout()` | action | Clear on unmount |
-| `useWorkoutListStore.use.updateWorkoutList(id, dto)` | action | Update and save workout list; returns `true` on success, `false` on error |
+| `useWorkoutListStore.use.updateWorkoutList(id, dto)` | action | Update via `PUT /workout-lists/:id`; returns `Promise<true>` on success, `Promise<false>` on error |
 | `MenuButton` | component | From [shared-components.spec.md](shared-components.spec.md) |
 | Route | — | `/edit/$id` |
 
@@ -131,11 +131,11 @@ type Props = {
 
 | Scenario | Handling |
 |---------|----------|
-| Non-existent `id` on `/edit/$id` | `setCurrentWorkout(id)` sets `currentWorkout = null` when list not found; render `NotFoundMessage`, Link to home |
+| Non-existent `id` on `/edit/$id` | `setCurrentWorkout(id)` sets `currentWorkout = null` when API returns 404/not owned; render `NotFoundMessage`, Link to home |
 | Empty name on submit | Confirm «Please enter a list name» |
 | No exercises on submit | Confirm «Please add at least one exercise» |
 | Invalid exercise data | Confirm «Please check exercise data validity» |
-| Error on `updateWorkoutList` | Store writes `state.error`, returns `false`, navigation does NOT run |
+| Error on `updateWorkoutList` (API failure) | Store writes `state.error`, resolves `false`, navigation does NOT run |
 | `WorkoutListForm` with `mode="edit"` without `initialData` | Render `NotFoundMessage` inside widget |
 | Cancel without changes | Navigate to `/` |
 | New exercise in Edit mode | Generate new `id`, `completedSets: 0` |

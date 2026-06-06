@@ -1,6 +1,17 @@
 import { screen } from '@testing-library/react';
 
 import { createTestQueryClient, createTestRouter, renderApp } from 'src/app/model/specs/test-utils';
+import { fetchWorkoutList } from 'src/entities/workout-list/api';
+
+jest.mock('src/entities/workout-list/api', () => ({
+  fetchWorkoutLists: jest.fn().mockResolvedValue([]),
+  fetchWorkoutList: jest.fn(),
+  createWorkoutList: jest.fn(),
+  updateWorkoutList: jest.fn(),
+  deleteWorkoutList: jest.fn(),
+  incrementExerciseProgress: jest.fn(),
+  resetWorkoutProgress: jest.fn(),
+}));
 
 const TEST_LIST_ID = 'test-list-1';
 const TEST_LIST = {
@@ -24,10 +35,11 @@ const TEST_LIST = {
 
 describe('EditWorkoutPage', () => {
   beforeEach((): void => {
-    localStorage.clear();
+    jest.clearAllMocks();
   });
 
   it('matches snapshot when list not found', async () => {
+    (fetchWorkoutList as jest.Mock).mockResolvedValue(null);
     const queryClient = createTestQueryClient();
     const testRouter = createTestRouter('/edit/non-existent-id', queryClient);
     const { container } = renderApp(testRouter, queryClient);
@@ -37,7 +49,7 @@ describe('EditWorkoutPage', () => {
   });
 
   it('matches snapshot when list exists', async () => {
-    localStorage.setItem('workout-lists', JSON.stringify([TEST_LIST]));
+    (fetchWorkoutList as jest.Mock).mockResolvedValue(TEST_LIST);
     const queryClient = createTestQueryClient();
     const testRouter = createTestRouter(`/edit/${TEST_LIST_ID}`, queryClient);
     const { container } = renderApp(testRouter, queryClient);

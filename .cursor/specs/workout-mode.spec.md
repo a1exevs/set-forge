@@ -16,8 +16,8 @@ Page for running a workout from a selected workout list: display exercises, doub
 
 ### Workout loading
 
-4. `setCurrentWorkout(id)`: store calls `workoutListStorage.getList(id)`. When list exists — `state.currentWorkout = list`.
-5. `getList` reads from `localStorage`, finds list by `id`.
+4. `setCurrentWorkout(id)`: store calls `GET /workout-lists/:id` (via `workout-list-api`). When the list exists — `state.currentWorkout = list`.
+5. On 404/not owned, `state.currentWorkout = null`.
 
 ### Display
 
@@ -37,17 +37,15 @@ Page for running a workout from a selected workout list: display exercises, doub
 
 ### Progress update in store
 
-10. `updateWorkoutProgress(listId, exerciseId)`:
-    - Finds list in `workoutLists`, exercise in list.
-    - If `completedSets < sets` → `exercise.completedSets += 1`.
-    - `list.lastUsedAt = new Date().toISOString()`.
-    - If `currentWorkout?.id === listId` — syncs `currentWorkout.exercises` and `currentWorkout.lastUsedAt`.
-    - `workoutListStorage.saveList(list)`.
+10. `updateWorkoutProgress(listId, exerciseId)` (async, optimistic):
+    - Optimistically updates local state first for snappy double-tap: finds list in `workoutLists`, exercise in list; if `completedSets < sets` → `exercise.completedSets += 1`; `list.lastUsedAt = now`; syncs `currentWorkout` when `currentWorkout?.id === listId`.
+    - Then calls `PATCH /workout-lists/:listId/exercises/:exerciseId/progress`; server clamps to `sets` and sets `lastUsedAt`, returning the authoritative list.
+    - On API error: `state.error` is set (in-memory optimistic change may be reconciled on next `setCurrentWorkout`/`loadLists`).
 
 ### Progress reset
 
 11. `handleResetAll`: confirm «Reset all progress?» → on OK calls `resetAllProgress(currentWorkout.id)`.
-12. `resetAllProgress(listId)`: zeros `completedSets` for all exercises in the matching list from `workoutLists`, saves to storage. If `currentWorkout?.id === listId`, also zeros `completedSets` on each exercise in `currentWorkout.exercises` (same sync pattern as `updateWorkoutProgress`). UI updates immediately; progress bars animate via CSS `transition: width` on `.progressBarFill` and `.progressBar`.
+12. `resetAllProgress(listId)` (async, optimistic): zeros `completedSets` for all exercises in the matching list from `workoutLists` immediately, and on `currentWorkout` when `currentWorkout?.id === listId` (same sync pattern as `updateWorkoutProgress`), then calls `POST /workout-lists/:listId/reset`. UI updates immediately; progress bars animate via CSS `transition: width` on `.progressBarFill` and `.progressBar`.
 
 ### Progress
 
@@ -108,7 +106,7 @@ type Props = {
 
 ### Relationships
 
-- `currentWorkout` — separate copy from storage (`getList`), not a reference to element in `workoutLists`.
+- `currentWorkout` — separate copy from the API (`GET /workout-lists/:id`), not a reference to element in `workoutLists`.
 - On `updateWorkoutProgress` and `resetAllProgress` (and `resetExerciseProgress`), both `workoutLists` and `currentWorkout` stay in sync when list ids match.
 
 ---
@@ -138,11 +136,10 @@ type Props = {
 | API | Type | Description |
 |-----|-----|----------|
 | `useWorkoutListStore.use.currentWorkout()` | selector | Current workout |
-| `useWorkoutListStore.use.setCurrentWorkout(id)` | action | Set currentWorkout from storage |
+| `useWorkoutListStore.use.setCurrentWorkout(id)` | action | Set currentWorkout from API (`GET /workout-lists/:id`) |
 | `useWorkoutListStore.use.clearCurrentWorkout()` | action | Clear currentWorkout |
-| `useWorkoutListStore.use.updateWorkoutProgress(listId, exerciseId)` | action | +1 completedSets |
-| `useWorkoutListStore.use.resetAllProgress(listId)` | action | Zero completedSets |
-| `workoutListStorage.getList(id)` | method | Get list by id |
+| `useWorkoutListStore.use.updateWorkoutProgress(listId, exerciseId)` | action | +1 completedSets (optimistic + `PATCH .../progress`) |
+| `useWorkoutListStore.use.resetAllProgress(listId)` | action | Zero completedSets (optimistic + `POST .../reset`) |
 | `NotFoundMessage` | widget | From `widgets/not-found-message` |
 | Route | — | `/workout/$id` |
 
@@ -157,11 +154,11 @@ type Props = {
 | Scenario | Handling |
 |----------|-----------|
 | `currentWorkout === null` | Render `NotFoundMessage` widget + Link to home |
-| Non-existent `id` | `getList(id)` returns `null` → `currentWorkout` stays `null` |
+| Non-existent `id` | `GET /workout-lists/:id` returns 404/not owned → `currentWorkout` set to `null` |
 | `exercise.completedSets >= exercise.sets` | Click does not increase completedSets |
 | Double-tap < 300ms | Treated as single action, `handleExerciseClick` runs |
 | `resetAllProgress` | `currentWorkout` synced when ids match; counts and bars reflect reset with same width transition as fill |
-| Error on `workoutListStorage.saveList` in updateWorkoutProgress | `state.error` updated, progress in memory already changed |
+| API error in updateWorkoutProgress | `state.error` updated, optimistic progress in memory already changed (reconciled on next load) |
 | Empty `exercises` | `totalExercises = 0`, `overallProgress = 0` |
 | `justCompleted` | Checkmark animation 1s, then reset |
 | `exercise.sets === 0` | `progress = 0`, `isCompleted = false`, exercise not counted in completedExercises |

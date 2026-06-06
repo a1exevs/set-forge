@@ -1,2 +1,9 @@
-export { workoutListStorage } from 'src/entities/workout-list/api/local-storage.service';
-export type { IWorkoutListStorage, StorageStats } from 'src/entities/workout-list/api/types';
+export {
+  fetchWorkoutLists,
+  fetchWorkoutList,
+  createWorkoutList,
+  updateWorkoutList,
+  deleteWorkoutList,
+  incrementExerciseProgress,
+  resetWorkoutProgress,
+} from 'src/entities/workout-list/api/workout-list-api';

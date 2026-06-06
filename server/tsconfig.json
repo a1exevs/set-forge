@@ -29,6 +29,7 @@
       "@roles/*": ["src/roles/*"],
       "@security/*": ["src/security/*"],
       "@users/*": ["src/users/*"],
+      "@workout-lists/*": ["src/workout-lists/*"],
       "@test/*": ["test/*"],
       "@assets/*": ["assets/*"],
     }

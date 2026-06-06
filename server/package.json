@@ -164,6 +164,9 @@
       "@users/(.*)$": [
         "<rootDir>/src/users/$1"
       ],
+      "@workout-lists/(.*)$": [
+        "<rootDir>/src/workout-lists/$1"
+      ],
       "@test/(.*)$": [
         "<rootDir>/test/$1"
       ],

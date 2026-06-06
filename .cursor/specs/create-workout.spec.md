@@ -35,8 +35,8 @@ Page for creating a new workout list. Uses shared widget `workout-list-form` in 
     - `exercises.length === 0` → confirm «Please add at least one exercise», return.
     - Check: `exercises.find(ex => !ex.name.trim() || ex.weight < 0 || Number.isNaN(ex.weight) || ex.reps <= 0 || Number.isNaN(ex.reps) || ex.sets <= 0 || Number.isNaN(ex.sets))` → confirm «Please check exercise data validity», return.
 12. Build DTO: `name.trim()`, `description.trim()`, `exercises` (without `tempId`; `id` and `completedSets` are added in store).
-13. `onSubmit(dto)` → `addWorkoutList(dto)` in store creates `WorkoutList`, saves to storage, pushes to `workoutLists`. Returns `true` on success, `false` on error.
-14. On success: `navigate({ to: '/' })`. On error: no navigation.
+13. `onSubmit(dto)` → `addWorkoutList(dto)` in store calls `POST /workout-lists`; the server creates the `WorkoutList` (generates ids, `completedSets: 0`, timestamps) and returns it; the store pushes it to `workoutLists`. Returns `Promise<true>` on success, `Promise<false>` on error.
+14. On success (awaited `true`): `navigate({ to: '/' })`. On error: no navigation.
 
 ### Cancel
 
@@ -100,7 +100,7 @@ Internal Presentation layer receives `title`, `submitButtonText`, `name`, `descr
 ### Transformation on save
 
 - `tempId` is not passed to DTO.
-- Store on `addWorkoutList`: for each exercise generates `id: crypto.randomUUID()`, adds `completedSets: 0`.
+- The server (on `POST /workout-lists`) generates `id` for the list and each exercise (UUID), sets `completedSets: 0`, `createdAt`, `lastUsedAt: null`, and returns the full `WorkoutList`.
 
 ---
 
@@ -129,7 +129,7 @@ Internal Presentation layer receives `title`, `submitButtonText`, `name`, `descr
 
 | API | Type | Description |
 |-----|-----|----------|
-| `useWorkoutListStore.use.addWorkoutList(dto)` | action | Create and save workout list; returns `true` on success, `false` on error |
+| `useWorkoutListStore.use.addWorkoutList(dto)` | action | Create workout list via `POST /workout-lists`; returns `Promise<true>` on success, `Promise<false>` on error |
 | `muscleGroupLabels`, `muscleGroups` | constants | Dictionary and array of muscle groups |
 | `useConfirm()` | hook | Confirm dialog |
 | `WorkoutListForm` | widget | From `widgets/workout-list-form` |
@@ -151,6 +151,6 @@ Internal Presentation layer receives `title`, `submitButtonText`, `name`, `descr
 | `weight < 0` | Same validation |
 | `reps <= 0`, `sets <= 0` | Same validation |
 | `exercises.length === 0` in UI | Text «Add exercises to your list» |
-| Error on `addWorkoutList` | Store writes to `state.error`, `addWorkoutList` returns `false`, navigation does NOT run |
+| Error on `addWorkoutList` (API failure) | Store writes to `state.error`, `addWorkoutList` resolves `false`, navigation does NOT run |
 | `Number(e.target.value)` for empty input | `NaN` is caught via `Number.isNaN()` checks for `weight`, `reps`, `sets` |
 | Cancel without changes | Navigate to `/` without saving |

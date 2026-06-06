@@ -11,6 +11,7 @@ import { ProfilesModule, UserCommonInfo, UserContact, UserAvatar } from '@src/pr
 import { LoggerModule } from '@src/logger';
 import { SecurityModule } from '@src/security';
 import { HealthModule } from '@src/health/health.module';
+import { WorkoutListsModule, WorkoutList, WorkoutExercise } from '@src/workout-lists';
 
 import * as path from 'path';
 
@@ -33,7 +34,17 @@ import * as path from 'path';
       username: process.env.MYSQL_USER,
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DB,
-      models: [User, Role, UserRole, RefreshToken, UserCommonInfo, UserContact, UserAvatar],
+      models: [
+        User,
+        Role,
+        UserRole,
+        RefreshToken,
+        UserCommonInfo,
+        UserContact,
+        UserAvatar,
+        WorkoutList,
+        WorkoutExercise,
+      ],
       autoLoadModels: true,
       // Schema is owned by sequelize-cli migrations under server/database/migrations.
       // Keep this `false` in every environment so dev and prod share one source of truth
@@ -47,6 +58,7 @@ import * as path from 'path';
     ProfilesModule,
     LoggerModule,
     SecurityModule,
+    WorkoutListsModule,
   ],
 })
 export class AppModule {}

@@ -4,13 +4,23 @@ import { immer } from 'zustand/middleware/immer';
 
 import { createSelectors } from '@shared';
 
-import { workoutListStorage } from 'src/entities/workout-list/api';
+import {
+  createWorkoutList as apiCreateWorkoutList,
+  deleteWorkoutList as apiDeleteWorkoutList,
+  updateWorkoutList as apiUpdateWorkoutList,
+  fetchWorkoutList,
+  fetchWorkoutLists,
+  incrementExerciseProgress,
+  resetWorkoutProgress,
+} from 'src/entities/workout-list/api';
 import type {
   CreateWorkoutListDto,
   UpdateWorkoutListDto,
-  WorkoutExercise,
   WorkoutList,
 } from 'src/entities/workout-list/model/types';
+
+const resolveErrorMessage = (error: unknown, fallback: string): string =>
+  error instanceof Error ? error.message : fallback;
 
 interface WorkoutListState {
   workoutLists: WorkoutList[];
@@ -18,29 +28,33 @@ interface WorkoutListState {
   isLoading: boolean;
   error: string | null;
 
-  loadFromStorage: () => void;
-  addWorkoutList: (dto: CreateWorkoutListDto) => boolean;
-  updateWorkoutList: (id: string, dto: UpdateWorkoutListDto) => boolean;
-  deleteWorkoutList: (id: string) => void;
-  updateWorkoutProgress: (listId: string, exerciseId: string) => void;
-  setCurrentWorkout: (id: string) => void;
+  loadLists: () => Promise<void>;
+  addWorkoutList: (dto: CreateWorkoutListDto) => Promise<boolean>;
+  updateWorkoutList: (id: string, dto: UpdateWorkoutListDto) => Promise<boolean>;
+  deleteWorkoutList: (id: string) => Promise<void>;
+  updateWorkoutProgress: (listId: string, exerciseId: string) => Promise<void>;
+  setCurrentWorkout: (id: string) => Promise<void>;
   clearCurrentWorkout: () => void;
   resetExerciseProgress: (listId: string, exerciseId: string) => void;
-  resetAllProgress: (listId: string) => void;
+  resetAllProgress: (listId: string) => Promise<void>;
+  /** Retained for backward compatibility after the localStorage → API migration; always 0. */
   getUsagePercentageAsync: () => Promise<number>;
 }
 
 const useWorkoutListStoreBase = create<WorkoutListState>()(
   devtools(
-    immer(set => ({
+    immer((set, get) => ({
       workoutLists: [],
       currentWorkout: null,
       isLoading: false,
       error: null,
 
-      loadFromStorage: () => {
+      loadLists: async () => {
+        set(state => {
+          state.isLoading = true;
+        });
         try {
-          const lists = workoutListStorage.getAllLists();
+          const lists = await fetchWorkoutLists();
           set(state => {
             state.error = null;
             state.workoutLists = lists;
@@ -48,81 +62,31 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
           });
         } catch (error) {
           set(state => {
-            state.error = error instanceof Error ? error.message : 'Failed to load workout lists';
+            state.error = resolveErrorMessage(error, 'Failed to load workout lists');
             state.isLoading = false;
           });
         }
       },
 
-      addWorkoutList: dto => {
-        const newList: WorkoutList = {
-          id: crypto.randomUUID(),
-          name: dto.name,
-          description: dto.description,
-          exercises: dto.exercises.map(ex => ({
-            ...ex,
-            id: crypto.randomUUID(),
-            completedSets: 0,
-          })),
-          createdAt: new Date().toISOString(),
-          lastUsedAt: null,
-        };
-
+      addWorkoutList: async dto => {
         try {
-          workoutListStorage.saveList(newList);
+          const created = await apiCreateWorkoutList(dto);
           set(state => {
             state.error = null;
-            state.workoutLists.push(newList);
+            state.workoutLists.push(created);
           });
           return true;
         } catch (error) {
           set(state => {
-            state.error = error instanceof Error ? error.message : 'Failed to save workout list';
+            state.error = resolveErrorMessage(error, 'Failed to save workout list');
           });
           return false;
         }
       },
 
-      updateWorkoutList: (id, dto) => {
-        const existing = workoutListStorage.getList(id);
-        if (!existing) {
-          set(state => {
-            state.error = 'Workout list not found';
-          });
-          return false;
-        }
-        const exercises: WorkoutExercise[] = dto.exercises.map(ex => {
-          if (ex.id !== undefined && ex.completedSets !== undefined) {
-            return {
-              id: ex.id,
-              name: ex.name,
-              muscleGroup: ex.muscleGroup,
-              weight: ex.weight,
-              reps: ex.reps,
-              sets: ex.sets,
-              completedSets: ex.completedSets,
-            };
-          }
-          return {
-            id: crypto.randomUUID(),
-            name: ex.name,
-            muscleGroup: ex.muscleGroup,
-            weight: ex.weight,
-            reps: ex.reps,
-            sets: ex.sets,
-            completedSets: 0,
-          };
-        });
-
-        const updated: WorkoutList = {
-          ...existing,
-          name: dto.name,
-          description: dto.description,
-          exercises,
-        };
-
+      updateWorkoutList: async (id, dto) => {
         try {
-          workoutListStorage.saveList(updated);
+          const updated = await apiUpdateWorkoutList(id, dto);
           set(state => {
             state.error = null;
             const idx = state.workoutLists.findIndex(l => l.id === id);
@@ -136,15 +100,15 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
           return true;
         } catch (error) {
           set(state => {
-            state.error = error instanceof Error ? error.message : 'Failed to update workout list';
+            state.error = resolveErrorMessage(error, 'Failed to update workout list');
           });
           return false;
         }
       },
 
-      deleteWorkoutList: id => {
+      deleteWorkoutList: async id => {
         try {
-          workoutListStorage.deleteList(id);
+          await apiDeleteWorkoutList(id);
           set(state => {
             state.error = null;
             state.workoutLists = state.workoutLists.filter(list => list.id !== id);
@@ -154,51 +118,58 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
           });
         } catch (error) {
           set(state => {
-            state.error = error instanceof Error ? error.message : 'Failed to delete workout list';
+            state.error = resolveErrorMessage(error, 'Failed to delete workout list');
           });
         }
       },
 
-      updateWorkoutProgress: (listId, exerciseId) => {
+      updateWorkoutProgress: async (listId, exerciseId) => {
+        const timestamp = new Date().toISOString();
+        // Optimistic update so double-tap feels instant; the server clamps identically.
         set(state => {
           const list = state.workoutLists.find(l => l.id === listId);
-          if (!list) {
-            return;
+          if (list) {
+            const exercise = list.exercises.find(ex => ex.id === exerciseId);
+            if (exercise && exercise.completedSets < exercise.sets) {
+              exercise.completedSets += 1;
+            }
+            list.lastUsedAt = timestamp;
           }
-
-          const exercise = list.exercises.find(ex => ex.id === exerciseId);
-          if (!exercise) {
-            return;
-          }
-
-          if (exercise.completedSets < exercise.sets) {
-            exercise.completedSets += 1;
-          }
-
-          list.lastUsedAt = new Date().toISOString();
-
           if (state.currentWorkout?.id === listId) {
             const currentExercise = state.currentWorkout.exercises.find(ex => ex.id === exerciseId);
             if (currentExercise && currentExercise.completedSets < currentExercise.sets) {
               currentExercise.completedSets += 1;
             }
-            state.currentWorkout.lastUsedAt = list.lastUsedAt;
-          }
-
-          try {
-            workoutListStorage.saveList(list);
-            state.error = null;
-          } catch (error) {
-            state.error = error instanceof Error ? error.message : 'Failed to update progress';
+            state.currentWorkout.lastUsedAt = timestamp;
           }
         });
+
+        try {
+          await incrementExerciseProgress(listId, exerciseId);
+          set(state => {
+            state.error = null;
+          });
+        } catch (error) {
+          set(state => {
+            state.error = resolveErrorMessage(error, 'Failed to update progress');
+          });
+          await get().setCurrentWorkout(listId);
+        }
       },
 
-      setCurrentWorkout: id => {
-        const list = workoutListStorage.getList(id);
-        set(state => {
-          state.currentWorkout = list ?? null;
-        });
+      setCurrentWorkout: async id => {
+        try {
+          const list = await fetchWorkoutList(id);
+          set(state => {
+            state.error = null;
+            state.currentWorkout = list ?? null;
+          });
+        } catch (error) {
+          set(state => {
+            state.error = resolveErrorMessage(error, 'Failed to load workout list');
+            state.currentWorkout = null;
+          });
+        }
       },
 
       clearCurrentWorkout: () => {
@@ -208,61 +179,52 @@ const useWorkoutListStoreBase = create<WorkoutListState>()(
       },
 
       resetExerciseProgress: (listId, exerciseId) => {
+        // Local-only optimistic reset (no dedicated API endpoint); not used by current UI.
         set(state => {
           const list = state.workoutLists.find(l => l.id === listId);
-          if (!list) {
-            return;
-          }
-
-          const exercise = list.exercises.find(ex => ex.id === exerciseId);
+          const exercise = list?.exercises.find(ex => ex.id === exerciseId);
           if (exercise) {
             exercise.completedSets = 0;
           }
-
           if (state.currentWorkout?.id === listId) {
             const currentExercise = state.currentWorkout.exercises.find(ex => ex.id === exerciseId);
             if (currentExercise) {
               currentExercise.completedSets = 0;
             }
           }
-
-          try {
-            workoutListStorage.saveList(list);
-            state.error = null;
-          } catch (error) {
-            state.error = error instanceof Error ? error.message : 'Failed to reset progress';
-          }
         });
       },
 
-      resetAllProgress: listId => {
+      resetAllProgress: async listId => {
+        // Optimistic reset for instant progress-bar animation; server is the source of truth.
         set(state => {
           const list = state.workoutLists.find(l => l.id === listId);
-          if (!list) {
-            return;
+          if (list) {
+            list.exercises.forEach(exercise => {
+              exercise.completedSets = 0;
+            });
           }
-
-          list.exercises.forEach(exercise => {
-            exercise.completedSets = 0;
-          });
-
           if (state.currentWorkout?.id === listId) {
             state.currentWorkout.exercises.forEach(exercise => {
               exercise.completedSets = 0;
             });
           }
-
-          try {
-            workoutListStorage.saveList(list);
-            state.error = null;
-          } catch (error) {
-            state.error = error instanceof Error ? error.message : 'Failed to reset progress';
-          }
         });
+
+        try {
+          await resetWorkoutProgress(listId);
+          set(state => {
+            state.error = null;
+          });
+        } catch (error) {
+          set(state => {
+            state.error = resolveErrorMessage(error, 'Failed to reset progress');
+          });
+          await get().setCurrentWorkout(listId);
+        }
       },
-      getUsagePercentageAsync: () => {
-        return workoutListStorage.getUsagePercentageAsync();
-      },
+
+      getUsagePercentageAsync: () => Promise.resolve(0),
     })),
     { name: 'WorkoutListStore' },
   ),

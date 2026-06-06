@@ -2,7 +2,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext, Outlet, redirect } from '@tanstack/react-router';
 import { FC, useEffect } from 'react';
 
-import { useWorkoutListStore } from '@entities';
+import { useCurrentUserQuery, useWorkoutListStore } from '@entities';
 
 import type { CurrentUser } from 'src/entities/session/api/session-api';
 import { bootstrapSessionAndPrimeCache } from 'src/entities/session/lib/bootstrap-session';
@@ -30,14 +30,16 @@ const buildRedirectTarget = (pathname: string, search: unknown): string => {
 };
 
 const RootComponent: FC = () => {
-  const loadFromStorage = useWorkoutListStore.use.loadFromStorage();
-  const workoutLists = useWorkoutListStore.use.workoutLists();
+  const loadLists = useWorkoutListStore.use.loadLists();
+  const { data: user } = useCurrentUserQuery(true);
 
   useEffect((): void => {
-    if (workoutLists.length === 0) {
-      loadFromStorage();
+    // Hydrate the lists from the API only once an authenticated session exists,
+    // so public routes (login/register) don't fire an unauthenticated request.
+    if (user) {
+      void loadLists();
     }
-  }, [loadFromStorage, workoutLists.length]);
+  }, [loadLists, user]);
 
   return <Outlet />;
 };

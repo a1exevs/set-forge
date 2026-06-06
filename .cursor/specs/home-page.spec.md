@@ -20,20 +20,18 @@ The home page displays a list of workout lists, allows navigation to create a ne
 ### Initialization
 
 1. `HomePageDataLayer` mounts.
-2. Subscribes to `useWorkoutListStore.use.workoutLists()`, `loadFromStorage`, `deleteWorkoutList`, `getUsagePercentageAsync`. Passes `onEdit` (navigate to `/edit/$id`) and `deleteWorkoutList` to LogicLayer.
+2. Subscribes to `useWorkoutListStore.use.workoutLists()`, `loadLists`, `deleteWorkoutList`. Passes `onEdit` (navigate to `/edit/$id`) and `deleteWorkoutList` to LogicLayer.
 3. `HomePageLogicLayer` creates `onDelete` (`handleDelete`) from `deleteWorkoutList` and `useConfirm`, passes it to Presentation along with other data.
 
 ### Data loading
 
-4. `HomePageLogicLayer` calls `loadFromStorage()` on mount via `useEffect`.
-5. `loadFromStorage` in store reads `workoutListStorage.getAllLists()`, parses JSON from `localStorage` under key `workout-lists`.
+4. `HomePageLogicLayer` calls `loadLists()` on mount via `useEffect`.
+5. `loadLists` in store calls `GET /workout-lists` (via `workout-list-api`) for the authenticated user.
 6. Result is written to `state.workoutLists`. On error — to `state.error`.
 
 ### Storage usage check
 
-7. In `useEffect` with dependencies `[workoutLists, getUsagePercentageAsync]`, `getUsagePercentageAsync()` is called.
-8. If `navigator.storage.estimate` is available — `usage / quota * 100` is used. Otherwise — `calculateLocalStorageSize() / 5MB * 100`.
-9. When `percentage >= 80`, `storageWarning = true` is set.
+7. Retired with the move to a backend API. There is no `localStorage` quota to monitor; `getUsagePercentageAsync` is stubbed to return `0` and `storageWarning` is always `false` (the warning UI path is removed). Server-side quota/limits are out of scope for this page.
 
 ### Display
 
@@ -45,8 +43,8 @@ The home page displays a list of workout lists, allows navigation to create a ne
 12. Dot-dot-dot menu in top right of each card. Items: Edit, Delete (in that order).
 13. **Edit**: `onEdit(id)` → `navigate({ to: '/edit/$id', params: { id } })`.
 14. **Delete**: `onDelete(id, name)` → `handleDelete` opens confirm dialog via `useConfirm()` with title/description.
-15. On confirmation, `deleteWorkoutList(id)` is called.
-16. Store: `workoutListStorage.deleteList(id)`, filter `workoutLists`, when `currentWorkout?.id === id` — `currentWorkout = null`.
+15. On confirmation, `deleteWorkoutList(id)` is called (awaited).
+16. Store: `DELETE /workout-lists/:id`, then filter `workoutLists`, when `currentWorkout?.id === id` — `currentWorkout = null`.
 
 ---
 
@@ -77,19 +75,19 @@ type Props = {
 
 ```typescript
 type Props = {
-  loadFromStorage: () => void;
+  loadLists: () => Promise<void>;
   workoutLists: WorkoutList[];
-  deleteWorkoutList: (id: string) => void;
+  deleteWorkoutList: (id: string) => Promise<void>;
   onEdit: (id: string) => void;
   formatDate: (date: string | null) => string;
-  getUsagePercentageAsync: () => Promise<number>;
 };
 ```
 
 ### Relationships
 
-- `workoutLists` — from `useWorkoutListStore.use.workoutLists()`
+- `workoutLists` — from `useWorkoutListStore.use.workoutLists()`, populated by `loadLists()` (`GET /workout-lists`)
 - `formatDate` — from `@shared` (`src/shared/model/helpers/dates.ts`): `date => date ? new Date(date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) : 'Never'`
+- `storageWarning` is always `false` (storage-usage monitoring retired with the backend migration)
 
 ---
 
@@ -101,7 +99,7 @@ type Props = {
 | State | Zustand + Immer + DevTools, `createSelectors`; session user from `@entities` / TanStack Query |
 | UI | React 18, FC, SCSS Modules, MenuButton (see [shared-components.spec.md](shared-components.spec.md)), UserAvatarMenu |
 | Dialogs | `useConfirm` (ConfirmDialogProvider) |
-| Storage | `workoutListStorage` (LocalStorage, key `workout-lists`) |
+| Persistence | Backend API `/api/1.0/workout-lists` via `workout-list-api` (see [workout-list-api.spec.md](workout-list-api.spec.md)) |
 
 ### Patterns
 
@@ -118,9 +116,8 @@ type Props = {
 | API | Type | Description |
 |-----|-----|----------|
 | `useWorkoutListStore.use.workoutLists()` | selector | List of workout lists |
-| `useWorkoutListStore.use.loadFromStorage()` | action | Load from storage |
-| `useWorkoutListStore.use.deleteWorkoutList(id)` | action | Delete list |
-| `useWorkoutListStore.use.getUsagePercentageAsync()` | action | Storage usage percentage |
+| `useWorkoutListStore.use.loadLists()` | action | Load lists from API (`GET /workout-lists`) |
+| `useWorkoutListStore.use.deleteWorkoutList(id)` | action | Delete list (`DELETE /workout-lists/:id`) |
 | `formatDate(date)` | function | Date formatting |
 | `useConfirm()` | hook | Open confirm dialog |
 | Routes | — | `/` (home), `/create`, `/edit/$id`, `/workout/$id`, `/login`, `/register` (public) |
@@ -136,12 +133,10 @@ type Props = {
 
 | Scenario | Handling |
 |----------|-----------|
-| Empty `localStorage` | `getStorageData()` returns `[]` |
-| Invalid JSON in storage | `JSON.parse` in try/catch → fallback `[]` |
-| Error on `loadFromStorage` | `state.error = 'Failed to load workout lists'`, `state.isLoading = false` |
+| No lists for user | `GET /workout-lists` returns `[]` |
+| API error on `loadLists` | `state.error = 'Failed to load workout lists'`, `state.isLoading = false` |
 | `workoutLists.length === 0` | Render empty state, no cards |
 | `list.description` empty | Description block not rendered |
 | `list.lastUsedAt === null` | «Last used» string not displayed |
-| `navigator.storage.estimate` unavailable | Fallback to sync `getUsagePercentage()` |
 | Error on `deleteWorkoutList` | `state.error` updated, list not removed from UI |
 | Deleting currently open workout | `currentWorkout` cleared when `id === currentWorkout.id` |
