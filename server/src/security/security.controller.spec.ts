@@ -48,7 +48,7 @@ describe('SecurityController', () => {
       const captchaText = '1234';
       request._setSessionVariable('captcha', '');
       jest.spyOn(securityService, 'getCaptchaURL').mockImplementation(() => {
-        return Promise.resolve({ captchaURL, captchaText });
+        return { captchaURL, captchaText };
       });
       const result = await securityController.getCaptchaURL(request);
 

@@ -71,7 +71,6 @@
     "sequelize": "6.25.3",
     "sequelize-cli": "6.5.2",
     "sequelize-typescript": "2.1.5",
-    "sharp": "0.31.1",
     "svg-captcha": "1.4.0",
     "swagger-ui-express": "4.5.0",
     "uuid": "9.0.0"
@@ -143,17 +142,8 @@
       "@common/(.*)$": [
         "<rootDir>/src/common/$1"
       ],
-      "@files/(.*)$": [
-        "<rootDir>/src/files/$1"
-      ],
       "@logger/(.*)$": [
         "<rootDir>/src/logger/$1"
-      ],
-      "@posts/(.*)$": [
-        "<rootDir>/src/posts/$1"
-      ],
-      "@profiles/(.*)$": [
-        "<rootDir>/src/profiles/$1"
       ],
       "@roles/(.*)$": [
         "<rootDir>/src/roles/$1"

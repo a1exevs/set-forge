@@ -3,17 +3,10 @@
 /**
  * Initial schema for the Set-Forge backend.
  *
- * Replaces the previous reliance on `sequelize.sync()` (which only ran in non-production
- * builds). Tables, columns, charsets, indexes and FK constraints below mirror what the
- * sequelize-typescript models in `src/**` would produce on `sync()` so that databases
- * created with this migration are byte-compatible with existing dev databases.
+ * Single migration covering auth, roles, refresh tokens, and workout lists.
+ * Profile tables and unused user columns (banned, status) are intentionally omitted.
  *
  * Notes on FK constraints:
- *   - `user_common_info.user_id`, `user_contacts.user_id`, `user_avatars.user_id` carry
- *     `@ForeignKey(() => User)` decorators in the model layer. We materialise them as
- *     real FK constraints here (with ON DELETE CASCADE) — that matches what sequelize
- *     emits via sync() and is what new deployments should have. Older databases built
- *     without these FKs are not affected: the migration runs once on a fresh schema.
  *   - The `sessions` table is intentionally not included: it is owned by
  *     SequelizeSessionStore which calls `Model.sync()` itself on app boot and is
  *     decoupled from the application schema lifecycle.
@@ -52,9 +45,6 @@ module.exports = {
         },
         email: { type: Sequelize.STRING, allowNull: false, unique: true },
         password: { type: Sequelize.STRING, allowNull: false },
-        banned: { type: Sequelize.BOOLEAN, defaultValue: false },
-        ban_reason: { type: Sequelize.STRING, allowNull: true },
-        status: { type: Sequelize.STRING, allowNull: true },
       },
       utf8,
     );
@@ -103,91 +93,62 @@ module.exports = {
     });
 
     await queryInterface.createTable(
-      'user_common_info',
+      'workout_lists',
       {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           primaryKey: true,
-          autoIncrement: true,
           allowNull: false,
           unique: true,
+          defaultValue: Sequelize.UUIDV4,
         },
         user_id: {
           type: Sequelize.INTEGER,
           allowNull: false,
-          unique: true,
           references: { model: 'users', key: 'id' },
           onUpdate: 'CASCADE',
           onDelete: 'CASCADE',
         },
-        full_name: { type: Sequelize.STRING, allowNull: false },
-        about_me: { type: Sequelize.STRING, allowNull: true },
-        looking_for_a_job: { type: Sequelize.BOOLEAN, defaultValue: false },
-        looking_for_a_job_description: { type: Sequelize.STRING, allowNull: true },
+        name: { type: Sequelize.STRING, allowNull: false },
+        description: { type: Sequelize.STRING, allowNull: false, defaultValue: '' },
+        created_at: { type: Sequelize.DATE, allowNull: false },
+        last_used_at: { type: Sequelize.DATE, allowNull: true },
       },
       utf8,
     );
 
     await queryInterface.createTable(
-      'user_contacts',
+      'workout_exercises',
       {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           primaryKey: true,
-          autoIncrement: true,
           allowNull: false,
           unique: true,
+          defaultValue: Sequelize.UUIDV4,
         },
-        user_id: {
-          type: Sequelize.INTEGER,
+        workout_list_id: {
+          type: Sequelize.UUID,
           allowNull: false,
-          unique: true,
-          references: { model: 'users', key: 'id' },
+          references: { model: 'workout_lists', key: 'id' },
           onUpdate: 'CASCADE',
           onDelete: 'CASCADE',
         },
-        facebook: { type: Sequelize.STRING, allowNull: true },
-        website: { type: Sequelize.STRING, allowNull: true },
-        twitter: { type: Sequelize.STRING, allowNull: true },
-        instagram: { type: Sequelize.STRING, allowNull: true },
-        youtube: { type: Sequelize.STRING, allowNull: true },
-        github: { type: Sequelize.STRING, allowNull: true },
-        vk: { type: Sequelize.STRING, allowNull: true },
-        main_link: { type: Sequelize.STRING, allowNull: true },
-      },
-      utf8,
-    );
-
-    await queryInterface.createTable(
-      'user_avatars',
-      {
-        id: {
-          type: Sequelize.INTEGER,
-          primaryKey: true,
-          autoIncrement: true,
-          allowNull: false,
-          unique: true,
-        },
-        user_id: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          unique: true,
-          references: { model: 'users', key: 'id' },
-          onUpdate: 'CASCADE',
-          onDelete: 'CASCADE',
-        },
-        small: { type: Sequelize.STRING, allowNull: false },
-        large: { type: Sequelize.STRING, allowNull: false },
+        name: { type: Sequelize.STRING, allowNull: false },
+        muscle_group: { type: Sequelize.STRING, allowNull: false },
+        weight: { type: Sequelize.FLOAT, allowNull: false, defaultValue: 0 },
+        reps: { type: Sequelize.INTEGER, allowNull: false },
+        sets: { type: Sequelize.INTEGER, allowNull: false },
+        completed_sets: { type: Sequelize.INTEGER, allowNull: false, defaultValue: 0 },
+        position: { type: Sequelize.INTEGER, allowNull: false, defaultValue: 0 },
       },
       utf8,
     );
   },
 
   async down(queryInterface) {
-    // Drop in reverse FK order so MySQL doesn't reject the operation.
-    await queryInterface.dropTable('user_avatars');
-    await queryInterface.dropTable('user_contacts');
-    await queryInterface.dropTable('user_common_info');
+    await queryInterface.dropTable('workout_exercises');
+    await queryInterface.dropTable('workout_lists');
     await queryInterface.dropTable('refreshTokens');
     await queryInterface.dropTable('users_roles');
     await queryInterface.dropTable('users');

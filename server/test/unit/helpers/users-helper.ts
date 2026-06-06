@@ -1,4 +1,3 @@
-import { GetUsersResponse } from '@users/dto';
 import { User } from '@users/users.model';
 
 export const mockUsers = (count: number): Partial<User>[] => {
@@ -6,15 +5,7 @@ export const mockUsers = (count: number): Partial<User>[] => {
   const response: Partial<User>[] = [];
   for (let i = 0; i < count; ++i) {
     const j = i + 1;
-    response.push({ id: j, email: `email${j}`, password: `password${j}`, status: `status${j}`, roles: [] });
+    response.push({ id: j, email: `email${j}`, password: `password${j}`, roles: [] });
   }
   return response;
-};
-
-export const mockGetUsersResponse = (): GetUsersResponse.Data => {
-  const user1: GetUsersResponse.User = { id: 1, email: 'email1', status: 'status1', avatar: null };
-  const user2: GetUsersResponse.User = { id: 2, email: 'email2', status: 'status2', avatar: null };
-  const user3: GetUsersResponse.User = { id: 3, email: 'email3', status: 'status3', avatar: null };
-  const items = [user1, user2, user3];
-  return { totalCount: items.length, items };
 };

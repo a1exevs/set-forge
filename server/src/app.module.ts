@@ -6,8 +6,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { UsersModule, User, UserRole } from '@src/users';
 import { RolesModule, Role } from '@src/roles';
 import { AuthModule, RefreshToken } from '@src/auth';
-import { FilesModule } from '@src/files';
-import { ProfilesModule, UserCommonInfo, UserContact, UserAvatar } from '@src/profiles';
 import { LoggerModule } from '@src/logger';
 import { SecurityModule } from '@src/security';
 import { HealthModule } from '@src/health/health.module';
@@ -34,17 +32,7 @@ import * as path from 'path';
       username: process.env.MYSQL_USER,
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DB,
-      models: [
-        User,
-        Role,
-        UserRole,
-        RefreshToken,
-        UserCommonInfo,
-        UserContact,
-        UserAvatar,
-        WorkoutList,
-        WorkoutExercise,
-      ],
+      models: [User, Role, UserRole, RefreshToken, WorkoutList, WorkoutExercise],
       autoLoadModels: true,
       // Schema is owned by sequelize-cli migrations under server/database/migrations.
       // Keep this `false` in every environment so dev and prod share one source of truth
@@ -54,8 +42,6 @@ import * as path from 'path';
     UsersModule,
     RolesModule,
     AuthModule,
-    FilesModule,
-    ProfilesModule,
     LoggerModule,
     SecurityModule,
     WorkoutListsModule,

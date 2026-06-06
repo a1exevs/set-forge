@@ -30,18 +30,6 @@ export class User extends Model<User, IUser> {
   @Column({ type: DataType.STRING, allowNull: false })
   password: string;
 
-  @ApiProperty({ example: false, description: 'Забанен ли Пользователь' })
-  @Column({ type: DataType.BOOLEAN, defaultValue: false })
-  banned: boolean;
-
-  @ApiProperty({ example: 'Мошенничество', description: 'Причина попадания в бан Пользователя' })
-  @Column({ type: DataType.STRING, allowNull: true })
-  banReason: string;
-
   @BelongsToMany(() => Role, () => UserRole)
   roles: Role[];
-
-  @ApiProperty({ example: 'Все OK', description: 'Статус Пользователя' })
-  @Column({ type: DataType.STRING, allowNull: true })
-  status: string;
 }
