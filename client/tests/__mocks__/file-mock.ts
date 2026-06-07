@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Default export used for non-SVG static assets
 const file = 'FileMock';
 export default file;
