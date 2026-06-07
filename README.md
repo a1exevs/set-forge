@@ -192,7 +192,7 @@ For local development against `mysql-dev`, the equivalent flow is `npm run db:up
 - Track progress in interactive workout mode
 - Real-time progress bars with gradient fills
 - Double tap to mark sets complete
-- Data persistence in localStorage with 80% warning
+- Data persistence via backend API (MySQL) with authenticated sessions
 - Dark theme by default (light theme ready)
 - Mobile-first responsive design
 - Touch-friendly UI (min 44px tap targets)

@@ -1,12 +1,11 @@
 import type { WorkoutList } from '@entities';
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 
 import { useConfirm } from '@shared';
 
 import HomePage from 'src/pages/home/ui/home-page';
 
 type Props = {
-  loadLists: () => Promise<void>;
   workoutLists: WorkoutList[];
   deleteWorkoutList: (id: string) => Promise<void>;
   onEdit: (id: string) => void;
@@ -21,7 +20,6 @@ const HomePageLogicLayer: FC<Props> = ({
   deleteWorkoutList,
   onEdit,
   formatDate,
-  loadLists,
   userEmail,
   avatarLetter,
   onLogout,
@@ -39,10 +37,6 @@ const HomePageLogicLayer: FC<Props> = ({
       await deleteWorkoutList(id);
     }
   };
-
-  useEffect((): void => {
-    void loadLists();
-  }, [loadLists]);
 
   return (
     <HomePage

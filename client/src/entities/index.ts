@@ -1,23 +1,7 @@
+export { muscleGroupLabels, muscleGroups, type MuscleGroup } from 'src/entities/exercise';
 export {
-  exerciseApi,
-  type Exercise,
-  type MuscleGroup,
-  type CreateExerciseDto,
-  muscleGroupLabels,
-  muscleGroups,
-  useExerciseStore,
-} from 'src/entities/exercise';
-export {
-  bootstrapSessionAndPrimeCache,
-  deleteLogout,
   emailToAvatarLetter,
-  fetchCurrentUser,
-  getCaptchaUrl,
-  isNeedCaptchaEnvelope,
-  postLogin,
-  postRegistration,
   sessionQueryKeys,
-  toAbsoluteFromApiOrigin,
   useCurrentUserQuery,
   useLoginMutation,
   useLogoutMutation,
@@ -25,7 +9,14 @@ export {
   type CurrentUser,
 } from 'src/entities/session';
 export {
-  useWorkoutListStore,
+  useCreateWorkoutListMutation,
+  useDeleteWorkoutListMutation,
+  useResetWorkoutProgressMutation,
+  useUpdateWorkoutListMutation,
+  useUpdateWorkoutProgressMutation,
+  useWorkoutListsQuery,
+  useWorkoutQuery,
+  workoutQueryKeys,
   type WorkoutList,
   type WorkoutExercise,
   type CreateWorkoutListDto,

@@ -38,29 +38,6 @@
   margin: 0;
 }
 
-.warning {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.05));
-  border: 1px solid $warning-color;
-  border-radius: $radius-lg;
-  padding: $spacing-md;
-  margin-bottom: $spacing-lg;
-  display: flex;
-  align-items: flex-start;
-  gap: $spacing-sm;
-
-  p {
-    color: $text-primary;
-    font-size: $font-size-sm;
-    line-height: 1.5;
-    margin: 0;
-  }
-}
-
-.warningIcon {
-  font-size: $font-size-lg;
-  flex-shrink: 0;
-}
-
 .main {
   max-width: 800px;
   margin: 0 auto;

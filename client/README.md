@@ -11,14 +11,17 @@ Workout planning and strength tracking web app (React, Vite, TanStack Router, FS
 ![React](https://img.shields.io/badge/React-18.3-61dafb?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6.0-646cff?logo=vite&logoColor=white)
-![Zustand](https://img.shields.io/badge/Zustand-5.0-443e38)
+![TanStack Query](https://img.shields.io/badge/TanStack%20Query-5.62-FF4154)
 ![TanStack Router](https://img.shields.io/badge/TanStack%20Router-1.160-FF4154)
+![Zustand](https://img.shields.io/badge/Zustand-5.0-443e38)
 ![FSD](https://img.shields.io/badge/Architecture-FSD-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## Description
 
 A workout planning and strength tracking web-app that lets you build exercise lists, log sets and weights, rate perceived effort, and visualize progress over time.
+
+**State:** server data via TanStack Query; client-only UI state (e.g. theme) via Zustand where needed.
 
 ## Prerequisites
 

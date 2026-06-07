@@ -2,7 +2,7 @@
 
 ## Overview
 
-Backend REST API for the full Workout List lifecycle (create, read, update, delete, run in workout mode), replacing the client-side `localStorage` persistence. Implemented as a NestJS `workout-lists` module (controller + service + Sequelize models) scoped to the authenticated user, documented in Swagger and covered by unit tests. The client keeps its `useWorkoutListStore` (Zustand) public API but is backed by this API instead of `localStorage`.
+Backend REST API for the full Workout List lifecycle (create, read, update, delete, run in workout mode). Implemented as a NestJS `workout-lists` module (controller + service + Sequelize models) scoped to the authenticated user, documented in Swagger and covered by unit tests. The client consumes this API through TanStack Query hooks in `entities/workout-list/model/use-workout-queries.ts`.
 
 This spec aligns with [auth-session.spec.md](auth-session.spec.md) (envelope, base URL, guards) and updates the persistence sections of [home-page.spec.md](home-page.spec.md), [create-workout.spec.md](create-workout.spec.md), [edit-workout-list.spec.md](edit-workout-list.spec.md) and [workout-mode.spec.md](workout-mode.spec.md).
 
@@ -141,18 +141,18 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
 
 ## Client integration
 
-- New API service `entities/workout-list/api/workout-list-api.ts` using shared `apiRequest` (`auth: true`) + `ResultCodes`, mirroring `entities/session/api/session-api.ts`.
-- `useWorkoutListStore` keeps its selector surface but actions become async and call the API:
-  - `loadLists()` (replaces `loadFromStorage`): `GET /workout-lists` → `workoutLists`.
-  - `addWorkoutList(dto): Promise<boolean>`: `POST` → push returned list.
-  - `updateWorkoutList(id, dto): Promise<boolean>`: `PUT` → replace in state + sync `currentWorkout`.
-  - `deleteWorkoutList(id): Promise<void>`: `DELETE` → remove from state.
-  - `setCurrentWorkout(id): Promise<void>`: `GET /workout-lists/:id` → `currentWorkout` (null on 404).
-  - `updateWorkoutProgress(listId, exerciseId): Promise<void>`: optimistic local `+1` for snappy double-tap, then `PATCH`; on error reload list / set `error`.
-  - `resetAllProgress(listId): Promise<void>`: optimistic local zero, then `POST /reset`.
-  - `getUsagePercentageAsync()`: retired — returns `0` (no localStorage quota with a backend); home storage-warning path removed.
-- Initial load: replace the `localStorage` hydration in `__root.tsx` / home `useEffect` with `loadLists()` triggered when the session is authenticated (after `bootstrapSessionAndPrimeCache`).
-- IDs are server-generated (UUID strings); the client no longer calls `crypto.randomUUID()` for list/exercise ids.
+- API service `entities/workout-list/api/workout-list-api.ts` using shared `apiRequest` (`auth: true`) + `ResultCodes`, mirroring `entities/session/api/session-api.ts`. **Not** re-exported from `@entities`; consumed only by query hooks and tests.
+- TanStack Query hooks in `entities/workout-list/model/use-workout-queries.ts`:
+  - `useWorkoutListsQuery(enabled)` — `GET /workout-lists` → `workoutQueryKeys.lists`.
+  - `useWorkoutQuery(id)` — `GET /workout-lists/:id` → `workoutQueryKeys.detail(id)`; `null` on 404.
+  - `useCreateWorkoutListMutation()` — `POST`; appends to lists cache on success.
+  - `useUpdateWorkoutListMutation()` — `PUT`; updates detail + lists cache.
+  - `useDeleteWorkoutListMutation()` — `DELETE`; removes from lists cache, drops detail key.
+  - `useUpdateWorkoutProgressMutation()` — optimistic `+1`, then `PATCH .../progress`; rollback on error, server response on success.
+  - `useResetWorkoutProgressMutation()` — optimistic zero, then `POST .../reset`; same cache sync pattern.
+- Query keys: `workoutQueryKeys.lists`, `workoutQueryKeys.detail(id)`.
+- Initial load: `HomePageDataLayer` calls `useWorkoutListsQuery(Boolean(user))` when session exists.
+- IDs are server-generated (UUID strings); the client no longer calls `crypto.randomUUID()` for list/exercise ids (form `tempId` is local-only).
 
 ---
 
@@ -166,7 +166,7 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
 | Docs | Swagger (`@ApiTags`, `@ApiOperation`, `@ApiOkResponse`, `@ApiResult`), served at `/api/docs` (non-prod) |
 | Validation | `class-validator` on DTOs |
 | Tests | Jest + `@nestjs/testing`; service spec via `getModelToken`, controller spec mocks service + `JwtService` |
-| Client | `apiRequest` wrapper, Zustand store (existing public API), TanStack Router pages |
+| Client | `apiRequest` wrapper, `@tanstack/react-query` hooks, TanStack Router pages |
 
 ---
 
@@ -174,16 +174,15 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
 
 | API | Type | Description |
 |-----|------|-------------|
-| `useWorkoutListStore.use.workoutLists()` | selector | List of workout lists |
-| `useWorkoutListStore.use.currentWorkout()` | selector | Current workout |
-| `useWorkoutListStore.use.loadLists()` | action | Load lists from API |
-| `useWorkoutListStore.use.addWorkoutList(dto)` | action | Create via API; `Promise<boolean>` |
-| `useWorkoutListStore.use.updateWorkoutList(id, dto)` | action | Update via API; `Promise<boolean>` |
-| `useWorkoutListStore.use.deleteWorkoutList(id)` | action | Delete via API |
-| `useWorkoutListStore.use.setCurrentWorkout(id)` | action | Load single list into `currentWorkout` |
-| `useWorkoutListStore.use.clearCurrentWorkout()` | action | Clear `currentWorkout` |
-| `useWorkoutListStore.use.updateWorkoutProgress(listId, exerciseId)` | action | +1 completedSets (optimistic + PATCH) |
-| `useWorkoutListStore.use.resetAllProgress(listId)` | action | Zero completedSets (optimistic + POST) |
+| `useWorkoutListsQuery(enabled)` | hook | List of workout lists |
+| `useWorkoutQuery(id)` | hook | Single workout (`null` when missing) |
+| `useCreateWorkoutListMutation()` | hook | Create via API |
+| `useUpdateWorkoutListMutation()` | hook | Update via API |
+| `useDeleteWorkoutListMutation()` | hook | Delete via API |
+| `useUpdateWorkoutProgressMutation()` | hook | +1 completedSets (optimistic + PATCH) |
+| `useResetWorkoutProgressMutation()` | hook | Zero completedSets (optimistic + POST) |
+| `workoutQueryKeys.lists` | query key | Lists cache |
+| `workoutQueryKeys.detail(id)` | query key | Detail cache |
 | Routes | — | `/workout-lists`, `/workout-lists/:id`, `/workout-lists/:id/reset`, `/workout-lists/:id/exercises/:exerciseId/progress` |
 
 ---
@@ -193,7 +192,7 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
 | Scenario | Handling |
 |----------|----------|
 | Unauthenticated request | `JwtAuthGuard`/`RefreshTokenGuard` → 401 envelope |
-| `:id` not owned / missing | `NotFoundException` → 404 envelope; client `setCurrentWorkout` sets `currentWorkout = null` |
+| `:id` not owned / missing | `NotFoundException` → 404 envelope; client `useWorkoutQuery` resolves `null` |
 | Invalid create/update DTO | `class-validator` → 400 envelope with messages |
 | Progress when `completedSets === sets` | No increment, list returned unchanged |
 | `sets === 0` | Disallowed by validation (`@Min(1)`) |
@@ -201,5 +200,5 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
 | Update adds an exercise | New row, generated `id`, `completedSets: 0` |
 | Update keeps an exercise | `id` preserved; `completedSets` preserved unless supplied |
 | Delete cascade | Removing a list deletes its `workout_exercises` rows |
-| Network/API error in store action | `state.error` set; create/update return `false`; navigation does not run |
-| Reload (no in-memory token) | `apiRequest` refresh flow restores session; `loadLists` repopulates from server |
+| Network/API error in mutation | Mutation error; create/update data layers return `false`; navigation does not run |
+| Reload (no in-memory token) | `apiRequest` refresh flow restores session; queries refetch from server |

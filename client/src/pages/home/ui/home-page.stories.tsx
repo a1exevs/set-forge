@@ -21,7 +21,6 @@ const renderHomePage = (): ReturnType<typeof renderWithPageRouter> =>
     component: (): JSX.Element => (
       <HomePageLogicLayer
         workoutLists={mockWorkoutLists}
-        loadLists={async (): Promise<void> => undefined}
         deleteWorkoutList={async (): Promise<void> => undefined}
         onEdit={fn()}
         formatDate={formatDate}

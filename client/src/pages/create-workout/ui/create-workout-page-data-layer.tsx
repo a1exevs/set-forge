@@ -1,20 +1,22 @@
 import { FC } from 'react';
 
-import { useWorkoutListStore } from '@entities';
+import { useCreateWorkoutListMutation } from '@entities';
 
 import CreateWorkoutPageLogicLayer from 'src/pages/create-workout/ui/create-workout-page-logic-layer';
 
 const CreateWorkoutPageDataLayer: FC = () => {
-  const addWorkoutList = useWorkoutListStore.use.addWorkoutList();
+  const createWorkoutListMutation = useCreateWorkoutListMutation();
 
   return (
     <CreateWorkoutPageLogicLayer
       onSubmit={async (dto): Promise<boolean> => {
-        const success = await addWorkoutList(dto);
-        if (!success) {
+        try {
+          await createWorkoutListMutation.mutateAsync(dto);
+          return true;
+        } catch {
           // TODO: Support common toaster
+          return false;
         }
-        return success;
       }}
     />
   );

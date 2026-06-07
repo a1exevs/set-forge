@@ -1,17 +1,13 @@
-// api
-export {
-  fetchWorkoutLists,
-  fetchWorkoutList,
-  createWorkoutList,
-  updateWorkoutList,
-  deleteWorkoutList,
-  incrementExerciseProgress,
-  resetWorkoutProgress,
-} from 'src/entities/workout-list/api';
-
 // model
 export {
-  useWorkoutListStore,
+  useCreateWorkoutListMutation,
+  useDeleteWorkoutListMutation,
+  useResetWorkoutProgressMutation,
+  useUpdateWorkoutListMutation,
+  useUpdateWorkoutProgressMutation,
+  useWorkoutListsQuery,
+  useWorkoutQuery,
+  workoutQueryKeys,
   type WorkoutList,
   type WorkoutExercise,
   type CreateWorkoutListDto,

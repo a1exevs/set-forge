@@ -14,50 +14,23 @@ const fireWorkoutCompleteConfetti = (): void => {
 
 type Props = {
   id: string;
-  currentWorkout: WorkoutList | null;
-  setCurrentWorkout: (id: string) => Promise<void>;
-  clearCurrentWorkout: () => void;
+  workout: WorkoutList | null | undefined;
   updateWorkoutProgress: (listId: string, exerciseId: string) => Promise<void>;
   resetAllProgress: (listId: string) => Promise<void>;
 };
 
-const WorkoutModePageLogicLayer: FC<Props> = ({
-  id,
-  currentWorkout,
-  setCurrentWorkout,
-  clearCurrentWorkout,
-  updateWorkoutProgress,
-  resetAllProgress,
-}) => {
+const WorkoutModePageLogicLayer: FC<Props> = ({ id, workout, updateWorkoutProgress, resetAllProgress }) => {
   const confirmDialog = useConfirm();
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
-  const [isResolving, setIsResolving] = useState<boolean>(true);
   const lastTapRef = useRef<Record<string, number>>({});
   const prevCompletedExercisesRef = useRef<number | null>(null);
 
-  useEffect((): (() => void) => {
-    let active = true;
-    setIsResolving(true);
-    void (async (): Promise<void> => {
-      if (id) {
-        await setCurrentWorkout(id);
-      }
-      if (active) {
-        setIsResolving(false);
-      }
-    })();
-    return (): void => {
-      active = false;
-      clearCurrentWorkout();
-    };
-  }, [id, setCurrentWorkout, clearCurrentWorkout]);
-
   const handleExerciseClick = (exerciseId: string): void => {
-    if (!currentWorkout) {
+    if (!workout) {
       return;
     }
 
-    const exercise = currentWorkout.exercises.find(ex => ex.id === exerciseId);
+    const exercise = workout.exercises.find(ex => ex.id === exerciseId);
     if (!exercise) {
       return;
     }
@@ -65,7 +38,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     if (exercise.completedSets >= exercise.sets) {
       return;
     }
-    void updateWorkoutProgress(currentWorkout.id, exerciseId);
+    void updateWorkoutProgress(workout.id, exerciseId);
 
     if (exercise.completedSets + 1 === exercise.sets) {
       setJustCompleted(exerciseId);
@@ -88,7 +61,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   };
 
   const handleResetAll = async (): Promise<void> => {
-    if (!currentWorkout) {
+    if (!workout) {
       return;
     }
 
@@ -99,19 +72,17 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
       cancellationText: 'Cancel',
     });
     if (ok) {
-      void resetAllProgress(currentWorkout.id);
+      void resetAllProgress(workout.id);
     }
   };
 
   const calculateProgress = (): { totalExercises: number; completedExercises: number; overallProgress: number } => {
-    if (!currentWorkout) {
+    if (!workout) {
       return { totalExercises: 0, completedExercises: 0, overallProgress: 0 };
     }
 
-    const totalExercises = currentWorkout.exercises.length;
-    const completedExercises = currentWorkout.exercises.filter(
-      ex => ex.sets > 0 && ex.completedSets === ex.sets,
-    ).length;
+    const totalExercises = workout.exercises.length;
+    const completedExercises = workout.exercises.filter(ex => ex.sets > 0 && ex.completedSets === ex.sets).length;
     const overallProgress = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0;
 
     return { totalExercises, completedExercises, overallProgress };
@@ -124,7 +95,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   }, [id]);
 
   useEffect((): void => {
-    if (!currentWorkout || currentWorkout.id !== id) {
+    if (!workout || workout.id !== id) {
       return;
     }
     const prev = prevCompletedExercisesRef.current;
@@ -132,15 +103,15 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
       fireWorkoutCompleteConfetti();
     }
     prevCompletedExercisesRef.current = completedExercises;
-  }, [id, currentWorkout, completedExercises, totalExercises]);
+  }, [id, workout, completedExercises, totalExercises]);
 
-  if (isResolving) {
+  if (workout === undefined) {
     return null;
   }
 
   return (
     <WorkoutModePage
-      currentWorkout={currentWorkout}
+      currentWorkout={workout}
       justCompleted={justCompleted}
       totalExercises={totalExercises}
       completedExercises={completedExercises}

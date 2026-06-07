@@ -1,5 +1,4 @@
 import type { Meta } from '@storybook/react';
-import { fn } from '@storybook/test';
 
 import { mockWorkoutList } from 'storybook-dir/fixtures/workout-lists';
 import {
@@ -16,17 +15,13 @@ const storyTitle = 'Pages/EditWorkoutPage';
 
 const editWithDataProps = {
   id: mockWorkoutList.id,
-  currentWorkout: mockWorkoutList,
-  setCurrentWorkout: async (): Promise<void> => undefined,
-  clearCurrentWorkout: fn(),
+  workout: mockWorkoutList,
   updateWorkoutList: async (): Promise<boolean> => true,
 };
 
 const editNotFoundProps = {
   id: 'non-existent-id',
-  currentWorkout: null,
-  setCurrentWorkout: async (): Promise<void> => undefined,
-  clearCurrentWorkout: fn(),
+  workout: null,
   updateWorkoutList: async (): Promise<boolean> => true,
 };
 

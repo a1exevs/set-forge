@@ -1,61 +1,67 @@
 ---
-description: State management with Zustand
+description: State management with TanStack Query and Zustand
 globs: ["client/**"]
 ---
 
-# State Management (Zustand)
+# State Management
 
-## Store Pattern
+## Server state — TanStack Query
+
+All **server/async state** (session, workout lists) lives in `@tanstack/react-query` hooks under `entities/*/model/use-*-queries.ts`.
+
+- Query keys in `entities/*/model/*-keys.ts` or `workout-query-keys.ts`.
+- Data layers import hooks from `@entities`; Logic/Presentation layers receive data via props — **never** import query hooks or API functions directly.
+- Mutations handle cache updates (`setQueryData`, `invalidateQueries`) and optimistic updates (`onMutate` / rollback in `onError`).
+- API functions in `entities/*/api/` are internal to query hooks and tests; not re-exported from `@entities`.
+
+```typescript
+// entities/workout-list/model/use-workout-queries.ts
+export function useWorkoutListsQuery(enabled = true) {
+  return useQuery({
+    queryKey: workoutQueryKeys.lists,
+    queryFn: fetchWorkoutLists,
+    enabled,
+  });
+}
+```
+
+## Client state — Zustand
+
+Use Zustand only for **client-only UI state** (e.g. theme preference with `persist`). Not for server data.
 
 All stores: `devtools(immer(...))` + `createSelectors`. Middleware order: `devtools` wraps `immer`.
 
 ```typescript
 import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { createSelectors } from '@shared';
 
-interface StoreState {
-  data: Data[];
-  addItem: (item: Data) => void;
-}
-
-const useStoreBase = create<StoreState>()(
-  devtools(immer((set) => ({
-    data: [],
-    addItem: (item) => set((state) => { state.data.push(item); }),
-  })), { name: 'StoreName' })
+const useThemeStoreBase = create<ThemeState>()(
+  devtools(
+    immer(
+      persist(/* ... */),
+    ),
+    { name: 'ThemeStore' },
+  ),
 );
 
-export const useStore = createSelectors(useStoreBase);
+export const useThemeStore = createSelectors(useThemeStoreBase);
 ```
 
 ## Rules
 
-- **Auto-selectors:** `useStore.use.data()` — not `useStore(s => s.data)`
+- **Auto-selectors (Zustand):** `useStore.use.data()` — not `useStore(s => s.data)`
 - **Immer:** Mutate directly `state.x = y`, avoid spread `[...state.items, item]`
-- **Location:** `entities/X/model/store.ts`, `features/X/model/store.ts`, `shared/X/model/store.ts` (app-level). Pages/widgets rarely need stores.
-- **Usage:** Store only in Data Layer; Logic/Presentation never import stores
-- **DevTools:** Always `{ name: 'StoreName' }`
+- **Location:** `entities/X/model/store.ts` for client-only entity state; `shared/model/` for cross-cutting client state
+- **Usage:** Stores/query hooks only in Data Layer; Logic/Presentation never import stores or query hooks
+- **DevTools:** Always `{ name: 'StoreName' }` for Zustand stores
 - **Type safety:** See typescript-guidelines.
-
-## Async Actions
-
-```typescript
-fetchData: async () => {
-  set((s) => { s.isLoading = true; s.error = null; });
-  try {
-    const data = await api.fetchData();
-    set((s) => { s.data = data; s.isLoading = false; });
-  } catch (e) {
-    set((s) => { s.error = e.message; s.isLoading = false; });
-  }
-}
-```
 
 ## Single Source of Truth
 
-- One store per entity/feature
-- No duplicated state across stores
+- One query key namespace per server resource
+- One Zustand store per client-only concern
+- No duplicated server state in Zustand
 - Derive computed values, don't store them
-- Keep stores focused
+- Keep stores and query modules focused
