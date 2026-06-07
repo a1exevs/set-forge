@@ -22,28 +22,28 @@ interface IWorkoutList {
   collate: 'utf8_general_ci',
 })
 export class WorkoutList extends Model<WorkoutList, IWorkoutList> {
-  @ApiProperty({ example: 'a3f1c0e2-...', description: 'Уникальный идентификатор списка тренировки' })
+  @ApiProperty({ example: 'a3f1c0e2-...', description: 'Unique workout list identifier' })
   @Column({ type: DataType.UUID, unique: true, primaryKey: true, defaultValue: UUIDV4 })
   id: string;
 
   @ForeignKey(() => User)
-  @ApiProperty({ example: 1, description: 'Уникальный идентификатор пользователя-владельца' })
+  @ApiProperty({ example: 1, description: 'Owner user identifier' })
   @Column({ type: DataType.INTEGER, allowNull: false })
   userId: number;
 
-  @ApiProperty({ example: 'Push Day', description: 'Название списка тренировки' })
+  @ApiProperty({ example: 'Push Day', description: 'Workout list name' })
   @Column({ type: DataType.STRING, allowNull: false })
   name: string;
 
-  @ApiProperty({ example: 'Chest, shoulders, triceps', description: 'Описание списка тренировки' })
+  @ApiProperty({ example: 'Chest, shoulders, triceps', description: 'Workout list description' })
   @Column({ type: DataType.STRING, allowNull: false, defaultValue: '' })
   description: string;
 
-  @ApiProperty({ example: '2026-06-03T12:00:00.000Z', description: 'Дата создания' })
+  @ApiProperty({ example: '2026-06-03T12:00:00.000Z', description: 'Creation date' })
   @Column({ type: DataType.DATE, allowNull: false })
   createdAt: Date;
 
-  @ApiProperty({ example: '2026-06-03T12:00:00.000Z', description: 'Дата последнего использования', nullable: true })
+  @ApiProperty({ example: '2026-06-03T12:00:00.000Z', description: 'Last used date', nullable: true })
   @Column({ type: DataType.DATE, allowNull: true })
   lastUsedAt: Date | null;
 

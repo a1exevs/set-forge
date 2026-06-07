@@ -9,15 +9,15 @@ export namespace RegisterRequest {
     private static readonly passMinLength = 8;
     private static readonly passMaxLength = 50;
 
-    @ApiProperty({ format: Docs.ru.EMAIL_FORMAT })
-    @IsString({ message: ErrorMessages.ru.MUST_BE_A_STRING })
-    @IsEmail({}, { message: ErrorMessages.ru.MUST_HAS_EMAIL_FORMAT })
+    @ApiProperty({ format: Docs.EMAIL_FORMAT })
+    @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
+    @IsEmail({}, { message: ErrorMessages.MUST_HAS_EMAIL_FORMAT })
     readonly email: string;
 
     @ApiProperty({ minLength: Dto.passMinLength, maxLength: Dto.passMaxLength })
-    @IsString({ message: ErrorMessages.ru.MUST_BE_A_STRING })
+    @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
     @Length(Dto.passMinLength, Dto.passMaxLength, {
-      message: ErrorMessages.ru.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(
+      message: ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(
         Dto.passMinLength,
         Dto.passMaxLength,
       ),

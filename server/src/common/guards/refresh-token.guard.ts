@@ -10,12 +10,12 @@ export class RefreshTokenGuard implements CanActivate {
       const request = context.switchToHttp().getRequest();
       const cookies = request.cookies;
       if (!('refreshToken' in cookies)) {
-        throw new UnauthorizedException({ message: ErrorMessages.ru.UNAUTHORIZED });
+        throw new UnauthorizedException({ message: ErrorMessages.UNAUTHORIZED });
       }
 
       return true;
     } catch (e) {
-      throw new ForbiddenException(ErrorMessages.ru.FORBIDDEN);
+      throw new ForbiddenException(ErrorMessages.FORBIDDEN);
     }
   }
 }

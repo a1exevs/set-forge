@@ -62,7 +62,7 @@ describe('JwtAuthGuard', () => {
           sendPseudoError();
         } catch (err) {
           expect(err.status).toBe(HttpStatus.UNAUTHORIZED);
-          expect(err.message).toBe(ErrorMessages.ru.UNAUTHORIZED);
+          expect(err.message).toBe(ErrorMessages.UNAUTHORIZED);
           expect(mockGetRequest).toBeCalledTimes(1);
         }
       }, expiresIn * 1000);
@@ -92,7 +92,7 @@ describe('JwtAuthGuard', () => {
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(HttpStatus.UNAUTHORIZED);
-        expect(err.message).toBe(ErrorMessages.ru.UNAUTHORIZED);
+        expect(err.message).toBe(ErrorMessages.UNAUTHORIZED);
         expect(mockGetRequest).toBeCalledTimes(1);
       }
     });
@@ -120,7 +120,7 @@ describe('JwtAuthGuard', () => {
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(HttpStatus.UNAUTHORIZED);
-        expect(err.message).toBe(ErrorMessages.ru.UNAUTHORIZED);
+        expect(err.message).toBe(ErrorMessages.UNAUTHORIZED);
         expect(mockGetRequest).toBeCalledTimes(1);
       }
     });

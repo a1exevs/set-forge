@@ -86,8 +86,8 @@ describe('UsersService', () => {
         expect(error.status).toBe(HttpStatus.FORBIDDEN);
         expect(error.message).toBe(
           `${
-            ErrorMessages.ru.SERVICE_IS_UNAVAILABLE
-          }: ${ErrorMessages.ru.USER_ROLE_CONFIGURATION_IS_MISSING.toLowerCase()}`,
+            ErrorMessages.SERVICE_IS_UNAVAILABLE
+          }: ${ErrorMessages.USER_ROLE_CONFIGURATION_IS_MISSING.toLowerCase()}`,
         );
         expect(rolesService.getRoleByValue).toBeCalledTimes(1);
         expect(rolesService.getRoleByValue).toBeCalledWith('user');
@@ -109,7 +109,7 @@ describe('UsersService', () => {
         await usersService.createUser(dto);
       } catch (error) {
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(`${ErrorMessages.ru.FAILED_TO_CREATE_USER}. ${errorMessage}`);
+        expect(error.message).toBe(`${ErrorMessages.FAILED_TO_CREATE_USER}. ${errorMessage}`);
         expect(rolesService.getRoleByValue).toBeCalledTimes(1);
         expect(rolesService.getRoleByValue).toBeCalledWith('user');
         expect(model.create).toBeCalledTimes(1);

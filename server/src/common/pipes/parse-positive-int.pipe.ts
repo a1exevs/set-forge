@@ -10,7 +10,7 @@ export class ParsePositiveIntPipe implements PipeTransform<any> {
     await intPipe.transform(value, metadata);
 
     if (value < 0) {
-      throw new ValidationException(ErrorMessages.ru.NUMERIC_MUST_NOT_BE_LESS_THAN_N.format(0));
+      throw new ValidationException(ErrorMessages.NUMERIC_MUST_NOT_BE_LESS_THAN_N.format(0));
     }
 
     return value;

@@ -216,7 +216,7 @@ describe('AuthService', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(401);
-        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.ru.INVALID_EMAIL_OR_PASSWORD });
+        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.INVALID_EMAIL_OR_PASSWORD });
         expect(userService.getUserByEmail).toBeCalledTimes(1);
         expect(userService.getUserByEmail).toBeCalledWith(email, true);
         expect(tokenService.generateAccessToken).toBeCalledTimes(0);
@@ -244,7 +244,7 @@ describe('AuthService', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(401);
-        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.ru.INVALID_EMAIL_OR_PASSWORD });
+        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.INVALID_EMAIL_OR_PASSWORD });
         expect(userService.getUserByEmail).toBeCalledTimes(1);
         expect(userService.getUserByEmail).toBeCalledWith(email, true);
         expect(tokenService.generateAccessToken).toBeCalledTimes(0);
@@ -285,7 +285,7 @@ describe('AuthService', () => {
     it('Refresh method: should throw exception (token not found)', async () => {
       const currentRefreshToken = 'adfsdfsadfsdf';
       jest.spyOn(tokenService, 'updateAccessRefreshTokensFromRefreshToken').mockImplementation(async () => {
-        throw new UnprocessableEntityException(ErrorMessages.ru.REFRESH_TOKEN_NOT_FOUND);
+        throw new UnprocessableEntityException(ErrorMessages.REFRESH_TOKEN_NOT_FOUND);
       });
 
       try {
@@ -293,7 +293,7 @@ describe('AuthService', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(422);
-        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.ru.REFRESH_TOKEN_NOT_FOUND });
+        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.REFRESH_TOKEN_NOT_FOUND });
         expect(tokenService.updateAccessRefreshTokensFromRefreshToken).toBeCalledTimes(1);
         expect(tokenService.updateAccessRefreshTokensFromRefreshToken).toBeCalledWith(currentRefreshToken);
       }
@@ -328,7 +328,7 @@ describe('AuthService', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(401);
-        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.ru.UNAUTHORIZED });
+        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.UNAUTHORIZED });
         expect(userService.getUserById).toBeCalledTimes(1);
         expect(userService.getUserById).toBeCalledWith(userId);
       }
@@ -363,7 +363,7 @@ describe('AuthService', () => {
     it('Logout method: should throw exception (token expired)', async () => {
       const refreshToken = 'sdfsdfsdafsdf';
       jest.spyOn(tokenService, 'removeRefreshToken').mockImplementation(async () => {
-        throw new UnprocessableEntityException(ErrorMessages.ru.REFRESH_TOKEN_EXPIRED);
+        throw new UnprocessableEntityException(ErrorMessages.REFRESH_TOKEN_EXPIRED);
       });
 
       try {
@@ -371,7 +371,7 @@ describe('AuthService', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(422);
-        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.ru.REFRESH_TOKEN_EXPIRED });
+        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.REFRESH_TOKEN_EXPIRED });
         expect(tokenService.removeRefreshToken).toBeCalledTimes(1);
         expect(tokenService.removeRefreshToken).toBeCalledWith(refreshToken);
       }

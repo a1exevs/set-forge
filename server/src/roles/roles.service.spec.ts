@@ -63,7 +63,7 @@ describe('RolesService', () => {
         await rolesService.createRole(dto);
       } catch (error) {
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(`${ErrorMessages.ru.FAILED_TO_CREATE_ROLE}. ${errorMessage}`);
+        expect(error.message).toBe(`${ErrorMessages.FAILED_TO_CREATE_ROLE}. ${errorMessage}`);
         expect(model.create).toBeCalledTimes(1);
         expect(model.create).toBeCalledWith(dto);
       }

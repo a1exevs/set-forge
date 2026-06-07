@@ -6,15 +6,15 @@ import { ErrorMessages } from '@common/constants';
 export namespace LoginRequest {
   export class Dto {
     @ApiProperty()
-    @IsString({ message: ErrorMessages.ru.MUST_BE_A_STRING })
+    @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
     readonly email: string;
 
     @ApiProperty()
-    @IsString({ message: ErrorMessages.ru.MUST_BE_A_STRING })
+    @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
     readonly password: string;
 
     @ApiProperty({ required: false })
-    @IsString({ message: ErrorMessages.ru.MUST_BE_A_STRING })
+    @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
     @IsOptional()
     readonly captcha?: string;
 

@@ -67,7 +67,7 @@ export class TokensService {
     const tokenId = payload.jti;
 
     if (!tokenId) {
-      throw new UnprocessableEntityException(ErrorMessages.ru.REFRESH_TOKEN_IS_MALFORMED);
+      throw new UnprocessableEntityException(ErrorMessages.REFRESH_TOKEN_IS_MALFORMED);
     }
 
     return !!(await this.refreshTokensService.removeTokenByUUId(tokenId));
@@ -90,17 +90,17 @@ export class TokensService {
     await this.removeRefreshToken(encoded);
 
     if (!token) {
-      throw new UnprocessableEntityException(ErrorMessages.ru.REFRESH_TOKEN_NOT_FOUND);
+      throw new UnprocessableEntityException(ErrorMessages.REFRESH_TOKEN_NOT_FOUND);
     }
 
     if (token.isRevoked) {
-      throw new UnprocessableEntityException(ErrorMessages.ru.REFRESH_TOKEN_REVOKED);
+      throw new UnprocessableEntityException(ErrorMessages.REFRESH_TOKEN_REVOKED);
     }
 
     const user = await this.getUserFromRefreshTokenPayload(payload);
 
     if (!user) {
-      throw new UnprocessableEntityException(ErrorMessages.ru.REFRESH_TOKEN_IS_MALFORMED);
+      throw new UnprocessableEntityException(ErrorMessages.REFRESH_TOKEN_IS_MALFORMED);
     }
 
     const newRefreshToken = await this.generateRefreshToken(user, TokensService.getRefreshTokenExpiresIn());
@@ -113,9 +113,9 @@ export class TokensService {
       return await this.jwtService.verifyAsync(token);
     } catch (e) {
       if (e instanceof TokenExpiredError) {
-        throw new UnprocessableEntityException(ErrorMessages.ru.REFRESH_TOKEN_EXPIRED);
+        throw new UnprocessableEntityException(ErrorMessages.REFRESH_TOKEN_EXPIRED);
       } else {
-        throw new UnprocessableEntityException(ErrorMessages.ru.REFRESH_TOKEN_IS_MALFORMED);
+        throw new UnprocessableEntityException(ErrorMessages.REFRESH_TOKEN_IS_MALFORMED);
       }
     }
   }
@@ -124,7 +124,7 @@ export class TokensService {
     const subId = payload.sub;
 
     if (!subId) {
-      throw new UnprocessableEntityException(ErrorMessages.ru.REFRESH_TOKEN_IS_MALFORMED);
+      throw new UnprocessableEntityException(ErrorMessages.REFRESH_TOKEN_IS_MALFORMED);
     }
 
     return this.usersService.getUserById(subId);
@@ -134,7 +134,7 @@ export class TokensService {
     const tokenId = payload.jti;
 
     if (!tokenId) {
-      throw new UnprocessableEntityException(ErrorMessages.ru.REFRESH_TOKEN_IS_MALFORMED);
+      throw new UnprocessableEntityException(ErrorMessages.REFRESH_TOKEN_IS_MALFORMED);
     }
 
     return this.refreshTokensService.findTokenByUUId(tokenId);

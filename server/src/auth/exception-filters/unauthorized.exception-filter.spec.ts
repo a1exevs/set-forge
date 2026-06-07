@@ -16,7 +16,7 @@ describe('UnauthorizedExceptionFilter', () => {
         sessionVariables: [{ key: 'authFailedCount', value: authFailedCount }],
       });
 
-      const exceptionMessage = ErrorMessages.ru.INVALID_EMAIL_OR_PASSWORD;
+      const exceptionMessage = ErrorMessages.INVALID_EMAIL_OR_PASSWORD;
       const errorObject = { message: exceptionMessage };
 
       const unauthorizedExceptionFilter = new UnauthorizedExceptionFilter();
@@ -30,7 +30,7 @@ describe('UnauthorizedExceptionFilter', () => {
       expect(body.resultCode).toBe(ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
       expect(body.messages.length).toBe(2);
       expect(body.messages[0]).toBe(exceptionMessage);
-      expect(body.messages[1]).toBe(ErrorMessages.ru.NEED_AUTHORIZATION_WITH_CAPTCHA);
+      expect(body.messages[1]).toBe(ErrorMessages.NEED_AUTHORIZATION_WITH_CAPTCHA);
     });
     it('should not send response with NEED_CAPTCHA_AUTHORIZATION code', async () => {
       const authFailedCount = '3';
@@ -38,7 +38,7 @@ describe('UnauthorizedExceptionFilter', () => {
         sessionVariables: [{ key: 'authFailedCount', value: authFailedCount }],
       });
 
-      const exceptionMessage = ErrorMessages.ru.INVALID_EMAIL_OR_PASSWORD;
+      const exceptionMessage = ErrorMessages.INVALID_EMAIL_OR_PASSWORD;
       const errorObject = { message: exceptionMessage };
 
       const unauthorizedExceptionFilter = new UnauthorizedExceptionFilter();

@@ -65,7 +65,7 @@ describe('User workflow', () => {
           .expect(HttpStatus.BAD_REQUEST)
           .expect(response => {
             expect(response.body.data).toBeNull();
-            expect(response.body.messages[0]).toBe(ErrorMessages.ru.USER_ALREADY_EXISTS);
+            expect(response.body.messages[0]).toBe(ErrorMessages.USER_ALREADY_EXISTS);
             expect(response.body.resultCode).toBe(ResultCodes.ERROR);
           });
       });
@@ -78,7 +78,7 @@ describe('User workflow', () => {
           .send({ email: userEmail, password: `${userPassword}123` })
           .expect(HttpStatus.UNAUTHORIZED)
           .expect(response => {
-            expect(response.body.messages[0]).toBe(ErrorMessages.ru.INVALID_EMAIL_OR_PASSWORD);
+            expect(response.body.messages[0]).toBe(ErrorMessages.INVALID_EMAIL_OR_PASSWORD);
             expect(response.body.resultCode).toBe(ResultCodes.ERROR);
           });
       });

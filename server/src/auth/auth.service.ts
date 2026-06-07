@@ -22,7 +22,7 @@ export class AuthService {
   public async registration(dto: RegisterRequest.Dto): Promise<IAuthenticationResult> {
     const candidate = await this.userService.getUserByEmail(dto.email);
     if (candidate) {
-      throw new BadRequestException(ErrorMessages.ru.USER_ALREADY_EXISTS);
+      throw new BadRequestException(ErrorMessages.USER_ALREADY_EXISTS);
     }
 
     const hashPassword = await bcrypt.hash(dto.password, 5);
@@ -58,7 +58,7 @@ export class AuthService {
   public async me(userId: number): Promise<GetCurrentUserResponse.Dto> {
     const user = await this.userService.getUserById(userId);
     if (!user) {
-      throw new UnauthorizedException({ message: ErrorMessages.ru.UNAUTHORIZED });
+      throw new UnauthorizedException({ message: ErrorMessages.UNAUTHORIZED });
     }
 
     return new GetCurrentUserResponse.Dto({
@@ -79,7 +79,7 @@ export class AuthService {
         return user;
       }
     }
-    throw new UnauthorizedException({ message: ErrorMessages.ru.INVALID_EMAIL_OR_PASSWORD });
+    throw new UnauthorizedException({ message: ErrorMessages.INVALID_EMAIL_OR_PASSWORD });
   }
 
   private static buildResponsePayload(

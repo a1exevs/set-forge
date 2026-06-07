@@ -20,7 +20,7 @@ export class UnauthorizedExceptionFilter implements ExceptionFilter {
 
     if (session.authFailedCount >= MAX_AUTH_FAILED_COUNT) {
       sendResponse(exception, response, ResultCodes.NEED_CAPTCHA_AUTHORIZATION, [
-        ErrorMessages.ru.NEED_AUTHORIZATION_WITH_CAPTCHA,
+        ErrorMessages.NEED_AUTHORIZATION_WITH_CAPTCHA,
       ]);
       return;
     }

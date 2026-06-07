@@ -36,7 +36,7 @@ describe('ParsePositiveIntPipe', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(ErrorMessages.ru.NUMERIC_MUST_NOT_BE_LESS_THAN_N.format(0));
+        expect(error.message).toBe(ErrorMessages.NUMERIC_MUST_NOT_BE_LESS_THAN_N.format(0));
       }
     });
     it('should throw exception (value is string)', async () => {

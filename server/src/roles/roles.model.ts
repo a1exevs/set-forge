@@ -18,15 +18,15 @@ interface IRole {
   collate: 'utf8_general_ci',
 })
 export class Role extends Model<Role, IRole> {
-  @ApiProperty({ example: '1', description: 'Уникальный идентификатор Роли' })
+  @ApiProperty({ example: '1', description: 'Unique role identifier' })
   @Column({ type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
   id: number;
 
-  @ApiProperty({ example: 'ADMIN', description: 'Уникальная Роль' })
+  @ApiProperty({ example: 'ADMIN', description: 'Unique role value' })
   @Column({ type: DataType.STRING, unique: true, allowNull: false })
   value: string;
 
-  @ApiProperty({ example: 'Администратор', description: 'Описание Роли' })
+  @ApiProperty({ example: 'Administrator', description: 'Role description' })
   @Column({ type: DataType.STRING, allowNull: false })
   description: string;
 

@@ -18,15 +18,15 @@ interface IUser {
   collate: 'utf8_general_ci',
 })
 export class User extends Model<User, IUser> {
-  @ApiProperty({ example: 1, description: 'Уникальный идентификатор Пользователя' })
+  @ApiProperty({ example: 1, description: 'Unique user identifier' })
   @Column({ type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
   id: number;
 
-  @ApiProperty({ example: 'user@yandex.ru', description: 'Адрес электронной почты Пользователя' })
+  @ApiProperty({ example: 'user@example.com', description: 'User email address' })
   @Column({ type: DataType.STRING, unique: true, allowNull: false })
   email: string;
 
-  @ApiProperty({ example: '1234', description: 'Пароль Пользователя от учетной записи' })
+  @ApiProperty({ example: '1234', description: 'User account password' })
   @Column({ type: DataType.STRING, allowNull: false })
   password: string;
 

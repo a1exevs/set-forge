@@ -39,7 +39,7 @@ describe('RefreshTokenGuard', () => {
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(HttpStatus.FORBIDDEN);
-        expect(err.message).toBe(ErrorMessages.ru.FORBIDDEN);
+        expect(err.message).toBe(ErrorMessages.FORBIDDEN);
         expect(mockGetRequest).toBeCalledTimes(1);
       }
     });

@@ -19,15 +19,15 @@ export class UsersService {
     if (!role)
       throw new HttpException(
         `${
-          ErrorMessages.ru.SERVICE_IS_UNAVAILABLE
-        }: ${ErrorMessages.ru.USER_ROLE_CONFIGURATION_IS_MISSING.toLowerCase()}`,
+          ErrorMessages.SERVICE_IS_UNAVAILABLE
+        }: ${ErrorMessages.USER_ROLE_CONFIGURATION_IS_MISSING.toLowerCase()}`,
         HttpStatus.FORBIDDEN,
       );
     let user: User;
     try {
       user = await this.userRepository.create(dto);
     } catch (e) {
-      throw new HttpException(`${ErrorMessages.ru.FAILED_TO_CREATE_USER}. ${e.message}`, HttpStatus.BAD_REQUEST);
+      throw new HttpException(`${ErrorMessages.FAILED_TO_CREATE_USER}. ${e.message}`, HttpStatus.BAD_REQUEST);
     }
     await user.$set('roles', [role.id]);
     user.roles = [role];

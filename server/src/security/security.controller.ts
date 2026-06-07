@@ -7,12 +7,12 @@ import { ResponseInterceptor } from '@common/interceptors';
 import { Isession } from '@auth/interfaces';
 import { Routes, Docs } from '@common/constants';
 
-@ApiTags(Docs.ru.SECURITY_CONTROLLER)
+@ApiTags(Docs.SECURITY_CONTROLLER)
 @Controller(Routes.ENDPOINT_SECURITY)
 export class SecurityController {
   constructor(private securityService: SecurityService) {}
 
-  @ApiOperation({ summary: Docs.ru.GET_CAPTCHA_URL_ENDPOINT })
+  @ApiOperation({ summary: Docs.GET_CAPTCHA_URL_ENDPOINT })
   @ApiOkResponse({ type: CommonResponse.Swagger.CommonResponseDto })
   @UseInterceptors(ResponseInterceptor)
   @Get('get-captcha-url')

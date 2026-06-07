@@ -17,7 +17,7 @@ export class RolesGuard implements CanActivate {
       const bearer = authHeader.split(' ')[0];
       const token = authHeader.split(' ')[1];
       if (bearer !== 'Bearer' || !token) {
-        throw new UnauthorizedException(ErrorMessages.ru.UNAUTHORIZED);
+        throw new UnauthorizedException(ErrorMessages.UNAUTHORIZED);
       }
 
       const user = this.jstService.verify(token);
@@ -33,12 +33,12 @@ export class RolesGuard implements CanActivate {
           haveRoles = haveRoles && user.roles.some(userRole => userRole.value === requiredRole);
         });
         if (!haveRoles) {
-          throw new ForbiddenException(ErrorMessages.ru.NOT_ENOUGH_PERMISSIONS);
+          throw new ForbiddenException(ErrorMessages.NOT_ENOUGH_PERMISSIONS);
         }
       }
       return true;
     } catch (e) {
-      throw new ForbiddenException(ErrorMessages.ru.FORBIDDEN);
+      throw new ForbiddenException(ErrorMessages.FORBIDDEN);
     }
   }
 }

@@ -80,7 +80,7 @@ describe('RolesGuard', () => {
           sendPseudoError();
         } catch (err) {
           expect(err.status).toBe(HttpStatus.FORBIDDEN);
-          expect(err.message).toBe(ErrorMessages.ru.FORBIDDEN);
+          expect(err.message).toBe(ErrorMessages.FORBIDDEN);
           expect(mockGetRequest).toBeCalledTimes(1);
           expect(reflector.getAllAndOverride).toBeCalledTimes(0);
         }
@@ -120,7 +120,7 @@ describe('RolesGuard', () => {
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(HttpStatus.FORBIDDEN);
-        expect(err.message).toBe(ErrorMessages.ru.FORBIDDEN);
+        expect(err.message).toBe(ErrorMessages.FORBIDDEN);
         expect(mockGetRequest).toBeCalledTimes(1);
         expect(reflector.getAllAndOverride).toBeCalledTimes(0);
       }
@@ -158,7 +158,7 @@ describe('RolesGuard', () => {
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(HttpStatus.FORBIDDEN);
-        expect(err.message).toBe(ErrorMessages.ru.FORBIDDEN);
+        expect(err.message).toBe(ErrorMessages.FORBIDDEN);
         expect(mockGetRequest).toBeCalledTimes(1);
         expect(reflector.getAllAndOverride).toBeCalledTimes(0);
       }
@@ -221,7 +221,7 @@ describe('RolesGuard', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(HttpStatus.FORBIDDEN);
-        expect(error.message).toBe(ErrorMessages.ru.FORBIDDEN);
+        expect(error.message).toBe(ErrorMessages.FORBIDDEN);
         expect(mockGetRequest).toBeCalledTimes(1);
         expect(reflector.getAllAndOverride).toBeCalledTimes(1);
         expect(reflector.getAllAndOverride).toBeCalledWith(ROLES_KEY, [

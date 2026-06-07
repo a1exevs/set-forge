@@ -23,19 +23,19 @@ import { ApiResult } from '@common/decorators';
 import { HttpExceptionFilter } from '@common/exception-filters';
 import { OperationResultResponse } from '@common/dto';
 
-@ApiTags(Docs.ru.AUTHORIZATION_CONTROLLER)
+@ApiTags(Docs.AUTHORIZATION_CONTROLLER)
 @Controller(Routes.ENDPOINT_AUTH)
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @ApiOperation({ summary: Docs.ru.REGISTRATION_ENDPOINT })
+  @ApiOperation({ summary: Docs.REGISTRATION_ENDPOINT })
   @ApiBody({ type: RegisterRequest.Swagger.RegisterRequestDto })
   @ApiResult({
     status: 201,
     type: AuthenticationResponse.Swagger.AuthenticationResponseDto,
-    description: Docs.ru.REGISTRATION_SUCCESSFUL_RESULT,
+    description: Docs.REGISTRATION_SUCCESSFUL_RESULT,
   })
-  @ApiBadRequestResponse({ description: Docs.ru.REGISTRATION_BAD_REQUEST })
+  @ApiBadRequestResponse({ description: Docs.REGISTRATION_BAD_REQUEST })
   @UseInterceptors(ResponseInterceptor)
   @UseFilters(HttpExceptionFilter)
   @Post('/registration')
@@ -48,14 +48,14 @@ export class AuthController {
     });
   }
 
-  @ApiOperation({ summary: Docs.ru.AUTHORIZATION_ENDPOINT })
+  @ApiOperation({ summary: Docs.AUTHORIZATION_ENDPOINT })
   @ApiBody({ type: LoginRequest.Swagger.LoginRequestDto })
   @ApiResult({
     status: 201,
     type: AuthenticationResponse.Swagger.AuthenticationResponseDto,
-    description: Docs.ru.AUTHORIZATION_SUCCESSFUL_RESULT,
+    description: Docs.AUTHORIZATION_SUCCESSFUL_RESULT,
   })
-  @ApiUnauthorizedResponse({ description: Docs.ru.AUTHORIZATION_UNAUTHORIZED })
+  @ApiUnauthorizedResponse({ description: Docs.AUTHORIZATION_UNAUTHORIZED })
   @UseGuards(SvgCaptchaGuard)
   @UseFilters(HttpExceptionFilter, UnauthorizedExceptionFilter)
   @UseInterceptors(ResponseInterceptor)
@@ -70,14 +70,14 @@ export class AuthController {
     });
   }
 
-  @ApiOperation({ summary: Docs.ru.REFRESH_TOKENS_ENDPOINT })
+  @ApiOperation({ summary: Docs.REFRESH_TOKENS_ENDPOINT })
   @ApiResult({
     status: 201,
     type: AuthenticationResponse.Swagger.AuthenticationResponseDto,
-    description: Docs.ru.REFRESH_TOKENS_SUCCESSFUL_RESULT,
+    description: Docs.REFRESH_TOKENS_SUCCESSFUL_RESULT,
   })
-  @ApiUnprocessableEntityResponse({ description: Docs.ru.REFRESH_TOKENS_UNPROCESSABLE_ENTITY })
-  @ApiForbiddenResponse({ description: Docs.ru.REFRESH_TOKENS_FORBIDDEN })
+  @ApiUnprocessableEntityResponse({ description: Docs.REFRESH_TOKENS_UNPROCESSABLE_ENTITY })
+  @ApiForbiddenResponse({ description: Docs.REFRESH_TOKENS_FORBIDDEN })
   @UseGuards(RefreshTokenGuard)
   @UseInterceptors(ResponseInterceptor)
   @Post('/refresh')
@@ -90,14 +90,14 @@ export class AuthController {
     });
   }
 
-  @ApiOperation({ summary: Docs.ru.GET_CURRENT_USER_ENDPOINT })
+  @ApiOperation({ summary: Docs.GET_CURRENT_USER_ENDPOINT })
   @ApiResult({
     status: 200,
     type: GetCurrentUserResponse.Swagger.GetCurrentUserResponseDto,
-    description: Docs.ru.GET_CURRENT_USER_SUCCESSFUL_RESULT,
+    description: Docs.GET_CURRENT_USER_SUCCESSFUL_RESULT,
   })
-  @ApiUnauthorizedResponse({ description: Docs.ru.GET_CURRENT_USER_UNAUTHORIZED })
-  @ApiForbiddenResponse({ description: Docs.ru.GET_CURRENT_USER_FORBIDDEN })
+  @ApiUnauthorizedResponse({ description: Docs.GET_CURRENT_USER_UNAUTHORIZED })
+  @ApiForbiddenResponse({ description: Docs.GET_CURRENT_USER_FORBIDDEN })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @UseInterceptors(ResponseInterceptor)
   @Get('/me')
@@ -106,14 +106,14 @@ export class AuthController {
     return this.authService.me(userId);
   }
 
-  @ApiOperation({ summary: Docs.ru.LOGOUT_ENDPOINT })
+  @ApiOperation({ summary: Docs.LOGOUT_ENDPOINT })
   @ApiOkResponse({
     type: OperationResultResponse.Swagger.OperationResultResponseDto,
-    description: Docs.ru.LOGOUT_SUCCESSFUL_RESULT,
+    description: Docs.LOGOUT_SUCCESSFUL_RESULT,
   })
-  @ApiUnprocessableEntityResponse({ description: Docs.ru.LOGOUT_UNPROCESSABLE_ENTITY })
-  @ApiUnauthorizedResponse({ description: Docs.ru.LOGOUT_UNAUTHORIZED })
-  @ApiForbiddenResponse({ description: Docs.ru.LOGOUT_FORBIDDEN })
+  @ApiUnprocessableEntityResponse({ description: Docs.LOGOUT_UNPROCESSABLE_ENTITY })
+  @ApiUnauthorizedResponse({ description: Docs.LOGOUT_UNAUTHORIZED })
+  @ApiForbiddenResponse({ description: Docs.LOGOUT_FORBIDDEN })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @Delete('/logout')
   async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response) {

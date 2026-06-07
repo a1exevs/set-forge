@@ -6,11 +6,11 @@ import { ErrorMessages } from '@common/constants';
 export namespace CreateRoleRequest {
   export class Dto {
     @ApiProperty()
-    @IsString({ message: ErrorMessages.ru.MUST_BE_A_STRING })
+    @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
     readonly value: string;
 
     @ApiProperty()
-    @IsString({ message: ErrorMessages.ru.MUST_BE_A_STRING })
+    @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
     readonly description: string;
 
     constructor(value, description) {

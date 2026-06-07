@@ -31,7 +31,7 @@ import { OperationResultResponse } from '@common/dto';
 import { WorkoutListsService } from '@workout-lists/workout-lists.service';
 import { CreateWorkoutListRequest, UpdateWorkoutListRequest, WorkoutListResponse } from '@workout-lists/dto';
 
-@ApiTags(Docs.ru.WORKOUT_LISTS_CONTROLLER)
+@ApiTags(Docs.WORKOUT_LISTS_CONTROLLER)
 @UseGuards(JwtAuthGuard, RefreshTokenGuard)
 @UseFilters(HttpExceptionFilter)
 @UseInterceptors(ResponseInterceptor)
@@ -39,55 +39,55 @@ import { CreateWorkoutListRequest, UpdateWorkoutListRequest, WorkoutListResponse
 export class WorkoutListsController {
   constructor(private workoutListsService: WorkoutListsService) {}
 
-  @ApiOperation({ summary: Docs.ru.GET_WORKOUT_LISTS_ENDPOINT })
+  @ApiOperation({ summary: Docs.GET_WORKOUT_LISTS_ENDPOINT })
   @ApiResult({
     status: 200,
     type: WorkoutListResponse.Swagger.WorkoutListResponseDto,
-    description: Docs.ru.GET_WORKOUT_LISTS_SUCCESSFUL_RESULT,
+    description: Docs.GET_WORKOUT_LISTS_SUCCESSFUL_RESULT,
   })
-  @ApiUnauthorizedResponse({ description: Docs.ru.GET_WORKOUT_LISTS_UNAUTHORIZED })
+  @ApiUnauthorizedResponse({ description: Docs.GET_WORKOUT_LISTS_UNAUTHORIZED })
   @Get()
   getAll(@Req() request): Promise<WorkoutListResponse.Dto[]> {
     return this.workoutListsService.getAll(request.user.id);
   }
 
-  @ApiOperation({ summary: Docs.ru.GET_WORKOUT_LIST_ENDPOINT })
+  @ApiOperation({ summary: Docs.GET_WORKOUT_LIST_ENDPOINT })
   @ApiResult({
     status: 200,
     type: WorkoutListResponse.Swagger.WorkoutListResponseDto,
-    description: Docs.ru.GET_WORKOUT_LIST_SUCCESSFUL_RESULT,
+    description: Docs.GET_WORKOUT_LIST_SUCCESSFUL_RESULT,
   })
-  @ApiNotFoundResponse({ description: Docs.ru.GET_WORKOUT_LIST_NOT_FOUND })
-  @ApiUnauthorizedResponse({ description: Docs.ru.GET_WORKOUT_LIST_UNAUTHORIZED })
+  @ApiNotFoundResponse({ description: Docs.GET_WORKOUT_LIST_NOT_FOUND })
+  @ApiUnauthorizedResponse({ description: Docs.GET_WORKOUT_LIST_UNAUTHORIZED })
   @Get('/:id')
   getOne(@Param('id') id: string, @Req() request): Promise<WorkoutListResponse.Dto> {
     return this.workoutListsService.getOne(request.user.id, id);
   }
 
-  @ApiOperation({ summary: Docs.ru.CREATE_WORKOUT_LIST_ENDPOINT })
+  @ApiOperation({ summary: Docs.CREATE_WORKOUT_LIST_ENDPOINT })
   @ApiBody({ type: CreateWorkoutListRequest.Swagger.CreateWorkoutListRequestDto })
   @ApiResult({
     status: 201,
     type: WorkoutListResponse.Swagger.WorkoutListResponseDto,
-    description: Docs.ru.CREATE_WORKOUT_LIST_SUCCESSFUL_RESULT,
+    description: Docs.CREATE_WORKOUT_LIST_SUCCESSFUL_RESULT,
   })
-  @ApiBadRequestResponse({ description: Docs.ru.CREATE_WORKOUT_LIST_BAD_REQUEST })
-  @ApiUnauthorizedResponse({ description: Docs.ru.CREATE_WORKOUT_LIST_UNAUTHORIZED })
+  @ApiBadRequestResponse({ description: Docs.CREATE_WORKOUT_LIST_BAD_REQUEST })
+  @ApiUnauthorizedResponse({ description: Docs.CREATE_WORKOUT_LIST_UNAUTHORIZED })
   @Post()
   create(@Body() dto: CreateWorkoutListRequest.Dto, @Req() request): Promise<WorkoutListResponse.Dto> {
     return this.workoutListsService.create(request.user.id, dto);
   }
 
-  @ApiOperation({ summary: Docs.ru.UPDATE_WORKOUT_LIST_ENDPOINT })
+  @ApiOperation({ summary: Docs.UPDATE_WORKOUT_LIST_ENDPOINT })
   @ApiBody({ type: UpdateWorkoutListRequest.Swagger.UpdateWorkoutListRequestDto })
   @ApiResult({
     status: 200,
     type: WorkoutListResponse.Swagger.WorkoutListResponseDto,
-    description: Docs.ru.UPDATE_WORKOUT_LIST_SUCCESSFUL_RESULT,
+    description: Docs.UPDATE_WORKOUT_LIST_SUCCESSFUL_RESULT,
   })
-  @ApiBadRequestResponse({ description: Docs.ru.UPDATE_WORKOUT_LIST_BAD_REQUEST })
-  @ApiNotFoundResponse({ description: Docs.ru.UPDATE_WORKOUT_LIST_NOT_FOUND })
-  @ApiUnauthorizedResponse({ description: Docs.ru.UPDATE_WORKOUT_LIST_UNAUTHORIZED })
+  @ApiBadRequestResponse({ description: Docs.UPDATE_WORKOUT_LIST_BAD_REQUEST })
+  @ApiNotFoundResponse({ description: Docs.UPDATE_WORKOUT_LIST_NOT_FOUND })
+  @ApiUnauthorizedResponse({ description: Docs.UPDATE_WORKOUT_LIST_UNAUTHORIZED })
   @Put('/:id')
   update(
     @Param('id') id: string,
@@ -97,27 +97,27 @@ export class WorkoutListsController {
     return this.workoutListsService.update(request.user.id, id, dto);
   }
 
-  @ApiOperation({ summary: Docs.ru.DELETE_WORKOUT_LIST_ENDPOINT })
+  @ApiOperation({ summary: Docs.DELETE_WORKOUT_LIST_ENDPOINT })
   @ApiOkResponse({
     type: OperationResultResponse.Swagger.OperationResultResponseDto,
-    description: Docs.ru.DELETE_WORKOUT_LIST_SUCCESSFUL_RESULT,
+    description: Docs.DELETE_WORKOUT_LIST_SUCCESSFUL_RESULT,
   })
-  @ApiNotFoundResponse({ description: Docs.ru.DELETE_WORKOUT_LIST_NOT_FOUND })
-  @ApiUnauthorizedResponse({ description: Docs.ru.DELETE_WORKOUT_LIST_UNAUTHORIZED })
+  @ApiNotFoundResponse({ description: Docs.DELETE_WORKOUT_LIST_NOT_FOUND })
+  @ApiUnauthorizedResponse({ description: Docs.DELETE_WORKOUT_LIST_UNAUTHORIZED })
   @Delete('/:id')
   async remove(@Param('id') id: string, @Req() request): Promise<OperationResultResponse.Dto> {
     const result = await this.workoutListsService.remove(request.user.id, id);
     return new OperationResultResponse.Dto(result);
   }
 
-  @ApiOperation({ summary: Docs.ru.UPDATE_WORKOUT_PROGRESS_ENDPOINT })
+  @ApiOperation({ summary: Docs.UPDATE_WORKOUT_PROGRESS_ENDPOINT })
   @ApiResult({
     status: 200,
     type: WorkoutListResponse.Swagger.WorkoutListResponseDto,
-    description: Docs.ru.UPDATE_WORKOUT_PROGRESS_SUCCESSFUL_RESULT,
+    description: Docs.UPDATE_WORKOUT_PROGRESS_SUCCESSFUL_RESULT,
   })
-  @ApiNotFoundResponse({ description: Docs.ru.UPDATE_WORKOUT_PROGRESS_NOT_FOUND })
-  @ApiUnauthorizedResponse({ description: Docs.ru.UPDATE_WORKOUT_PROGRESS_UNAUTHORIZED })
+  @ApiNotFoundResponse({ description: Docs.UPDATE_WORKOUT_PROGRESS_NOT_FOUND })
+  @ApiUnauthorizedResponse({ description: Docs.UPDATE_WORKOUT_PROGRESS_UNAUTHORIZED })
   @Patch('/:id/exercises/:exerciseId/progress')
   incrementProgress(
     @Param('id') id: string,
@@ -127,14 +127,14 @@ export class WorkoutListsController {
     return this.workoutListsService.incrementProgress(request.user.id, id, exerciseId);
   }
 
-  @ApiOperation({ summary: Docs.ru.RESET_WORKOUT_PROGRESS_ENDPOINT })
+  @ApiOperation({ summary: Docs.RESET_WORKOUT_PROGRESS_ENDPOINT })
   @ApiResult({
     status: 201,
     type: WorkoutListResponse.Swagger.WorkoutListResponseDto,
-    description: Docs.ru.RESET_WORKOUT_PROGRESS_SUCCESSFUL_RESULT,
+    description: Docs.RESET_WORKOUT_PROGRESS_SUCCESSFUL_RESULT,
   })
-  @ApiNotFoundResponse({ description: Docs.ru.RESET_WORKOUT_PROGRESS_NOT_FOUND })
-  @ApiUnauthorizedResponse({ description: Docs.ru.RESET_WORKOUT_PROGRESS_UNAUTHORIZED })
+  @ApiNotFoundResponse({ description: Docs.RESET_WORKOUT_PROGRESS_NOT_FOUND })
+  @ApiUnauthorizedResponse({ description: Docs.RESET_WORKOUT_PROGRESS_UNAUTHORIZED })
   @Post('/:id/reset')
   resetAll(@Param('id') id: string, @Req() request): Promise<WorkoutListResponse.Dto> {
     return this.workoutListsService.resetAll(request.user.id, id);

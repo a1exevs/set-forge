@@ -14,7 +14,7 @@ export class RolesService {
     try {
       role = await this.roleRepository.create(dto);
     } catch (e) {
-      throw new BadRequestException(`${ErrorMessages.ru.FAILED_TO_CREATE_ROLE}. ${e.message}`);
+      throw new BadRequestException(`${ErrorMessages.FAILED_TO_CREATE_ROLE}. ${e.message}`);
     }
     return role;
   }

@@ -125,7 +125,7 @@ describe('AuthController', () => {
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(400);
-        expect(err.getResponse()).toContainEqual(`email - ${ErrorMessages.ru.MUST_HAS_EMAIL_FORMAT}`);
+        expect(err.getResponse()).toContainEqual(`email - ${ErrorMessages.MUST_HAS_EMAIL_FORMAT}`);
       }
     });
     it('Input params validation: should return bad request (incorrect small password)', async () => {
@@ -136,7 +136,7 @@ describe('AuthController', () => {
       } catch (err) {
         expect(err.status).toBe(400);
         expect(err.getResponse()).toContainEqual(
-          `password - ${ErrorMessages.ru.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(8, 50)}`,
+          `password - ${ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(8, 50)}`,
         );
       }
     });
@@ -151,7 +151,7 @@ describe('AuthController', () => {
       } catch (err) {
         expect(err.status).toBe(400);
         expect(err.getResponse()).toContainEqual(
-          `password - ${ErrorMessages.ru.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(8, 50)}`,
+          `password - ${ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(8, 50)}`,
         );
       }
     });
@@ -185,7 +185,7 @@ describe('AuthController', () => {
     });
     it('Registration method: should return bad request (user already exists)', async () => {
       const res = createResponse();
-      const exceptionMessage = ErrorMessages.ru.USER_ALREADY_EXISTS;
+      const exceptionMessage = ErrorMessages.USER_ALREADY_EXISTS;
       const registerDto = { email: 'user@yandex.ru', password: '12345678' };
       jest.spyOn(authService, 'registration').mockImplementation(async () => {
         throw new HttpException(exceptionMessage, HttpStatus.BAD_REQUEST);
@@ -229,7 +229,7 @@ describe('AuthController', () => {
       req._setSessionVariable('authFailedCount', authFailedCount);
       const res = createResponse();
       const loginDto = { email: 'user@yandex.ru', password: '12345678' };
-      const exceptionMessage = ErrorMessages.ru.INVALID_EMAIL_OR_PASSWORD;
+      const exceptionMessage = ErrorMessages.INVALID_EMAIL_OR_PASSWORD;
       const errorObject = { message: exceptionMessage };
       jest.spyOn(authService, 'login').mockImplementation(async () => {
         throw new UnauthorizedException(errorObject);

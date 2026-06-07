@@ -16,9 +16,9 @@ describe('CreateRoleRequest', () => {
     it('should has errors (values are not strings)', async () => {
       const dto = new CreateRoleRequest.Dto(1, 2);
       const errors = await validateDto(CreateRoleRequest.Dto, dto);
-      expect(errors[0].constraints.isString).toBe(ErrorMessages.ru.MUST_BE_A_STRING);
+      expect(errors[0].constraints.isString).toBe(ErrorMessages.MUST_BE_A_STRING);
       expect(errors[0].property).toBe('value');
-      expect(errors[1].constraints.isString).toBe(ErrorMessages.ru.MUST_BE_A_STRING);
+      expect(errors[1].constraints.isString).toBe(ErrorMessages.MUST_BE_A_STRING);
       expect(errors[1].property).toBe('description');
     });
   });
