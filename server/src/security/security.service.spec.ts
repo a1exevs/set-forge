@@ -34,9 +34,7 @@ describe('SecurityService', () => {
       const result = securityService.getCaptchaURL();
 
       expect(result.captchaText).toBe(captchaText);
-      expect(result.captchaURL).toBe(
-        `data:image/svg+xml;base64,${Buffer.from(captchaData).toString('base64')}`,
-      );
+      expect(result.captchaURL).toBe(`data:image/svg+xml;base64,${Buffer.from(captchaData).toString('base64')}`);
       expect(svgCaptcha.create).toBeCalledTimes(1);
     });
   });

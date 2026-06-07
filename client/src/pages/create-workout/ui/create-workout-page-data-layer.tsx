@@ -1,28 +1,20 @@
-import { useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 
 import { useWorkoutListStore } from '@entities';
-import { WorkoutListForm } from '@widgets';
+
+import CreateWorkoutPageLogicLayer from 'src/pages/create-workout/ui/create-workout-page-logic-layer';
 
 const CreateWorkoutPageDataLayer: FC = () => {
   const addWorkoutList = useWorkoutListStore.use.addWorkoutList();
-  const navigate = useNavigate();
 
   return (
-    <WorkoutListForm
-      mode="create"
-      onSubmit={(dto): void => {
-        void (async (): Promise<void> => {
-          const success = await addWorkoutList(dto);
-          if (!success) {
-            // TODO: Support common toaster
-            return;
-          }
-          navigate({ to: '/' });
-        })();
-      }}
-      onCancel={(): void => {
-        navigate({ to: '/' });
+    <CreateWorkoutPageLogicLayer
+      onSubmit={async (dto): Promise<boolean> => {
+        const success = await addWorkoutList(dto);
+        if (!success) {
+          // TODO: Support common toaster
+        }
+        return success;
       }}
     />
   );

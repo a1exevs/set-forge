@@ -1,13 +1,15 @@
 import '@root/string.extensions';
 
-import { HttpStatus } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 
 import { Routes, ResultCodes, ErrorMessages } from '@common/constants';
 
 import * as request from 'supertest';
 
+import { createTestApp } from '@test/e2e/create-test-app';
+
 describe('User workflow', () => {
-  let URL;
+  let app: INestApplication;
   let userId;
   let accessToken;
   let cookies;
@@ -16,6 +18,7 @@ describe('User workflow', () => {
 
   const userEmail = 'user1@gmail.com';
   const userPassword = '12345678';
+  const api = '/api/1.0';
 
   const workoutListPayload = {
     name: 'Push Day',
@@ -23,17 +26,19 @@ describe('User workflow', () => {
     exercises: [{ name: 'Bench Press', muscleGroup: 'chest', weight: 60, reps: 10, sets: 3 }],
   };
 
-  beforeAll(() => {
-    const baseURL = process.env.SERVER_URL;
-    const port = process.env.PORT;
-    URL = `${baseURL}:${port}/api/1.0/`;
+  beforeAll(async () => {
+    app = await createTestApp();
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 
   describe(Routes.ENDPOINT_AUTH, () => {
     describe('/registration POST', () => {
       it('Register user (bad request - email and password are numbers)', () => {
-        return request(URL + Routes.ENDPOINT_AUTH)
-          .post('/registration')
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_AUTH}/registration`)
           .send({ email: 1, password: 2 })
           .expect(HttpStatus.BAD_REQUEST)
           .expect(response => {
@@ -43,8 +48,8 @@ describe('User workflow', () => {
       });
 
       it('Register user', () => {
-        return request(URL + Routes.ENDPOINT_AUTH)
-          .post('/registration')
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_AUTH}/registration`)
           .send({ email: userEmail, password: userPassword })
           .expect(HttpStatus.CREATED)
           .expect(response => {
@@ -59,8 +64,8 @@ describe('User workflow', () => {
       });
 
       it('Register user (bad request - user was registered before)', () => {
-        return request(URL + Routes.ENDPOINT_AUTH)
-          .post('/registration')
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_AUTH}/registration`)
           .send({ email: userEmail, password: userPassword })
           .expect(HttpStatus.BAD_REQUEST)
           .expect(response => {
@@ -73,8 +78,8 @@ describe('User workflow', () => {
 
     describe('/login POST', () => {
       it('Login (unauthorized)', () => {
-        return request(URL + Routes.ENDPOINT_AUTH)
-          .post('/login')
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_AUTH}/login`)
           .send({ email: userEmail, password: `${userPassword}123` })
           .expect(HttpStatus.UNAUTHORIZED)
           .expect(response => {
@@ -84,8 +89,8 @@ describe('User workflow', () => {
       });
 
       it('Login', () => {
-        return request(URL + Routes.ENDPOINT_AUTH)
-          .post('/login')
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_AUTH}/login`)
           .send({ email: userEmail, password: userPassword })
           .expect(HttpStatus.CREATED)
           .expect(response => {
@@ -103,8 +108,8 @@ describe('User workflow', () => {
   describe(Routes.ENDPOINT_SECURITY, () => {
     describe('/get-captcha-url GET', () => {
       it('Get captcha URL', () => {
-        return request(URL + Routes.ENDPOINT_SECURITY)
-          .get('/get-captcha-url')
+        return request(app.getHttpServer())
+          .get(`${api}/${Routes.ENDPOINT_SECURITY}/get-captcha-url`)
           .expect(HttpStatus.OK)
           .expect(response => {
             expect(response.body.data.captchaURL).toBeDefined();
@@ -118,8 +123,8 @@ describe('User workflow', () => {
   describe(Routes.ENDPOINT_AUTH, () => {
     describe('/me GET', () => {
       it('Get current user', () => {
-        return request(URL + Routes.ENDPOINT_AUTH)
-          .get('/me')
+        return request(app.getHttpServer())
+          .get(`${api}/${Routes.ENDPOINT_AUTH}/me`)
           .set('Cookie', cookies)
           .set('Authorization', `Bearer ${accessToken}`)
           .expect(HttpStatus.OK)
@@ -133,8 +138,8 @@ describe('User workflow', () => {
 
     describe('/refresh POST', () => {
       it('Refresh Access Token', () => {
-        return request(URL + Routes.ENDPOINT_AUTH)
-          .post('/refresh')
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_AUTH}/refresh`)
           .set('Cookie', cookies)
           .set('Authorization', `Bearer ${accessToken}`)
           .expect(HttpStatus.CREATED)
@@ -152,8 +157,8 @@ describe('User workflow', () => {
   describe(Routes.ENDPOINT_WORKOUT_LISTS, () => {
     describe('/ POST', () => {
       it('Create workout list', () => {
-        return request(URL + Routes.ENDPOINT_WORKOUT_LISTS)
-          .post('')
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}`)
           .set('Cookie', cookies)
           .set('Authorization', `Bearer ${accessToken}`)
           .send(workoutListPayload)
@@ -171,8 +176,8 @@ describe('User workflow', () => {
 
     describe('/ GET', () => {
       it('Get workout lists', () => {
-        return request(URL + Routes.ENDPOINT_WORKOUT_LISTS)
-          .get('')
+        return request(app.getHttpServer())
+          .get(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}`)
           .set('Cookie', cookies)
           .set('Authorization', `Bearer ${accessToken}`)
           .expect(HttpStatus.OK)
@@ -185,8 +190,8 @@ describe('User workflow', () => {
 
     describe('/:id GET', () => {
       it('Get workout list by id', () => {
-        return request(URL + Routes.ENDPOINT_WORKOUT_LISTS)
-          .get(`/${workoutListId}`)
+        return request(app.getHttpServer())
+          .get(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}/${workoutListId}`)
           .set('Cookie', cookies)
           .set('Authorization', `Bearer ${accessToken}`)
           .expect(HttpStatus.OK)
@@ -199,13 +204,17 @@ describe('User workflow', () => {
 
     describe('/:id PUT', () => {
       it('Update workout list', () => {
-        return request(URL + Routes.ENDPOINT_WORKOUT_LISTS)
-          .put(`/${workoutListId}`)
+        return request(app.getHttpServer())
+          .put(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}/${workoutListId}`)
           .set('Cookie', cookies)
           .set('Authorization', `Bearer ${accessToken}`)
           .send({
             ...workoutListPayload,
             name: 'Updated Push Day',
+            exercises: workoutListPayload.exercises.map(exercise => ({
+              ...exercise,
+              id: exerciseId,
+            })),
           })
           .expect(HttpStatus.OK)
           .expect(response => {
@@ -217,8 +226,8 @@ describe('User workflow', () => {
 
     describe('/:id/exercises/:exerciseId/progress PATCH', () => {
       it('Increment exercise progress', () => {
-        return request(URL + Routes.ENDPOINT_WORKOUT_LISTS)
-          .patch(`/${workoutListId}/exercises/${exerciseId}/progress`)
+        return request(app.getHttpServer())
+          .patch(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}/${workoutListId}/exercises/${exerciseId}/progress`)
           .set('Cookie', cookies)
           .set('Authorization', `Bearer ${accessToken}`)
           .expect(HttpStatus.OK)
@@ -231,8 +240,8 @@ describe('User workflow', () => {
 
     describe('/:id/reset POST', () => {
       it('Reset workout progress', () => {
-        return request(URL + Routes.ENDPOINT_WORKOUT_LISTS)
-          .post(`/${workoutListId}/reset`)
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}/${workoutListId}/reset`)
           .set('Cookie', cookies)
           .set('Authorization', `Bearer ${accessToken}`)
           .expect(HttpStatus.CREATED)
@@ -245,8 +254,8 @@ describe('User workflow', () => {
 
     describe('/:id DELETE', () => {
       it('Delete workout list', () => {
-        return request(URL + Routes.ENDPOINT_WORKOUT_LISTS)
-          .delete(`/${workoutListId}`)
+        return request(app.getHttpServer())
+          .delete(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}/${workoutListId}`)
           .set('Cookie', cookies)
           .set('Authorization', `Bearer ${accessToken}`)
           .expect(HttpStatus.OK)
@@ -261,8 +270,8 @@ describe('User workflow', () => {
   describe(Routes.ENDPOINT_AUTH, () => {
     describe('/logout DELETE', () => {
       it('Logout', () => {
-        return request(URL + Routes.ENDPOINT_AUTH)
-          .delete('/logout')
+        return request(app.getHttpServer())
+          .delete(`${api}/${Routes.ENDPOINT_AUTH}/logout`)
           .auth(accessToken, { type: 'bearer' })
           .set('Cookie', cookies)
           .expect(HttpStatus.OK)

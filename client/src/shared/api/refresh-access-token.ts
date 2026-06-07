@@ -8,25 +8,30 @@ type AuthPayload = { userId: number; accessToken: string };
 let refreshInFlight: Promise<boolean> | null = null;
 
 async function postRefresh(): Promise<boolean> {
-  const res = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-  });
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
 
-  if (!res.ok) {
+    if (!res.ok) {
+      clearAccessToken();
+      return false;
+    }
+
+    const body = (await res.json()) as CommonResponseEnvelope<AuthPayload>;
+    if (body.resultCode !== ResultCodes.OK || !body.data?.accessToken) {
+      clearAccessToken();
+      return false;
+    }
+
+    setAccessToken(body.data.accessToken);
+    return true;
+  } catch {
     clearAccessToken();
     return false;
   }
-
-  const body = (await res.json()) as CommonResponseEnvelope<AuthPayload>;
-  if (body.resultCode !== ResultCodes.OK || !body.data?.accessToken) {
-    clearAccessToken();
-    return false;
-  }
-
-  setAccessToken(body.data.accessToken);
-  return true;
 }
 
 /**

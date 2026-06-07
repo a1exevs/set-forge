@@ -10,10 +10,11 @@ import { RefreshTokensService } from '@auth/refresh-tokens.service';
 import { TokensService } from '@auth/tokens.service';
 import { RefreshToken } from '@auth/refresh-tokens.model';
 import { User } from '@users/users.model';
+import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, RefreshTokensService, TokensService],
+  providers: [AuthService, RefreshTokensService, TokensService, JwtAuthGuard, RefreshTokenGuard],
   imports: [
     forwardRef(() => UsersModule),
     JwtModule.registerAsync({
@@ -35,6 +36,6 @@ import { User } from '@users/users.model';
     }),
     SequelizeModule.forFeature([RefreshToken, User]),
   ],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService, JwtModule, JwtAuthGuard, RefreshTokenGuard],
 })
 export class AuthModule {}

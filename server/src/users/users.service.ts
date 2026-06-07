@@ -9,18 +9,13 @@ import { ErrorMessages } from '@common/constants';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectModel(User) private userRepository: typeof User,
-    private roleService: RolesService,
-  ) {}
+  constructor(@InjectModel(User) private userRepository: typeof User, private roleService: RolesService) {}
 
   async createUser(dto: CreateUserRequest.Dto): Promise<User> {
     const role = await this.roleService.getRoleByValue('user');
     if (!role)
       throw new HttpException(
-        `${
-          ErrorMessages.SERVICE_IS_UNAVAILABLE
-        }: ${ErrorMessages.USER_ROLE_CONFIGURATION_IS_MISSING.toLowerCase()}`,
+        `${ErrorMessages.SERVICE_IS_UNAVAILABLE}: ${ErrorMessages.USER_ROLE_CONFIGURATION_IS_MISSING.toLowerCase()}`,
         HttpStatus.FORBIDDEN,
       );
     let user: User;

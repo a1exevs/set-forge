@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
 
 import { getMockArgumentsHostData } from '@test/unit/helpers';
 import { HttpExceptionFilter } from '@common/exception-filters';
@@ -19,6 +19,19 @@ describe('HttpExceptionFilter', () => {
       const body = JSON.parse(response._getData());
 
       expect(response._getStatusCode()).toBe(errorCode);
+      expect(mockGetResponse).toBeCalledTimes(1);
+      expect(body.messages).toContainEqual(errorMessage);
+      expect(body.data).toBeNull();
+    });
+
+    it('should respond when UnauthorizedException is caught', () => {
+      const { mockArgumentsHost, mockGetResponse, response } = getMockArgumentsHostData({});
+      const errorMessage = 'User is not authorized';
+      const httpExceptionFilter = new HttpExceptionFilter();
+      httpExceptionFilter.catch(new UnauthorizedException({ message: errorMessage }), mockArgumentsHost);
+      const body = JSON.parse(response._getData());
+
+      expect(response._getStatusCode()).toBe(HttpStatus.UNAUTHORIZED);
       expect(mockGetResponse).toBeCalledTimes(1);
       expect(body.messages).toContainEqual(errorMessage);
       expect(body.data).toBeNull();

@@ -1,19 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { mockUnauthenticatedSession } from 'tests/e2e/helpers/auth-mocks';
+
 test.describe('Auth gate', () => {
   test('redirects home to login when refresh has no session', async ({ page }) => {
-    await page.route('**/auth/refresh', async route => {
-      await route.fulfill({
-        status: 422,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          data: null,
-          messages: [],
-          fieldsErrors: [],
-          resultCode: 1,
-        }),
-      });
-    });
+    await mockUnauthenticatedSession(page);
 
     await page.goto('/');
 

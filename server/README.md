@@ -41,13 +41,25 @@ Run these **from the repository root** (they delegate to this workspace):
 | `npm run server:format` / `npm run server:format:check` | Prettier |
 | `npm run server:lint` / `npm run server:lint:fix` | ESLint |
 | `npm run server:test:unit` / `npm run server:test:unit-watch` / `npm run server:test:unit-cov` / `npm run server:test:unit-debug` | Jest unit tests |
-| `npm run server:test:e2e` | Jest e2e (`jest-e2e.json`) |
+| `npm run server:test:e2e` | Jest e2e (`jest-e2e.json`) — in-process Nest app + ephemeral MySQL via Testcontainers |
 | `npm run server:db:migrate` / `:undo` / `:undo:all` / `:status` | Sequelize migrations against the **local** DB (uses `server/.development.env`) |
 | `npm run server:db:seed` / `:undo` | Sequelize seeders against the **local** DB |
 | `npm run prod:db:migrate` / `:undo` / `:status` / `prod:db:seed` / `:undo` | Same, but executed inside the running **prod** container (`docker compose exec server-prod ...`) |
 | `npm run server:check-deps` / `npm run server:upgrade-deps` | Dependency maintenance |
 
 You can also run the same script names **from `server/`** after install (for example `npm run start:dev` inside this package).
+
+## E2E tests
+
+Server e2e tests boot the Nest app **in-process** and start an ephemeral MySQL 8.4 container via [Testcontainers](https://node.testcontainers.org/). No manual `db:up` or `server:start:dev` is required.
+
+**Prerequisites:** Docker must be running locally (and is available on GitHub Actions `ubuntu-latest`).
+
+```bash
+npm run server:test:e2e
+```
+
+On startup, Jest `globalSetup` migrates and seeds the container database using `server/.e2e.env` (see `.e2e.env.example`). Runtime `MYSQL_*` values are written to `test/e2e/.runtime-env.json` (gitignored) and injected before each spec file runs.
 
 ## Database schema (Sequelize migrations)
 

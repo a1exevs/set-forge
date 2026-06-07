@@ -10,6 +10,13 @@
     "./test-environment.ts",
     "./string.extensions.ts"
   ],
+  "setupFilesAfterEnv": [
+    "<rootDir>/test/e2e/setup-env.ts"
+  ],
+  "globalSetup": "<rootDir>/test/e2e/global-setup.ts",
+  "globalTeardown": "<rootDir>/test/e2e/global-teardown.ts",
+  "testTimeout": 30000,
+  "forceExit": true,
   "moduleNameMapper": {
     "@root/(.*)$": [
       "<rootDir>/$1"

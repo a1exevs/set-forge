@@ -1,39 +1,44 @@
-import { HttpStatus } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 
 import { Routes } from '@common/constants';
 
 import * as request from 'supertest';
 
-describe('Authorized user methods', () => {
-  let URL;
+import { createTestApp } from '@test/e2e/create-test-app';
 
-  beforeAll(() => {
-    const baseURL = process.env.SERVER_URL;
-    const port = process.env.PORT;
-    URL = `${baseURL}:${port}/api/1.0/`;
+describe('Authorized user methods', () => {
+  let app: INestApplication;
+  const api = '/api/1.0';
+
+  beforeAll(async () => {
+    app = await createTestApp();
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 
   describe(Routes.ENDPOINT_AUTH, () => {
     describe('/me GET', () => {
       it('Get current user', () => {
-        return request(URL + Routes.ENDPOINT_AUTH)
-          .get('/me')
+        return request(app.getHttpServer())
+          .get(`${api}/${Routes.ENDPOINT_AUTH}/me`)
           .expect(HttpStatus.UNAUTHORIZED);
       });
     });
 
     describe('/refresh POST', () => {
       it('Refresh Access Token', () => {
-        return request(URL + Routes.ENDPOINT_AUTH)
-          .post('/refresh')
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_AUTH}/refresh`)
           .expect(HttpStatus.FORBIDDEN);
       });
     });
 
     describe('/logout DELETE', () => {
       it('Logout', () => {
-        return request(URL + Routes.ENDPOINT_AUTH)
-          .delete('/logout')
+        return request(app.getHttpServer())
+          .delete(`${api}/${Routes.ENDPOINT_AUTH}/logout`)
           .expect(HttpStatus.UNAUTHORIZED);
       });
     });
@@ -42,14 +47,16 @@ describe('Authorized user methods', () => {
   describe(Routes.ENDPOINT_WORKOUT_LISTS, () => {
     describe('/ GET', () => {
       it('Get workout lists', () => {
-        return request(URL + Routes.ENDPOINT_WORKOUT_LISTS).get('').expect(HttpStatus.UNAUTHORIZED);
+        return request(app.getHttpServer())
+          .get(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}`)
+          .expect(HttpStatus.UNAUTHORIZED);
       });
     });
 
     describe('/ POST', () => {
       it('Create workout list', () => {
-        return request(URL + Routes.ENDPOINT_WORKOUT_LISTS)
-          .post('')
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}`)
           .send({
             name: 'Push Day',
             description: 'Chest workout',

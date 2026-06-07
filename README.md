@@ -29,6 +29,19 @@ npm install
 
 This installs npm workspaces (`client`, `server`), hoists dependencies, and runs **`prepare`** (Husky git hooks).
 
+To run client e2e tests locally, also download Playwright browsers once: `npm run client:e2e:install`.
+
+Server e2e tests need **Docker** locally (Testcontainers starts ephemeral MySQL).
+
+## CI (GitHub Actions)
+
+| Workflow | Runs on | What it checks |
+|----------|---------|----------------|
+| [Project test](.github/workflows/project-test.yml) | `ubuntu-latest` | Client unit + snap, server unit |
+| [E2E Tests](.github/workflows/e2e-tests.yml) | `windows-latest` + `ubuntu-latest` | Client Playwright e2e; server Jest e2e (Docker + Testcontainers) |
+| [Project build](.github/workflows/project-build.yml) | `ubuntu-latest` | Format, lint, client/server build, Storybook build |
+| [Chromatic](.github/workflows/chromatic.yml) | — | Visual regression (Storybook) |
+
 ## Available scripts
 
 Run from the **repository root**. Names mirror `package.json` workspaces and shared tooling.
@@ -44,12 +57,15 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 | `npm run client:lint` / `npm run client:lint:fix` | ESLint |
 | `npm run client:test:unit` / `npm run client:test:unit-cov` | Jest unit tests |
 | `npm run client:test:snap` / `npm run client:test:snap-cov` / `npm run client:test:snap-update` | Snapshot tests |
-| `npm run client:test:e2e` | Playwright |
-| `npm run client:test` | Full client test script |
+| `npm run client:test:e2e` | Playwright e2e (headless in CI; headed locally via config) |
+| `npm run client:test:e2e:headed` | Playwright with a visible browser, one worker |
+| `npm run client:test:e2e:ui` | Playwright UI mode (pick and watch tests) |
+| `npm run client:test:e2e:debug` | Playwright debug (step through with inspector) |
+| `npm run client:test` | Full client test script (unit + snap + e2e) |
 | `npm run client:storybook` / `npm run client:build-storybook` | Storybook |
 | `npm run client:chromatic` | Chromatic |
 | `npm run client:docs` | TypeDoc |
-| `npm run client:e2e:install` | Install Playwright browsers |
+| `npm run client:e2e:install` | Download Playwright browsers (once after install or Playwright upgrade) |
 | `npm run client:check-deps` / `npm run client:upgrade-deps` | Dependency maintenance |
 
 ### Server (`@set-forge/server`)

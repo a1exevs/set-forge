@@ -85,9 +85,7 @@ describe('UsersService', () => {
       } catch (error) {
         expect(error.status).toBe(HttpStatus.FORBIDDEN);
         expect(error.message).toBe(
-          `${
-            ErrorMessages.SERVICE_IS_UNAVAILABLE
-          }: ${ErrorMessages.USER_ROLE_CONFIGURATION_IS_MISSING.toLowerCase()}`,
+          `${ErrorMessages.SERVICE_IS_UNAVAILABLE}: ${ErrorMessages.USER_ROLE_CONFIGURATION_IS_MISSING.toLowerCase()}`,
         );
         expect(rolesService.getRoleByValue).toBeCalledTimes(1);
         expect(rolesService.getRoleByValue).toBeCalledWith('user');

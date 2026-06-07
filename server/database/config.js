@@ -80,5 +80,6 @@ const shared = mysqlConfig();
 module.exports = {
   development: { ...shared },
   test: { ...shared },
+  e2e: { ...shared },
   production: { ...shared },
 };

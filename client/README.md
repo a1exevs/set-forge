@@ -26,7 +26,7 @@ From the **repository root**: Node `v22.20.0`, npm `v10.9.3` (see root README). 
 
 ## Available scripts
 
-Run these **from the repository root** (they delegate to this workspace):
+From the **repository root**, use the `client:*` aliases (see [root README](../README.md#client-set-forgeclient)). From **`client/`**, use the names below.
 
 | Command | Description |
 |--------|-------------|
@@ -37,13 +37,28 @@ Run these **from the repository root** (they delegate to this workspace):
 | `npm run lint` / `npm run lint:fix` | ESLint |
 | `npm run test:unit` / `npm run test:unit-cov` | Jest unit tests |
 | `npm run test:snap` / `npm run test:snap-cov` / `npm run test:snap-update` | Snapshot tests |
-| `npm run test:e2e` | Playwright |
+| `npm run test:e2e` | Playwright e2e (headless in CI; headed locally via config) |
+| `npm run test:e2e:headed` | Playwright with a visible browser, one worker |
+| `npm run test:e2e:ui` | Playwright UI mode (pick and watch tests) |
+| `npm run test:e2e:debug` | Playwright debug (step through with inspector) |
 | `npm test` | Unit + snap + e2e |
 | `npm run storybook` / `npm run build-storybook` | Storybook |
 | `npm run chromatic` | Chromatic |
 | `npm run docs` | TypeDoc |
-| `npm run e2e:install` | Playwright browsers |
+| `npm run e2e:install` | Download Playwright browsers (required once after `npm install` or Playwright upgrade) |
 | `npm run check-deps` / `npm run upgrade-deps` | Dependency maintenance |
+
+### E2E (Playwright)
+
+Browser binaries are **not** installed by `npm install`. Before the first e2e run (or after `@playwright/test` is upgraded):
+
+```bash
+npm run e2e:install          # from client/
+# or from repo root:
+npm run client:e2e:install
+```
+
+`test:e2e` starts (or reuses) the Vite dev server on port **5173**; the Nest API is **not** required for current smoke tests. To watch tests in a real browser window, use `test:e2e:headed` or `test:e2e:ui`.
 
 ## API base and dev proxy
 
@@ -51,7 +66,7 @@ The client always calls the API through the same-origin `/api/1.0` base path. In
 
 For local development, Vite proxies `/api` to a backend target:
 
-- Default: `http://localhost:5000`
+- Default: `http://localhost:5001`
 - Override: copy [`.env.example`](.env.example) to `.env.local` and set `VITE_DEV_API_PROXY`, for example `https://staging.example.com`
 
 The app intentionally keeps one same-origin API base for both prod and dev.

@@ -2,11 +2,20 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import type { FormEvent } from 'react';
 
+import { renderWithAuthRouter } from 'storybook-dir/render-with-page-router';
+
 import AuthPage from 'src/pages/auth/ui/auth-page';
 
 const meta = {
   title: 'Pages/AuthPage',
   component: AuthPage,
+  decorators: [
+    (Story, { args }): JSX.Element =>
+      renderWithAuthRouter({
+        initialEntries: [args.activeTab === 'register' ? '/register' : '/login'],
+        component: (): JSX.Element => <Story />,
+      }),
+  ],
   args: {
     activeTab: 'login',
     email: '',

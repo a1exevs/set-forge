@@ -1,11 +1,10 @@
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-import { e2eTest } from 'tests/e2e/config/context';
-
-e2eTest.describe('Site page', () => {
-  e2eTest('should have correct title', async ({ page }) => {
-    await page.goto('/');
+test.describe('Site page', () => {
+  test('should have correct title on login page', async ({ page }) => {
+    await page.goto('/login');
 
     await expect(page).toHaveTitle('Set Forge - Workout Tracker');
+    await expect(page.getByRole('heading', { name: 'Set Forge' })).toBeVisible();
   });
 });
