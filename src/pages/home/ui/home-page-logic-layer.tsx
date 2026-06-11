@@ -3,7 +3,6 @@ import { FC, useEffect, useState } from 'react';
 
 import { useConfirm } from '@shared';
 
-
 import ExportFallbackDialog from 'src/pages/home/ui/export-fallback-dialog';
 import HomePage from 'src/pages/home/ui/home-page';
 import { exportWorkoutListsWithFallback } from 'src/shared/model/helpers/export-workout-lists-file';

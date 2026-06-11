@@ -5,7 +5,6 @@ import { Button } from '@shared';
 import classes from 'src/pages/home/ui/export-fallback-dialog.module.scss';
 import Dialog from 'src/shared/ui/dialog/dialog';
 
-
 type Props = {
   open: boolean;
   variant: 'clipboard' | 'manual';
