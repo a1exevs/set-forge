@@ -15,13 +15,3 @@ export type { Theme, ThemeState } from 'src/shared/model/theme/types';
 // helpers
 export { createSelectors } from 'src/shared/model/helpers/stores';
 export { formatDate } from 'src/shared/model/helpers/dates';
-export {
-  buildWorkoutListsExportFile,
-  buildWorkoutListsExportPayload,
-  exportWorkoutListsWithFallback,
-  isRestrictedDownloadEnvironment,
-  type WorkoutListsExportFile,
-  type WorkoutListsExportMethod,
-  type WorkoutListsExportPayload,
-  type WorkoutListsExportResult,
-} from 'src/shared/model/helpers/export-workout-lists-file';
