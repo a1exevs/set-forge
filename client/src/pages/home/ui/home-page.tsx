@@ -6,20 +6,49 @@ import { Button, MenuButton } from '@shared';
 
 import classes from 'src/pages/home/ui/home-page.module.scss';
 
+const IconDownload: FC = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+    <path d="M12 3v10" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+    <path
+      d="M8 9l4 4 4-4"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path d="M4 17h16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+  </svg>
+);
+
 type Props = {
   workoutLists: WorkoutList[];
   storageWarning: boolean;
   onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void | Promise<void>;
+  onExport: () => void;
   formatDate: (date: string | null) => string;
 };
 
-const HomePage: FC<Props> = ({ workoutLists, storageWarning, onEdit, onDelete, formatDate }) => {
+const HomePage: FC<Props> = ({ workoutLists, storageWarning, onEdit, onDelete, onExport, formatDate }) => {
   return (
     <div className={classes.container}>
       <header className={classes.header}>
-        <h1>Set Forge</h1>
-        <p className={classes.subtitle}>Track your workout progress</p>
+        <div className={classes.headerTop}>
+          <div className={classes.headerTitles}>
+            <h1>Set Forge</h1>
+            <p className={classes.subtitle}>Track your workout progress</p>
+          </div>
+          <button
+            type="button"
+            className={classes.exportButton}
+            aria-label="Export workout lists"
+            title="Export workout lists"
+            disabled={workoutLists.length === 0}
+            onClick={onExport}
+          >
+            <IconDownload />
+          </button>
+        </div>
       </header>
 
       {storageWarning && (
