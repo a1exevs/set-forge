@@ -1,1 +1,1 @@
-export { AuthPageDataLayer } from 'src/pages/auth/ui';
+export { AuthPage } from 'src/pages/auth/ui';
