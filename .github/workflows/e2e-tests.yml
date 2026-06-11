@@ -7,8 +7,8 @@ jobs:
     timeout-minutes: 60
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v4.3.1
+      - uses: actions/setup-node@v4.4.0
         with:
           node-version: 22.20.0
 
@@ -22,7 +22,7 @@ jobs:
         env:
           BROWSER: chrome
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4.6.2
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
