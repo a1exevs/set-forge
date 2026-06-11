@@ -50,12 +50,42 @@ const HomePageLogicLayer: FC<Props> = ({
     checkUsage();
   }, [workoutLists, getUsagePercentageAsync]);
 
+  const handleExport = (): void => {
+    const exportFile = {
+      formatVersion: 1,
+      app: 'set-forge' as const,
+      exportedAt: new Date().toISOString(),
+      workoutLists: workoutLists.map(list => ({
+        name: list.name,
+        description: list.description,
+        exercises: list.exercises.map(({ name, muscleGroup, weight, reps, sets }) => ({
+          name,
+          muscleGroup,
+          weight,
+          reps,
+          sets,
+        })),
+        createdAt: list.createdAt,
+        lastUsedAt: list.lastUsedAt,
+      })),
+    };
+    const day = new Date().toISOString().slice(0, 10);
+    const blob = new Blob([JSON.stringify(exportFile, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `set-forge-workout-lists-${day}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <HomePage
       workoutLists={workoutLists}
       storageWarning={storageWarning}
       onEdit={onEdit}
       onDelete={handleDelete}
+      onExport={handleExport}
       formatDate={formatDate}
     />
   );
