@@ -3,7 +3,10 @@ import { FC, useEffect, useState } from 'react';
 
 import { useConfirm } from '@shared';
 
+
+import ExportFallbackDialog from 'src/pages/home/ui/export-fallback-dialog';
 import HomePage from 'src/pages/home/ui/home-page';
+import { exportWorkoutListsWithFallback } from 'src/shared/model/helpers/export-workout-lists-file';
 
 type Props = {
   loadFromStorage: () => void;
@@ -23,6 +26,11 @@ const HomePageLogicLayer: FC<Props> = ({
   loadFromStorage,
 }) => {
   const [storageWarning, setStorageWarning] = useState<boolean>(false);
+  const [exportDialog, setExportDialog] = useState<{
+    variant: 'clipboard' | 'manual';
+    json: string;
+    filename: string;
+  } | null>(null);
 
   const confirmDialog = useConfirm();
 
@@ -50,44 +58,43 @@ const HomePageLogicLayer: FC<Props> = ({
     checkUsage();
   }, [workoutLists, getUsagePercentageAsync]);
 
-  const handleExport = (): void => {
-    const exportFile = {
-      formatVersion: 1,
-      app: 'set-forge' as const,
-      exportedAt: new Date().toISOString(),
-      workoutLists: workoutLists.map(list => ({
-        name: list.name,
-        description: list.description,
-        exercises: list.exercises.map(({ name, muscleGroup, weight, reps, sets }) => ({
-          name,
-          muscleGroup,
-          weight,
-          reps,
-          sets,
-        })),
-        createdAt: list.createdAt,
-        lastUsedAt: list.lastUsedAt,
-      })),
-    };
-    const day = new Date().toISOString().slice(0, 10);
-    const blob = new Blob([JSON.stringify(exportFile, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `set-forge-workout-lists-${day}.json`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+  const handleExport = async (): Promise<void> => {
+    const result = await exportWorkoutListsWithFallback(workoutLists);
+
+    if (result.method === 'clipboard') {
+      setExportDialog({ variant: 'clipboard', json: '', filename: result.filename });
+      return;
+    }
+
+    if (result.method === 'manual') {
+      setExportDialog({
+        variant: 'manual',
+        json: result.json,
+        filename: result.filename,
+      });
+    }
   };
 
   return (
-    <HomePage
-      workoutLists={workoutLists}
-      storageWarning={storageWarning}
-      onEdit={onEdit}
-      onDelete={handleDelete}
-      onExport={handleExport}
-      formatDate={formatDate}
-    />
+    <>
+      <HomePage
+        workoutLists={workoutLists}
+        storageWarning={storageWarning}
+        onEdit={onEdit}
+        onDelete={handleDelete}
+        onExport={handleExport}
+        formatDate={formatDate}
+      />
+      {exportDialog && (
+        <ExportFallbackDialog
+          open={true}
+          variant={exportDialog.variant}
+          json={exportDialog.json}
+          filename={exportDialog.filename}
+          onClose={(): void => setExportDialog(null)}
+        />
+      )}
+    </>
   );
 };
 
