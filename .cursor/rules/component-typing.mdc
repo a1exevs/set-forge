@@ -1,6 +1,6 @@
 ---
 description: React.FC requirement and explicit typing for components
-alwaysApply: true
+globs: ["client/**"]
 ---
 
 # Component Typing Rules

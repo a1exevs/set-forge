@@ -8,14 +8,58 @@ exports[`App Page with route / matches snapshot, route / 1`] = `
     <header
       class="header"
     >
-      <h1>
-        Set Forge
-      </h1>
-      <p
-        class="subtitle"
+      <div
+        class="headerTop"
       >
-        Track your workout progress
-      </p>
+        <div
+          class="headerTitles"
+        >
+          <h1>
+            Set Forge
+          </h1>
+          <p
+            class="subtitle"
+          >
+            Track your workout progress
+          </p>
+        </div>
+        <button
+          aria-label="Export workout lists"
+          class="exportButton"
+          disabled=""
+          title="Export workout lists"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            fill="none"
+            height="18"
+            viewBox="0 0 24 24"
+            width="18"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 3v10"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-width="1.75"
+            />
+            <path
+              d="M8 9l4 4 4-4"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.75"
+            />
+            <path
+              d="M4 17h16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-width="1.75"
+            />
+          </svg>
+        </button>
+      </div>
     </header>
     <main
       class="main"
@@ -75,9 +119,7 @@ exports[`App Page with route / matches snapshot, route /create 1`] = `
         <div
           class="section"
         >
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="name"
@@ -93,9 +135,7 @@ exports[`App Page with route / matches snapshot, route /create 1`] = `
               value=""
             />
           </div>
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="description"
@@ -111,7 +151,7 @@ exports[`App Page with route / matches snapshot, route /create 1`] = `
           </div>
         </div>
         <div
-          class="section"
+          class="section section_withoutGap"
         >
           <div
             class="sectionHeader"

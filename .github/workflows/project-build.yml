@@ -25,6 +25,7 @@ jobs:
       - name: Styling
         run: |
           npm run format:check
+          npm run format:root:check
           npm run lint
 
       - name: Project build

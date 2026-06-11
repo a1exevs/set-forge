@@ -1,6 +1,6 @@
 ---
 description: State management with Zustand
-alwaysApply: true
+globs: ["client/**"]
 ---
 
 # State Management (Zustand)

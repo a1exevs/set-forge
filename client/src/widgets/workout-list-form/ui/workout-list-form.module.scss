@@ -34,10 +34,16 @@
 }
 
 .section {
+  display: flex;
+  flex-direction: column;
   background-color: $bg-elevated;
   border: 1px solid $border-color;
   border-radius: $radius-lg;
   padding: $spacing-lg;
+  gap: $spacing-md;
+  &_withoutGap {
+    gap: 0;
+  }
 }
 
 .sectionHeader {

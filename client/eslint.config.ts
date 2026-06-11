@@ -57,12 +57,4 @@ export default tsEslint.config(
       '@typescript-eslint/ban-ts-comment': ['error', { 'ts-ignore': 'allow-with-description' }],
     },
   },
-  {
-    // Script files
-    files: ['scripts/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': 'off',
-      'no-console': 'off',
-    },
-  },
 );

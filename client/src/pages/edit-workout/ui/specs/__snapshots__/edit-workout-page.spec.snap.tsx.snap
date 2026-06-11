@@ -21,9 +21,7 @@ exports[`EditWorkoutPage matches snapshot when list exists 1`] = `
         <div
           class="section"
         >
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="name"
@@ -39,9 +37,7 @@ exports[`EditWorkoutPage matches snapshot when list exists 1`] = `
               value="Push Day"
             />
           </div>
-          <div
-            class="field"
-          >
+          <div>
             <label
               class="label"
               for="description"
@@ -59,7 +55,7 @@ exports[`EditWorkoutPage matches snapshot when list exists 1`] = `
           </div>
         </div>
         <div
-          class="section"
+          class="section section_withoutGap"
         >
           <div
             class="sectionHeader"
@@ -97,9 +93,7 @@ exports[`EditWorkoutPage matches snapshot when list exists 1`] = `
                   ✕
                 </button>
               </div>
-              <div
-                class="field"
-              >
+              <div>
                 <label
                   class="label"
                 >
@@ -113,9 +107,7 @@ exports[`EditWorkoutPage matches snapshot when list exists 1`] = `
                   value="Bench Press"
                 />
               </div>
-              <div
-                class="field"
-              >
+              <div>
                 <label
                   class="label"
                 >
