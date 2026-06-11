@@ -5,61 +5,19 @@
 }
 
 .header {
-  padding: $spacing-lg 0 $spacing-xl;
-}
-
-.headerTop {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 800px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.headerTitles {
   text-align: center;
+  padding: $spacing-lg 0 $spacing-xl;
 
   h1 {
     font-size: $font-size-3xl;
     color: $text-primary;
-    margin: 0 0 $spacing-xs;
+    margin-bottom: $spacing-xs;
   }
 }
 
 .subtitle {
   font-size: $font-size-base;
   color: $text-secondary;
-  margin: 0;
-}
-
-.exportButton {
-  position: absolute;
-  right: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  padding: $spacing-xs;
-  border: none;
-  border-radius: $radius-md;
-  background-color: transparent;
-  color: $text-primary;
-  cursor: pointer;
-
-  svg {
-    display: block;
-  }
-
-  &:hover:not(:disabled) {
-    background-color: $bg-hover;
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
 }
 
 .warning {
