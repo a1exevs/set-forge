@@ -2,6 +2,8 @@
 export {
   useCreateWorkoutListMutation,
   useDeleteWorkoutListMutation,
+  useExportAllWorkoutListsMutation,
+  useImportWorkoutListsMutation,
   useResetWorkoutProgressMutation,
   useUpdateWorkoutListMutation,
   useUpdateWorkoutProgressMutation,
@@ -12,4 +14,6 @@ export {
   type WorkoutExercise,
   type CreateWorkoutListDto,
   type UpdateWorkoutListDto,
+  type WorkoutListsExportFile,
+  type ImportWorkoutListsResult,
 } from 'src/entities/workout-list/model';

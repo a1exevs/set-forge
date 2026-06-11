@@ -15,6 +15,7 @@
   max-width: 800px;
   margin: 0 auto;
   position: relative;
+  gap: $spacing-sm;
 }
 
 .headerTitles {
@@ -36,6 +37,46 @@
   font-size: $font-size-base;
   color: $text-secondary;
   margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: $spacing-xs;
+  border: none;
+  border-radius: $radius-md;
+  background-color: transparent;
+  color: $text-primary;
+  cursor: pointer;
+
+  svg {
+    display: block;
+  }
+  transition: background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: $bg-hover;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.hiddenFileInput {
+  display: none;
 }
 
 .main {

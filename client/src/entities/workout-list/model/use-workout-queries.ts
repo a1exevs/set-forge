@@ -3,13 +3,20 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createWorkoutList,
   deleteWorkoutList,
+  exportAllWorkoutLists,
   fetchWorkoutList,
   fetchWorkoutLists,
+  importWorkoutLists,
   incrementExerciseProgress,
   resetWorkoutProgress,
   updateWorkoutList,
 } from 'src/entities/workout-list/api';
-import type { CreateWorkoutListDto, UpdateWorkoutListDto, WorkoutList } from 'src/entities/workout-list/model/types';
+import type {
+  CreateWorkoutListDto,
+  UpdateWorkoutListDto,
+  WorkoutList,
+  WorkoutListsExportFile,
+} from 'src/entities/workout-list/model/types';
 import { workoutQueryKeys } from 'src/entities/workout-list/model/workout-query-keys';
 
 const patchWorkoutInLists = (lists: WorkoutList[], updated: WorkoutList): WorkoutList[] =>
@@ -185,6 +192,23 @@ export function useResetWorkoutProgressMutation() {
       if (context?.previousLists) {
         qc.setQueryData(workoutQueryKeys.lists, context.previousLists);
       }
+    },
+  });
+}
+
+export function useExportAllWorkoutListsMutation() {
+  return useMutation({
+    mutationFn: () => exportAllWorkoutLists(),
+  });
+}
+
+export function useImportWorkoutListsMutation() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (file: WorkoutListsExportFile) => importWorkoutLists(file),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: workoutQueryKeys.lists });
     },
   });
 }

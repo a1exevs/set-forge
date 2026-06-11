@@ -5,7 +5,13 @@ import { HttpStatus, NotFoundException } from '@nestjs/common';
 import { WorkoutListsService } from '@workout-lists/workout-lists.service';
 import { WorkoutList } from '@workout-lists/workout-list.model';
 import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
-import { CreateWorkoutListRequest, UpdateWorkoutListRequest } from '@workout-lists/dto';
+
+import {
+  CreateWorkoutListRequest,
+  UpdateWorkoutListRequest,
+  WORKOUT_LISTS_EXPORT_APP,
+  WORKOUT_LISTS_EXPORT_FORMAT_VERSION,
+} from '@workout-lists/dto';
 import { sendPseudoError } from '@test/unit/helpers';
 
 type MockExercise = {
@@ -267,6 +273,85 @@ describe('WorkoutListsService', () => {
       expect(exerciseModel.update).toBeCalledWith(
         { completedSets: 0 },
         expect.objectContaining({ where: { workoutListId: 'list-1' } }),
+      );
+    });
+  });
+
+  describe('exportAll', () => {
+    it('returns export file without ids and progress', async () => {
+      const list = buildListModel([buildExercise({ completedSets: 2 })]);
+      listModel.findAll.mockResolvedValue([list]);
+
+      const result = await service.exportAll(userId);
+
+      expect(result.formatVersion).toBe(WORKOUT_LISTS_EXPORT_FORMAT_VERSION);
+      expect(result.app).toBe(WORKOUT_LISTS_EXPORT_APP);
+      expect(result.workoutLists).toHaveLength(1);
+      expect(result.workoutLists[0]).toEqual(
+        expect.objectContaining({
+          name: 'Push Day',
+          description: 'chest',
+          exercises: [{ name: 'Bench', muscleGroup: 'chest', weight: 60, reps: 10, sets: 3 }],
+        }),
+      );
+    });
+  });
+
+  describe('importAll', () => {
+    it('creates all lists from export file in one transaction', async () => {
+      const body = {
+        formatVersion: WORKOUT_LISTS_EXPORT_FORMAT_VERSION,
+        app: WORKOUT_LISTS_EXPORT_APP,
+        exportedAt: '2026-06-03T12:00:00.000Z',
+        workoutLists: [
+          {
+            name: 'Push Day',
+            description: 'chest',
+            exercises: [{ name: 'Bench', muscleGroup: 'chest', weight: 60, reps: 10, sets: 3 }],
+          },
+        ],
+      };
+      listModel.create.mockResolvedValue({ id: 'list-new' });
+      listModel.findOne.mockResolvedValue(buildListModel([buildExercise()]));
+
+      const result = await service.importAll(userId, body);
+
+      expect(connection.transaction).toBeCalledTimes(1);
+      expect(listModel.create).toBeCalledTimes(1);
+      expect(result.importedCount).toBe(1);
+      expect(result.lists).toHaveLength(1);
+    });
+
+    it('accepts legacy localStorage array format', async () => {
+      const legacy = [
+        {
+          id: 'legacy-1',
+          name: 'Legacy Day',
+          description: 'back',
+          exercises: [
+            {
+              id: 'ex-legacy',
+              name: 'Row',
+              muscleGroup: 'back',
+              weight: 40,
+              reps: 8,
+              sets: 4,
+              completedSets: 2,
+            },
+          ],
+          createdAt: '2026-01-01T00:00:00.000Z',
+          lastUsedAt: null,
+        },
+      ];
+      listModel.create.mockResolvedValue({ id: 'list-new' });
+      listModel.findOne.mockResolvedValue(buildListModel([buildExercise({ name: 'Row', muscleGroup: 'back' })]));
+
+      const result = await service.importAll(userId, legacy);
+
+      expect(result.importedCount).toBe(1);
+      expect(listModel.create).toBeCalledWith(
+        expect.objectContaining({ name: 'Legacy Day', description: 'back' }),
+        expect.anything(),
       );
     });
   });

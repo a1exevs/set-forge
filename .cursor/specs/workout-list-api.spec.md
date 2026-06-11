@@ -27,6 +27,12 @@ This spec aligns with [auth-session.spec.md](auth-session.spec.md) (envelope, ba
 | DELETE | `/workout-lists/:id` | `id` (UUID) | Delete an owned list, returns `{ result: true }` |
 | PATCH | `/workout-lists/:id/exercises/:exerciseId/progress` | `id`, `exerciseId` | +1 `completedSets` for the exercise (clamped to `sets`), set `lastUsedAt`; returns updated list |
 | POST | `/workout-lists/:id/reset` | `id` (UUID) | Zero `completedSets` for all exercises; returns updated list |
+| GET | `/workout-lists/export` | — | Export all owned lists as `WorkoutListsExportFile` |
+| POST | `/workout-lists/import` | `WorkoutListsExportFile` | Import lists from file; bulk create in one transaction; returns `{ importedCount, lists }` |
+
+**Reserved (not implemented yet):** `GET /workout-lists/:id/export` — export a single list in the same `WorkoutListsExportFile` format (`workoutLists.length === 1`).
+
+Static routes (`/export`, `/import`) are registered **before** `GET /:id` in the controller.
 
 ### Response payloads (`data`)
 
@@ -52,6 +58,42 @@ List endpoints return a `WorkoutList` matching the client model:
 ```
 
 `GET /workout-lists` returns `WorkoutList[]`. `DELETE` returns `{ result: boolean }`.
+
+### Export / import file format (`WorkoutListsExportFile`)
+
+Source of truth: server DTO `WorkoutListsExportFile`. Client mirrors types for API calls and file download.
+
+```typescript
+{
+  formatVersion: 1;
+  app: 'set-forge';
+  exportedAt: string;   // ISO
+  workoutLists: {
+    name: string;
+    description: string;
+    exercises: {
+      name: string;
+      muscleGroup: MuscleGroup;
+      weight: number;
+      reps: number;
+      sets: number;
+    }[];
+    createdAt?: string;      // metadata only, not applied on import
+    lastUsedAt?: string | null;
+  }[];
+}
+```
+
+- **Export** (`GET /workout-lists/export`): server calls `exportAll(userId)` → all owned lists → `toExportFile()` strips `id` and `completedSets`.
+- **Import** (`POST /workout-lists/import`): validates `formatVersion`; maps items to `CreateWorkoutListRequest.Dto[]`; creates all lists in **one DB transaction**; `completedSets` always `0`; duplicate names allowed.
+- **Legacy import**: bare `WorkoutList[]` array (localStorage v0) accepted and normalized to the envelope format before import.
+- **Future single-list export**: `GET /workout-lists/:id/export` → same file shape with one item; service method `exportOne(userId, listId)`.
+
+Import response:
+
+```typescript
+{ importedCount: number; lists: WorkoutList[] }
+```
 
 ---
 
@@ -134,6 +176,10 @@ Sequelize + MySQL, `synchronize: false` (schema via migration). Two tables.
 - `remove(userId, id)`: ownership check, delete (cascade removes exercises); returns `{ result: true }`.
 - `incrementProgress(userId, listId, exerciseId)`: ownership check; if `completedSets < sets` → `+1`; set `lastUsedAt = now`; returns updated list. No-op increment when already at `sets`.
 - `resetAll(userId, listId)`: ownership check; set all `completedSets = 0`; returns updated list.
+- `exportAll(userId)`: `getAll` → `toExportFile(lists)` → `WorkoutListsExportFile`.
+- `exportOne(userId, listId)` *(future)*: `getOne` → `toExportFile([list])`.
+- `toExportFile(lists)`: shared serializer; strips ids and progress; sets `exportedAt = now`.
+- `importAll(userId, file)`: normalize legacy array if needed; validate; map to create DTOs; one transaction calling create logic per list; returns `{ importedCount, lists }`. On any failure — rollback, `BadRequestException`.
 
 Ownership: all queries filter by `userId`. A list belonging to another user is treated as not found (`NotFoundException`).
 
@@ -150,6 +196,9 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
   - `useDeleteWorkoutListMutation()` — `DELETE`; removes from lists cache, drops detail key.
   - `useUpdateWorkoutProgressMutation()` — optimistic `+1`, then `PATCH .../progress`; rollback on error, server response on success.
   - `useResetWorkoutProgressMutation()` — optimistic zero, then `POST .../reset`; same cache sync pattern.
+  - `useExportAllWorkoutListsMutation()` — `GET /workout-lists/export`; client triggers file download (`set-forge-workout-lists-YYYY-MM-DD.json`).
+  - `useImportWorkoutListsMutation()` — `POST /workout-lists/import`; invalidates `workoutQueryKeys.lists` on success.
+- API functions in `workout-list-api.ts`: `exportAllWorkoutLists()`, `importWorkoutLists(file)`; reserved name `exportWorkoutList(id)` for future `GET /:id/export`.
 - Query keys: `workoutQueryKeys.lists`, `workoutQueryKeys.detail(id)`.
 - Initial load: `HomePageDataLayer` calls `useWorkoutListsQuery(Boolean(user))` when session exists.
 - IDs are server-generated (UUID strings); the client no longer calls `crypto.randomUUID()` for list/exercise ids (form `tempId` is local-only).
@@ -181,9 +230,11 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
 | `useDeleteWorkoutListMutation()` | hook | Delete via API |
 | `useUpdateWorkoutProgressMutation()` | hook | +1 completedSets (optimistic + PATCH) |
 | `useResetWorkoutProgressMutation()` | hook | Zero completedSets (optimistic + POST) |
+| `useExportAllWorkoutListsMutation()` | hook | Export all lists (`GET /workout-lists/export`) |
+| `useImportWorkoutListsMutation()` | hook | Import file (`POST /workout-lists/import`) |
 | `workoutQueryKeys.lists` | query key | Lists cache |
 | `workoutQueryKeys.detail(id)` | query key | Detail cache |
-| Routes | — | `/workout-lists`, `/workout-lists/:id`, `/workout-lists/:id/reset`, `/workout-lists/:id/exercises/:exerciseId/progress` |
+| Routes | — | `/workout-lists`, `/workout-lists/export`, `/workout-lists/import`, `/workout-lists/:id`, `/workout-lists/:id/reset`, `/workout-lists/:id/exercises/:exerciseId/progress`; reserved: `/workout-lists/:id/export` |
 
 ---
 
@@ -202,3 +253,7 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
 | Delete cascade | Removing a list deletes its `workout_exercises` rows |
 | Network/API error in mutation | Mutation error; create/update data layers return `false`; navigation does not run |
 | Reload (no in-memory token) | `apiRequest` refresh flow restores session; queries refetch from server |
+| Export with zero lists | `GET /export` returns file with `workoutLists: []`; client disables export button when list count is 0 |
+| Import invalid file | 400 envelope; transaction rolled back, no partial import |
+| Import legacy localStorage array | Server normalizes v0 array to export format before create |
+| Import duplicate list names | All items created (append semantics) |

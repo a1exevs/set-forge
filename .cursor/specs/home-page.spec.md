@@ -8,10 +8,13 @@ The home page displays a list of workout lists, allows navigation to create a ne
 
 ## App header (authenticated)
 
-1. Top **header** row: **left** — circular **user avatar** (placeholder for future image). Inside the circle: **first letter of the email local-part** in uppercase (text before `@`; if empty, use `?`).
-2. **Right** (or remaining header area): existing title block «Set Forge» / subtitle «Track your workout progress» (layout: avatar left, titles to the right of the avatar on the same row, consistent spacing).
-3. Avatar is the trigger for **Headless UI `Menu`** (`UserAvatarMenu`, see [shared-components.spec.md](shared-components.spec.md)): menu item **Logout**.
-4. **Logout**: `DELETE /auth/logout` via `useLogoutMutation` — on success clear access token, session query cache, navigate to `/login`.
+1. Top **header** row (`.headerTop`): **left** — circular **user avatar** (placeholder for future image). Inside the circle: **first letter of the email local-part** in uppercase (text before `@`; if empty, use `?`).
+2. **Center** — title block «Set Forge» / subtitle «Track your workout progress» (`.headerTitles`, absolutely centered).
+3. **Right** — `.headerActions` with two icon-only buttons (`margin-left: auto`):
+   - **Export workout lists** — `title` + `aria-label`; calls `onExport()`; **disabled** when `workoutLists.length === 0`.
+   - **Import workout lists** — `title` + `aria-label`; opens hidden `<input type="file" accept=".json,application/json">` via `onImportClick()`; file passed to `onImportFile(file)`.
+4. Avatar is the trigger for **Headless UI `Menu`** (`UserAvatarMenu`, see [shared-components.spec.md](shared-components.spec.md)): menu item **Logout**.
+5. **Logout**: `DELETE /auth/logout` via `useLogoutMutation` — on success clear access token, session query cache, navigate to `/login`.
 
 ---
 
@@ -20,9 +23,9 @@ The home page displays a list of workout lists, allows navigation to create a ne
 ### Initialization
 
 1. `HomePageDataLayer` mounts.
-2. Subscribes to `useCurrentUserQuery(true)`, `useWorkoutListsQuery(Boolean(user))`, `useDeleteWorkoutListMutation()`, `useLogoutMutation()`.
-3. Passes `workoutLists` (`data ?? []`), delete handler, session props, and `onEdit` (navigate to `/edit/$id`) to LogicLayer.
-4. `HomePageLogicLayer` creates `onDelete` (`handleDelete`) from `deleteWorkoutList` and `useConfirm`, passes it to Presentation along with other data.
+2. Subscribes to `useCurrentUserQuery(true)`, `useWorkoutListsQuery(Boolean(user))`, `useDeleteWorkoutListMutation()`, `useExportAllWorkoutListsMutation()`, `useImportWorkoutListsMutation()`, `useLogoutMutation()`.
+3. Passes `workoutLists` (`data ?? []`), delete/export/import handlers, session props, and `onEdit` (navigate to `/edit/$id`) to LogicLayer.
+4. `HomePageLogicLayer` creates `onDelete` (`handleDelete`), `onExport`, `onImportClick`, `onImportFile` from mutations + `useConfirm`, passes them to Presentation along with other data.
 
 ### Data loading
 
@@ -43,6 +46,14 @@ The home page displays a list of workout lists, allows navigation to create a ne
 13. On confirmation, `useDeleteWorkoutListMutation().mutateAsync(id)` is called (awaited).
 14. Mutation on success: removes the list from `workoutQueryKeys.lists` cache and drops `workoutQueryKeys.detail(id)`.
 
+### Import / Export (header actions)
+
+15. **Export**: `onExport()` → `useExportAllWorkoutListsMutation().mutateAsync()` → `GET /workout-lists/export` → client downloads `set-forge-workout-lists-YYYY-MM-DD.json` via `downloadJsonFile` helper.
+16. **Import click**: `onImportClick()` triggers hidden file input (`ref` in LogicLayer).
+17. **Import file**: `onImportFile(file)` → read JSON → confirm dialog «Import N workout list(s)?» → `useImportWorkoutListsMutation().mutateAsync(body)` → `POST /workout-lists/import` → invalidate lists cache on success.
+18. Import/parse error: confirm dialog with error message (no toaster yet).
+19. See [workout-list-api.spec.md](workout-list-api.spec.md) for file format and server behaviour.
+
 ---
 
 ## Data Model
@@ -61,6 +72,10 @@ type Props = {
   workoutLists: WorkoutList[];
   onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void | Promise<void>;
+  onExport: () => void | Promise<void>;
+  onImportClick: () => void;
+  onImportFile: (file: File) => void | Promise<void>;
+  importInputRef: RefObject<HTMLInputElement>;
   formatDate: (date: string | null) => string;
   userEmail: string;
   avatarLetter: string;
@@ -74,6 +89,8 @@ type Props = {
 type Props = {
   workoutLists: WorkoutList[];
   deleteWorkoutList: (id: string) => Promise<void>;
+  exportAllWorkoutLists: () => Promise<WorkoutListsExportFile>;
+  importWorkoutLists: (file: WorkoutListsExportFile) => Promise<void>;
   onEdit: (id: string) => void;
   formatDate: (date: string | null) => string;
   userEmail: string;
@@ -96,7 +113,7 @@ type Props = {
 | Category | Technology |
 |-----------|------------|
 | Routing | TanStack Router (`Link`, `to`, `useNavigate`) |
-| Server state | `@tanstack/react-query` (`useWorkoutListsQuery`, `useDeleteWorkoutListMutation`, session hooks) |
+| Server state | `@tanstack/react-query` (`useWorkoutListsQuery`, `useDeleteWorkoutListMutation`, `useExportAllWorkoutListsMutation`, `useImportWorkoutListsMutation`, session hooks) |
 | UI | React 18, FC, SCSS Modules, MenuButton (see [shared-components.spec.md](shared-components.spec.md)), UserAvatarMenu |
 | Dialogs | `useConfirm` (ConfirmDialogProvider) |
 | Persistence | Backend API `/api/1.0/workout-lists` via `workout-list-api` (see [workout-list-api.spec.md](workout-list-api.spec.md)) |
@@ -117,6 +134,8 @@ type Props = {
 |-----|-----|----------|
 | `useWorkoutListsQuery(enabled)` | hook | List of workout lists (`GET /workout-lists`) |
 | `useDeleteWorkoutListMutation()` | hook | Delete list (`DELETE /workout-lists/:id`) |
+| `useExportAllWorkoutListsMutation()` | hook | Export all lists (`GET /workout-lists/export`) |
+| `useImportWorkoutListsMutation()` | hook | Import file (`POST /workout-lists/import`) |
 | `useCurrentUserQuery(enabled)` | hook | Current session user |
 | `useLogoutMutation()` | hook | Logout + cache clear + redirect |
 | `workoutQueryKeys.lists` | query key | Lists cache key |
@@ -141,3 +160,7 @@ type Props = {
 | `list.lastUsedAt === null` | «Last used» string not displayed |
 | Error on delete mutation | Mutation error; list remains in cache until refetch |
 | Unauthenticated user | Protected route redirect handled in root `beforeLoad` |
+| Export with no lists | Export button disabled |
+| Import cancelled in confirm | No API call |
+| Import invalid JSON | Error confirm; input value reset |
+| Import API error | Error confirm; lists cache unchanged |

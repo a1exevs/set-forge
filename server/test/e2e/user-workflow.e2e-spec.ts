@@ -252,6 +252,52 @@ describe('User workflow', () => {
       });
     });
 
+    describe('/export GET', () => {
+      it('Export workout lists', () => {
+        return request(app.getHttpServer())
+          .get(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}/export`)
+          .set('Cookie', cookies)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .expect(HttpStatus.OK)
+          .expect(response => {
+            expect(response.body.data.formatVersion).toBe(1);
+            expect(response.body.data.app).toBe('set-forge');
+            expect(response.body.data.workoutLists.some(list => list.name === workoutListPayload.name)).toBeTruthy();
+            expect(response.body.data.workoutLists[0].exercises[0].id).toBeUndefined();
+            expect(response.body.resultCode).toBe(ResultCodes.OK);
+          });
+      });
+    });
+
+    describe('/import POST', () => {
+      it('Import workout lists', () => {
+        const importPayload = {
+          formatVersion: 1,
+          app: 'set-forge',
+          exportedAt: new Date().toISOString(),
+          workoutLists: [
+            {
+              name: 'Imported Day',
+              description: 'legs',
+              exercises: [{ name: 'Squat', muscleGroup: 'legs', weight: 100, reps: 5, sets: 5 }],
+            },
+          ],
+        };
+
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}/import`)
+          .set('Cookie', cookies)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .send(importPayload)
+          .expect(HttpStatus.CREATED)
+          .expect(response => {
+            expect(response.body.data.importedCount).toBe(1);
+            expect(response.body.data.lists[0].name).toBe('Imported Day');
+            expect(response.body.resultCode).toBe(ResultCodes.OK);
+          });
+      });
+    });
+
     describe('/:id DELETE', () => {
       it('Delete workout list', () => {
         return request(app.getHttpServer())

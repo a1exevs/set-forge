@@ -66,4 +66,13 @@ export const Docs = {
   RESET_WORKOUT_PROGRESS_SUCCESSFUL_RESULT: 'Workout progress reset successfully',
   RESET_WORKOUT_PROGRESS_NOT_FOUND: 'Not found',
   RESET_WORKOUT_PROGRESS_UNAUTHORIZED: 'Unauthorized',
+
+  EXPORT_ALL_WORKOUT_LISTS_ENDPOINT: 'Export all workout lists for the current user',
+  EXPORT_ALL_WORKOUT_LISTS_SUCCESSFUL_RESULT: 'Workout lists exported successfully',
+  EXPORT_ALL_WORKOUT_LISTS_UNAUTHORIZED: 'Unauthorized',
+
+  IMPORT_WORKOUT_LISTS_ENDPOINT: 'Import workout lists from file',
+  IMPORT_WORKOUT_LISTS_SUCCESSFUL_RESULT: 'Workout lists imported successfully',
+  IMPORT_WORKOUT_LISTS_BAD_REQUEST: 'Bad request',
+  IMPORT_WORKOUT_LISTS_UNAUTHORIZED: 'Unauthorized',
 };

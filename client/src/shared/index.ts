@@ -10,6 +10,8 @@ export {
   type ThemeState,
   createSelectors,
   formatDate,
+  downloadJsonFile,
+  buildWorkoutListsExportFilename,
 } from 'src/shared/model';
 
 // ui

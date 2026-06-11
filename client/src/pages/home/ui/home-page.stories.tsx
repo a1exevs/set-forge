@@ -22,6 +22,13 @@ const renderHomePage = (): ReturnType<typeof renderWithPageRouter> =>
       <HomePageLogicLayer
         workoutLists={mockWorkoutLists}
         deleteWorkoutList={async (): Promise<void> => undefined}
+        exportAllWorkoutLists={async () => ({
+          formatVersion: 1,
+          app: 'set-forge',
+          exportedAt: new Date().toISOString(),
+          workoutLists: [],
+        })}
+        importWorkoutLists={async (): Promise<void> => undefined}
         onEdit={fn()}
         formatDate={formatDate}
         userEmail="storybook@example.com"

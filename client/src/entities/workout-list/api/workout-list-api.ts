@@ -1,7 +1,9 @@
 import type {
   CreateWorkoutListDto,
+  ImportWorkoutListsResult,
   UpdateWorkoutListDto,
   WorkoutList,
+  WorkoutListsExportFile,
 } from 'src/entities/workout-list/model/types';
 import { apiRequest, ApiRequestError } from 'src/shared/api/http-client';
 import { ResultCodes } from 'src/shared/api/result-codes';
@@ -61,4 +63,24 @@ export async function incrementExerciseProgress(listId: string, exerciseId: stri
 export async function resetWorkoutProgress(listId: string): Promise<WorkoutList> {
   const res = await apiRequest<WorkoutList>(`${BASE}/${listId}/reset`, { method: 'POST', auth: true });
   return unwrap(res, 'Failed to reset progress');
+}
+
+export async function exportAllWorkoutLists(): Promise<WorkoutListsExportFile> {
+  const res = await apiRequest<WorkoutListsExportFile>(`${BASE}/export`, { method: 'GET', auth: true });
+  return unwrap(res, 'Failed to export workout lists');
+}
+
+// Reserved for GET /workout-lists/:id/export
+export async function exportWorkoutList(id: string): Promise<WorkoutListsExportFile> {
+  const res = await apiRequest<WorkoutListsExportFile>(`${BASE}/${id}/export`, { method: 'GET', auth: true });
+  return unwrap(res, 'Failed to export workout list');
+}
+
+export async function importWorkoutLists(file: WorkoutListsExportFile): Promise<ImportWorkoutListsResult> {
+  const res = await apiRequest<ImportWorkoutListsResult>(`${BASE}/import`, {
+    method: 'POST',
+    auth: true,
+    body: file,
+  });
+  return unwrap(res, 'Failed to import workout lists');
 }

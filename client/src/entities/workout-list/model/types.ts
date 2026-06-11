@@ -33,3 +33,23 @@ export interface UpdateWorkoutListDto {
   description: string;
   exercises: UpdateExerciseDto[];
 }
+
+export interface WorkoutListExportItem {
+  name: string;
+  description: string;
+  exercises: Omit<WorkoutExercise, 'id' | 'completedSets'>[];
+  createdAt?: string;
+  lastUsedAt?: string | null;
+}
+
+export interface WorkoutListsExportFile {
+  formatVersion: 1;
+  app: 'set-forge';
+  exportedAt: string;
+  workoutLists: WorkoutListExportItem[];
+}
+
+export interface ImportWorkoutListsResult {
+  importedCount: number;
+  lists: WorkoutList[];
+}

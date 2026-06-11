@@ -29,7 +29,13 @@ import { Routes, Docs } from '@common/constants';
 import { ApiResult } from '@common/decorators';
 import { OperationResultResponse } from '@common/dto';
 import { WorkoutListsService } from '@workout-lists/workout-lists.service';
-import { CreateWorkoutListRequest, UpdateWorkoutListRequest, WorkoutListResponse } from '@workout-lists/dto';
+import {
+  CreateWorkoutListRequest,
+  ImportWorkoutListsResponse,
+  UpdateWorkoutListRequest,
+  WorkoutListResponse,
+  WorkoutListsExportFile,
+} from '@workout-lists/dto';
 
 @ApiTags(Docs.WORKOUT_LISTS_CONTROLLER)
 @UseGuards(JwtAuthGuard, RefreshTokenGuard)
@@ -49,6 +55,32 @@ export class WorkoutListsController {
   @Get()
   getAll(@Req() request): Promise<WorkoutListResponse.Dto[]> {
     return this.workoutListsService.getAll(request.user.id);
+  }
+
+  @ApiOperation({ summary: Docs.EXPORT_ALL_WORKOUT_LISTS_ENDPOINT })
+  @ApiResult({
+    status: 200,
+    type: WorkoutListsExportFile.Swagger.WorkoutListsExportFileDto,
+    description: Docs.EXPORT_ALL_WORKOUT_LISTS_SUCCESSFUL_RESULT,
+  })
+  @ApiUnauthorizedResponse({ description: Docs.EXPORT_ALL_WORKOUT_LISTS_UNAUTHORIZED })
+  @Get('export')
+  exportAll(@Req() request): Promise<WorkoutListsExportFile.Dto> {
+    return this.workoutListsService.exportAll(request.user.id);
+  }
+
+  @ApiOperation({ summary: Docs.IMPORT_WORKOUT_LISTS_ENDPOINT })
+  @ApiBody({ type: WorkoutListsExportFile.Swagger.WorkoutListsExportFileDto })
+  @ApiResult({
+    status: 201,
+    type: ImportWorkoutListsResponse.Swagger.ImportWorkoutListsResponseDto,
+    description: Docs.IMPORT_WORKOUT_LISTS_SUCCESSFUL_RESULT,
+  })
+  @ApiBadRequestResponse({ description: Docs.IMPORT_WORKOUT_LISTS_BAD_REQUEST })
+  @ApiUnauthorizedResponse({ description: Docs.IMPORT_WORKOUT_LISTS_UNAUTHORIZED })
+  @Post('import')
+  importAll(@Body() body: unknown, @Req() request): Promise<ImportWorkoutListsResponse.Dto> {
+    return this.workoutListsService.importAll(request.user.id, body);
   }
 
   @ApiOperation({ summary: Docs.GET_WORKOUT_LIST_ENDPOINT })

@@ -4,7 +4,14 @@ import { HttpStatus, NotFoundException } from '@nestjs/common';
 
 import { WorkoutListsController } from '@workout-lists/workout-lists.controller';
 import { WorkoutListsService } from '@workout-lists/workout-lists.service';
-import { CreateWorkoutListRequest, UpdateWorkoutListRequest, WorkoutListResponse } from '@workout-lists/dto';
+import {
+  CreateWorkoutListRequest,
+  ImportWorkoutListsResponse,
+  UpdateWorkoutListRequest,
+  WorkoutListResponse,
+  WorkoutListsExportFile,
+  WORKOUT_LISTS_EXPORT_APP,
+} from '@workout-lists/dto';
 import { sendPseudoError } from '@test/unit/helpers';
 
 const buildList = (overrides: Partial<WorkoutListResponse.Dto> = {}): WorkoutListResponse.Dto =>
@@ -40,6 +47,8 @@ describe('WorkoutListsController', () => {
             remove: jest.fn(x => x),
             incrementProgress: jest.fn(x => x),
             resetAll: jest.fn(x => x),
+            exportAll: jest.fn(x => x),
+            importAll: jest.fn(x => x),
           },
         },
         { provide: JwtService, useValue: {} },
@@ -166,6 +175,47 @@ describe('WorkoutListsController', () => {
 
       expect(service.resetAll).toBeCalledWith(userId, 'list-1');
       expect(result).toEqual(list);
+    });
+  });
+
+  describe('exportAll', () => {
+    it('exports all lists for the current user', async () => {
+      const exportFile: WorkoutListsExportFile.Dto = {
+        formatVersion: 1,
+        app: WORKOUT_LISTS_EXPORT_APP,
+        exportedAt: '2026-06-03T12:00:00.000Z',
+        workoutLists: [],
+      };
+      jest.spyOn(service, 'exportAll').mockResolvedValue(exportFile);
+
+      const result = await controller.exportAll(request);
+
+      expect(service.exportAll).toBeCalledWith(userId);
+      expect(result).toEqual(exportFile);
+    });
+  });
+
+  describe('importAll', () => {
+    it('imports lists for the current user', async () => {
+      const body = {
+        formatVersion: 1,
+        app: WORKOUT_LISTS_EXPORT_APP,
+        exportedAt: '2026-06-03T12:00:00.000Z',
+        workoutLists: [
+          {
+            name: 'Push Day',
+            description: 'chest',
+            exercises: [{ name: 'Bench', muscleGroup: 'chest', weight: 60, reps: 10, sets: 3 }],
+          },
+        ],
+      };
+      const response = new ImportWorkoutListsResponse.Dto({ importedCount: 1, lists: [buildList()] });
+      jest.spyOn(service, 'importAll').mockResolvedValue(response);
+
+      const result = await controller.importAll(body, request);
+
+      expect(service.importAll).toBeCalledWith(userId, body);
+      expect(result).toEqual(response);
     });
   });
 });

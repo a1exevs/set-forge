@@ -5,6 +5,8 @@ import {
   emailToAvatarLetter,
   useCurrentUserQuery,
   useDeleteWorkoutListMutation,
+  useExportAllWorkoutListsMutation,
+  useImportWorkoutListsMutation,
   useLogoutMutation,
   useWorkoutListsQuery,
 } from '@entities';
@@ -17,6 +19,8 @@ const HomePageDataLayer: FC = () => {
   const { data: user } = useCurrentUserQuery(true);
   const { data: workoutLists = [] } = useWorkoutListsQuery(Boolean(user));
   const deleteWorkoutListMutation = useDeleteWorkoutListMutation();
+  const exportAllWorkoutListsMutation = useExportAllWorkoutListsMutation();
+  const importWorkoutListsMutation = useImportWorkoutListsMutation();
   const logoutMutation = useLogoutMutation();
 
   const userEmail = user?.email ?? '';
@@ -27,6 +31,10 @@ const HomePageDataLayer: FC = () => {
       workoutLists={workoutLists}
       deleteWorkoutList={async (id): Promise<void> => {
         await deleteWorkoutListMutation.mutateAsync(id);
+      }}
+      exportAllWorkoutLists={async () => exportAllWorkoutListsMutation.mutateAsync()}
+      importWorkoutLists={async (file): Promise<void> => {
+        await importWorkoutListsMutation.mutateAsync(file);
       }}
       onEdit={(id): void => {
         navigate({ to: '/edit/$id', params: { id } });
