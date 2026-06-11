@@ -18,8 +18,13 @@ export { formatDate } from 'src/shared/model/helpers/dates';
 export {
   buildWorkoutListsExportFile,
   buildWorkoutListsExportPayload,
+  copyWorkoutListsExport,
+  downloadWorkoutListsExport,
   exportWorkoutListsWithFallback,
   isRestrictedDownloadEnvironment,
+  isTelegramWebview,
+  shareWorkoutListsExport,
+  type ShareWorkoutListsExportResult,
   type WorkoutListsExportFile,
   type WorkoutListsExportMethod,
   type WorkoutListsExportPayload,

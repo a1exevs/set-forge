@@ -4,6 +4,7 @@ import {
   buildWorkoutListsExportFile,
   buildWorkoutListsExportPayload,
   isRestrictedDownloadEnvironment,
+  isTelegramWebview,
 } from 'src/shared/model/helpers/export-workout-lists-file';
 
 const workoutList = (overrides: Partial<WorkoutList> = {}): WorkoutList => ({
@@ -25,6 +26,11 @@ const workoutList = (overrides: Partial<WorkoutList> = {}): WorkoutList => ({
   lastUsedAt: null,
   ...overrides,
 });
+
+const windowStub = (overrides: Record<string, unknown> = {}): Window =>
+  ({
+    ...overrides,
+  }) as Window;
 
 describe('export-workout-lists-file', () => {
   describe('buildWorkoutListsExportFile', () => {
@@ -60,15 +66,32 @@ describe('export-workout-lists-file', () => {
     });
   });
 
+  describe('isTelegramWebview', () => {
+    it('detects Android Telegram WebView global', () => {
+      expect(isTelegramWebview(windowStub({ TelegramWebview: {} }))).toBe(true);
+    });
+
+    it('detects iOS Telegram WebView global', () => {
+      expect(isTelegramWebview(windowStub({ TelegramWebviewProxy: {} }))).toBe(true);
+    });
+  });
+
   describe('isRestrictedDownloadEnvironment', () => {
-    it('detects Telegram in-app browser', () => {
-      expect(isRestrictedDownloadEnvironment('Mozilla/5.0 Telegram-Android')).toBe(true);
+    it('detects Telegram via user agent fallback', () => {
+      expect(isRestrictedDownloadEnvironment('Mozilla/5.0 Telegram-Android', windowStub())).toBe(true);
+    });
+
+    it('detects Telegram via WebView globals without Telegram in user agent', () => {
+      const chromeUa = 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36';
+
+      expect(isRestrictedDownloadEnvironment(chromeUa, windowStub({ TelegramWebview: {} }))).toBe(true);
     });
 
     it('allows regular Chrome on Android', () => {
       expect(
         isRestrictedDownloadEnvironment(
           'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36',
+          windowStub(),
         ),
       ).toBe(false);
     });

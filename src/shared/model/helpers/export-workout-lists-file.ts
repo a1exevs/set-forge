@@ -26,13 +26,21 @@ export type WorkoutListsExportPayload = {
   file: File;
 };
 
-export type WorkoutListsExportMethod = 'download' | 'share' | 'clipboard' | 'manual';
+export type WorkoutListsExportMethod = 'download' | 'share' | 'clipboard' | 'manual' | 'options';
 
 export type WorkoutListsExportResult =
   | { method: 'download' }
   | { method: 'share' }
   | { method: 'clipboard'; filename: string }
-  | { method: 'manual'; json: string; filename: string };
+  | { method: 'manual'; json: string; filename: string }
+  | { method: 'options'; json: string; filename: string };
+
+export type ShareWorkoutListsExportResult = 'shared' | 'cancelled' | 'unavailable';
+
+type TelegramWebviewWindow = Window & {
+  TelegramWebview?: unknown;
+  TelegramWebviewProxy?: unknown;
+};
 
 export const buildWorkoutListsExportFile = (workoutLists: WorkoutList[]): WorkoutListsExportFile => ({
   formatVersion: 1,
@@ -63,9 +71,13 @@ export const buildWorkoutListsExportPayload = (workoutLists: WorkoutList[]): Wor
   return { json, filename, blob, file };
 };
 
-export const isRestrictedDownloadEnvironment = (userAgent: string): boolean => /Telegram/i.test(userAgent);
+export const isTelegramWebview = (windowObject: TelegramWebviewWindow): boolean =>
+  windowObject.TelegramWebview !== undefined || windowObject.TelegramWebviewProxy !== undefined;
 
-const tryDownload = (payload: WorkoutListsExportPayload): boolean => {
+export const isRestrictedDownloadEnvironment = (userAgent: string, windowObject: TelegramWebviewWindow): boolean =>
+  isTelegramWebview(windowObject) || /Telegram/i.test(userAgent);
+
+export const downloadWorkoutListsExport = (payload: WorkoutListsExportPayload): boolean => {
   try {
     const url = URL.createObjectURL(payload.blob);
     const anchor = document.createElement('a');
@@ -82,9 +94,11 @@ const tryDownload = (payload: WorkoutListsExportPayload): boolean => {
   }
 };
 
-const tryShare = async (payload: WorkoutListsExportPayload): Promise<boolean> => {
+export const shareWorkoutListsExport = async (
+  payload: WorkoutListsExportPayload,
+): Promise<ShareWorkoutListsExportResult> => {
   if (typeof navigator.share !== 'function') {
-    return false;
+    return 'unavailable';
   }
 
   const shareData: ShareData = {
@@ -94,21 +108,21 @@ const tryShare = async (payload: WorkoutListsExportPayload): Promise<boolean> =>
   };
 
   if (typeof navigator.canShare === 'function' && !navigator.canShare(shareData)) {
-    return false;
+    return 'unavailable';
   }
 
   try {
     await navigator.share(shareData);
-    return true;
+    return 'shared';
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
-      return true;
+      return 'cancelled';
     }
-    return false;
+    return 'unavailable';
   }
 };
 
-const tryClipboard = async (payload: WorkoutListsExportPayload): Promise<boolean> => {
+export const copyWorkoutListsExport = async (payload: WorkoutListsExportPayload): Promise<boolean> => {
   if (!navigator.clipboard?.writeText) {
     return false;
   }
@@ -124,19 +138,24 @@ const tryClipboard = async (payload: WorkoutListsExportPayload): Promise<boolean
 export const exportWorkoutListsWithFallback = async (
   workoutLists: WorkoutList[],
   userAgent: string = navigator.userAgent,
+  windowObject: TelegramWebviewWindow = window,
 ): Promise<WorkoutListsExportResult> => {
   const payload = buildWorkoutListsExportPayload(workoutLists);
-  const restricted = isRestrictedDownloadEnvironment(userAgent);
 
-  if (!restricted && tryDownload(payload)) {
+  if (isRestrictedDownloadEnvironment(userAgent, windowObject)) {
+    return { method: 'options', json: payload.json, filename: payload.filename };
+  }
+
+  if (downloadWorkoutListsExport(payload)) {
     return { method: 'download' };
   }
 
-  if (await tryShare(payload)) {
+  const shareResult = await shareWorkoutListsExport(payload);
+  if (shareResult === 'shared') {
     return { method: 'share' };
   }
 
-  if (await tryClipboard(payload)) {
+  if (await copyWorkoutListsExport(payload)) {
     return { method: 'clipboard', filename: payload.filename };
   }
 
