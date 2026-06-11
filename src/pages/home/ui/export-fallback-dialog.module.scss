@@ -43,18 +43,6 @@
   font-size: $font-size-xs;
 }
 
-.optionButtons {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-  margin-bottom: $spacing-md;
-
-  button {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
 .buttons {
   display: flex;
   justify-content: flex-end;
