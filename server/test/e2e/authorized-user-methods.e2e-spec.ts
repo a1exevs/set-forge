@@ -21,17 +21,13 @@ describe('Authorized user methods', () => {
   describe(Routes.ENDPOINT_AUTH, () => {
     describe('/me GET', () => {
       it('Get current user', () => {
-        return request(app.getHttpServer())
-          .get(`${api}/${Routes.ENDPOINT_AUTH}/me`)
-          .expect(HttpStatus.UNAUTHORIZED);
+        return request(app.getHttpServer()).get(`${api}/${Routes.ENDPOINT_AUTH}/me`).expect(HttpStatus.UNAUTHORIZED);
       });
     });
 
     describe('/refresh POST', () => {
       it('Refresh Access Token', () => {
-        return request(app.getHttpServer())
-          .post(`${api}/${Routes.ENDPOINT_AUTH}/refresh`)
-          .expect(HttpStatus.FORBIDDEN);
+        return request(app.getHttpServer()).post(`${api}/${Routes.ENDPOINT_AUTH}/refresh`).expect(HttpStatus.FORBIDDEN);
       });
     });
 

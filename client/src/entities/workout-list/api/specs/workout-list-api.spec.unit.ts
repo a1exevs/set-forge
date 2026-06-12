@@ -22,7 +22,9 @@ const LIST = {
   id: 'list-1',
   name: 'Push Day',
   description: 'chest',
-  exercises: [{ id: 'ex-1', name: 'Bench', muscleGroup: 'chest' as const, weight: 60, reps: 10, sets: 3, completedSets: 0 }],
+  exercises: [
+    { id: 'ex-1', name: 'Bench', muscleGroup: 'chest' as const, weight: 60, reps: 10, sets: 3, completedSets: 0 },
+  ],
   createdAt: '2026-06-03T12:00:00.000Z',
   lastUsedAt: null,
 };

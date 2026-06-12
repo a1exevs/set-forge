@@ -5,11 +5,7 @@ import { apiRequest } from 'src/shared/api/http-client';
 import { ResultCodes } from 'src/shared/api/result-codes';
 
 export function toAbsoluteFromApiOrigin(pathOrUrl: string): string {
-  if (
-    pathOrUrl.startsWith('http://') ||
-    pathOrUrl.startsWith('https://') ||
-    pathOrUrl.startsWith('data:')
-  ) {
+  if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://') || pathOrUrl.startsWith('data:')) {
     return pathOrUrl;
   }
   const apiBase = getApiBaseUrl();
