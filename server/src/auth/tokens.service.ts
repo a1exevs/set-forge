@@ -8,6 +8,7 @@ import { UsersService } from '@users/users.service';
 import { RefreshTokensService } from '@auth/refresh-tokens.service';
 import { ErrorMessages } from '@common/constants';
 
+// TODO Replace
 const BASE_OPTIONS: SignOptions = {
   issuer: 'https://sowa-api.com',
   audience: 'https://sowa-api.com',
