@@ -1,0 +1,17 @@
+# Caddy site config for the prod profile of docker-compose.
+#
+# SITE_ADDRESS is supplied by docker-compose (see service `caddy`).
+#   - localhost          → Caddy issues a cert from its internal CA (Caddy Local Authority).
+#   - <public hostname>  → Caddy auto-issues a real Let's Encrypt cert via HTTP-01 (needs ports 80+443 reachable from the internet).
+#
+# `client-prod` is the existing nginx container that serves the SPA and reverse-proxies /api to server-prod.
+
+{$SITE_ADDRESS:localhost} {
+	encode zstd gzip
+
+	# Caddy v2 auto-forwards X-Forwarded-{For,Proto} and preserves Host.
+	# Only X-Real-IP is non-default and worth setting explicitly.
+	reverse_proxy client-prod:80 {
+		header_up X-Real-IP {remote_host}
+	}
+}

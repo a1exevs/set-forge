@@ -1,6 +1,6 @@
 ---
 description: Component architecture - 3-layer pattern, arrow functions, absolute paths
-alwaysApply: true
+globs: ["client/**"]
 ---
 
 # Component Architecture
@@ -13,19 +13,19 @@ alwaysApply: true
 
 ## 3-Layer Pattern
 
-**Data** (`*-data-layer.tsx`): Stores only. `useStore.use.x()`. Pass to logic. No business logic. Optimization hooks (`useCallback`, `useMemo`) allowed for stable references.
-**Logic** (`*-logic-layer.tsx`): Hooks, handlers, state. No stores.
+**Data** (`*-data-layer.tsx`): TanStack Query hooks and/or Zustand stores. Pass data and callbacks to logic. No business logic. Optimization hooks (`useCallback`, `useMemo`) allowed for stable references.
+**Logic** (`*-logic-layer.tsx`): Hooks, handlers, state. No stores, no query hooks, no API imports.
 **Presentation** (`*.tsx`): Props only. No hooks.
 
 ```typescript
-// Data: useStore.use.addExercise(); return <LogicLayer onAdd={...} />;
+// Data: useWorkoutListsQuery(); return <LogicLayer workoutLists={data ?? []} ... />;
 // Logic: useState, handleSubmit; return <Presentation {...} />;
 // Presentation: pure props, className={classes.form}
 ```
 
 Export: `export { default as X } from 'src/.../x-data-layer'`. No Data → export logic-layer. No Logic → export presentation.
 
-**Skip layers:** No stores → skip Data. No state → skip Logic. Simple → Presentation only.
+**Skip layers:** No server/client async state → skip Data if logic can live in page. No state → skip Logic. Simple → Presentation only.
 
 ## File Naming
 

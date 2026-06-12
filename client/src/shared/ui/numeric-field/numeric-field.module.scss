@@ -1,0 +1,50 @@
+.field {
+  margin-bottom: 0;
+}
+
+.label {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: $text-secondary;
+  margin-bottom: $spacing-xs;
+}
+
+.input {
+  width: 100%;
+  text-align: center;
+  background-color: $bg-tertiary;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  color: $text-primary;
+  font-size: $font-size-base;
+  transition: all 0.2s ease-in-out;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+  }
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+}
+
+.inputMd {
+  padding: $spacing-md $spacing-md;
+}
+
+.inputSm {
+  padding: $spacing-sm $spacing-sm;
+}
+
+.inputInvalid {
+  border-color: $danger-color;
+}
+
+.error {
+  margin-top: $spacing-xs;
+  font-size: $font-size-xs;
+  color: $danger-color;
+}

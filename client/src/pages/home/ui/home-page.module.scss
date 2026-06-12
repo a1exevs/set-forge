@@ -1,0 +1,229 @@
+.container {
+  min-height: 100vh;
+  background-color: $bg-primary;
+  padding: $spacing-md;
+}
+
+.header {
+  padding: $spacing-lg 0 $spacing-xl;
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  gap: $spacing-sm;
+}
+
+.headerTitles {
+  text-align: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 56px - $spacing-md);
+
+  h1 {
+    font-size: $font-size-3xl;
+    color: $text-primary;
+    margin: 0 0 $spacing-xs;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-base;
+  color: $text-secondary;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: $spacing-xs;
+  border: none;
+  border-radius: $radius-md;
+  background-color: transparent;
+  color: $text-primary;
+  cursor: pointer;
+
+  svg {
+    display: block;
+  }
+  transition: background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: $bg-hover;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+.main {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.addButton {
+  display: block;
+  margin-bottom: $spacing-xl;
+  text-decoration: none;
+
+  button {
+    width: 100%;
+    justify-content: center;
+    font-size: $font-size-lg;
+    font-weight: 600;
+  }
+}
+
+.addIcon {
+  font-size: $font-size-2xl;
+  margin-right: $spacing-xs;
+}
+
+.empty {
+  text-align: center;
+  padding: $spacing-2xl $spacing-md;
+  color: $text-secondary;
+
+  p {
+    margin-bottom: $spacing-sm;
+  }
+}
+
+.emptyHint {
+  font-size: $font-size-sm;
+  color: $text-tertiary;
+}
+
+.listGrid {
+  display: grid;
+  gap: $spacing-md;
+  grid-template-columns: 1fr;
+}
+
+.card {
+  background-color: $bg-elevated;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-md;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    border-color: $border-hover;
+  }
+}
+
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  cursor: pointer;
+
+  // Touch-friendly target
+  min-height: 44px;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+
+  h2 {
+    font-size: $font-size-xl;
+    color: $text-primary;
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.badge {
+  background-color: $primary-color;
+  color: $bg-primary;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-md;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.description {
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  margin-bottom: $spacing-md;
+  line-height: 1.5;
+}
+
+.cardFooter {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+  padding-top: $spacing-sm;
+  border-top: 1px solid $border-color;
+}
+
+.date,
+.lastUsed {
+  display: block;
+}
+
+.menuButton {
+  flex-shrink: 0;
+
+  // Touch-friendly target
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Tablet and up
+@media (min-width: 768px) {
+  .container {
+    padding: $spacing-xl;
+  }
+
+  .listGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cardFooter {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+// Desktop
+@media (min-width: 1024px) {
+  .listGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

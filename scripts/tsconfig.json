@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2021",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "rootDir": ".",
+    "baseUrl": ".",
+    "strict": true,
+    "declaration": true,
+    "alwaysStrict": true,
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "typeRoots": ["../node_modules/@types"]
+  },
+  "include": ["./**/*.ts"]
+}

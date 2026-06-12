@@ -145,3 +145,51 @@ The public component uses an internal `Props` type (not exported). Documented sh
 ### Usage
 
 Referenced by: workout list form (`widgets/workout-list-form`) for exercise weight, reps, and sets. Domain validation messages for that form live in `widgets/workout-list-form/model/exercise-numeric-validation.ts`.
+
+---
+
+## User avatar menu
+
+### Purpose
+
+Circular avatar (letter from user email) as the trigger for a small account menu (e.g. Logout). Used on the Home page header. Pattern mirrors `shared/ui/menu-button` (Headless UI `Menu`, `MenuButton`, `MenuItems`, `MenuItem`, `close()` after action).
+
+### Location
+
+`shared/ui/user-avatar-menu/`
+
+### Props
+
+```typescript
+type Props = {
+  letter: string;
+  items: MenuItem[]; // same shape as MenuButton — id, label, onClick
+  ariaLabel?: string;
+};
+```
+
+- `letter`: single visible character (caller computes from email local-part).
+
+### UI
+
+- Round trigger with centered letter; focus ring for a11y.
+- Dropdown: `anchor="bottom start"` (align with avatar).
+
+### Storybook
+
+- Title: `Shared/UserAvatarMenu`
+
+### Tests
+
+- Unit: `specs/user-avatar-menu.spec.unit.tsx`
+- Snapshot: `specs/user-avatar-menu.spec.snap.tsx`
+
+### Usage
+
+Referenced by: [home-page.spec.md](home-page.spec.md), [auth-session.spec.md](auth-session.spec.md)
+
+---
+
+## Auth route tabs (inline)
+
+Login / Register tabs on the auth page use Headless UI `Tab` / `TabGroup` / `TabList` / `Tab` / `TabPanels` / `TabPanel` with **inline SVG** icons (decorative). Tab selection is driven by route (`/login` vs `/register`). Documented in [auth-session.spec.md](auth-session.spec.md); stories live next to the auth page or shared auth-tabs widget if extracted.
