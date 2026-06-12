@@ -1,0 +1,104 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`NumericField matches snapshot for decimal with value 1`] = `
+<div>
+  <div
+    class="field"
+    data-headlessui-state=""
+  >
+    <label
+      class="label"
+      data-headlessui-state=""
+      for="snap-weight"
+      id="headlessui-label-:r1:"
+    >
+      Weight (kg)
+    </label>
+    <input
+      aria-labelledby="headlessui-label-:r1:"
+      class="input inputSm "
+      data-headlessui-state=""
+      id="snap-weight"
+      inputmode="decimal"
+      type="text"
+      value="80"
+    />
+    <span
+      hidden=""
+      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+    />
+  </div>
+</div>
+`;
+
+exports[`NumericField matches snapshot for empty integer field 1`] = `
+<div>
+  <div
+    class="field"
+    data-headlessui-state=""
+  >
+    <label
+      class="label"
+      data-headlessui-state=""
+      for="snap-reps-empty"
+      id="headlessui-label-:r4:"
+    >
+      Reps
+    </label>
+    <input
+      aria-labelledby="headlessui-label-:r4:"
+      class="input inputSm "
+      data-headlessui-state=""
+      id="snap-reps-empty"
+      inputmode="numeric"
+      type="text"
+      value=""
+    />
+    <span
+      hidden=""
+      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+    />
+  </div>
+</div>
+`;
+
+exports[`NumericField matches snapshot with inline error 1`] = `
+<div>
+  <div
+    class="field"
+    data-headlessui-state=""
+  >
+    <label
+      class="label"
+      data-headlessui-state=""
+      for="snap-reps-err"
+      id="headlessui-label-:r7:"
+    >
+      Reps
+    </label>
+    <input
+      aria-describedby="headlessui-description-:r9:"
+      aria-invalid=""
+      aria-labelledby="headlessui-label-:r7:"
+      class="input inputSm inputInvalid"
+      data-headlessui-state="invalid"
+      data-invalid=""
+      id="snap-reps-err"
+      inputmode="numeric"
+      type="text"
+      value=""
+    />
+    <p
+      class="error"
+      data-headlessui-state=""
+      id="headlessui-description-:r9:"
+    >
+      Enter a valid number of reps
+    </p>
+    <span
+      hidden=""
+      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+    />
+  </div>
+</div>
+`;

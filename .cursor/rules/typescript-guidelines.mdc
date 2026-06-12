@@ -1,6 +1,6 @@
 ---
 description: TypeScript strict mode and type safety
-alwaysApply: true
+globs: ["client/**", "server/**"]
 ---
 
 # TypeScript Guidelines
