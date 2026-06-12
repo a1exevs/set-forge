@@ -11,8 +11,8 @@ Page for creating a new workout list. Uses shared widget `workout-list-form` in 
 ### Initialization
 
 1. `CreateWorkoutPageDataLayer` mounts.
-2. Subscribes to `useWorkoutListStore.use.addWorkoutList()`.
-3. Passes `onSubmit` with callback that calls `addWorkoutList(dto)` and navigates to `/` on success.
+2. Subscribes to `useCreateWorkoutListMutation()`.
+3. Passes `onSubmit` with callback that calls `mutateAsync(dto)` and navigates to `/` on success.
 4. Create page is a thin wrapper around `widgets/workout-list-form`; form logic lives in the widget.
 
 ### Form state (in WorkoutListForm widget)
@@ -34,9 +34,9 @@ Page for creating a new workout list. Uses shared widget `workout-list-form` in 
     - `!name.trim()` → confirm dialog «Please enter a list name», return.
     - `exercises.length === 0` → confirm «Please add at least one exercise», return.
     - Check: `exercises.find(ex => !ex.name.trim() || ex.weight < 0 || Number.isNaN(ex.weight) || ex.reps <= 0 || Number.isNaN(ex.reps) || ex.sets <= 0 || Number.isNaN(ex.sets))` → confirm «Please check exercise data validity», return.
-12. Build DTO: `name.trim()`, `description.trim()`, `exercises` (without `tempId`; `id` and `completedSets` are added in store).
-13. `onSubmit(dto)` → `addWorkoutList(dto)` in store creates `WorkoutList`, saves to storage, pushes to `workoutLists`. Returns `true` on success, `false` on error.
-14. On success: `navigate({ to: '/' })`. On error: no navigation.
+12. Build DTO: `name.trim()`, `description.trim()`, `exercises` (without `tempId`; `id` and `completedSets` are assigned by the server).
+13. `onSubmit(dto)` → `useCreateWorkoutListMutation().mutateAsync(dto)` calls `POST /workout-lists`; the server creates the `WorkoutList` (generates ids, `completedSets: 0`, timestamps) and returns it; the mutation appends it to `workoutQueryKeys.lists` cache. Data layer returns `Promise<true>` on success, `Promise<false>` on error.
+14. On success (awaited `true`): `navigate({ to: '/' })`. On error: no navigation.
 
 ### Cancel
 
@@ -100,7 +100,7 @@ Internal Presentation layer receives `title`, `submitButtonText`, `name`, `descr
 ### Transformation on save
 
 - `tempId` is not passed to DTO.
-- Store on `addWorkoutList`: for each exercise generates `id: crypto.randomUUID()`, adds `completedSets: 0`.
+- The server (on `POST /workout-lists`) generates `id` for the list and each exercise (UUID), sets `completedSets: 0`, `createdAt`, `lastUsedAt: null`, and returns the full `WorkoutList`.
 
 ---
 
@@ -109,7 +109,8 @@ Internal Presentation layer receives `title`, `submitButtonText`, `name`, `descr
 | Category | Technology |
 |-----------|------------|
 | Routing | TanStack Router (`useNavigate`) |
-| State | Zustand (addWorkoutList), local useState in Logic |
+| Server state | `@tanstack/react-query` (`useCreateWorkoutListMutation`) |
+| Form state | Local `useState` in widget Logic |
 | UI | React 18, Headless UI (`Listbox`), SCSS Modules |
 | Dialogs | `useConfirm` — validation dialogs use `hideCancelButton: true`, `confirmationText: 'Ok'` |
 | Muscle groups | `muscleGroupLabels`, `muscleGroups` from `@entities` |
@@ -129,7 +130,7 @@ Internal Presentation layer receives `title`, `submitButtonText`, `name`, `descr
 
 | API | Type | Description |
 |-----|-----|----------|
-| `useWorkoutListStore.use.addWorkoutList(dto)` | action | Create and save workout list; returns `true` on success, `false` on error |
+| `useCreateWorkoutListMutation()` | hook | Create workout list via `POST /workout-lists`; data layer maps success/error to `Promise<boolean>` |
 | `muscleGroupLabels`, `muscleGroups` | constants | Dictionary and array of muscle groups |
 | `useConfirm()` | hook | Confirm dialog |
 | `WorkoutListForm` | widget | From `widgets/workout-list-form` |
@@ -151,6 +152,6 @@ Internal Presentation layer receives `title`, `submitButtonText`, `name`, `descr
 | `weight < 0` | Same validation |
 | `reps <= 0`, `sets <= 0` | Same validation |
 | `exercises.length === 0` in UI | Text «Add exercises to your list» |
-| Error on `addWorkoutList` | Store writes to `state.error`, `addWorkoutList` returns `false`, navigation does NOT run |
+| Error on create mutation (API failure) | Data layer catches, returns `false`, navigation does NOT run |
 | `Number(e.target.value)` for empty input | `NaN` is caught via `Number.isNaN()` checks for `weight`, `reps`, `sets` |
 | Cancel without changes | Navigate to `/` without saving |

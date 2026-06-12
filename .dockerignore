@@ -1,0 +1,16 @@
+node_modules
+**/node_modules
+**/dist
+**/coverage
+.git
+.cursor
+.idea
+server/_stub
+client/.storybook-static
+client/playwright-report
+client/test-results
+client/.cache
+*.log
+**/.env*
+server/.development.env
+server/.production.env

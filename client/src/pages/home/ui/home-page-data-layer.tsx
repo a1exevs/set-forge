@@ -1,28 +1,50 @@
 import { useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 
-import { useWorkoutListStore } from '@entities';
+import {
+  emailToAvatarLetter,
+  useCurrentUserQuery,
+  useDeleteWorkoutListMutation,
+  useExportAllWorkoutListsMutation,
+  useImportWorkoutListsMutation,
+  useLogoutMutation,
+  useWorkoutListsQuery,
+} from '@entities';
 import { formatDate } from '@shared';
 
 import HomePageLogicLayer from 'src/pages/home/ui/home-page-logic-layer';
 
 const HomePageDataLayer: FC = () => {
   const navigate = useNavigate();
-  const workoutLists = useWorkoutListStore.use.workoutLists();
-  const loadFromStorage = useWorkoutListStore.use.loadFromStorage();
-  const deleteWorkoutList = useWorkoutListStore.use.deleteWorkoutList();
-  const getUsagePercentageAsync = useWorkoutListStore.use.getUsagePercentageAsync();
+  const { data: user } = useCurrentUserQuery(true);
+  const { data: workoutLists = [] } = useWorkoutListsQuery(Boolean(user));
+  const deleteWorkoutListMutation = useDeleteWorkoutListMutation();
+  const exportAllWorkoutListsMutation = useExportAllWorkoutListsMutation();
+  const importWorkoutListsMutation = useImportWorkoutListsMutation();
+  const logoutMutation = useLogoutMutation();
+
+  const userEmail = user?.email ?? '';
+  const avatarLetter = user ? emailToAvatarLetter(user.email) : '?';
 
   return (
     <HomePageLogicLayer
       workoutLists={workoutLists}
-      deleteWorkoutList={deleteWorkoutList}
+      deleteWorkoutList={async (id): Promise<void> => {
+        await deleteWorkoutListMutation.mutateAsync(id);
+      }}
+      exportAllWorkoutLists={async () => exportAllWorkoutListsMutation.mutateAsync()}
+      importWorkoutLists={async (file): Promise<void> => {
+        await importWorkoutListsMutation.mutateAsync(file);
+      }}
       onEdit={(id): void => {
         navigate({ to: '/edit/$id', params: { id } });
       }}
       formatDate={formatDate}
-      getUsagePercentageAsync={getUsagePercentageAsync}
-      loadFromStorage={loadFromStorage}
+      userEmail={userEmail}
+      avatarLetter={avatarLetter}
+      onLogout={(): void => {
+        logoutMutation.mutate();
+      }}
     />
   );
 };

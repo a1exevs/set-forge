@@ -1,0 +1,16 @@
+# Secrets and environment files
+**/.env
+**/.env.*
+**/secrets/**
+**/*.pem
+**/*.key
+
+# Dependencies and build artifacts
+**/node_modules/**
+client/dist/**
+server/dist/**
+
+# Tooling caches and reports
+**/.tanstack/**
+**/playwright-report/**
+**/test-results/**

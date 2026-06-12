@@ -1,0 +1,68 @@
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid $border-color;
+  border-radius: 50%;
+  background-color: $bg-secondary;
+  color: $text-primary;
+  font-weight: 700;
+  font-size: $font-size-base;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+
+  &:focus {
+    outline: none;
+  }
+
+  &[data-hover],
+  &[data-focus] {
+    background-color: $bg-hover;
+    border-color: $border-hover;
+  }
+}
+
+.letter {
+  user-select: none;
+}
+
+.items {
+  z-index: $z-dropdown;
+  min-width: 9rem;
+  padding: $spacing-xs;
+  margin-top: $spacing-xs;
+  background-color: $bg-elevated;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.item {
+  padding: $spacing-sm $spacing-md;
+  border: none;
+  border-radius: $radius-sm;
+  background: none;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+
+  &:focus {
+    outline: none;
+  }
+
+  &[data-hover],
+  &[data-focus] {
+    background-color: $bg-hover;
+  }
+}

@@ -1,0 +1,21 @@
+# Install workspace deps from the repo root lockfile (client + root dev tooling only).
+FROM node:22.20.0-alpine AS deps
+WORKDIR /app
+ENV HUSKY=0
+COPY package.json package-lock.json ./
+COPY client/package.json ./client/package.json
+COPY server/package.json ./server/package.json
+RUN npm ci --workspace @set-forge/client --include-workspace-root
+
+# Produce static assets under client/dist.
+FROM deps AS build
+WORKDIR /app
+COPY client ./client
+RUN npm run build -w @set-forge/client
+
+# Serve SPA + reverse-proxy /api to server-prod (see client/nginx.conf).
+FROM nginx:1.27-alpine AS production
+COPY --from=build /app/client/dist /usr/share/nginx/html
+COPY client/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

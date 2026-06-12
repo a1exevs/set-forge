@@ -10,7 +10,9 @@ export {
   type ThemeState,
   createSelectors,
   formatDate,
+  downloadJsonFile,
+  buildWorkoutListsExportFilename,
 } from 'src/shared/model';
 
 // ui
-export { Button, ConfirmDialogProvider, MenuButton, NumericField, useConfirm } from 'src/shared/ui';
+export { Button, ConfirmDialogProvider, MenuButton, NumericField, UserAvatarMenu, useConfirm } from 'src/shared/ui';

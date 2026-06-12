@@ -1,24 +1,31 @@
 import type { Meta } from '@storybook/react';
 
-import { CreateWorkoutPage } from '@pages';
 import {
   buildDesktop4KStoryObj,
   buildDesktopStoryObj,
   buildMobileStoryObj,
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
+import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
+
+import CreateWorkoutPageLogicLayer from 'src/pages/create-workout/ui/create-workout-page-logic-layer';
 
 const storyTitle = 'Pages/CreateWorkoutPage';
 
+const renderCreateWorkoutPage = (): ReturnType<typeof renderWithPageRouter> =>
+  renderWithPageRouter({
+    initialEntries: ['/create'],
+    component: (): JSX.Element => <CreateWorkoutPageLogicLayer onSubmit={async (): Promise<boolean> => true} />,
+  });
+
 const meta = {
   title: storyTitle,
-  component: CreateWorkoutPage,
-  parameters: { router: { initialEntries: ['/create'] } },
-} satisfies Meta<typeof CreateWorkoutPage>;
+  component: CreateWorkoutPageLogicLayer,
+} satisfies Meta<typeof CreateWorkoutPageLogicLayer>;
 
 export default meta;
 
-export const Desktop4k = buildDesktop4KStoryObj<typeof meta>();
-export const Desktop = buildDesktopStoryObj<typeof meta>();
-export const Tablet = buildTabletStoryObj<typeof meta>();
-export const Mobile = buildMobileStoryObj<typeof meta>();
+export const Desktop4k = buildDesktop4KStoryObj<typeof meta>({ render: renderCreateWorkoutPage });
+export const Desktop = buildDesktopStoryObj<typeof meta>({ render: renderCreateWorkoutPage });
+export const Tablet = buildTabletStoryObj<typeof meta>({ render: renderCreateWorkoutPage });
+export const Mobile = buildMobileStoryObj<typeof meta>({ render: renderCreateWorkoutPage });

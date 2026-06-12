@@ -1,0 +1,13 @@
+# Patterns for a build whose context is the client/ directory only.
+# When the build context is the repository root (docker-compose), the root .dockerignore applies;
+# keep the same entries mirrored in /.dockerignore for client-heavy paths.
+node_modules
+dist
+.storybook-static
+coverage
+playwright-report
+test-results
+.cache
+*.log
+.DS_Store
+.idea

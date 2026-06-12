@@ -1,8 +1,17 @@
-import { createMemoryHistory, createRouter } from '@tanstack/react-router';
 import { screen } from '@testing-library/react';
 
-import { renderApp } from 'src/app/model/specs/test-utils';
-import { routeTree } from 'src/route-tree.gen';
+import { createTestQueryClient, createTestRouter, renderApp } from 'src/app/model/specs/test-utils';
+import { fetchWorkoutList } from 'src/entities/workout-list/api';
+
+jest.mock('src/entities/workout-list/api', () => ({
+  fetchWorkoutLists: jest.fn().mockResolvedValue([]),
+  fetchWorkoutList: jest.fn(),
+  createWorkoutList: jest.fn(),
+  updateWorkoutList: jest.fn(),
+  deleteWorkoutList: jest.fn(),
+  incrementExerciseProgress: jest.fn(),
+  resetWorkoutProgress: jest.fn(),
+}));
 
 const TEST_LIST_ID = 'test-list-1';
 const TEST_LIST = {
@@ -26,29 +35,24 @@ const TEST_LIST = {
 
 describe('EditWorkoutPage', () => {
   beforeEach((): void => {
-    localStorage.clear();
+    jest.clearAllMocks();
   });
 
   it('matches snapshot when list not found', async () => {
-    const testRouter = createRouter({
-      routeTree,
-      defaultPreload: 'intent',
-      history: createMemoryHistory({ initialEntries: ['/edit/non-existent-id'] }),
-    });
-    const { container } = renderApp(testRouter);
+    (fetchWorkoutList as jest.Mock).mockResolvedValue(null);
+    const queryClient = createTestQueryClient();
+    const testRouter = createTestRouter('/edit/non-existent-id', queryClient);
+    const { container } = renderApp(testRouter, queryClient);
 
     await screen.findByText('Workout list not found');
     expect(container).toMatchSnapshot();
   });
 
   it('matches snapshot when list exists', async () => {
-    localStorage.setItem('workout-lists', JSON.stringify([TEST_LIST]));
-    const testRouter = createRouter({
-      routeTree,
-      defaultPreload: 'intent',
-      history: createMemoryHistory({ initialEntries: [`/edit/${TEST_LIST_ID}`] }),
-    });
-    const { container } = renderApp(testRouter);
+    (fetchWorkoutList as jest.Mock).mockResolvedValue(TEST_LIST);
+    const queryClient = createTestQueryClient();
+    const testRouter = createTestRouter(`/edit/${TEST_LIST_ID}`, queryClient);
+    const { container } = renderApp(testRouter, queryClient);
 
     await screen.findByRole('heading', { name: /Editing Push Day/ });
     expect(container).toMatchSnapshot();

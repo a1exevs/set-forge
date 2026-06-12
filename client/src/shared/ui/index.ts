@@ -4,3 +4,4 @@ export { useConfirm } from 'src/shared/ui/confirm-dialog/hooks/use-confirm';
 export { default as MenuButton } from 'src/shared/ui/menu-button/menu-button';
 export type { MenuItem } from 'src/shared/ui/menu-button/menu-button.types';
 export { default as NumericField } from 'src/shared/ui/numeric-field/numeric-field-logic-layer';
+export { default as UserAvatarMenu } from 'src/shared/ui/user-avatar-menu/user-avatar-menu';

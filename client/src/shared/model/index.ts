@@ -15,3 +15,4 @@ export type { Theme, ThemeState } from 'src/shared/model/theme/types';
 // helpers
 export { createSelectors } from 'src/shared/model/helpers/stores';
 export { formatDate } from 'src/shared/model/helpers/dates';
+export { buildWorkoutListsExportFilename, downloadJsonFile } from 'src/shared/model/helpers/download-json-file';

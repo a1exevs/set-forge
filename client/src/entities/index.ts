@@ -1,16 +1,28 @@
+export { muscleGroupLabels, muscleGroups, type MuscleGroup } from 'src/entities/exercise';
 export {
-  exerciseApi,
-  type Exercise,
-  type MuscleGroup,
-  type CreateExerciseDto,
-  muscleGroupLabels,
-  muscleGroups,
-  useExerciseStore,
-} from 'src/entities/exercise';
+  emailToAvatarLetter,
+  sessionQueryKeys,
+  useCurrentUserQuery,
+  useLoginMutation,
+  useLogoutMutation,
+  useRegisterMutation,
+  type CurrentUser,
+} from 'src/entities/session';
 export {
-  useWorkoutListStore,
+  useCreateWorkoutListMutation,
+  useDeleteWorkoutListMutation,
+  useExportAllWorkoutListsMutation,
+  useImportWorkoutListsMutation,
+  useResetWorkoutProgressMutation,
+  useUpdateWorkoutListMutation,
+  useUpdateWorkoutProgressMutation,
+  useWorkoutListsQuery,
+  useWorkoutQuery,
+  workoutQueryKeys,
   type WorkoutList,
   type WorkoutExercise,
   type CreateWorkoutListDto,
   type UpdateWorkoutListDto,
+  type WorkoutListsExportFile,
+  type ImportWorkoutListsResult,
 } from 'src/entities/workout-list';

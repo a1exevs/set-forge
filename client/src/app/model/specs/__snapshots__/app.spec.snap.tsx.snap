@@ -8,14 +8,118 @@ exports[`App Page with route / matches snapshot, route / 1`] = `
     <header
       class="header"
     >
-      <h1>
-        Set Forge
-      </h1>
-      <p
-        class="subtitle"
+      <div
+        class="headerTop"
       >
-        Track your workout progress
-      </p>
+        <button
+          aria-expanded="false"
+          aria-haspopup="menu"
+          aria-label="Account menu"
+          class="trigger"
+          data-headlessui-state=""
+          id="headlessui-menu-button-:r2:"
+          type="button"
+        >
+          <span
+            aria-hidden="true"
+            class="letter"
+          >
+            ?
+          </span>
+        </button>
+        <div
+          class="headerTitles"
+        >
+          <h1>
+            Set Forge
+          </h1>
+          <p
+            class="subtitle"
+          >
+            Track your workout progress
+          </p>
+        </div>
+        <div
+          class="headerActions"
+        >
+          <button
+            aria-label="Export workout lists"
+            class="iconButton"
+            disabled=""
+            title="Export workout lists"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              fill="none"
+              height="18"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 3v10"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-width="1.75"
+              />
+              <path
+                d="M8 9l4 4 4-4"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.75"
+              />
+              <path
+                d="M4 17h16"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-width="1.75"
+              />
+            </svg>
+          </button>
+          <button
+            aria-label="Import workout lists"
+            class="iconButton"
+            title="Import workout lists"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              fill="none"
+              height="18"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 21V11"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-width="1.75"
+              />
+              <path
+                d="M8 15l4-4 4 4"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.75"
+              />
+              <path
+                d="M4 7h16"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-width="1.75"
+              />
+            </svg>
+          </button>
+          <input
+            accept=".json,application/json"
+            class="hiddenFileInput"
+            type="file"
+          />
+        </div>
+      </div>
     </header>
     <main
       class="main"
