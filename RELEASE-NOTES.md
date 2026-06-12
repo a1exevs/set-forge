@@ -1,3 +1,22 @@
+# Release v0.3.0
+## What's Changed
+* [Common] RELEASE-NOTES.md update v0.2.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/16
+* [Feature] Confetti on workout completion and numeric field improvements by @a1exevs in https://github.com/a1exevs/set-forge/pull/17
+* [Common] Version increase v0.2.1 by @a1exevs in https://github.com/a1exevs/set-forge/pull/18
+* [Bugfix] Workout form layout fix by @a1exevs in https://github.com/a1exevs/set-forge/pull/20
+* [Testing] Release v0.2.1 by @a1exevs in https://github.com/a1exevs/set-forge/pull/19
+* [Common] Restructuring the repo into a client-server monorepo by @a1exevs in https://github.com/a1exevs/set-forge/pull/23
+* [Feature] Add temporary client-only export for workout lists. by @a1exevs in https://github.com/a1exevs/set-forge/pull/28
+* [Common] Version increase v0.3.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/29
+* [Fix] Revert temporary client-only export on develop by @a1exevs in https://github.com/a1exevs/set-forge/pull/30
+* [Common] Pin dependencies by @renovate[bot] in https://github.com/a1exevs/set-forge/pull/27
+* [Feature] docker-compose.yml, nginx, tests by @a1exevs in https://github.com/a1exevs/set-forge/pull/24
+
+## New Contributors
+* @renovate[bot] made their first contribution in https://github.com/a1exevs/set-forge/pull/27
+
+**Full Changelog**: https://github.com/a1exevs/set-forge/compare/v0.2.0...v0.3.0
+
 # Release v0.2.0
 ## What's Changed
 * [Common] RELEASE-NOTES.md update v0.1.2 by @a1exevs in https://github.com/a1exevs/set-forge/pull/6
