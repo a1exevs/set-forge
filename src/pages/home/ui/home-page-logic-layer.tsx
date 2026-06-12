@@ -3,15 +3,7 @@ import { FC, useEffect, useState } from 'react';
 
 import { useConfirm } from '@shared';
 
-import ExportFallbackDialog from 'src/pages/home/ui/export-fallback-dialog';
 import HomePage from 'src/pages/home/ui/home-page';
-import { exportWorkoutListsWithFallback } from 'src/shared/model/helpers/export-workout-lists-file';
-
-type ExportDialogState = {
-  variant: 'options' | 'clipboard' | 'manual';
-  json: string;
-  filename: string;
-};
 
 type Props = {
   loadFromStorage: () => void;
@@ -31,7 +23,6 @@ const HomePageLogicLayer: FC<Props> = ({
   loadFromStorage,
 }) => {
   const [storageWarning, setStorageWarning] = useState<boolean>(false);
-  const [exportDialog, setExportDialog] = useState<ExportDialogState | null>(null);
 
   const confirmDialog = useConfirm();
 
@@ -59,48 +50,14 @@ const HomePageLogicLayer: FC<Props> = ({
     checkUsage();
   }, [workoutLists, getUsagePercentageAsync]);
 
-  const handleExport = async (): Promise<void> => {
-    const result = await exportWorkoutListsWithFallback(workoutLists);
-
-    if (result.method === 'download' || result.method === 'share') {
-      return;
-    }
-
-    if (result.method === 'clipboard') {
-      setExportDialog({ variant: 'clipboard', json: '', filename: result.filename });
-      return;
-    }
-
-    if (result.method === 'options' || result.method === 'manual') {
-      setExportDialog({
-        variant: result.method === 'options' ? 'options' : 'manual',
-        json: result.json,
-        filename: result.filename,
-      });
-    }
-  };
-
   return (
-    <>
-      <HomePage
-        workoutLists={workoutLists}
-        storageWarning={storageWarning}
-        onEdit={onEdit}
-        onDelete={handleDelete}
-        onExport={handleExport}
-        formatDate={formatDate}
-      />
-      {exportDialog && (
-        <ExportFallbackDialog
-          open={true}
-          variant={exportDialog.variant}
-          workoutLists={workoutLists}
-          json={exportDialog.json}
-          filename={exportDialog.filename}
-          onClose={(): void => setExportDialog(null)}
-        />
-      )}
-    </>
+    <HomePage
+      workoutLists={workoutLists}
+      storageWarning={storageWarning}
+      onEdit={onEdit}
+      onDelete={handleDelete}
+      formatDate={formatDate}
+    />
   );
 };
 
