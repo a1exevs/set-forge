@@ -262,7 +262,7 @@ describe('User workflow', () => {
           .expect(response => {
             expect(response.body.data.formatVersion).toBe(1);
             expect(response.body.data.app).toBe('set-forge');
-            expect(response.body.data.workoutLists.some(list => list.name === workoutListPayload.name)).toBeTruthy();
+            expect(response.body.data.workoutLists.some(list => list.name === 'Updated Push Day')).toBeTruthy();
             expect(response.body.data.workoutLists[0].exercises[0].id).toBeUndefined();
             expect(response.body.resultCode).toBe(ResultCodes.OK);
           });
