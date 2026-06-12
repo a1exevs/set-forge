@@ -448,6 +448,122 @@
 									"response": []
 								},
 								{
+									"name": "export all workout lists",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Export all workout lists: successfully\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"pm.test(\"Response is a valid export file\", function () {",
+													"    var data = pm.response.json().data;",
+													"    pm.expect(data.formatVersion).to.eql(1);",
+													"    pm.expect(data.app).to.eql(\"set-forge\");",
+													"    pm.expect(data.exportedAt).to.be.a(\"string\");",
+													"    pm.expect(data.workoutLists).to.be.an(\"array\");",
+													"});",
+													"pm.collectionVariables.set(\"api/workout_lists_export\", JSON.stringify(pm.response.json().data));"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-lists-end-point}}/export",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{workout-lists-end-point}}",
+												"export"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "import workout lists",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Import workout lists: successfully\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"pm.test(\"Response contains imported lists\", function () {",
+													"    var data = pm.response.json().data;",
+													"    pm.expect(data.importedCount).to.be.a(\"number\");",
+													"    pm.expect(data.lists).to.be.an(\"array\");",
+													"    pm.expect(data.importedCount).to.eql(data.lists.length);",
+													"});",
+													"var data = pm.response.json().data;",
+													"if (data.lists.length > 0) {",
+													"    pm.collectionVariables.set(\"api/workout_list_id\", data.lists[0].id);",
+													"    if (data.lists[0].exercises && data.lists[0].exercises.length > 0) {",
+													"        pm.collectionVariables.set(\"api/exercise_id\", data.lists[0].exercises[0].id);",
+													"    }",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"formatVersion\": 1,\n    \"app\": \"set-forge\",\n    \"exportedAt\": \"2026-06-03T12:00:00.000Z\",\n    \"workoutLists\": [\n        {\n            \"name\": \"Imported Push Day\",\n            \"description\": \"Chest, shoulders, triceps\",\n            \"exercises\": [\n                {\n                    \"name\": \"Bench Press\",\n                    \"muscleGroup\": \"chest\",\n                    \"weight\": 60,\n                    \"reps\": 10,\n                    \"sets\": 3\n                }\n            ]\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-lists-end-point}}/import",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{workout-lists-end-point}}",
+												"import"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "create workout list",
 									"event": [
 										{
@@ -795,6 +911,10 @@
 		},
 		{
 			"key": "api/captcha_text",
+			"value": ""
+		},
+		{
+			"key": "api/workout_lists_export",
 			"value": ""
 		}
 	]
