@@ -1,6 +1,13 @@
+x-json-file-logging: &json-file-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 x-mysql-common: &mysql-common
   image: mysql:8.4
   restart: unless-stopped
+  logging: *json-file-logging
   environment:
     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -30,6 +37,7 @@ services:
 
   server-prod:
     profiles: ["prod"]
+    logging: *json-file-logging
     build:
       context: .
       dockerfile: server/Dockerfile
@@ -69,6 +77,7 @@ services:
 
   client-prod:
     profiles: ["prod"]
+    logging: *json-file-logging
     build:
       context: .
       dockerfile: client/Dockerfile
@@ -87,6 +96,7 @@ services:
   # HTTP_PORT/HTTPS_PORT let you sidestep ports 80/443 when they are taken on the host (common on Windows).
   caddy:
     profiles: ["prod"]
+    logging: *json-file-logging
     image: caddy:2.8-alpine
     depends_on:
       - client-prod
