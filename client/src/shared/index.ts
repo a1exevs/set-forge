@@ -15,4 +15,12 @@ export {
 } from 'src/shared/model';
 
 // ui
-export { Button, ConfirmDialogProvider, MenuButton, NumericField, UserAvatarMenu, useConfirm } from 'src/shared/ui';
+export {
+  Button,
+  ConfirmDialogProvider,
+  IconButton,
+  MenuButton,
+  NumericField,
+  UserAvatarMenu,
+  useConfirm,
+} from 'src/shared/ui';

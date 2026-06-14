@@ -2,10 +2,11 @@ import type { WorkoutList } from '@entities';
 import { Link } from '@tanstack/react-router';
 import { ChangeEvent, FC, MouseEvent, RefObject } from 'react';
 
-import { Button, MenuButton, UserAvatarMenu } from '@shared';
+import { IconButton, MenuButton } from '@shared';
 
 import classes from 'src/pages/home/ui/home-page.module.scss';
 
+// TODO: Replace inline SVG icons with a shared icon library (e.g. lucide-react, @heroicons/react, react-icons).
 const IconDownload: FC = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
     <path d="M12 3v10" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
@@ -22,6 +23,13 @@ const IconUpload: FC = () => (
   </svg>
 );
 
+const IconPlus: FC = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+    <path d="M12 5v14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <path d="M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+
 type Props = {
   workoutLists: WorkoutList[];
   onEdit: (id: string) => void;
@@ -31,9 +39,6 @@ type Props = {
   onImportFile: (event: ChangeEvent<HTMLInputElement>) => void | Promise<void>;
   importInputRef: RefObject<HTMLInputElement>;
   formatDate: (date: string | null) => string;
-  userEmail: string;
-  avatarLetter: string;
-  onLogout: () => void | Promise<void>;
 };
 
 const HomePage: FC<Props> = ({
@@ -45,43 +50,24 @@ const HomePage: FC<Props> = ({
   onImportFile,
   importInputRef,
   formatDate,
-  userEmail,
-  avatarLetter,
-  onLogout,
 }) => {
   return (
     <div className={classes.container}>
       <header className={classes.header}>
         <div className={classes.headerTop}>
-          <UserAvatarMenu
-            letter={avatarLetter}
-            ariaLabel={userEmail ? `Account menu for ${userEmail}` : 'Account menu'}
-            items={[{ id: 'logout', label: 'Log out', onClick: (): void => void onLogout() }]}
-          />
-          <div className={classes.headerTitles}>
-            <h1>Set Forge</h1>
-            <p className={classes.subtitle}>Track your workout progress</p>
-          </div>
+          <img src="/logo.svg" alt="Set Forge" className={classes.logo} width={1909} height={420} />
           <div className={classes.headerActions}>
-            <button
-              type="button"
-              className={classes.iconButton}
+            <IconButton
               aria-label="Export workout lists"
               title="Export workout lists"
               disabled={workoutLists.length === 0}
               onClick={(): void => void onExport()}
             >
               <IconDownload />
-            </button>
-            <button
-              type="button"
-              className={classes.iconButton}
-              aria-label="Import workout lists"
-              title="Import workout lists"
-              onClick={onImportClick}
-            >
+            </IconButton>
+            <IconButton aria-label="Import workout lists" title="Import workout lists" onClick={onImportClick}>
               <IconUpload />
-            </button>
+            </IconButton>
             <input
               ref={importInputRef}
               type="file"
@@ -94,13 +80,6 @@ const HomePage: FC<Props> = ({
       </header>
 
       <main className={classes.main}>
-        <Link to="/create" className={classes.addButton}>
-          <Button size="lg">
-            <span className={classes.addIcon}>+</span>
-            Create Workout List
-          </Button>
-        </Link>
-
         {workoutLists.length === 0 ? (
           <div className={classes.empty}>
             <p>No workout lists yet</p>
@@ -146,6 +125,18 @@ const HomePage: FC<Props> = ({
           </div>
         )}
       </main>
+
+      <IconButton
+        as={Link}
+        to="/create"
+        className={classes.createFab}
+        variant="primary"
+        size="lg"
+        aria-label="Create workout list"
+        title="Create workout list"
+      >
+        <IconPlus />
+      </IconButton>
     </div>
   );
 };

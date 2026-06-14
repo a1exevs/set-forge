@@ -191,7 +191,7 @@ git checkout v1.0.0   # replace with the tag you need
 
 ## 8. Configure environment variables
 
-You need **two** files. Copy the templates and edit the values.
+You need **two** files for production (plus optional `client/.env` for local Vite dev only). Copy the templates and edit the values.
 
 ### 8.1. Root `.env`
 
@@ -210,6 +210,7 @@ MYSQL_USER=set_forge_user
 MYSQL_PASSWORD=strong_db_password
 
 SITE_ADDRESS=185-10-20-30.sslip.io
+VITE_PUBLIC_ORIGIN=https://185-10-20-30.sslip.io
 ```
 
 Example **with your own domain** (domain A record points to the server IP):
@@ -221,6 +222,7 @@ MYSQL_USER=set_forge_user
 MYSQL_PASSWORD=strong_db_password
 
 SITE_ADDRESS=set-forge.example.com
+VITE_PUBLIC_ORIGIN=https://set-forge.example.com
 ```
 
 > **Do not override** `HTTP_PORT` and `HTTPS_PORT` on the VDS — Caddy must listen on standard ports 80 and 443 for automatic TLS.
@@ -535,6 +537,10 @@ npm run prod:down && npm run prod:up
 ### CORS errors / wrong redirects
 
 Check that `SERVER_URL` and `CLIENT_URL` in `server/.production.env` **exactly** match the URL in the browser (with `https://`, no trailing slash).
+
+### Wrong or missing link preview (OG image)
+
+`VITE_PUBLIC_ORIGIN` in the root `.env` must match `CLIENT_URL` (see [§8.3](#83-vite_public_origin-og-meta-tags)). Rebuild `client-prod` after changing it. Crawlers need absolute URLs — placeholders like `%VITE_PUBLIC_ORIGIN%` in the served HTML mean the image was built without the variable set.
 
 ### Not enough memory during build
 

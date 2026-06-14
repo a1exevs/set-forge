@@ -11,40 +11,21 @@ exports[`App Page with route / matches snapshot, route / 1`] = `
       <div
         class="headerTop"
       >
-        <button
-          aria-expanded="false"
-          aria-haspopup="menu"
-          aria-label="Account menu"
-          class="trigger"
-          data-headlessui-state=""
-          id="headlessui-menu-button-:r2:"
-          type="button"
-        >
-          <span
-            aria-hidden="true"
-            class="letter"
-          >
-            ?
-          </span>
-        </button>
-        <div
-          class="headerTitles"
-        >
-          <h1>
-            Set Forge
-          </h1>
-          <p
-            class="subtitle"
-          >
-            Track your workout progress
-          </p>
-        </div>
+        <img
+          alt="Set Forge"
+          class="logo"
+          height="420"
+          src="/logo.svg"
+          width="1909"
+        />
         <div
           class="headerActions"
         >
           <button
             aria-label="Export workout lists"
-            class="iconButton"
+            class="iconButton ghost md"
+            data-disabled=""
+            data-headlessui-state="disabled"
             disabled=""
             title="Export workout lists"
             type="button"
@@ -80,7 +61,8 @@ exports[`App Page with route / matches snapshot, route / 1`] = `
           </button>
           <button
             aria-label="Import workout lists"
-            class="iconButton"
+            class="iconButton ghost md"
+            data-headlessui-state=""
             title="Import workout lists"
             type="button"
           >
@@ -124,23 +106,6 @@ exports[`App Page with route / matches snapshot, route / 1`] = `
     <main
       class="main"
     >
-      <a
-        class="addButton"
-        href="/create"
-      >
-        <button
-          class="button primary lg"
-          data-headlessui-state=""
-          type="button"
-        >
-          <span
-            class="addIcon"
-          >
-            +
-          </span>
-          Create Workout List
-        </button>
-      </a>
       <div
         class="empty"
       >
@@ -154,6 +119,35 @@ exports[`App Page with route / matches snapshot, route / 1`] = `
         </p>
       </div>
     </main>
+    <a
+      aria-label="Create workout list"
+      class="iconButton primary lg createFab"
+      data-headlessui-state=""
+      href="/create"
+      title="Create workout list"
+    >
+      <svg
+        aria-hidden="true"
+        fill="none"
+        height="24"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M12 5v14"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-width="2"
+        />
+        <path
+          d="M5 12h14"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-width="2"
+        />
+      </svg>
+    </a>
   </div>
 </div>
 `;

@@ -50,7 +50,7 @@ When `authFailedCount >= 5`, failed login responses use `resultCode === 10` (`NE
 ## Session model
 
 - **Access token**: stored in memory only (module); lost on full page reload — restored via `POST /auth/refresh` then `GET /auth/me` during root `beforeLoad`.
-- **Current user**: `{ id, email }` from `/auth/me`; exposed via TanStack Query (`['session', 'me']`) and used for UI (avatar letter).
+- **Current user**: `{ id, email }` from `/auth/me`; exposed via TanStack Query (`['session', 'me']`). Email letter for `UserAvatarMenu` — **planned on Settings page** (see [home-page.spec.md](home-page.spec.md#app-header-authenticated)).
 
 ### Bootstrap (`beforeLoad` on root)
 
@@ -90,5 +90,5 @@ When `authFailedCount >= 5`, failed login responses use `resultCode === 10` (`NE
 ## References
 
 - Backend DTOs: `server/src/auth/dto/`
-- [home-page.spec.md](home-page.spec.md) — header avatar + logout
-- [shared-components.spec.md](shared-components.spec.md) — `UserAvatarMenu`, auth tabs
+- [home-page.spec.md](home-page.spec.md) — header logo; avatar/logout planned on Settings
+- [shared-components.spec.md](shared-components.spec.md) — `UserAvatarMenu` (Settings), auth tabs

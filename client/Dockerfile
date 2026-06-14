@@ -10,6 +10,8 @@ RUN npm ci --workspace @set-forge/client --include-workspace-root
 # Produce static assets under client/dist.
 FROM deps AS build
 WORKDIR /app
+ARG VITE_PUBLIC_ORIGIN
+ENV VITE_PUBLIC_ORIGIN=$VITE_PUBLIC_ORIGIN
 COPY client ./client
 RUN npm run build -w @set-forge/client
 
