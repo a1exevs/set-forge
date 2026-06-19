@@ -1,0 +1,18 @@
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 1px solid $border-color;
+  border-radius: 50%;
+  background-color: $bg-secondary;
+  color: $text-primary;
+}
+
+.letter {
+  font-size: $font-size-2xl;
+  font-weight: 700;
+  line-height: 1;
+  user-select: none;
+}

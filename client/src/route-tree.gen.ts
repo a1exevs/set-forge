@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './app/model/routes/__root'
 import { Route as RegisterRouteImport } from './app/model/routes/register'
+import { Route as ProfileRouteImport } from './app/model/routes/profile'
 import { Route as LoginRouteImport } from './app/model/routes/login'
 import { Route as CreateRouteImport } from './app/model/routes/create'
 import { Route as IndexRouteImport } from './app/model/routes/index'
@@ -19,6 +20,11 @@ import { Route as EditIdRouteImport } from './app/model/routes/edit/$id'
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/create': typeof CreateRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/edit/$id': typeof EditIdRoute
   '/workout/$id': typeof WorkoutIdRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/create': typeof CreateRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/edit/$id': typeof EditIdRoute
   '/workout/$id': typeof WorkoutIdRoute
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/create': typeof CreateRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/edit/$id': typeof EditIdRoute
   '/workout/$id': typeof WorkoutIdRoute
@@ -78,16 +87,25 @@ export interface FileRouteTypes {
     | '/'
     | '/create'
     | '/login'
+    | '/profile'
     | '/register'
     | '/edit/$id'
     | '/workout/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create' | '/login' | '/register' | '/edit/$id' | '/workout/$id'
+  to:
+    | '/'
+    | '/create'
+    | '/login'
+    | '/profile'
+    | '/register'
+    | '/edit/$id'
+    | '/workout/$id'
   id:
     | '__root__'
     | '/'
     | '/create'
     | '/login'
+    | '/profile'
     | '/register'
     | '/edit/$id'
     | '/workout/$id'
@@ -97,6 +115,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CreateRoute: typeof CreateRoute
   LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   EditIdRoute: typeof EditIdRoute
   WorkoutIdRoute: typeof WorkoutIdRoute
@@ -109,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -153,6 +179,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CreateRoute: CreateRoute,
   LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   EditIdRoute: EditIdRoute,
   WorkoutIdRoute: WorkoutIdRoute,

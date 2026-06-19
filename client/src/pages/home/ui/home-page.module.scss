@@ -2,6 +2,7 @@
   min-height: 100vh;
   background-color: $bg-primary;
   padding: $spacing-md;
+  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0) + $spacing-md);
 }
 
 .header {
@@ -15,13 +16,6 @@
   max-width: 800px;
   margin: 0 auto;
   gap: $spacing-sm;
-}
-
-.logo {
-  display: block;
-  height: 2.5rem;
-  width: auto;
-  flex-shrink: 0;
 }
 
 .headerActions {
@@ -43,7 +37,7 @@
 .createFab {
   position: fixed;
   right: $spacing-md;
-  bottom: $spacing-md;
+  bottom: calc(3.5rem + env(safe-area-inset-bottom, 0) + $spacing-md);
   z-index: $z-fab;
   text-decoration: none;
 }
@@ -51,7 +45,7 @@
 @media (min-width: 768px) {
   .createFab {
     right: $spacing-xl;
-    bottom: $spacing-xl;
+    bottom: calc(3.5rem + env(safe-area-inset-bottom, 0) + $spacing-xl);
   }
 }
 
@@ -162,6 +156,7 @@
 @media (min-width: 768px) {
   .container {
     padding: $spacing-xl;
+    padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0) + $spacing-xl);
   }
 
   .listGrid {

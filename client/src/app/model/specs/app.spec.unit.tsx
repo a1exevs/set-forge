@@ -9,8 +9,8 @@ describe('App', () => {
       const testRouter = createTestRouter('/', queryClient);
       renderApp(testRouter, queryClient);
 
-      const logo = await screen.findByRole('img', { name: 'Set Forge' });
-      expect(logo).toBeInTheDocument();
+      const wordmark = await screen.findByText('Workout lists');
+      expect(wordmark).toBeInTheDocument();
 
       const createLink = screen.getByRole('link', { name: /Create workout list/i });
       expect(createLink).toBeInTheDocument();

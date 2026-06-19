@@ -54,6 +54,7 @@
     "@tanstack/react-router": "1.161.3",
     "canvas-confetti": "1.9.3",
     "immer": "10.1.1",
+    "lucide-react": "1.18.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "recharts": "2.15.0",

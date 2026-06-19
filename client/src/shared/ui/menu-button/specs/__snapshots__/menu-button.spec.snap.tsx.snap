@@ -11,12 +11,35 @@ exports[`MenuButton matches snapshot when closed 1`] = `
     id="headlessui-menu-button-:r2:"
     type="button"
   >
-    <span
+    <svg
       aria-hidden="true"
-      class="icon"
+      class="lucide lucide-ellipsis-vertical icon"
+      fill="none"
+      height="20"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="20"
+      xmlns="http://www.w3.org/2000/svg"
     >
-      ⋮
-    </span>
+      <circle
+        cx="12"
+        cy="12"
+        r="1"
+      />
+      <circle
+        cx="12"
+        cy="5"
+        r="1"
+      />
+      <circle
+        cx="12"
+        cy="19"
+        r="1"
+      />
+    </svg>
   </button>
 </div>
 `;
@@ -37,12 +60,35 @@ exports[`MenuButton matches snapshot when opened 1`] = `
       id="headlessui-menu-button-:r8:"
       type="button"
     >
-      <span
+      <svg
         aria-hidden="true"
-        class="icon"
+        class="lucide lucide-ellipsis-vertical icon"
+        fill="none"
+        height="20"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="20"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        ⋮
-      </span>
+        <circle
+          cx="12"
+          cy="12"
+          r="1"
+        />
+        <circle
+          cx="12"
+          cy="5"
+          r="1"
+        />
+        <circle
+          cx="12"
+          cy="19"
+          r="1"
+        />
+      </svg>
     </button>
   </div>
   <div

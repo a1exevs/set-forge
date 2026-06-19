@@ -1,8 +1,9 @@
 import { Link } from '@tanstack/react-router';
+import { LogIn, UserPlus } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { FC, FormEvent } from 'react';
 
-import { Button } from '@shared';
+import { BrandWordmark, Button } from '@shared';
 
 import classes from 'src/pages/auth/ui/auth-page.module.scss';
 
@@ -47,35 +48,6 @@ const TabLink: FC<{
   </Link>
 );
 
-const IconLogin: FC = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M12 11c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S9 4.34 9 6v2c0 1.66 1.34 3 3 3z"
-      stroke="currentColor"
-      strokeWidth="1.75"
-    />
-    <path
-      d="M5 20v-1c0-2.76 2.24-5 5-5h4c2.76 0 5 2.24 5 5v1"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
-const IconRegister: FC = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-    />
-    <circle cx="9" cy="7" r="3.25" stroke="currentColor" strokeWidth="1.75" />
-    <path d="M19 8v6M22 11h-6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-  </svg>
-);
-
 const AuthPage: FC<Props> = ({
   activeTab,
   email,
@@ -98,15 +70,25 @@ const AuthPage: FC<Props> = ({
     <div className={classes.page}>
       <div className={classes.card}>
         <header className={classes.header}>
-          <h1 className={classes.title}>Set Forge</h1>
+          <BrandWordmark title="SET FORGE" titleAs="h1" className={classes.wordmark} />
           <p className={classes.subtitle}>Sign in to sync workouts across devices</p>
         </header>
 
         <div className={classes.tabs} role="tablist" aria-label="Authentication">
-          <TabLink to="/login" active={activeTab === 'login'} search={redirectSearch} icon={<IconLogin />}>
+          <TabLink
+            to="/login"
+            active={activeTab === 'login'}
+            search={redirectSearch}
+            icon={<LogIn size={18} strokeWidth={1.75} aria-hidden />}
+          >
             Log in
           </TabLink>
-          <TabLink to="/register" active={activeTab === 'register'} search={redirectSearch} icon={<IconRegister />}>
+          <TabLink
+            to="/register"
+            active={activeTab === 'register'}
+            search={redirectSearch}
+            icon={<UserPlus size={18} strokeWidth={1.75} aria-hidden />}
+          >
             Register
           </TabLink>
         </div>

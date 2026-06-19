@@ -4,19 +4,22 @@
 
 Specification for shared UI components in `client/src/shared/ui/`. New components are added as sections in this file.
 
-**Components (7):**
+**Components (10):**
 
 | Component | Public export (`@shared`) | Storybook title |
 |-----------|---------------------------|-----------------|
 | Button | `Button` | `Shared/Button` |
+| BrandWordmark | `BrandWordmark` | `Shared/BrandWordmark` |
 | IconButton | `IconButton` | `Shared/IconButton` |
 | MenuButton | `MenuButton`, `MenuItem` type | `Shared/MenuButton` |
+| TabsBar | `TabsBar`, `TabsBarItem` type | `Shared/TabsBar` |
+| UserAvatar | `UserAvatar` | `Shared/UserAvatar` |
 | UserAvatarMenu | `UserAvatarMenu` | `Shared/UserAvatarMenu` |
 | NumericField | `NumericField` | `Shared/NumericField` |
 | Dialog | internal only (used by ConfirmDialog) | `Shared/Dialog` |
 | ConfirmDialog | `ConfirmDialogProvider`, `useConfirm` | `Shared/ConfirmDialog` |
 
-All components use Headless UI where applicable and SCSS Modules for styling. The `styles/` directory (themes, variables, global) is not a component and is out of scope here.
+All components use Headless UI where applicable, **lucide-react** for icons, and SCSS Modules for styling. The `styles/` directory (themes, variables, global) is not a component and is out of scope here.
 
 ---
 
@@ -222,7 +225,7 @@ type Props = {
 
 ### UI
 
-- Icon: ⋮ (three vertical dots), decorative (`aria-hidden` on the glyph span).
+- Icon: `EllipsisVertical` from lucide-react (20px, stroke 2), decorative (`aria-hidden`).
 - Dropdown panel: positioned below the trigger, start-aligned (`anchor="bottom start"`).
 - Menu items rendered in caller-supplied order (e.g. Edit, then Delete).
 
@@ -257,7 +260,7 @@ Referenced by: [edit-workout-list.spec.md](edit-workout-list.spec.md), [home-pag
 
 ### Purpose
 
-Circular avatar (letter from user email) as the trigger for a small account menu (e.g. Log out). **Planned for the Settings page** (account section with logout). Previously on the Home header; removed when the header switched to `logo.svg`. Pattern mirrors `MenuButton` (Headless UI `Menu`, `close()` after action).
+Circular avatar (letter from user email) as the trigger for a small account menu (e.g. Log out). **Not used on Home or Profile** — Profile uses display-only [`UserAvatar`](#useravatar) and a standalone `Button` for logout. Kept for future account menus. Pattern mirrors `MenuButton` (Headless UI `Menu`, `close()` after action).
 
 ### Location
 
@@ -316,7 +319,183 @@ type Props = {
 
 ### Usage
 
-Referenced by: [home-page.spec.md](home-page.spec.md), [auth-session.spec.md](auth-session.spec.md)
+Storybook / future account menus only. Profile logout: see [profile-page.spec.md](profile-page.spec.md).
+
+---
+
+## UserAvatar
+
+### Purpose
+
+Display-only circular avatar showing the first letter of the user's email. Used on the Profile page (not interactive, no dropdown).
+
+### Location
+
+`shared/ui/user-avatar/`
+
+### Files
+
+- `user-avatar.tsx` — default export.
+- `user-avatar.module.scss` — circle, letter styles.
+
+### Props
+
+```typescript
+type Props = {
+  letter: string;
+  className?: string;
+};
+```
+
+### Tech stack
+
+| Category | Technology |
+|----------|------------|
+| Styling | SCSS Modules |
+
+### UI
+
+- Round avatar (4.5rem), bordered, `$bg-secondary` background, centered bold letter.
+
+### Storybook
+
+- Title: `Shared/UserAvatar`
+- File: `user-avatar.stories.tsx`
+- Stories: Default.
+
+### Tests
+
+- Unit: `specs/user-avatar.spec.unit.tsx`
+- Snapshot: `specs/user-avatar.spec.snap.tsx`
+
+### Usage
+
+- [profile-page.spec.md](profile-page.spec.md) — account section; letter from `emailToAvatarLetter(email)`.
+
+---
+
+## TabsBar
+
+### Purpose
+
+Generic fixed bottom navigation bar with icon + label tabs. Used via [`MainTabsBar`](../../client/src/widgets/main-tabs-bar/) widget on Home and Profile.
+
+### Location
+
+`shared/ui/tabs-bar/`
+
+### Files
+
+- `tabs-bar.tsx` — TanStack Router `Link` tabs; default export.
+- `tabs-bar.module.scss` — fixed bar, active/inactive, badge styles.
+
+### Props
+
+```typescript
+type TabsBarItem = {
+  id: string;
+  label: string;
+  to: string;
+  icon: LucideIcon;
+  badgeCount?: number;
+};
+
+type Props = {
+  items: TabsBarItem[];
+  activeItemId: string;
+  className?: string;
+};
+```
+
+### Tech stack
+
+| Category | Technology |
+|----------|------------|
+| Icons | lucide-react |
+| Routing | TanStack Router `Link` |
+| Styling | SCSS Modules |
+
+### UI
+
+- Fixed bottom `<nav role="tablist">`; equal-width columns; icon (24px) + label.
+- Active tab: `$text-primary`; inactive: `$text-tertiary`.
+- Background: `$bg-secondary`, top border; `padding-bottom: env(safe-area-inset-bottom)`.
+- Optional `badgeCount`: red pill on icon (capped at `99+`).
+
+### Behavior
+
+- Each tab is a router `Link` with `role="tab"`; active tab has `aria-current="page"`.
+
+### Accessibility
+
+- `aria-label="Main navigation"` on tablist.
+- Tab labels are visible text; icons are `aria-hidden`.
+
+### Storybook
+
+- Title: `Shared/TabsBar`
+- File: `tabs-bar.stories.tsx`
+- Stories: TwoTabsHomeActive, TwoTabsProfileActive, FiveTabsReference.
+
+### Tests
+
+- Unit: `specs/tabs-bar.spec.unit.tsx`
+- Snapshot: `specs/tabs-bar.spec.snap.tsx`
+
+### Usage
+
+- `widgets/main-tabs-bar` — Home + Profile tabs.
+- [home-page.spec.md](home-page.spec.md), [profile-page.spec.md](profile-page.spec.md).
+
+---
+
+## BrandWordmark
+
+### Purpose
+
+Header branding: favicon with optional plain leading label and/or styled wordmark text. Used on Home (`leadingTitle`), Auth (`title`), and Profile (`title`).
+
+### Location
+
+`shared/ui/brand-wordmark/`
+
+### Files
+
+- `brand-wordmark.tsx` — default export.
+- `brand-wordmark.module.scss` — favicon size, leading label, wordmark stroke/shadow.
+
+### Props
+
+```typescript
+type Props = {
+  title?: string; // styled wordmark after favicon, e.g. "SET FORGE", "PROFILE"
+  leadingTitle?: string; // plain label before favicon, e.g. "Workout lists"
+  className?: string;
+  titleAs?: 'span' | 'h1'; // default span; auth uses h1
+};
+```
+
+### UI
+
+- Optional `leadingTitle` (plain `$text-primary`, bold) → `/favicon.svg` (2.5rem) → optional styled `title` (uppercase, stroke, shadow).
+- `className` can center the row (auth page: `justify-content: center`).
+
+### Storybook
+
+- Title: `Shared/BrandWordmark`
+- File: `brand-wordmark.stories.tsx`
+- Stories: SetForge, WorkoutLists, Profile.
+
+### Tests
+
+- Unit: `specs/brand-wordmark.spec.unit.tsx`
+- Snapshot: `specs/brand-wordmark.spec.snap.tsx`
+
+### Usage
+
+- [home-page.spec.md](home-page.spec.md) — `title="Workout lists"` (uppercase wordmark after favicon).
+- [profile-page.spec.md](profile-page.spec.md) — `title="PROFILE"`.
+- [auth-session.spec.md](auth-session.spec.md) — `title="SET FORGE"`, centered, `titleAs="h1"`.
 
 ---
 

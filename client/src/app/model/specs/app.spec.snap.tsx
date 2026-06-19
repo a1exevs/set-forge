@@ -8,7 +8,7 @@ describe('App', () => {
       const queryClient = createTestQueryClient();
       const testRouter = createTestRouter('/', queryClient);
       const { container } = renderApp(testRouter, queryClient);
-      await screen.findByRole('img', { name: 'Set Forge' });
+      await screen.findByText('Workout lists');
       expect(container).toMatchSnapshot();
     });
     it(`matches snapshot, route /create`, async () => {
