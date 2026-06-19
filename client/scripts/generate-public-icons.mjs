@@ -30,6 +30,7 @@ const defs = defsMatch?.[0] ?? '';
 const logoOgSvg = `<?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="950" height="451" viewBox="0 0 1909 906">
   ${defs}
+  <rect width="1909" height="906" fill="#ffffff" />
   <clipPath id="cl_og">
     <rect x="0" y="0" width="1909" height="372" />
   </clipPath>
