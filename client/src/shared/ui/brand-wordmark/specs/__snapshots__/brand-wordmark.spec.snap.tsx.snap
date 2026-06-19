@@ -49,11 +49,6 @@ exports[`BrandWordmark matches snapshot for Workout lists 1`] = `
   <div
     class="wordmark"
   >
-    <span
-      class="leadingTitle"
-    >
-      Workout lists
-    </span>
     <img
       alt=""
       aria-hidden="true"
@@ -62,6 +57,11 @@ exports[`BrandWordmark matches snapshot for Workout lists 1`] = `
       src="/favicon.svg"
       width="512"
     />
+    <span
+      class="title"
+    >
+      Workout lists
+    </span>
   </div>
 </div>
 `;
