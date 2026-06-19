@@ -11,14 +11,14 @@ describe('BrandWordmark', () => {
   });
 
   it('renders favicon and title', () => {
-    render(<BrandWordmark title="SET FORGE" />);
+    render(<BrandWordmark title="Set Forge" />);
 
-    expect(screen.getByText('SET FORGE')).toBeInTheDocument();
+    expect(screen.getByText('Set Forge')).toBeInTheDocument();
     expect(document.querySelector('img[src="/favicon.svg"]')).toBeInTheDocument();
   });
 
   it('applies custom className', () => {
-    const { container } = render(<BrandWordmark title="PROFILE" className="custom" />);
+    const { container } = render(<BrandWordmark title="Profile" className="custom" />);
     expect(container.firstChild).toHaveClass('custom');
   });
 });

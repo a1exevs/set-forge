@@ -8,13 +8,13 @@ describe('BrandWordmark', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('matches snapshot for SET FORGE', () => {
-    const { container } = render(<BrandWordmark title="SET FORGE" />);
+  it('matches snapshot for Set Forge', () => {
+    const { container } = render(<BrandWordmark title="Set Forge" />);
     expect(container).toMatchSnapshot();
   });
 
-  it('matches snapshot for PROFILE', () => {
-    const { container } = render(<BrandWordmark title="PROFILE" />);
+  it('matches snapshot for Profile', () => {
+    const { container } = render(<BrandWordmark title="Profile" />);
     expect(container).toMatchSnapshot();
   });
 });

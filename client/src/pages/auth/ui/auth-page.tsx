@@ -70,7 +70,7 @@ const AuthPage: FC<Props> = ({
     <div className={classes.page}>
       <div className={classes.card}>
         <header className={classes.header}>
-          <BrandWordmark title="SET FORGE" titleAs="h1" className={classes.wordmark} />
+          <BrandWordmark title="Set Forge" titleAs="h1" className={classes.wordmark} />
           <p className={classes.subtitle}>Sign in to sync workouts across devices</p>
         </header>
 

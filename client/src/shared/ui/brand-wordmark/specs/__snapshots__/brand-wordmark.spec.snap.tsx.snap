@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`BrandWordmark matches snapshot for PROFILE 1`] = `
+exports[`BrandWordmark matches snapshot for Profile 1`] = `
 <div>
   <div
     class="wordmark"
@@ -16,13 +16,13 @@ exports[`BrandWordmark matches snapshot for PROFILE 1`] = `
     <span
       class="title"
     >
-      PROFILE
+      Profile
     </span>
   </div>
 </div>
 `;
 
-exports[`BrandWordmark matches snapshot for SET FORGE 1`] = `
+exports[`BrandWordmark matches snapshot for Set Forge 1`] = `
 <div>
   <div
     class="wordmark"
@@ -38,7 +38,7 @@ exports[`BrandWordmark matches snapshot for SET FORGE 1`] = `
     <span
       class="title"
     >
-      SET FORGE
+      Set Forge
     </span>
   </div>
 </div>

@@ -30,7 +30,7 @@ describe('ProfilePage', () => {
       <ProfilePage email="jane@example.com" avatarLetter="J" onLogout={(): void => undefined} isLoggingOut={false} />,
     );
 
-    expect(screen.getByText('PROFILE')).toBeInTheDocument();
+    expect(screen.getByText('Profile')).toBeInTheDocument();
     expect(screen.getByText('J')).toBeInTheDocument();
     expect(screen.getByText('jane@example.com')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Log out' })).toBeInTheDocument();

@@ -21,7 +21,7 @@ const ProfilePage: FC<Props> = ({ email, avatarLetter, onLogout, isLoggingOut })
     <div ref={swipeRef} className={classes.container}>
       <header className={classes.header}>
         <div className={classes.headerTop}>
-          <BrandWordmark title="PROFILE" />
+          <BrandWordmark title="Profile" />
         </div>
       </header>
 

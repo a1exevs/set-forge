@@ -68,7 +68,7 @@ When `authFailedCount >= 5`, failed login responses use `resultCode === 10` (`NE
 
 ## Auth page UI
 
-- Centered [`BrandWordmark`](shared-components.spec.md#brandwordmark) (`title="SET FORGE"`, `titleAs="h1"`) + subtitle.
+- Centered [`BrandWordmark`](shared-components.spec.md#brandwordmark) (`title="Set Forge"`, `titleAs="h1"`) + subtitle.
 - Headless UI tab links: Login / Register with lucide `LogIn` / `UserPlus` icons; tab change updates route (`/login` | `/register`).
 - Forms: email + password; register validates client-side per DTO (email format, password 8–50).
 - Server errors: show `messages` / validation feedback; captcha path when `resultCode === 10`.

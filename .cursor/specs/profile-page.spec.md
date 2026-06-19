@@ -8,7 +8,7 @@ The profile page shows the authenticated user's account info (avatar letter, ema
 
 ## App header
 
-1. Top **header** row (`.headerTop`): [`BrandWordmark`](shared-components.spec.md#brandwordmark) with `title="PROFILE"` (same layout as Home, no right-side actions).
+1. Top **header** row (`.headerTop`): [`BrandWordmark`](shared-components.spec.md#brandwordmark) with `title="Profile"` (same layout as Home, no right-side actions).
 
 ---
 

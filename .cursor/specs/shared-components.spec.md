@@ -468,7 +468,7 @@ Header branding: favicon with optional plain leading label and/or styled wordmar
 
 ```typescript
 type Props = {
-  title?: string; // styled wordmark after favicon, e.g. "SET FORGE", "PROFILE"
+  title?: string; // styled wordmark after favicon, e.g. "Set Forge", "Profile"
   leadingTitle?: string; // plain label before favicon, e.g. "Workout lists"
   className?: string;
   titleAs?: 'span' | 'h1'; // default span; auth uses h1
@@ -494,8 +494,8 @@ type Props = {
 ### Usage
 
 - [home-page.spec.md](home-page.spec.md) — `title="Workout lists"` (uppercase wordmark after favicon).
-- [profile-page.spec.md](profile-page.spec.md) — `title="PROFILE"`.
-- [auth-session.spec.md](auth-session.spec.md) — `title="SET FORGE"`, centered, `titleAs="h1"`.
+- [profile-page.spec.md](profile-page.spec.md) — `title="Profile"`.
+- [auth-session.spec.md](auth-session.spec.md) — `title="Set Forge"`, centered, `titleAs="h1"`.
 
 ---
 

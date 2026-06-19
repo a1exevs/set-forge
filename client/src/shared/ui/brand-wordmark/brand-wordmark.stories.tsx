@@ -12,7 +12,7 @@ type Story = StoryObj<typeof meta>;
 
 export const SetForge: Story = {
   args: {
-    title: 'SET FORGE',
+    title: 'Set Forge',
   },
 };
 
@@ -24,6 +24,6 @@ export const WorkoutLists: Story = {
 
 export const Profile: Story = {
   args: {
-    title: 'PROFILE',
+    title: 'Profile',
   },
 };

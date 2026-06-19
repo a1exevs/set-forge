@@ -9,7 +9,7 @@ test.describe('Auth gate', () => {
     await page.goto('/');
 
     await expect(page).toHaveURL(/\/login/);
-    await expect(page.getByRole('heading', { name: 'SET FORGE' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Set Forge' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Log in' })).toBeVisible();
   });
 });
