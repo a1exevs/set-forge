@@ -6,6 +6,8 @@ import { defineConfig, loadEnv } from 'vite';
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, __dirname, '');
+  const publicOrigin = env.VITE_PUBLIC_ORIGIN || 'https://localhost';
+  process.env.VITE_PUBLIC_ORIGIN = publicOrigin;
   const devServerPort = 5173;
   const apiProxyTarget = env.VITE_DEV_API_PROXY || 'http://localhost:5001';
   const devClientOrigin = `http://localhost:${devServerPort}`;
