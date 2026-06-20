@@ -7,6 +7,6 @@
     "allowImportingTsExtensions": false,
     "types": ["jest", "@testing-library/jest-dom"]
   },
-  "include": ["src/**/*.spec.*", "tests/**/*"],
+  "include": ["src/vite-env.d.ts", "src/**/*.spec.*", "tests/**/*"],
   "exclude": ["node_modules", "dist", "build", "coverage"]
 }

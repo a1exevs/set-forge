@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { useWorkoutListStore } from '@entities';
+import { useResetWorkoutProgressMutation, useUpdateWorkoutProgressMutation, useWorkoutQuery } from '@entities';
 
 import WorkoutModePageLogicLayer from 'src/pages/workout-mode/ui/workout-mode-page-logic-layer';
 
@@ -9,20 +9,20 @@ type Props = {
 };
 
 const WorkoutModePageDataLayer: FC<Props> = ({ id }) => {
-  const currentWorkout = useWorkoutListStore.use.currentWorkout();
-  const setCurrentWorkout = useWorkoutListStore.use.setCurrentWorkout();
-  const clearCurrentWorkout = useWorkoutListStore.use.clearCurrentWorkout();
-  const updateWorkoutProgress = useWorkoutListStore.use.updateWorkoutProgress();
-  const resetAllProgress = useWorkoutListStore.use.resetAllProgress();
+  const { data: workout, isLoading } = useWorkoutQuery(id);
+  const updateWorkoutProgressMutation = useUpdateWorkoutProgressMutation();
+  const resetWorkoutProgressMutation = useResetWorkoutProgressMutation();
 
   return (
     <WorkoutModePageLogicLayer
       id={id}
-      currentWorkout={currentWorkout}
-      setCurrentWorkout={setCurrentWorkout}
-      clearCurrentWorkout={clearCurrentWorkout}
-      updateWorkoutProgress={updateWorkoutProgress}
-      resetAllProgress={resetAllProgress}
+      workout={isLoading ? undefined : (workout ?? null)}
+      updateWorkoutProgress={async (listId, exerciseId): Promise<void> => {
+        await updateWorkoutProgressMutation.mutateAsync({ listId, exerciseId });
+      }}
+      resetAllProgress={async (listId): Promise<void> => {
+        await resetWorkoutProgressMutation.mutateAsync(listId);
+      }}
     />
   );
 };

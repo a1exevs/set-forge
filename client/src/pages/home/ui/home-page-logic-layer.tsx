@@ -1,30 +1,29 @@
-import type { WorkoutList } from '@entities';
-import { FC, useEffect, useState } from 'react';
+import type { WorkoutList, WorkoutListsExportFile } from '@entities';
+import { ChangeEvent, FC, useRef } from 'react';
 
-import { useConfirm } from '@shared';
+import { buildWorkoutListsExportFilename, downloadJsonFile, useConfirm } from '@shared';
 
 import HomePage from 'src/pages/home/ui/home-page';
 
 type Props = {
-  loadFromStorage: () => void;
   workoutLists: WorkoutList[];
-  deleteWorkoutList: (id: string) => void;
+  deleteWorkoutList: (id: string) => Promise<void>;
+  exportAllWorkoutLists: () => Promise<WorkoutListsExportFile>;
+  importWorkoutLists: (file: WorkoutListsExportFile) => Promise<void>;
   onEdit: (id: string) => void;
   formatDate: (date: string | null) => string;
-  getUsagePercentageAsync: () => Promise<number>;
 };
 
 const HomePageLogicLayer: FC<Props> = ({
   workoutLists,
   deleteWorkoutList,
+  exportAllWorkoutLists,
+  importWorkoutLists,
   onEdit,
   formatDate,
-  getUsagePercentageAsync,
-  loadFromStorage,
 }) => {
-  const [storageWarning, setStorageWarning] = useState<boolean>(false);
-
   const confirmDialog = useConfirm();
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const handleDelete = async (id: string, name: string): Promise<void> => {
     const ok = await confirmDialog({
@@ -34,58 +33,95 @@ const HomePageLogicLayer: FC<Props> = ({
       cancellationText: 'Cancel',
     });
     if (ok) {
-      deleteWorkoutList(id);
+      await deleteWorkoutList(id);
     }
   };
 
-  useEffect((): void => {
-    loadFromStorage();
-  }, [loadFromStorage]);
+  const handleExport = async (): Promise<void> => {
+    try {
+      const data = await exportAllWorkoutLists();
+      downloadJsonFile(data, buildWorkoutListsExportFilename());
+    } catch (error) {
+      await confirmDialog({
+        title: 'Export failed',
+        description: error instanceof Error ? error.message : 'Failed to export workout lists',
+        confirmationText: 'OK',
+        cancellationText: 'Close',
+      });
+    }
+  };
 
-  useEffect((): void => {
-    const checkUsage = async (): Promise<void> => {
-      const percentage = await getUsagePercentageAsync();
-      setStorageWarning(percentage >= 80);
-    };
-    checkUsage();
-  }, [workoutLists, getUsagePercentageAsync]);
+  const handleImportClick = (): void => {
+    importInputRef.current?.click();
+  };
 
-  const handleExport = (): void => {
-    const exportFile = {
-      formatVersion: 1,
-      app: 'set-forge' as const,
-      exportedAt: new Date().toISOString(),
-      workoutLists: workoutLists.map(list => ({
-        name: list.name,
-        description: list.description,
-        exercises: list.exercises.map(({ name, muscleGroup, weight, reps, sets }) => ({
-          name,
-          muscleGroup,
-          weight,
-          reps,
-          sets,
-        })),
-        createdAt: list.createdAt,
-        lastUsedAt: list.lastUsedAt,
-      })),
-    };
-    const day = new Date().toISOString().slice(0, 10);
-    const blob = new Blob([JSON.stringify(exportFile, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `set-forge-workout-lists-${day}.json`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+  const handleImportFile = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) {
+      return;
+    }
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(await file.text());
+    } catch {
+      await confirmDialog({
+        title: 'Import failed',
+        description: 'The selected file is not valid JSON.',
+        confirmationText: 'OK',
+        cancellationText: 'Close',
+      });
+      return;
+    }
+
+    const count = Array.isArray(parsed)
+      ? parsed.length
+      : typeof parsed === 'object' && parsed !== null && 'workoutLists' in parsed
+        ? (parsed as WorkoutListsExportFile).workoutLists.length
+        : 0;
+
+    if (count === 0) {
+      await confirmDialog({
+        title: 'Import failed',
+        description: 'The file does not contain any workout lists to import.',
+        confirmationText: 'OK',
+        cancellationText: 'Close',
+      });
+      return;
+    }
+
+    const ok = await confirmDialog({
+      title: 'Import workout lists?',
+      description: `Import ${count} workout list${count === 1 ? '' : 's'}?`,
+      confirmationText: 'Import',
+      cancellationText: 'Cancel',
+    });
+    if (!ok) {
+      return;
+    }
+
+    try {
+      await importWorkoutLists(parsed as WorkoutListsExportFile);
+    } catch (error) {
+      await confirmDialog({
+        title: 'Import failed',
+        description: error instanceof Error ? error.message : 'Failed to import workout lists',
+        confirmationText: 'OK',
+        cancellationText: 'Close',
+      });
+    }
   };
 
   return (
     <HomePage
       workoutLists={workoutLists}
-      storageWarning={storageWarning}
       onEdit={onEdit}
       onDelete={handleDelete}
       onExport={handleExport}
+      onImportClick={handleImportClick}
+      onImportFile={handleImportFile}
+      importInputRef={importInputRef}
       formatDate={formatDate}
     />
   );

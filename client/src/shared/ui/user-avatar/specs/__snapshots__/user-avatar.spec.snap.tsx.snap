@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`UserAvatar matches snapshot 1`] = `
+<div>
+  <div
+    aria-hidden="true"
+    class="avatar"
+  >
+    <span
+      class="letter"
+    >
+      J
+    </span>
+  </div>
+</div>
+`;

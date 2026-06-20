@@ -1,0 +1,55 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "./",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "setupFiles": [
+    "./test-environment.ts",
+    "./string.extensions.ts"
+  ],
+  "setupFilesAfterEnv": [
+    "<rootDir>/test/e2e/setup-env.ts"
+  ],
+  "globalSetup": "<rootDir>/test/e2e/global-setup.ts",
+  "globalTeardown": "<rootDir>/test/e2e/global-teardown.ts",
+  "testTimeout": 30000,
+  "forceExit": true,
+  "moduleNameMapper": {
+    "@root/(.*)$": [
+      "<rootDir>/$1"
+    ],
+    "@src/(.*)$": [
+      "<rootDir>/src/$1"
+    ],
+    "@auth/(.*)$": [
+      "<rootDir>/src/auth/$1"
+    ],
+    "@common/(.*)$": [
+      "<rootDir>/src/common/$1"
+    ],
+    "@logger/(.*)$": [
+      "<rootDir>/src/logger/$1"
+    ],
+    "@roles/(.*)$": [
+      "<rootDir>/src/roles/$1"
+    ],
+    "@security/(.*)$": [
+      "<rootDir>/src/security/$1"
+    ],
+    "@users/(.*)$": [
+      "<rootDir>/src/users/$1"
+    ],
+    "@workout-lists/(.*)$": [
+      "<rootDir>/src/workout-lists/$1"
+    ],
+    "@test/(.*)$": [
+      "<rootDir>/test/$1"
+    ],
+    "@assets/(.*)$": [
+      "<rootDir>/assets/$1"
+    ]
+  }
+}

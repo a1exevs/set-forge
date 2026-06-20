@@ -1,2 +1,2 @@
 // model
-export { router } from 'src/app/model';
+export { queryClient, router } from 'src/app/model';

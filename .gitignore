@@ -30,6 +30,9 @@ dist-ssr
 .env.development.local
 .env.test.local
 .env.production.local
+.development.env
+.production.env
+.e2e.env
 
 # Build output
 build
@@ -46,3 +49,4 @@ test-results
 playwright-report
 docs
 storybook-static
+server/test/e2e/.runtime-env.json

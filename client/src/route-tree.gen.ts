@@ -9,11 +9,29 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './app/model/routes/__root'
+import { Route as RegisterRouteImport } from './app/model/routes/register'
+import { Route as ProfileRouteImport } from './app/model/routes/profile'
+import { Route as LoginRouteImport } from './app/model/routes/login'
 import { Route as CreateRouteImport } from './app/model/routes/create'
 import { Route as IndexRouteImport } from './app/model/routes/index'
 import { Route as WorkoutIdRouteImport } from './app/model/routes/workout/$id'
 import { Route as EditIdRouteImport } from './app/model/routes/edit/$id'
 
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreateRoute = CreateRouteImport.update({
   id: '/create',
   path: '/create',
@@ -38,12 +56,18 @@ const EditIdRoute = EditIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/create': typeof CreateRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
   '/edit/$id': typeof EditIdRoute
   '/workout/$id': typeof WorkoutIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/create': typeof CreateRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
   '/edit/$id': typeof EditIdRoute
   '/workout/$id': typeof WorkoutIdRoute
 }
@@ -51,26 +75,75 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/create': typeof CreateRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
   '/edit/$id': typeof EditIdRoute
   '/workout/$id': typeof WorkoutIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/create' | '/edit/$id' | '/workout/$id'
+  fullPaths:
+    | '/'
+    | '/create'
+    | '/login'
+    | '/profile'
+    | '/register'
+    | '/edit/$id'
+    | '/workout/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create' | '/edit/$id' | '/workout/$id'
-  id: '__root__' | '/' | '/create' | '/edit/$id' | '/workout/$id'
+  to:
+    | '/'
+    | '/create'
+    | '/login'
+    | '/profile'
+    | '/register'
+    | '/edit/$id'
+    | '/workout/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/create'
+    | '/login'
+    | '/profile'
+    | '/register'
+    | '/edit/$id'
+    | '/workout/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CreateRoute: typeof CreateRoute
+  LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
+  RegisterRoute: typeof RegisterRoute
   EditIdRoute: typeof EditIdRoute
   WorkoutIdRoute: typeof WorkoutIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/create': {
       id: '/create'
       path: '/create'
@@ -105,6 +178,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CreateRoute: CreateRoute,
+  LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
+  RegisterRoute: RegisterRoute,
   EditIdRoute: EditIdRoute,
   WorkoutIdRoute: WorkoutIdRoute,
 }

@@ -1,0 +1,124 @@
+x-json-file-logging: &json-file-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-mysql-common: &mysql-common
+  image: mysql:8.4
+  restart: unless-stopped
+  logging: *json-file-logging
+  environment:
+    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    MYSQL_DATABASE: ${MYSQL_DATABASE}
+    MYSQL_USER: ${MYSQL_USER}
+    MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  healthcheck:
+    test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+    interval: 10s
+    timeout: 5s
+    retries: 10
+    start_period: 20s
+
+services:
+  mysql:
+    <<: *mysql-common
+    profiles: ["prod"]
+    volumes:
+      - mysql_data_prod:/var/lib/mysql
+
+  mysql-dev:
+    <<: *mysql-common
+    profiles: ["dev"]
+    ports:
+      - "127.0.0.1:${MYSQL_PUBLIC_PORT:-3306}:3306"
+    volumes:
+      - mysql_data_dev:/var/lib/mysql
+
+  server-prod:
+    profiles: ["prod"]
+    logging: *json-file-logging
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      target: production
+    env_file:
+      - ./server/.production.env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    expose:
+      - "5000"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+    # Writable mounts for the only two paths the app writes to:
+    #   - SERVER_STATIC=static  → user uploads (avatars, post images) via files.service.ts
+    #   - SERVER_LOGS=logs      → error logs via logger.service.ts
+    # Both live under /app/dist/<name> because __dirname in the compiled code is /app/dist/src/...
+    volumes:
+      - server_static:/app/dist/static
+      - server_logs:/app/dist/logs
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"require('http').get('http://127.0.0.1:'+(process.env.PORT||5000)+'/api/1.0/health',(r)=>{r.resume();r.on('end',()=>process.exit(r.statusCode===200?0:1));}).on('error',()=>process.exit(1));\"",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  client-prod:
+    profiles: ["prod"]
+    logging: *json-file-logging
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+      args:
+        VITE_PUBLIC_ORIGIN: ${VITE_PUBLIC_ORIGIN:-https://localhost}
+    depends_on:
+      server-prod:
+        condition: service_healthy
+    expose:
+      - "80"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+  # TLS-terminating reverse proxy in front of client-prod (which serves SPA + proxies /api to server-prod).
+  # SITE_ADDRESS=localhost → Caddy uses its internal CA (HTTPS works without a public domain).
+  # SITE_ADDRESS=<public host> → Caddy auto-issues a Let's Encrypt cert.
+  # HTTP_PORT/HTTPS_PORT let you sidestep ports 80/443 when they are taken on the host (common on Windows).
+  caddy:
+    profiles: ["prod"]
+    logging: *json-file-logging
+    image: caddy:2.8-alpine
+    depends_on:
+      - client-prod
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  mysql_data_prod:
+  mysql_data_dev:
+  caddy_data:
+  caddy_config:
+  server_static:
+  server_logs:

@@ -1,48 +1,39 @@
 import type { UpdateWorkoutListDto, WorkoutList } from '@entities';
 import { useNavigate } from '@tanstack/react-router';
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 
 import { NotFoundMessage, WorkoutListForm } from '@widgets';
 
 type Props = {
   id: string;
-  currentWorkout: WorkoutList | null;
-  setCurrentWorkout: (id: string) => void;
-  clearCurrentWorkout: () => void;
-  updateWorkoutList: (id: string, dto: UpdateWorkoutListDto) => boolean;
+  workout: WorkoutList | null | undefined;
+  updateWorkoutList: (id: string, dto: UpdateWorkoutListDto) => Promise<boolean>;
 };
 
-const EditWorkoutPageLogicLayer: FC<Props> = ({
-  id,
-  currentWorkout,
-  setCurrentWorkout,
-  clearCurrentWorkout,
-  updateWorkoutList,
-}) => {
+const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, updateWorkoutList }) => {
   const navigate = useNavigate();
 
-  useEffect((): (() => void) => {
-    if (id) {
-      setCurrentWorkout(id);
-    }
-    return clearCurrentWorkout;
-  }, [id, setCurrentWorkout, clearCurrentWorkout]);
+  if (workout === undefined) {
+    return null;
+  }
 
-  if (currentWorkout === null) {
+  if (workout === null) {
     return <NotFoundMessage title="Workout list not found" />;
   }
 
   return (
     <WorkoutListForm
       mode="edit"
-      initialData={currentWorkout}
+      initialData={workout}
       onSubmit={(dto): void => {
-        const success = updateWorkoutList(id, dto);
-        if (!success) {
-          // TODO: Support common toaster
-          return;
-        }
-        navigate({ to: '/' });
+        void (async (): Promise<void> => {
+          const success = await updateWorkoutList(id, dto);
+          if (!success) {
+            // TODO: Support common toaster
+            return;
+          }
+          navigate({ to: '/' });
+        })();
       }}
       onCancel={(): void => {
         navigate({ to: '/' });

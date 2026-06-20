@@ -2,6 +2,7 @@
   min-height: 100vh;
   background-color: $bg-primary;
   padding: $spacing-md;
+  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0) + $spacing-md);
 }
 
 .header {
@@ -11,78 +12,21 @@
 .headerTop {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   max-width: 800px;
   margin: 0 auto;
-  position: relative;
-}
-
-.headerTitles {
-  text-align: center;
-
-  h1 {
-    font-size: $font-size-3xl;
-    color: $text-primary;
-    margin: 0 0 $spacing-xs;
-  }
-}
-
-.subtitle {
-  font-size: $font-size-base;
-  color: $text-secondary;
-  margin: 0;
-}
-
-.exportButton {
-  position: absolute;
-  right: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  padding: $spacing-xs;
-  border: none;
-  border-radius: $radius-md;
-  background-color: transparent;
-  color: $text-primary;
-  cursor: pointer;
-
-  svg {
-    display: block;
-  }
-
-  &:hover:not(:disabled) {
-    background-color: $bg-hover;
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-}
-
-.warning {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.05));
-  border: 1px solid $warning-color;
-  border-radius: $radius-lg;
-  padding: $spacing-md;
-  margin-bottom: $spacing-lg;
-  display: flex;
-  align-items: flex-start;
   gap: $spacing-sm;
-
-  p {
-    color: $text-primary;
-    font-size: $font-size-sm;
-    line-height: 1.5;
-    margin: 0;
-  }
 }
 
-.warningIcon {
-  font-size: $font-size-lg;
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
   flex-shrink: 0;
+}
+
+.hiddenFileInput {
+  display: none;
 }
 
 .main {
@@ -90,22 +34,19 @@
   margin: 0 auto;
 }
 
-.addButton {
-  display: block;
-  margin-bottom: $spacing-xl;
+.createFab {
+  position: fixed;
+  right: $spacing-md;
+  bottom: calc(3.5rem + env(safe-area-inset-bottom, 0) + $spacing-md);
+  z-index: $z-fab;
   text-decoration: none;
-
-  button {
-    width: 100%;
-    justify-content: center;
-    font-size: $font-size-lg;
-    font-weight: 600;
-  }
 }
 
-.addIcon {
-  font-size: $font-size-2xl;
-  margin-right: $spacing-xs;
+@media (min-width: 768px) {
+  .createFab {
+    right: $spacing-xl;
+    bottom: calc(3.5rem + env(safe-area-inset-bottom, 0) + $spacing-xl);
+  }
 }
 
 .empty {
@@ -215,6 +156,7 @@
 @media (min-width: 768px) {
   .container {
     padding: $spacing-xl;
+    padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0) + $spacing-xl);
   }
 
   .listGrid {

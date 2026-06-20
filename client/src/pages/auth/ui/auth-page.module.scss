@@ -1,0 +1,135 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl $spacing-md;
+  background: $bg-primary;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  padding: $spacing-2xl $spacing-xl;
+  border-radius: $radius-lg;
+  border: 1px solid $border-color;
+  background: $bg-secondary;
+  box-shadow: $shadow-lg;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: $spacing-xl;
+}
+
+.wordmark {
+  justify-content: center;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.tabs {
+  display: flex;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-xl;
+}
+
+.tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  border: 1px solid $border-color;
+  background: $bg-tertiary;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    color: $text-primary;
+    border-color: $border-hover;
+  }
+}
+
+.tabActive {
+  background: $bg-elevated;
+  color: $text-primary;
+  border-color: $border-hover;
+}
+
+.tabIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: $text-secondary;
+}
+
+.input {
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  border: 1px solid $border-color;
+  background: $bg-primary;
+  color: $text-primary;
+  font-size: $font-size-base;
+
+  &:focus {
+    outline: 2px solid $primary-color;
+    outline-offset: 1px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+.fieldError,
+.formError {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: $danger-color;
+}
+
+.formError {
+  margin-top: $spacing-xs;
+}
+
+.captchaHint {
+  margin: 0;
+  font-size: $font-size-xs;
+  color: $text-tertiary;
+}
+
+.captchaImg {
+  max-width: 100%;
+  height: auto;
+  border-radius: $radius-sm;
+  border: 1px solid $border-color;
+}
+
+.submit {
+  margin-top: $spacing-md;
+  width: 100%;
+}

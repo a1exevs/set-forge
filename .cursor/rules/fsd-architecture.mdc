@@ -19,11 +19,11 @@ Layers import only downward. Per layer (except shared): slices → segments.
 - **app/** - Init, providers, global styles
 - **pages/** - Page components (routing)
 - **widgets/** - Composite UI blocks
-- **features/** - User interactions, business features
+- **features/** - User interactions, business features (may be empty until features are added)
 - **entities/** - Business entities, domain models
 - **shared/** - Utilities, UI components, API clients
 
-**Segments:** `ui/` (components), `model/` (logic, types, stores), `api/` (API)
+**Segments:** `ui/` (components), `model/` (logic, types, query hooks, stores), `api/` (HTTP functions — internal to entity, used by query hooks)
 
 ## Import Rules
 
@@ -32,20 +32,19 @@ Layers import only downward. Per layer (except shared): slices → segments.
 ```typescript
 // ✅ CORRECT
 import { Button, createSelectors } from '@shared';
-import { Exercise, useExerciseStore } from '@entities';
-import { AddExerciseForm } from '@features';
+import { useWorkoutListsQuery, type WorkoutList, muscleGroupLabels } from '@entities';
 
 // ❌ WRONG
 import { Button } from '@shared/ui';
-import { Exercise } from '@entities/exercise';
-import { useExerciseStore } from '@entities/exercise/model';
+import { WorkoutList } from '@entities/workout-list';
+import { useWorkoutListsQuery } from '@entities/workout-list/model/use-workout-queries';
 ```
 
 **Intra-layer — absolute paths from `src/`:**
 
 ```typescript
 // ✅ CORRECT
-import { AddExerciseFormLogicLayer } from 'src/features/add-exercise/ui/add-exercise-form-logic-layer';
+import HomePageLogicLayer from 'src/pages/home/ui/home-page-logic-layer';
 ```
 
 ## Public API Exports
@@ -58,14 +57,16 @@ export { HomePage } from 'src/pages/home';
 export { CreateWorkoutPage } from 'src/pages/create-workout';
 export { WorkoutModePage } from 'src/pages/workout-mode';
 
-// Slice: src/entities/exercise/index.ts
-export { useExerciseStore } from 'src/entities/exercise/model';
-export { exerciseApi } from 'src/entities/exercise/api';
-export type { Exercise, MuscleGroup, CreateExerciseDto } from 'src/entities/exercise/model';
+// Slice: src/entities/workout-list/index.ts
+export {
+  useWorkoutListsQuery,
+  useWorkoutQuery,
+  workoutQueryKeys,
+  type WorkoutList,
+} from 'src/entities/workout-list/model';
 
-// Segment: src/entities/exercise/model/index.ts
-export { useExerciseStore } from 'src/entities/exercise/model/store';
-export type { Exercise, MuscleGroup, CreateExerciseDto } from 'src/entities/exercise/model/types';
+// Slice: src/entities/exercise/index.ts
+export { muscleGroups, muscleGroupLabels, type MuscleGroup } from 'src/entities/exercise/model';
 ```
 
 ## When Creating New Code
@@ -89,23 +90,33 @@ src/
 │        └── index.ts
 ├── entities/
 │   ├── index.ts
-│   └── exercise/
+│   ├── exercise/
+│   │   ├── index.ts
+│   │   └── model/
+│   │       ├── index.ts
+│   │       ├── types.ts
+│   │       └── muscle-group-labels.ts
+│   ├── session/
+│   │   ├── index.ts
+│   │   ├── api/
+│   │   ├── model/
+│   │   │   ├── use-session-queries.ts
+│   │   │   └── session-keys.ts
+│   │   └── lib/
+│   └── workout-list/
 │       ├── index.ts
-│       ├── model/
-│       │   ├── index.ts
-│       │   ├── types.ts
-│       │   └── store.ts
-│       └── api/
-│           └── index.ts
-├── features/
-│   ├── index.ts
-│   └── add-exercise/
-│       ├── index.ts
+│       ├── api/
+│       │   └── workout-list-api.ts
+│       └── model/
+│           ├── use-workout-queries.ts
+│           ├── workout-query-keys.ts
+│           └── types.ts
+├── pages/
+│   └── home/
 │       └── ui/
-│           ├── index.ts
-│           ├── add-exercise-form-data-layer.tsx
-│           ├── add-exercise-form-logic-layer.tsx
-│           └── add-exercise-form.tsx
+│           ├── home-page-data-layer.tsx
+│           ├── home-page-logic-layer.tsx
+│           └── home-page.tsx
 └── shared/
     ├── index.ts
     ├── ui/
@@ -115,7 +126,9 @@ src/
     │       └── button.module.scss
     └── model/
         ├── index.ts
-        └── helpers
+        ├── theme/
+        │   └── store.ts
+        └── helpers/
             ├── stores.ts
             └── dates.ts
 ```
