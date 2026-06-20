@@ -12,7 +12,26 @@ export {
   formatDate,
   downloadJsonFile,
   buildWorkoutListsExportFilename,
+  getAdjacentTabRoute,
+  useHorizontalSwipe,
+  useTabSwipeNavigation,
+  type SwipeDirection,
+  type TabRoute,
+  type UseHorizontalSwipeOptions,
+  type UseTabSwipeNavigationOptions,
 } from 'src/shared/model';
 
 // ui
-export { Button, ConfirmDialogProvider, MenuButton, NumericField, UserAvatarMenu, useConfirm } from 'src/shared/ui';
+export {
+  Button,
+  ConfirmDialogProvider,
+  IconButton,
+  BrandWordmark,
+  MenuButton,
+  NumericField,
+  UserAvatar,
+  UserAvatarMenu,
+  useConfirm,
+  TabsBar,
+  type TabsBarItem,
+} from 'src/shared/ui';

@@ -1,0 +1,50 @@
+.container {
+  min-height: 100vh;
+  background-color: $bg-primary;
+  padding: $spacing-md;
+  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0) + $spacing-md);
+}
+
+.header {
+  padding: $spacing-lg 0 $spacing-xl;
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 800px;
+  margin: 0 auto;
+  gap: $spacing-sm;
+}
+
+.main {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.account {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-2xl $spacing-md;
+}
+
+.email {
+  color: $text-secondary;
+  font-size: $font-size-base;
+  text-align: center;
+  word-break: break-word;
+}
+
+.logoutButton {
+  min-width: 10rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: $spacing-xl;
+    padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0) + $spacing-xl);
+  }
+}

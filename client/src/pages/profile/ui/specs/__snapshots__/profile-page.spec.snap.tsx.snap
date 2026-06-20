@@ -1,0 +1,68 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ProfilePage matches snapshot 1`] = `
+<div>
+  <div
+    class="container"
+  >
+    <header
+      class="header"
+    >
+      <div
+        class="headerTop"
+      >
+        <div
+          class="wordmark"
+        >
+          <img
+            alt=""
+            aria-hidden="true"
+            class="icon"
+            height="512"
+            src="/favicon.svg"
+            width="512"
+          />
+          <span
+            class="title"
+          >
+            Profile
+          </span>
+        </div>
+      </div>
+    </header>
+    <main
+      class="main"
+    >
+      <div
+        class="account"
+      >
+        <div
+          aria-hidden="true"
+          class="avatar"
+        >
+          <span
+            class="letter"
+          >
+            J
+          </span>
+        </div>
+        <p
+          class="email"
+        >
+          jane@example.com
+        </p>
+        <button
+          class="button secondary md logoutButton"
+          data-headlessui-state=""
+          type="button"
+        >
+          Log out
+        </button>
+      </div>
+    </main>
+    <nav
+      data-testid="main-tabs-bar"
+    />
+  </div>
+</div>
+`;

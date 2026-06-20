@@ -1,0 +1,61 @@
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.2s ease;
+
+  svg {
+    display: block;
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &[data-active]:not([data-disabled]) {
+    transform: scale(0.97);
+  }
+
+  &.ghost {
+    min-width: 44px;
+    min-height: 44px;
+    padding: $spacing-xs;
+    border-radius: $radius-md;
+    background-color: transparent;
+    color: $text-primary;
+
+    &[data-hover]:not([data-disabled]) {
+      background-color: $bg-hover;
+    }
+  }
+
+  &.primary {
+    border-radius: 50%;
+    background-color: $primary-color;
+    color: $bg-primary;
+    box-shadow: $shadow-lg;
+
+    &[data-hover]:not([data-disabled]) {
+      opacity: 0.9;
+      box-shadow: $shadow-lg;
+    }
+  }
+
+  &.md {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  &.lg {
+    min-width: 56px;
+    min-height: 56px;
+  }
+}

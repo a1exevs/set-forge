@@ -38,7 +38,7 @@ When `authFailedCount >= 5`, failed login responses use `resultCode === 10` (`NE
 
 - **`/login`** and **`/register`**: same page component; active tab matches the path. Changing tab navigates to the other path.
 - **Public**: `/login`, `/register` only.
-- **Protected**: `/`, `/create`, `/edit/$id`, `/workout/$id` (all non-public routes).
+- **Protected**: `/`, `/profile`, `/create`, `/edit/$id`, `/workout/$id` (all non-public routes).
 
 ### Redirects
 
@@ -50,7 +50,7 @@ When `authFailedCount >= 5`, failed login responses use `resultCode === 10` (`NE
 ## Session model
 
 - **Access token**: stored in memory only (module); lost on full page reload — restored via `POST /auth/refresh` then `GET /auth/me` during root `beforeLoad`.
-- **Current user**: `{ id, email }` from `/auth/me`; exposed via TanStack Query (`['session', 'me']`) and used for UI (avatar letter).
+- **Current user**: `{ id, email }` from `/auth/me`; exposed via TanStack Query (`['session', 'me']`). Email letter for [`UserAvatar`](shared-components.spec.md#useravatar) on [Profile page](profile-page.spec.md).
 
 ### Bootstrap (`beforeLoad` on root)
 
@@ -68,8 +68,8 @@ When `authFailedCount >= 5`, failed login responses use `resultCode === 10` (`NE
 
 ## Auth page UI
 
-- App title + subtitle.
-- Headless UI `TabGroup`: Login / Register with decorative inline SVG icons; tab change updates route (`/login` | `/register`).
+- Centered [`BrandWordmark`](shared-components.spec.md#brandwordmark) (`title="Set Forge"`, `titleAs="h1"`) + subtitle.
+- Headless UI tab links: Login / Register with lucide `LogIn` / `UserPlus` icons; tab change updates route (`/login` | `/register`).
 - Forms: email + password; register validates client-side per DTO (email format, password 8–50).
 - Server errors: show `messages` / validation feedback; captcha path when `resultCode === 10`.
 - Success: persist token, prefetch `me`, navigate to `/` or `redirect` search param.
@@ -90,5 +90,6 @@ When `authFailedCount >= 5`, failed login responses use `resultCode === 10` (`NE
 ## References
 
 - Backend DTOs: `server/src/auth/dto/`
-- [home-page.spec.md](home-page.spec.md) — header avatar + logout
-- [shared-components.spec.md](shared-components.spec.md) — `UserAvatarMenu`, auth tabs
+- [home-page.spec.md](home-page.spec.md) — header `BrandWordmark`, bottom tabs
+- [profile-page.spec.md](profile-page.spec.md) — account UI, logout via `Button`
+- [shared-components.spec.md](shared-components.spec.md) — `UserAvatar`, `BrandWordmark` on auth/login
