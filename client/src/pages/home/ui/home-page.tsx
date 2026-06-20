@@ -1,26 +1,12 @@
 import type { WorkoutList } from '@entities';
-import { Link } from '@tanstack/react-router';
+import { Link, useRouterState } from '@tanstack/react-router';
+import { Download, Plus, Upload } from 'lucide-react';
 import { ChangeEvent, FC, MouseEvent, RefObject } from 'react';
 
-import { Button, MenuButton, UserAvatarMenu } from '@shared';
+import { BrandWordmark, IconButton, MenuButton, useTabSwipeNavigation } from '@shared';
+import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets';
 
 import classes from 'src/pages/home/ui/home-page.module.scss';
-
-const IconDownload: FC = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-    <path d="M12 3v10" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-    <path d="M8 9l4 4 4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M4 17h16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-  </svg>
-);
-
-const IconUpload: FC = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-    <path d="M12 21V11" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-    <path d="M8 15l4-4 4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M4 7h16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-  </svg>
-);
 
 type Props = {
   workoutLists: WorkoutList[];
@@ -31,9 +17,6 @@ type Props = {
   onImportFile: (event: ChangeEvent<HTMLInputElement>) => void | Promise<void>;
   importInputRef: RefObject<HTMLInputElement>;
   formatDate: (date: string | null) => string;
-  userEmail: string;
-  avatarLetter: string;
-  onLogout: () => void | Promise<void>;
 };
 
 const HomePage: FC<Props> = ({
@@ -45,43 +28,27 @@ const HomePage: FC<Props> = ({
   onImportFile,
   importInputRef,
   formatDate,
-  userEmail,
-  avatarLetter,
-  onLogout,
 }) => {
+  const pathname = useRouterState({ select: state => state.location.pathname });
+  const swipeRef = useTabSwipeNavigation({ tabs: MAIN_TAB_ROUTES, activePath: pathname });
+
   return (
-    <div className={classes.container}>
+    <div ref={swipeRef} className={classes.container}>
       <header className={classes.header}>
         <div className={classes.headerTop}>
-          <UserAvatarMenu
-            letter={avatarLetter}
-            ariaLabel={userEmail ? `Account menu for ${userEmail}` : 'Account menu'}
-            items={[{ id: 'logout', label: 'Log out', onClick: (): void => void onLogout() }]}
-          />
-          <div className={classes.headerTitles}>
-            <h1>Set Forge</h1>
-            <p className={classes.subtitle}>Track your workout progress</p>
-          </div>
+          <BrandWordmark title="Workout lists" />
           <div className={classes.headerActions}>
-            <button
-              type="button"
-              className={classes.iconButton}
+            <IconButton
               aria-label="Export workout lists"
               title="Export workout lists"
               disabled={workoutLists.length === 0}
               onClick={(): void => void onExport()}
             >
-              <IconDownload />
-            </button>
-            <button
-              type="button"
-              className={classes.iconButton}
-              aria-label="Import workout lists"
-              title="Import workout lists"
-              onClick={onImportClick}
-            >
-              <IconUpload />
-            </button>
+              <Download size={18} strokeWidth={1.75} aria-hidden />
+            </IconButton>
+            <IconButton aria-label="Import workout lists" title="Import workout lists" onClick={onImportClick}>
+              <Upload size={18} strokeWidth={1.75} aria-hidden />
+            </IconButton>
             <input
               ref={importInputRef}
               type="file"
@@ -94,13 +61,6 @@ const HomePage: FC<Props> = ({
       </header>
 
       <main className={classes.main}>
-        <Link to="/create" className={classes.addButton}>
-          <Button size="lg">
-            <span className={classes.addIcon}>+</span>
-            Create Workout List
-          </Button>
-        </Link>
-
         {workoutLists.length === 0 ? (
           <div className={classes.empty}>
             <p>No workout lists yet</p>
@@ -146,6 +106,20 @@ const HomePage: FC<Props> = ({
           </div>
         )}
       </main>
+
+      <IconButton
+        as={Link}
+        to="/create"
+        className={classes.createFab}
+        variant="primary"
+        size="lg"
+        aria-label="Create workout list"
+        title="Create workout list"
+      >
+        <Plus size={24} strokeWidth={2} aria-hidden />
+      </IconButton>
+
+      <MainTabsBar />
     </div>
   );
 };

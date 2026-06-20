@@ -1,0 +1,74 @@
+.tabsBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: $z-tabs-bar;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background-color: $bg-secondary;
+  border-top: 1px solid $border-color;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+  min-height: 3.5rem;
+  padding: $spacing-xs $spacing-sm;
+  text-decoration: none;
+  color: $text-tertiary;
+  transition: color 0.2s ease;
+
+  &:focus {
+    outline: none;
+  }
+
+  &[data-status='active'],
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.tabActive {
+  color: $text-primary;
+}
+
+.iconWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  display: block;
+}
+
+.label {
+  font-size: $font-size-xs;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.badge {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.55rem;
+  min-width: 1.125rem;
+  height: 1.125rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background-color: $danger-color;
+  color: #fff;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.125rem;
+  text-align: center;
+}

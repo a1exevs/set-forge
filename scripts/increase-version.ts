@@ -13,6 +13,7 @@ enum IncreaseVersionMode {
 const CANONICAL_PACKAGE_JSON = path.resolve(rootDir, 'client', 'package.json');
 const PACKAGE_JSON_PATHS = [
   path.resolve(rootDir, 'client', 'package.json'),
+  path.resolve(rootDir, 'client', 'public', 'manifest.json'),
   path.resolve(rootDir, 'server', 'package.json'),
 ];
 

@@ -1,0 +1,67 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`BrandWordmark matches snapshot for Profile 1`] = `
+<div>
+  <div
+    class="wordmark"
+  >
+    <img
+      alt=""
+      aria-hidden="true"
+      class="icon"
+      height="512"
+      src="/favicon.svg"
+      width="512"
+    />
+    <span
+      class="title"
+    >
+      Profile
+    </span>
+  </div>
+</div>
+`;
+
+exports[`BrandWordmark matches snapshot for Set Forge 1`] = `
+<div>
+  <div
+    class="wordmark"
+  >
+    <img
+      alt=""
+      aria-hidden="true"
+      class="icon"
+      height="512"
+      src="/favicon.svg"
+      width="512"
+    />
+    <span
+      class="title"
+    >
+      Set Forge
+    </span>
+  </div>
+</div>
+`;
+
+exports[`BrandWordmark matches snapshot for Workout lists 1`] = `
+<div>
+  <div
+    class="wordmark"
+  >
+    <img
+      alt=""
+      aria-hidden="true"
+      class="icon"
+      height="512"
+      src="/favicon.svg"
+      width="512"
+    />
+    <span
+      class="title"
+    >
+      Workout lists
+    </span>
+  </div>
+</div>
+`;

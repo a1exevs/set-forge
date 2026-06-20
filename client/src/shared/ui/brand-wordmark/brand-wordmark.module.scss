@@ -1,0 +1,36 @@
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.icon {
+  display: block;
+  height: 2.5rem;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.title {
+  color: #fefefe;
+  font-size: clamp(1rem, 4vw, 1.35rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  -webkit-text-stroke: 1.5px #070606;
+  paint-order: stroke fill;
+  text-shadow: 0 4px 10px rgba(96, 165, 250, 0.7);
+  white-space: nowrap;
+  margin: 0;
+}
+
+.leadingTitle {
+  font-size: $font-size-xl;
+  font-weight: 700;
+  color: $text-primary;
+  line-height: 1.1;
+  white-space: nowrap;
+}

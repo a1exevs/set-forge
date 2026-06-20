@@ -6,7 +6,9 @@ NestJS HTTP API for Set Forge web-client: authentication, workout lists flow (Se
 
 ---
 
-<!-- TODO: logo -->
+<p align="center">
+  <img src="../client/public/logo-og.png" alt="Set Forge" width="712" />
+</p>
 
 ![NestJS](https://img.shields.io/badge/NestJS-9.1-e0234e?logo=nestjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white)

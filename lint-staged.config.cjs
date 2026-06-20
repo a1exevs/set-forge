@@ -65,7 +65,7 @@ function serverTsTasks(files) {
   }
   const rel = toServerRelativePosix(files);
   return [
-    `prettier --config server/.prettierrc.json --write ${files.map((f) => JSON.stringify(f)).join(" ")}`,
+    `prettier --write ${files.map((f) => JSON.stringify(f)).join(" ")}`,
     `npm exec -w @set-forge/server -- eslint --fix ${rel.map(quoteFileArg).join(" ")}`,
   ];
 }

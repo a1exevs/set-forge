@@ -33,6 +33,7 @@
     "client:build-storybook": "npm run build-storybook -w @set-forge/client",
     "client:chromatic": "npm run chromatic -w @set-forge/client",
     "client:docs": "npm run docs -w @set-forge/client",
+    "client:generate:icons": "npm run generate:icons -w @set-forge/client",
     "client:e2e:install": "npm run e2e:install -w @set-forge/client",
     "client:check-deps": "npm run check-deps -w @set-forge/client",
     "client:upgrade-deps": "npm run upgrade-deps -w @set-forge/client",

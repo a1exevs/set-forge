@@ -44,9 +44,8 @@ export class AuthService {
   }
 
   public async refresh(currentRefreshToken: string): Promise<IAuthenticationResult> {
-    const { user, accessToken, refreshToken } = await this.tokensService.updateAccessRefreshTokensFromRefreshToken(
-      currentRefreshToken,
-    );
+    const { user, accessToken, refreshToken } =
+      await this.tokensService.updateAccessRefreshTokensFromRefreshToken(currentRefreshToken);
     return AuthService.buildResponsePayload(
       user,
       accessToken,

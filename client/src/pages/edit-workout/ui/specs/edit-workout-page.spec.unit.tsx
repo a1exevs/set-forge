@@ -75,7 +75,7 @@ describe('EditWorkoutPage', () => {
       const user = userEvent.setup();
       await user.click(cancelButton);
 
-      expect(await screen.findByText('Set Forge')).toBeInTheDocument();
+      expect(await screen.findByText('Workout lists')).toBeInTheDocument();
     });
   });
 });

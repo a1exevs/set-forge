@@ -2,12 +2,10 @@ import { useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 
 import {
-  emailToAvatarLetter,
   useCurrentUserQuery,
   useDeleteWorkoutListMutation,
   useExportAllWorkoutListsMutation,
   useImportWorkoutListsMutation,
-  useLogoutMutation,
   useWorkoutListsQuery,
 } from '@entities';
 import { formatDate } from '@shared';
@@ -21,11 +19,6 @@ const HomePageDataLayer: FC = () => {
   const deleteWorkoutListMutation = useDeleteWorkoutListMutation();
   const exportAllWorkoutListsMutation = useExportAllWorkoutListsMutation();
   const importWorkoutListsMutation = useImportWorkoutListsMutation();
-  const logoutMutation = useLogoutMutation();
-
-  const userEmail = user?.email ?? '';
-  const avatarLetter = user ? emailToAvatarLetter(user.email) : '?';
-
   return (
     <HomePageLogicLayer
       workoutLists={workoutLists}
@@ -40,11 +33,6 @@ const HomePageDataLayer: FC = () => {
         navigate({ to: '/edit/$id', params: { id } });
       }}
       formatDate={formatDate}
-      userEmail={userEmail}
-      avatarLetter={avatarLetter}
-      onLogout={(): void => {
-        logoutMutation.mutate();
-      }}
     />
   );
 };

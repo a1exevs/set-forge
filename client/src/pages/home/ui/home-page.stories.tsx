@@ -31,9 +31,6 @@ const renderHomePage = (): ReturnType<typeof renderWithPageRouter> =>
         importWorkoutLists={async (): Promise<void> => undefined}
         onEdit={fn()}
         formatDate={formatDate}
-        userEmail="storybook@example.com"
-        avatarLetter="S"
-        onLogout={fn()}
       />
     ),
   });

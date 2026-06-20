@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_DEV_API_PROXY?: string;
+  readonly VITE_PUBLIC_ORIGIN?: string;
 }
 
 interface ImportMeta {
