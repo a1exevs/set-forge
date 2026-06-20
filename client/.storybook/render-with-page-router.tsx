@@ -36,6 +36,12 @@ export function renderWithPageRouter({ component, initialEntries }: RenderWithPa
     component,
   });
 
+  const profileRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/profile',
+    component,
+  });
+
   const createRouteNode = createRoute({
     getParentRoute: () => rootRoute,
     path: '/create',
@@ -54,7 +60,7 @@ export function renderWithPageRouter({ component, initialEntries }: RenderWithPa
     component: PlaceholderPage,
   });
 
-  const routeTree = rootRoute.addChildren([indexRoute, createRouteNode, editRoute, workoutRoute]);
+  const routeTree = rootRoute.addChildren([indexRoute, profileRoute, createRouteNode, editRoute, workoutRoute]);
   const router = createRouter({
     routeTree,
     history: createMemoryHistory({ initialEntries }),
