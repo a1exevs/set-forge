@@ -1,6 +1,8 @@
 # Set Forge
 
-<!-- TODO: logo -->
+<p align="center">
+  <img src="client/public/logo-og.png" alt="Set Forge" width="712" />
+</p>
 
 ## Description
 
@@ -65,6 +67,7 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 | `npm run client:storybook` / `npm run client:build-storybook` | Storybook |
 | `npm run client:chromatic` | Chromatic |
 | `npm run client:docs` | TypeDoc |
+| `npm run client:generate:icons` | Regenerate favicon/OG PNG/ICO from client `public/*.svg` (sources: `logo.svg`, `favicon.svg` — see [client README](client/README.md#generateicons)) |
 | `npm run client:e2e:install` | Download Playwright browsers (once after install or Playwright upgrade) |
 | `npm run client:check-deps` / `npm run client:upgrade-deps` | Dependency maintenance |
 
@@ -121,7 +124,8 @@ Persistent Docker volumes:
 
 Create these files before running `npm run prod:up`:
 
-- Root `.env` (copy from [`.env.example`](.env.example)): compose-level values such as MySQL bootstrap credentials, `SITE_ADDRESS`, and optional host port overrides.
+- Root `.env` (copy from [`.env.example`](.env.example)): compose-level values such as MySQL bootstrap credentials, `SITE_ADDRESS`, `VITE_PUBLIC_ORIGIN` (OG meta for the client Docker build), and optional host port overrides.
+- `client/.env` (copy from [`client/.env.example`](client/.env.example), **local dev only**): Vite dev overrides such as `VITE_DEV_API_PROXY` and `VITE_PUBLIC_ORIGIN` for manual `vite build`.
 - `server/.production.env` (copy from [`server/.production.env.example`](server/.production.env.example)): Nest runtime values such as `SERVER_URL`, `CLIENT_URL`, MySQL connection credentials, JWT/session secrets, `SERVER_STATIC`, and `SERVER_LOGS`.
 
 For local HTTPS checks on Windows, ports 80/443 are often occupied by `HTTP.sys`. Use this in the root `.env` and open `https://localhost:8443/`:
@@ -143,6 +147,7 @@ For a VDS, do not override `HTTP_PORT` / `HTTPS_PORT`; Caddy should bind real po
 
 ```env
 SITE_ADDRESS=185-10-20-30.sslip.io
+VITE_PUBLIC_ORIGIN=https://185-10-20-30.sslip.io
 ```
 
 Then set the matching public origin in `server/.production.env`:

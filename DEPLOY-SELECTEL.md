@@ -152,7 +152,7 @@ docker run --rm hello-world
 
 ## 6. Install Node.js and npm
 
-Scripts like `npm run prod:up`, `npm run prod:db:migrate`, and others are Docker Compose wrappers in [`package.json`](package.json). This guide uses **those scripts**, not raw `docker compose` commands: if deploy commands change in the repo, you won't need to update this document.
+Scripts like `npm run prod:up`, `npm run prod:db:migrate`, and others are Docker Compose wrappers in [`package.json`](package.json). This guide uses **those scripts**, not raw `docker compose` commands — **except** in [§13 Log and disk usage](#log-and-disk-usage), where host-level log inspection and cleanup require direct `docker` / `docker compose` commands.
 
 > **`npm install` in the repo root on the VDS is not required.** Images `server-prod` and `client-prod` are built inside Docker with exact Node **22.20.0** / npm **10.9.3** versions (see Dockerfiles). On the host, the **npm** CLI is enough to invoke the scripts.
 
@@ -191,7 +191,7 @@ git checkout v1.0.0   # replace with the tag you need
 
 ## 8. Configure environment variables
 
-You need **two** files. Copy the templates and edit the values.
+You need **two** files for production (plus optional `client/.env` for local Vite dev only). Copy the templates and edit the values.
 
 ### 8.1. Root `.env`
 
@@ -210,6 +210,7 @@ MYSQL_USER=set_forge_user
 MYSQL_PASSWORD=strong_db_password
 
 SITE_ADDRESS=185-10-20-30.sslip.io
+VITE_PUBLIC_ORIGIN=https://185-10-20-30.sslip.io
 ```
 
 Example **with your own domain** (domain A record points to the server IP):
@@ -221,6 +222,7 @@ MYSQL_USER=set_forge_user
 MYSQL_PASSWORD=strong_db_password
 
 SITE_ADDRESS=set-forge.example.com
+VITE_PUBLIC_ORIGIN=https://set-forge.example.com
 ```
 
 > **Do not override** `HTTP_PORT` and `HTTPS_PORT` on the VDS — Caddy must listen on standard ports 80 and 443 for automatic TLS.
@@ -366,6 +368,150 @@ npm run prod:db:seed
 
 Data is stored in Docker volumes: `mysql_data_prod`, `caddy_data`, `server_static`, `server_logs`.
 
+### Log and disk usage
+
+This section uses raw `docker` and `docker compose` commands (no npm wrappers): log paths and disk usage are host-level operations.
+
+Container logs and API error files are stored on **disk**, not in RAM. The prod stack configures Docker log rotation in [`docker-compose.yml`](docker-compose.yml) (`max-size: 10m`, `max-file: 3` per container — about 30 MB cap each). On a long-running VDS, still check disk usage periodically; manual cleanup below helps if logs grew before rotation was enabled.
+
+**Docker container logs** (stdout/stderr of each prod container):
+
+```bash
+cd ~/set-forge
+docker compose --profile prod ps -q | while read id; do
+  name=$(docker inspect --format '{{.Name}}' "$id" | sed 's#^/##')
+  size=$(sudo du -b "$(docker inspect --format '{{.LogPath}}' "$id")" 2>/dev/null | cut -f1)
+  printf '%s\t%s\n' "$(numfmt --to=iec-i --suffix=B "$size" 2>/dev/null || echo "${size}B")" "$name"
+done | sort -h
+```
+
+Requires `numfmt` (GNU coreutils; present on Ubuntu/Debian). Without it, sizes are shown in bytes.
+
+Total size of all Docker container logs on the host:
+
+```bash
+sudo du -ch /var/lib/docker/containers/*/*-json.log 2>/dev/null | tail -1
+```
+
+Per-file breakdown:
+
+```bash
+sudo du -h /var/lib/docker/containers/*/*-json.log 2>/dev/null | sort -h
+```
+
+**Server error logs** (only `error` level; files under `SERVER_LOGS=logs` in the `server-prod` container):
+
+```bash
+cd ~/set-forge
+docker compose --profile prod exec server-prod du -sh /app/dist/logs
+```
+
+By year/month:
+
+```bash
+docker compose --profile prod exec server-prod sh -c 'du -h /app/dist/logs/*/* 2>/dev/null | sort -h'
+```
+
+Via the Docker volume on the host (volume name is `set-forge_server_logs` when the project directory is `set-forge`):
+
+```bash
+mp=$(docker volume inspect set-forge_server_logs --format '{{.Mountpoint}}' 2>/dev/null)
+[ -n "$mp" ] || { echo "volume not found: set-forge_server_logs" >&2; exit 1; }
+echo "$mp"
+sudo du -sh "$mp"
+sudo find "$mp" -type f -exec du -h {} \; | sort -h
+```
+
+**Quick summary** (Docker logs + error logs + free disk space):
+
+```bash
+echo "=== Docker container logs ==="
+sudo du -ch /var/lib/docker/containers/*/*-json.log 2>/dev/null | tail -1
+
+echo "=== Server error logs ==="
+cd ~/set-forge && docker compose --profile prod exec server-prod du -sh /app/dist/logs
+
+echo "=== Disk free ==="
+df -h /
+```
+
+### Clear logs
+
+> **Warning:** `truncate` and `rm` are irreversible. Clearing Docker logs does not stop containers. `npm run prod:down` removes containers (and their log files) but **keeps** data volumes (MySQL, uploads, error logs).
+
+**Docker container logs** — clear prod stack only (containers keep running):
+
+```bash
+cd ~/set-forge
+docker compose --profile prod ps -q | while read id; do
+  log=$(docker inspect --format '{{.LogPath}}' "$id")
+  name=$(docker inspect --format '{{.Name}}' "$id" | sed 's#^/##')
+  [ -n "$log" ] || { echo "skip (no log path): $name" >&2; continue; }
+  sudo truncate -s 0 "$log"
+  echo "cleared: $name"
+done
+```
+
+Clear **all** Docker container logs on the host:
+
+```bash
+sudo truncate -s 0 /var/lib/docker/containers/*/*-json.log
+```
+
+To recreate containers (also drops their log files; volumes unchanged), see **Automatic Docker log rotation** below.
+
+**Server error logs** — delete all files:
+
+```bash
+cd ~/set-forge
+docker compose --profile prod exec server-prod sh -c 'rm -rf /app/dist/logs/*'
+```
+
+Delete error log files older than 30 days:
+
+```bash
+docker compose --profile prod exec server-prod find /app/dist/logs -type f -mtime +30 -delete
+```
+
+Via the Docker volume on the host:
+
+```bash
+mp=$(docker volume inspect set-forge_server_logs --format '{{.Mountpoint}}' 2>/dev/null)
+[ -n "$mp" ] || { echo "volume not found: set-forge_server_logs" >&2; exit 1; }
+sudo rm -rf "$mp"/*
+```
+
+**Verify after cleanup:**
+
+```bash
+echo "=== Docker logs ==="
+sudo du -ch /var/lib/docker/containers/*/*-json.log 2>/dev/null | tail -1
+
+echo "=== Error logs ==="
+docker compose --profile prod exec server-prod du -sh /app/dist/logs
+
+echo "=== Disk ==="
+df -h /
+```
+
+**Automatic Docker log rotation** (already set in [`docker-compose.yml`](docker-compose.yml) for prod services):
+
+```yaml
+logging:
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+```
+
+After pulling a release that includes this change, recreate containers so the new logging options apply (also drops existing log files; data volumes unchanged):
+
+```bash
+cd ~/set-forge
+npm run prod:down
+npm run prod:up
+```
+
 ---
 
 ## 14. Common issues
@@ -391,6 +537,10 @@ npm run prod:down && npm run prod:up
 ### CORS errors / wrong redirects
 
 Check that `SERVER_URL` and `CLIENT_URL` in `server/.production.env` **exactly** match the URL in the browser (with `https://`, no trailing slash).
+
+### Wrong or missing link preview (OG image)
+
+`VITE_PUBLIC_ORIGIN` in the root `.env` must match `CLIENT_URL` (see [§8.3](#83-vite_public_origin-og-meta-tags)). Rebuild `client-prod` after changing it. Crawlers need absolute URLs — placeholders like `%VITE_PUBLIC_ORIGIN%` in the served HTML mean the image was built without the variable set.
 
 ### Not enough memory during build
 

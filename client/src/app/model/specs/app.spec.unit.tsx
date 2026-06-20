@@ -9,10 +9,10 @@ describe('App', () => {
       const testRouter = createTestRouter('/', queryClient);
       renderApp(testRouter, queryClient);
 
-      const heading = await screen.findByText('Set Forge');
-      expect(heading).toBeInTheDocument();
+      const wordmark = await screen.findByText('Workout lists');
+      expect(wordmark).toBeInTheDocument();
 
-      const createLink = screen.getByRole('link', { name: /Create Workout List/i });
+      const createLink = screen.getByRole('link', { name: /Create workout list/i });
       expect(createLink).toBeInTheDocument();
     });
 

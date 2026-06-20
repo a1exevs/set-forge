@@ -12,9 +12,6 @@ type Props = {
   importWorkoutLists: (file: WorkoutListsExportFile) => Promise<void>;
   onEdit: (id: string) => void;
   formatDate: (date: string | null) => string;
-  userEmail: string;
-  avatarLetter: string;
-  onLogout: () => void | Promise<void>;
 };
 
 const HomePageLogicLayer: FC<Props> = ({
@@ -24,9 +21,6 @@ const HomePageLogicLayer: FC<Props> = ({
   importWorkoutLists,
   onEdit,
   formatDate,
-  userEmail,
-  avatarLetter,
-  onLogout,
 }) => {
   const confirmDialog = useConfirm();
   const importInputRef = useRef<HTMLInputElement>(null);
@@ -129,9 +123,6 @@ const HomePageLogicLayer: FC<Props> = ({
       onImportFile={handleImportFile}
       importInputRef={importInputRef}
       formatDate={formatDate}
-      userEmail={userEmail}
-      avatarLetter={avatarLetter}
-      onLogout={onLogout}
     />
   );
 };

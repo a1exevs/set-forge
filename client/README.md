@@ -6,7 +6,9 @@ Workout planning and strength tracking web app (React, Vite, TanStack Router, FS
 
 ---
 
-<!-- TODO: logo -->
+<p align="center">
+  <img src="public/logo-og.png" alt="Set Forge" width="712" />
+</p>
 
 ![React](https://img.shields.io/badge/React-18.3-61dafb?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white)
@@ -48,8 +50,35 @@ From the **repository root**, use the `client:*` aliases (see [root README](../R
 | `npm run storybook` / `npm run build-storybook` | Storybook |
 | `npm run chromatic` | Chromatic |
 | `npm run docs` | TypeDoc |
+| `npm run generate:icons` | Regenerate favicon/OG PNG/ICO from `public/*.svg` (see below) |
 | `npm run e2e:install` | Download Playwright browsers (required once after `npm install` or Playwright upgrade) |
 | `npm run check-deps` / `npm run upgrade-deps` | Dependency maintenance |
+
+### `generate:icons`
+
+[`scripts/generate-public-icons.mjs`](scripts/generate-public-icons.mjs) — rasterizes SVG sources in [`public/`](public/) with `@resvg/resvg-js`, builds `favicon.ico` with `to-ico`.
+
+**Source of truth (edit manually, then re-run the script):**
+
+| File | Used for |
+|------|----------|
+| [`logo.svg`](public/logo.svg) | Header wordmark (`/logo.svg` on the home page); also drives OG assets |
+| [`favicon.svg`](public/favicon.svg) | Dumbbell icon — all favicon / PWA PNG sizes |
+
+[`manifest.json`](public/manifest.json) is **not** generated — update it by hand (app name, theme colors, icon paths).
+
+**Generated output (commit together with the SVG sources):**
+
+| File | From |
+|------|------|
+| `favicon-16x16.png`, `favicon-32x32.png`, `favicon-48x48.png`, `favicon-180x180.png`, `favicon-192x192.png`, `favicon-512x512.png` | `favicon.svg` |
+| `favicon.ico` | PNG 16 / 32 / 48 |
+| `logo-og.svg`, `logo-og.png` | `logo.svg` (950×451, vertical padding for `og:image` in [`index.html`](index.html)) |
+
+```bash
+npm run generate:icons          # from client/
+npm run client:generate:icons   # from repo root
+```
 
 ### E2E (Playwright)
 
@@ -70,7 +99,9 @@ The client always calls the API through the same-origin `/api/1.0` base path. In
 For local development, Vite proxies `/api` to a backend target:
 
 - Default: `http://localhost:5001`
-- Override: copy [`.env.example`](.env.example) to `.env.local` and set `VITE_DEV_API_PROXY`, for example `https://staging.example.com`
+- Override: copy [`.env.example`](.env.example) to `.env` / `.env.local` and set `VITE_DEV_API_PROXY`, for example `https://staging.example.com`
+
+`VITE_PUBLIC_ORIGIN` (see [`.env.example`](.env.example)) is substituted into `index.html` OG/Twitter meta tags at dev/build time. Use the same public origin as `CLIENT_URL` in production (no trailing slash). For the Docker stack, set it in the root `.env` — compose passes it as a build arg; env files are not copied into the image. See [DEPLOY-SELECTEL.md](../DEPLOY-SELECTEL.md#83-vite_public_origin-og-meta-tags).
 
 The app intentionally keeps one same-origin API base for both prod and dev.
 

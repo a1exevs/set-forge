@@ -1,0 +1,151 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`IconButton matches snapshot as Link 1`] = `
+<div>
+  <a
+    aria-label="Create workout list"
+    class="iconButton primary lg"
+    data-headlessui-state=""
+    href="/create"
+  >
+    <svg
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+      />
+    </svg>
+  </a>
+</div>
+`;
+
+exports[`IconButton matches snapshot for default 1`] = `
+<div>
+  <button
+    aria-label="Action"
+    class="iconButton ghost md"
+    data-headlessui-state=""
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`IconButton matches snapshot for disabled 1`] = `
+<div>
+  <button
+    aria-label="Disabled"
+    class="iconButton ghost md"
+    data-disabled=""
+    data-headlessui-state="disabled"
+    disabled=""
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`IconButton matches snapshot for ghost variant 1`] = `
+<div>
+  <button
+    aria-label="Action"
+    class="iconButton ghost md"
+    data-headlessui-state=""
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`IconButton matches snapshot for lg size 1`] = `
+<div>
+  <button
+    aria-label="Create"
+    class="iconButton ghost lg"
+    data-headlessui-state=""
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`IconButton matches snapshot for primary variant 1`] = `
+<div>
+  <button
+    aria-label="Create"
+    class="iconButton primary md"
+    data-headlessui-state=""
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+      />
+    </svg>
+  </button>
+</div>
+`;
+
+exports[`IconButton matches snapshot with title 1`] = `
+<div>
+  <button
+    aria-label="Export"
+    class="iconButton ghost md"
+    data-headlessui-state=""
+    title="Export workout lists"
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+      />
+    </svg>
+  </button>
+</div>
+`;

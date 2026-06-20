@@ -8,7 +8,10 @@ import { ErrorMessages } from '@common/constants';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private jstService: JwtService, private reflector: Reflector) {}
+  constructor(
+    private jstService: JwtService,
+    private reflector: Reflector,
+  ) {}
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     try {
