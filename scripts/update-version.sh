@@ -37,7 +37,7 @@ esac
 newVersion=$( sed -n -e 's/.*"version": "\(.*\)",/\1/p' client/package.json | head -1 )
 echo "New version: $newVersion"
 
-git add client/package.json server/package.json
+git add client/package.json client/public/manifest.json server/package.json
 
 git commit -m "[Common] Version increase v$newVersion"
 

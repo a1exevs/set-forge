@@ -1,6 +1,6 @@
 {
   "name": "@set-forge/server",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "This backend is designed for workout planning and strength tracking — exercise lists, logging sets and weights, perceived effort, and progress over time.",
   "private": true,
   "author": "AlexEvs",
