@@ -6,7 +6,7 @@
 
 ## Description
 
-A workout planning and strength tracking project that lets you build exercise lists, log sets and weights, rate perceived effort, and visualize progress over time.
+Build workout lists, log sets and weights, rate perceived effort, and track strength progress over time.
 
 Workspaces:
 

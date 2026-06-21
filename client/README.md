@@ -21,7 +21,7 @@ Workout planning and strength tracking web app (React, Vite, TanStack Router, FS
 
 ## Description
 
-A workout planning and strength tracking web-app that lets you build exercise lists, log sets and weights, rate perceived effort, and visualize progress over time.
+Build workout lists, log sets and weights, rate perceived effort, and track strength progress over time.
 
 **State:** server data via TanStack Query; client-only UI state (e.g. theme) via Zustand where needed.
 
@@ -73,7 +73,7 @@ From the **repository root**, use the `client:*` aliases (see [root README](../R
 |------|------|
 | `favicon-16x16.png`, `favicon-32x32.png`, `favicon-48x48.png`, `favicon-180x180.png`, `favicon-192x192.png`, `favicon-512x512.png` | `favicon.svg` |
 | `favicon.ico` | PNG 16 / 32 / 48 |
-| `logo-og.svg`, `logo-og.png` | `logo.svg` (950×451, vertical padding for `og:image` in [`index.html`](index.html)) |
+| `logo-og.svg`, `logo-og.png` | `logo.svg` (1200×630, vertical padding for `og:image` in [`index.html`](index.html)) |
 
 ```bash
 npm run generate:icons          # from client/
