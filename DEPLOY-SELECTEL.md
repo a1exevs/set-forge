@@ -422,7 +422,7 @@ sudo du -sh "$mp"
 sudo find "$mp" -type f -exec du -h {} \; | sort -h
 ```
 
-**Quick summary** (Docker logs + error logs + free disk space):
+**Quick summary** (Docker logs + error logs + disk + memory):
 
 ```bash
 echo "=== Docker container logs ==="
@@ -433,7 +433,12 @@ cd ~/set-forge && docker compose --profile prod exec server-prod du -sh /app/dis
 
 echo "=== Disk free ==="
 df -h /
+
+echo "=== Memory ==="
+free -h
 ```
+
+`free -h` shows total RAM and swap. On Ubuntu, focus on the **available** column under `Mem` — that is how much memory the kernel can still hand out without swapping. If **available** is near zero and **Swap** `used` keeps growing, the VDS may need more RAM or swap (see [§14 — Not enough memory during build](#not-enough-memory-during-build)).
 
 ### Clear logs
 
@@ -492,6 +497,9 @@ docker compose --profile prod exec server-prod du -sh /app/dist/logs
 
 echo "=== Disk ==="
 df -h /
+
+echo "=== Memory ==="
+free -h
 ```
 
 **Automatic Docker log rotation** (already set in [`docker-compose.yml`](docker-compose.yml) for prod services):
