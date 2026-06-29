@@ -666,6 +666,8 @@ Expected tables include `roles`, `users`, `users_roles`, `refreshTokens`, `worko
 
 No `npm run server:db:migrate` or `server:db:seed` after a full dump — schema and data are already included.
 
+If the `DROP DATABASE` / `mysql` commands fail with `ERROR 1045` (access denied for `root`), see [§15.7](#157-reset-local-mysql-completely-access-denied-or-import-fails).
+
 ### 15.6. Connect with TablePlus (or another client)
 
 | Field | Value |
@@ -676,15 +678,45 @@ No `npm run server:db:migrate` or `server:db:seed` after a full dump — schema 
 | Password | `MYSQL_PASSWORD` from `server/.development.env` |
 | Database | `MYSQL_DB` from `server/.development.env` |
 
-### 15.7. Reset local MySQL completely (if import fails)
+### 15.7. Reset local MySQL completely (access denied or import fails)
+
+If [§15.5](#155-wipe-local-data-and-import) fails with:
+
+```text
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+```
+
+the root password in your **current** root `.env` does not match what MySQL stored in the Docker volume `mysql_data_dev`.
+
+**Why this happens:** `MYSQL_ROOT_PASSWORD` is applied only when the volume is **first** initialized. After that, changing `.env` updates the container environment, but MySQL keeps the old password on disk.
+
+**`--force-recreate` is not enough** — it recreates the container but leaves the volume intact:
 
 ```bash
+# This alone does NOT reset the root password:
+docker compose --profile dev up -d --force-recreate mysql-dev
+```
+
+**Fix:** remove the dev volume and start fresh so MySQL re-initializes from the current `.env`:
+
+> **Warning:** this **deletes all data** in your local dev MySQL volume.
+
+```bash
+cd ~/set-forge               # or your local clone path
+
 npm run db:down
-docker volume rm set-forge_mysql_data_dev   # volume name = <project-dir>_mysql_data_dev
+
+docker volume ls | grep mysql_data_dev
+# usually: set-forge_mysql_data_dev  (volume name = <project-dir>_mysql_data_dev)
+
+docker volume rm set-forge_mysql_data_dev
+
 npm run db:up
 ```
 
-Then repeat [§15.5](#155-wipe-local-data-and-import).
+Wait until `mysql-dev` is **healthy** (`docker compose --profile dev ps`), then repeat [§15.5](#155-wipe-local-data-and-import).
+
+**Before `db:up`**, confirm the root `.env` has the credentials you want (especially `MYSQL_ROOT_PASSWORD`, `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`) and that `MYSQL_DATABASE` / `MYSQL_DB` in `server/.development.env` still match [§15.4](#154-align-database-names).
 
 ### Notes
 
