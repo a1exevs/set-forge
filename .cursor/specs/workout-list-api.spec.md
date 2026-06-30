@@ -149,16 +149,18 @@ Sequelize + MySQL, `synchronize: false` (schema via migration). Two tables.
     weight: number;      // @IsNumber, @Min(0)
     reps: number;        // @IsInt, @Min(1)
     sets: number;        // @IsInt, @Min(1)
-  }[];                   // @ValidateNested({ each: true })
+  }[];                   // @IsArray, @ArrayMinSize(1), @ValidateNested({ each: true })
 }
 
 // UpdateWorkoutListRequest.Dto
 {
   name: string;
   description: string;
-  exercises: (CreateExercise & { id?: string; completedSets?: number })[];
+  exercises: (CreateExercise & { id?: string; completedSets?: number })[]; // @ArrayMinSize(1)
 }
 ```
+
+- `exercises` must contain **at least one** entry on create and update (`@ArrayMinSize(1)`); empty arrays return `400`.
 
 - Existing exercises carry `id` (+ optional `completedSets`); new exercises omit `id`.
 - On update the server reconciles: keep existing by `id` (preserving `completedSets` unless provided), insert new (generate `id`, `completedSets: 0`), delete omitted. `position` follows array order.
@@ -245,6 +247,7 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
 | Unauthenticated request | `JwtAuthGuard`/`RefreshTokenGuard` → 401 envelope |
 | `:id` not owned / missing | `NotFoundException` → 404 envelope; client `useWorkoutQuery` resolves `null` |
 | Invalid create/update DTO | `class-validator` → 400 envelope with messages |
+| Empty `exercises` array on create/update | `@ArrayMinSize(1)` → 400 envelope |
 | Progress when `completedSets === sets` | No increment, list returned unchanged |
 | `sets === 0` | Disallowed by validation (`@Min(1)`) |
 | Update removes an exercise | Exercise row deleted; `position` recomputed from array order |
@@ -255,5 +258,10 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
 | Reload (no in-memory token) | `apiRequest` refresh flow restores session; queries refetch from server |
 | Export with zero lists | `GET /export` returns file with `workoutLists: []`; client disables export button when list count is 0 |
 | Import invalid file | 400 envelope; transaction rolled back, no partial import |
+
+### Tests
+
+- Unit: service, controller, DTO validation (`CreateWorkoutListRequest`, `UpdateWorkoutListRequest` — including empty `exercises`).
+- E2E (`server/test/e2e/workout-lists-sessions.e2e-spec.ts`): create/update with empty exercises → `400`.
 | Import legacy localStorage array | Server normalizes v0 array to export format before create |
 | Import duplicate list names | All items created (append semantics) |

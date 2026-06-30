@@ -66,27 +66,87 @@ Index: `(workout_session_id)`. `@BelongsTo(() => WorkoutSession)`.
 
 ## Module wiring
 
-- Models live in `server/src/workout-sessions/` and are exported via `server/src/workout-sessions/index.ts`.
-- Registered in `SequelizeModule.forRoot({ models: [...] })` in `server/src/app.module.ts`.
-- Path alias `@workout-sessions/*` added to `tsconfig.json`, Jest `moduleNameMapper`, and the ESLint import resolver.
+- Module lives in `server/src/workout-sessions/`: `workout-session.model.ts`, `workout-session-exercise.model.ts`, `workout-sessions.service.ts`, `workout-sessions.controller.ts`, `workout-sessions.module.ts`, `dto/`, `constants/`, exported via `index.ts`.
+- `WorkoutSessionsModule` imports `SequelizeModule.forFeature([WorkoutSession, WorkoutSessionExercise, WorkoutList, WorkoutExercise])` + `AuthModule`; registered in `AppModule`.
+- Models registered in `SequelizeModule.forRoot({ models: [...] })` in `server/src/app.module.ts`.
+- Route segment `ENDPOINT_WORKOUT_SESSIONS` and Swagger copy live in `@common/constants` (`routes.ts`, `docs.ts`).
+- Path alias `@workout-sessions/*` added to `tsconfig.json`, Jest `moduleNameMapper` (both `package.json` and `jest-e2e.json`), and the ESLint import resolver.
 
 ---
 
 ## API contract
 
-> Stage 2 — to be implemented. Endpoints will live under `/api/1.0/workout-sessions`, guarded by `JwtAuthGuard` + `RefreshTokenGuard`, user-scoped, using `ResponseInterceptor` / `HttpExceptionFilter` like `workout-lists`.
+- Base: same-origin `/api/1.0`. Controller segment: `workout-sessions`.
+- All requests authenticated (`Authorization: Bearer <access>` + refresh cookie) and scoped to `request.user.id`.
+- Responses follow `CommonResponse` (`{ data, messages, fieldsErrors, resultCode }`) via `ResponseInterceptor`; errors via `HttpExceptionFilter`.
+- Guards: `JwtAuthGuard` + `RefreshTokenGuard`. Documented in Swagger (`@ApiTags('Workout sessions')`, `@ApiResult`).
 
-Planned endpoints:
+### Endpoints
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| POST | `/workout-sessions` | Start or return the active session for `{ workoutListId }` (snapshot on create) |
-| GET | `/workout-sessions/active?workoutListId=` | Active session for a list, or `null` |
-| GET | `/workout-sessions/:id` | One owned session |
-| PATCH | `/workout-sessions/:id/exercises/:exerciseId/progress` | +1 `completedSets` (clamped); auto-finish when all complete |
-| POST | `/workout-sessions/:id/finish` | Finish early |
-| POST | `/workout-sessions/:id/resync` | Re-snapshot from the linked list preserving `completedSets` by `sourceExerciseId` |
-| GET | `/workout-sessions?status=completed&limit=&offset=` | Paginated history (Stage 4) |
+| Method | Path | Body / params | Description |
+|--------|------|---------------|-------------|
+| POST | `/workout-sessions` | `{ workoutListId }` (`StartWorkoutSessionRequest`) | Start or return the active session for the list. If an active session exists → returns it with **200** (idempotent resume); else snapshots the list into a new `active` session with **201** and stamps the list `lastUsedAt`. `404` if the list is missing/not owned; `400` if the list has no exercises. |
+| GET | `/workout-sessions/active?workoutListId=` | `workoutListId` query (`GetActiveWorkoutSessionQuery`, `@IsUUID`) | Active session for a list, or `null` in `data`. `400` when `workoutListId` is missing/invalid. |
+| GET | `/workout-sessions/:id` | `id` (UUID) | One owned session; `404` if missing/not owned. |
+| PATCH | `/workout-sessions/:id/exercises/:exerciseId/progress` | `id`, `exerciseId` | +1 `completedSets` (clamped to `sets`). When every exercise reaches `sets`, the session **auto-finishes** (`status=completed`, `finishedAt=now`). `400` if the session is not active; `404` if the exercise is missing. |
+| POST | `/workout-sessions/:id/finish` | `id` (UUID) | Finish early: sets `status=completed`, `finishedAt=now` when active; no-op (returns as-is) when already completed. |
+| POST | `/workout-sessions/:id/resync` | `id` (UUID) | Re-snapshot the active session from its linked list, preserving `completedSets` by `sourceExerciseId` (clamped to new `sets`); new exercises start at 0, removed ones dropped; `workoutListName` refreshed. **Auto-finishes** when every exercise is complete after clamping (e.g. user had 3/4 sets, template sets reduced to 2 → resync yields 2/2 and completes the session). `400` if not active, no linked list, or list missing. |
+| GET | `/workout-sessions?status=completed&limit=&offset=` | query | Paginated history (Stage 4). |
+
+Static route `active` is registered **before** `GET /:id` in the controller.
+
+### Response payload (`data`)
+
+`WorkoutSessionResponse.Dto` (the `active` endpoint may return `null`):
+
+```typescript
+{
+  id: string;                 // UUID
+  workoutListId: string | null;
+  workoutListName: string;    // snapshot
+  status: 'active' | 'completed';
+  startedAt: string;          // ISO
+  finishedAt: string | null;  // ISO or null
+  exercises: {
+    id: string;               // UUID (session exercise)
+    sourceExerciseId: string | null;
+    name: string;
+    muscleGroup: MuscleGroup;
+    weight: number;
+    reps: number;
+    sets: number;
+    completedSets: number;
+  }[];                        // ordered by position
+}
+```
+
+### DTOs (namespace + Swagger pattern)
+
+```typescript
+// StartWorkoutSessionRequest.Dto
+{ workoutListId: string; }    // @IsUUID
+
+// GetActiveWorkoutSessionQuery.Dto
+{ workoutListId: string; }    // @IsUUID (query)
+```
+
+### Service behaviour
+
+`WorkoutSessionsService` injects `WorkoutSession`, `WorkoutSessionExercise`, `WorkoutList` via `@InjectModel`, and the connection via `@InjectConnection` (transactions for snapshot/resync/progress):
+
+- `getOne(userId, id)`: owned session; `NotFoundException` if missing.
+- `getActive(userId, workoutListId)`: active session for the list or `null`.
+- `start(userId, workoutListId)`: ownership check on the list; return existing active session (`created: false`) or snapshot a new one (`created: true`, exercises copied in `position` order with `sourceExerciseId`, `completedSets=0`); stamp list `lastUsedAt` only on create. `BadRequestException` when the list has no exercises (defense in depth — create/update already require `exercises.length >= 1`). Concurrent starts are serialized by locking the `workout_lists` row inside a transaction.
+- `incrementProgress(userId, sessionId, exerciseId)`: only on `active` (`BadRequestException` otherwise); `+1` if below `sets`; auto-finish when all exercises complete (exercise + session updates in one transaction).
+- `finish(userId, sessionId)`: complete an active session; idempotent if already completed.
+- `resync(userId, sessionId)`: active-only; rebuild exercises from the linked list preserving progress by `sourceExerciseId`; auto-finish when all exercises are complete after clamping.
+
+Ownership: all queries filter by `userId`; another user's session is treated as not found.
+
+### Tests
+
+- Unit: models, service (snapshot, progress, resync clamp + auto-finish, empty-list guard), controller, DTO validation (`GetActiveWorkoutSessionQuery`).
+- E2E (`server/test/e2e/workout-lists-sessions.e2e-spec.ts`): empty exercises on create/update, empty-list start guard, start/resume status codes, progress auto-finish, resync auto-finish when sets are reduced.
 
 ---
 

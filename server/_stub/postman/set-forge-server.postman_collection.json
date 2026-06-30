@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "2712353a-d5be-4507-b7fe-58ef2ff9b1c2",
 		"name": "set-forge-server",
-		"description": "Set Forge API v1.0 — auth, security, workout-lists, health",
+		"description": "Set Forge API v1.0 — auth, security, workout-lists, workout-sessions, health",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -317,7 +317,9 @@
 													"pm.collectionVariables.unset(\"api/access_token\");",
 													"pm.collectionVariables.unset(\"api/current_user_id\");",
 													"pm.collectionVariables.unset(\"api/workout_list_id\");",
-													"pm.collectionVariables.unset(\"api/exercise_id\");"
+													"pm.collectionVariables.unset(\"api/exercise_id\");",
+													"pm.collectionVariables.unset(\"api/session_id\");",
+													"pm.collectionVariables.unset(\"api/session_exercise_id\");"
 												],
 												"type": "text/javascript"
 											}
@@ -620,6 +622,57 @@
 									"response": []
 								},
 								{
+									"name": "create workout list (empty exercises - bad request)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Create workout list with empty exercises: bad request\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Empty Day\",\n    \"description\": \"\",\n    \"exercises\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-lists-end-point}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{workout-lists-end-point}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "get workout list by id",
 									"event": [
 										{
@@ -699,6 +752,58 @@
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"name\": \"Updated Push Day\",\n    \"description\": \"Chest, shoulders, triceps\",\n    \"exercises\": [\n        {\n            \"id\": \"{{api/exercise_id}}\",\n            \"name\": \"Bench Press\",\n            \"muscleGroup\": \"chest\",\n            \"weight\": 65,\n            \"reps\": 10,\n            \"sets\": 3,\n            \"completedSets\": 0\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-lists-end-point}}/{{api/workout_list_id}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{workout-lists-end-point}}",
+												"{{api/workout_list_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update workout list (empty exercises - bad request)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Update workout list with empty exercises: bad request\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Updated Push Day\",\n    \"description\": \"Chest, shoulders, triceps\",\n    \"exercises\": []\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -862,6 +967,791 @@
 									"response": []
 								}
 							]
+						},
+						{
+							"name": "workout-sessions",
+							"item": [
+								{
+									"name": "start workout session",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Start workout session: successfully\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"pm.test(\"Response contains an active session\", function () {",
+													"    var data = pm.response.json().data;",
+													"    pm.expect(data.id).to.be.a(\"string\");",
+													"    pm.expect(data.status).to.eql(\"active\");",
+													"    pm.expect(data.exercises).to.be.an(\"array\");",
+													"});",
+													"var data = pm.response.json().data;",
+													"pm.collectionVariables.set(\"api/session_id\", data.id);",
+													"if (data.exercises && data.exercises.length > 0) {",
+													"    pm.collectionVariables.set(\"api/session_exercise_id\", data.exercises[0].id);",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"workoutListId\": \"{{api/workout_list_id}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{workout-sessions-end-point}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "resume workout session (200)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Resume workout session: successfully\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"pm.test(\"Session id unchanged\", function () {",
+													"    pm.expect(pm.response.json().data.id).to.eql(pm.collectionVariables.get(\"api/session_id\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"workoutListId\": \"{{api/workout_list_id}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{workout-sessions-end-point}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "get active workout session",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Get active workout session: successfully\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"var data = pm.response.json().data;",
+													"if (data) {",
+													"    pm.collectionVariables.set(\"api/session_id\", data.id);",
+													"    if (data.exercises && data.exercises.length > 0) {",
+													"        pm.collectionVariables.set(\"api/session_exercise_id\", data.exercises[0].id);",
+													"    }",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}/active?workoutListId={{api/workout_list_id}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{workout-sessions-end-point}}",
+												"active"
+											],
+											"query": [
+												{
+													"key": "workoutListId",
+													"value": "{{api/workout_list_id}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "get workout session by id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Get workout session: successfully\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"pm.test(\"Session id matches\", function () {",
+													"    pm.expect(pm.response.json().data.id).to.eql(pm.collectionVariables.get(\"api/session_id\"));",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}/{{api/session_id}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{workout-sessions-end-point}}",
+												"{{api/session_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "increment session exercise progress",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Increment session progress: successfully\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"pm.test(\"Response is a session\", function () {",
+													"    var data = pm.response.json().data;",
+													"    pm.expect([\"active\", \"completed\"]).to.include(data.status);",
+													"    pm.expect(data.exercises).to.be.an(\"array\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}/{{api/session_id}}/exercises/{{api/session_exercise_id}}/progress",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{workout-sessions-end-point}}",
+												"{{api/session_id}}",
+												"exercises",
+												"{{api/session_exercise_id}}",
+												"progress"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "finish workout session",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Finish workout session: successfully\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"pm.test(\"Session is completed\", function () {",
+													"    var data = pm.response.json().data;",
+													"    pm.expect(data.status).to.eql(\"completed\");",
+													"    pm.expect(data.finishedAt).to.be.a(\"string\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}/{{api/session_id}}/finish",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{workout-sessions-end-point}}",
+												"{{api/session_id}}",
+												"finish"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "resync workout session",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Resync workout session: successfully\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"pm.test(\"Response is a session\", function () {",
+													"    pm.expect(pm.response.json().data.exercises).to.be.an(\"array\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}/{{api/session_id}}/resync",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{workout-sessions-end-point}}",
+												"{{api/session_id}}",
+												"resync"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "edge cases",
+									"item": [
+										{
+											"name": "start session on empty list (bad request)",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"if (!pm.collectionVariables.get(\"api/empty_workout_list_id\")) {",
+															"    console.log(\"Skip: set api/empty_workout_list_id to a workout list with no exercises\");",
+															"}"
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"if (!pm.collectionVariables.get(\"api/empty_workout_list_id\")) {",
+															"    pm.test.skip(\"Set api/empty_workout_list_id to a list with no exercises\");",
+															"} else {",
+															"    pm.test(\"Start on empty list: bad request\", function () {",
+															"        pm.response.to.have.status(400);",
+															"    });",
+															"}"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "{{api/access_token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"workoutListId\": \"{{api/empty_workout_list_id}}\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{dev-url}}"
+													],
+													"path": [
+														"1.0",
+														"{{workout-sessions-end-point}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "resync auto-finish when sets reduced",
+											"item": [
+												{
+													"name": "create resync test list",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Create resync test list: successfully\", function () {",
+																	"    pm.response.to.have.status(201);",
+																	"});",
+																	"var data = pm.response.json().data;",
+																	"pm.collectionVariables.set(\"api/resync_list_id\", data.id);",
+																	"pm.collectionVariables.set(\"api/resync_template_exercise_id\", data.exercises[0].id);"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{api/access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "POST",
+														"header": [],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n    \"name\": \"Resync Auto Finish Day\",\n    \"description\": \"Sets reduced on resync\",\n    \"exercises\": [\n        {\n            \"name\": \"Bench Press\",\n            \"muscleGroup\": \"chest\",\n            \"weight\": 60,\n            \"reps\": 10,\n            \"sets\": 4\n        }\n    ]\n}",
+															"options": {
+																"raw": {
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-lists-end-point}}",
+															"protocol": "{{protocol}}",
+															"host": [
+																"{{dev-url}}"
+															],
+															"path": [
+																"1.0",
+																"{{workout-lists-end-point}}"
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "start resync test session",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Start resync test session: successfully\", function () {",
+																	"    pm.response.to.have.status(201);",
+																	"});",
+																	"var data = pm.response.json().data;",
+																	"pm.collectionVariables.set(\"api/resync_session_id\", data.id);",
+																	"pm.collectionVariables.set(\"api/resync_session_exercise_id\", data.exercises[0].id);"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{api/access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "POST",
+														"header": [],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n    \"workoutListId\": \"{{api/resync_list_id}}\"\n}",
+															"options": {
+																"raw": {
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}",
+															"protocol": "{{protocol}}",
+															"host": [
+																"{{dev-url}}"
+															],
+															"path": [
+																"1.0",
+																"{{workout-sessions-end-point}}"
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "increment resync session progress (1/3)",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Increment resync session progress 1/3: successfully\", function () {",
+																	"    pm.response.to.have.status(200);",
+																	"});"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{api/access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "PATCH",
+														"header": [],
+														"url": {
+															"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}/{{api/resync_session_id}}/exercises/{{api/resync_session_exercise_id}}/progress",
+															"protocol": "{{protocol}}",
+															"host": [
+																"{{dev-url}}"
+															],
+															"path": [
+																"1.0",
+																"{{workout-sessions-end-point}}",
+																"{{api/resync_session_id}}",
+																"exercises",
+																"{{api/resync_session_exercise_id}}",
+																"progress"
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "increment resync session progress (2/3)",
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{api/access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "PATCH",
+														"header": [],
+														"url": {
+															"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}/{{api/resync_session_id}}/exercises/{{api/resync_session_exercise_id}}/progress",
+															"protocol": "{{protocol}}",
+															"host": [
+																"{{dev-url}}"
+															],
+															"path": [
+																"1.0",
+																"{{workout-sessions-end-point}}",
+																"{{api/resync_session_id}}",
+																"exercises",
+																"{{api/resync_session_exercise_id}}",
+																"progress"
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "increment resync session progress (3/3)",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Increment resync session progress 3/3: successfully\", function () {",
+																	"    pm.response.to.have.status(200);",
+																	"});",
+																	"pm.expect(pm.response.json().data.exercises[0].completedSets).to.eql(3);"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{api/access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "PATCH",
+														"header": [],
+														"url": {
+															"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}/{{api/resync_session_id}}/exercises/{{api/resync_session_exercise_id}}/progress",
+															"protocol": "{{protocol}}",
+															"host": [
+																"{{dev-url}}"
+															],
+															"path": [
+																"1.0",
+																"{{workout-sessions-end-point}}",
+																"{{api/resync_session_id}}",
+																"exercises",
+																"{{api/resync_session_exercise_id}}",
+																"progress"
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "reduce template sets to 2",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Reduce template sets: successfully\", function () {",
+																	"    pm.response.to.have.status(200);",
+																	"});"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{api/access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "PUT",
+														"header": [],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n    \"name\": \"Resync Auto Finish Day\",\n    \"description\": \"Sets reduced on resync\",\n    \"exercises\": [\n        {\n            \"id\": \"{{api/resync_template_exercise_id}}\",\n            \"name\": \"Bench Press\",\n            \"muscleGroup\": \"chest\",\n            \"weight\": 60,\n            \"reps\": 10,\n            \"sets\": 2\n        }\n    ]\n}",
+															"options": {
+																"raw": {
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-lists-end-point}}/{{api/resync_list_id}}",
+															"protocol": "{{protocol}}",
+															"host": [
+																"{{dev-url}}"
+															],
+															"path": [
+																"1.0",
+																"{{workout-lists-end-point}}",
+																"{{api/resync_list_id}}"
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "resync and auto-finish",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Resync auto-finish: successfully\", function () {",
+																	"    pm.response.to.have.status(201);",
+																	"});",
+																	"var data = pm.response.json().data;",
+																	"pm.test(\"Session completed after resync\", function () {",
+																	"    pm.expect(data.status).to.eql(\"completed\");",
+																	"    pm.expect(data.finishedAt).to.be.a(\"string\");",
+																	"});",
+																	"pm.test(\"Progress clamped to new sets\", function () {",
+																	"    pm.expect(data.exercises[0].completedSets).to.eql(2);",
+																	"    pm.expect(data.exercises[0].sets).to.eql(2);",
+																	"});"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{api/access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "POST",
+														"header": [],
+														"url": {
+															"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-sessions-end-point}}/{{api/resync_session_id}}/resync",
+															"protocol": "{{protocol}}",
+															"host": [
+																"{{dev-url}}"
+															],
+															"path": [
+																"1.0",
+																"{{workout-sessions-end-point}}",
+																"{{api/resync_session_id}}",
+																"resync"
+															]
+														}
+													},
+													"response": []
+												}
+											]
+										}
+									]
+								}
+							]
 						}
 					]
 				}
@@ -894,6 +1784,10 @@
 			"value": "workout-lists"
 		},
 		{
+			"key": "workout-sessions-end-point",
+			"value": "workout-sessions"
+		},
+		{
 			"key": "api/access_token",
 			"value": ""
 		},
@@ -907,6 +1801,34 @@
 		},
 		{
 			"key": "api/exercise_id",
+			"value": ""
+		},
+		{
+			"key": "api/session_id",
+			"value": ""
+		},
+		{
+			"key": "api/session_exercise_id",
+			"value": ""
+		},
+		{
+			"key": "api/empty_workout_list_id",
+			"value": ""
+		},
+		{
+			"key": "api/resync_list_id",
+			"value": ""
+		},
+		{
+			"key": "api/resync_template_exercise_id",
+			"value": ""
+		},
+		{
+			"key": "api/resync_session_id",
+			"value": ""
+		},
+		{
+			"key": "api/resync_session_exercise_id",
 			"value": ""
 		},
 		{

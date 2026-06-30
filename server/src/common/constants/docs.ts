@@ -75,4 +75,40 @@ export const Docs = {
   IMPORT_WORKOUT_LISTS_SUCCESSFUL_RESULT: 'Workout lists imported successfully',
   IMPORT_WORKOUT_LISTS_BAD_REQUEST: 'Bad request',
   IMPORT_WORKOUT_LISTS_UNAUTHORIZED: 'Unauthorized',
+
+  WORKOUT_SESSIONS_CONTROLLER: 'Workout sessions',
+
+  START_WORKOUT_SESSION_ENDPOINT: 'Start or resume the active session for a workout list',
+  START_WORKOUT_SESSION_SUCCESSFUL_RESULT: 'Workout session started successfully',
+  START_WORKOUT_SESSION_RESUMED_RESULT: 'Active workout session resumed successfully',
+  START_WORKOUT_SESSION_BAD_REQUEST: 'Workout list has no exercises',
+  START_WORKOUT_SESSION_NOT_FOUND: 'Workout list not found',
+  START_WORKOUT_SESSION_UNAUTHORIZED: 'Unauthorized',
+
+  GET_ACTIVE_WORKOUT_SESSION_ENDPOINT: 'Get the active session for a workout list (or null)',
+  GET_ACTIVE_WORKOUT_SESSION_SUCCESSFUL_RESULT: 'Active workout session retrieved successfully',
+  GET_ACTIVE_WORKOUT_SESSION_BAD_REQUEST: 'workoutListId is missing or not a valid UUID',
+  GET_ACTIVE_WORKOUT_SESSION_UNAUTHORIZED: 'Unauthorized',
+
+  GET_WORKOUT_SESSION_ENDPOINT: 'Get a workout session by id',
+  GET_WORKOUT_SESSION_SUCCESSFUL_RESULT: 'Workout session retrieved successfully',
+  GET_WORKOUT_SESSION_NOT_FOUND: 'Not found',
+  GET_WORKOUT_SESSION_UNAUTHORIZED: 'Unauthorized',
+
+  UPDATE_WORKOUT_SESSION_PROGRESS_ENDPOINT: 'Mark a session exercise set as completed',
+  UPDATE_WORKOUT_SESSION_PROGRESS_SUCCESSFUL_RESULT: 'Workout session progress updated successfully',
+  UPDATE_WORKOUT_SESSION_PROGRESS_BAD_REQUEST: 'Session is not active',
+  UPDATE_WORKOUT_SESSION_PROGRESS_NOT_FOUND: 'Not found',
+  UPDATE_WORKOUT_SESSION_PROGRESS_UNAUTHORIZED: 'Unauthorized',
+
+  FINISH_WORKOUT_SESSION_ENDPOINT: 'Finish a workout session early',
+  FINISH_WORKOUT_SESSION_SUCCESSFUL_RESULT: 'Workout session finished successfully',
+  FINISH_WORKOUT_SESSION_NOT_FOUND: 'Not found',
+  FINISH_WORKOUT_SESSION_UNAUTHORIZED: 'Unauthorized',
+
+  RESYNC_WORKOUT_SESSION_ENDPOINT: 'Resync the active session from its workout list',
+  RESYNC_WORKOUT_SESSION_SUCCESSFUL_RESULT: 'Workout session resynced successfully',
+  RESYNC_WORKOUT_SESSION_BAD_REQUEST: 'Session is not active, source list is unlinked, or list is missing',
+  RESYNC_WORKOUT_SESSION_NOT_FOUND: 'Not found',
+  RESYNC_WORKOUT_SESSION_UNAUTHORIZED: 'Unauthorized',
 };

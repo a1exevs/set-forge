@@ -10,7 +10,7 @@ import { LoggerModule } from '@src/logger';
 import { SecurityModule } from '@src/security';
 import { HealthModule } from '@src/health/health.module';
 import { WorkoutListsModule, WorkoutList, WorkoutExercise } from '@src/workout-lists';
-import { WorkoutSession, WorkoutSessionExercise } from '@src/workout-sessions';
+import { WorkoutSessionsModule, WorkoutSession, WorkoutSessionExercise } from '@src/workout-sessions';
 
 import * as path from 'path';
 
@@ -55,6 +55,7 @@ import * as path from 'path';
     LoggerModule,
     SecurityModule,
     WorkoutListsModule,
+    WorkoutSessionsModule,
   ],
 })
 export class AppModule {}
