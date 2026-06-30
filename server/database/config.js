@@ -69,9 +69,9 @@ function mysqlConfig() {
     dialect: 'mysql',
     host,
     port,
-    username: username || 'change_me_db_user',
-    password: password || 'change_me_db_password',
-    database: database || 'change_me_db',
+    username: username || 'set_forge_db_user',
+    password: password || 'set_forge_db_password',
+    database: database || 'set_forge_db',
   };
 }
 
