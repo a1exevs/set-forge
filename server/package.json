@@ -160,6 +160,9 @@
       "@workout-lists/(.*)$": [
         "<rootDir>/src/workout-lists/$1"
       ],
+      "@workout-sessions/(.*)$": [
+        "<rootDir>/src/workout-sessions/$1"
+      ],
       "@test/(.*)$": [
         "<rootDir>/test/$1"
       ],
