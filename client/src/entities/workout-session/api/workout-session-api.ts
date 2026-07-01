@@ -39,21 +39,6 @@ export async function fetchActiveWorkoutSession(workoutListId: string): Promise<
   }
 }
 
-export async function fetchWorkoutSession(id: string): Promise<WorkoutSession | null> {
-  try {
-    const res = await apiRequest<WorkoutSession>(`${BASE}/${id}`, { method: 'GET', auth: true });
-    if (res.resultCode !== ResultCodes.OK || !res.data) {
-      return null;
-    }
-    return res.data;
-  } catch (error) {
-    if (error instanceof ApiRequestError && error.status === 404) {
-      return null;
-    }
-    throw error;
-  }
-}
-
 export async function incrementSessionProgress(sessionId: string, exerciseId: string): Promise<WorkoutSession> {
   const res = await apiRequest<WorkoutSession>(`${BASE}/${sessionId}/exercises/${exerciseId}/progress`, {
     method: 'PATCH',

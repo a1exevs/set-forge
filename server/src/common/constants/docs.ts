@@ -80,11 +80,6 @@ export const Docs = {
   GET_ACTIVE_WORKOUT_SESSION_BAD_REQUEST: 'workoutListId is missing or not a valid UUID',
   GET_ACTIVE_WORKOUT_SESSION_UNAUTHORIZED: 'Unauthorized',
 
-  GET_WORKOUT_SESSION_ENDPOINT: 'Get a workout session by id',
-  GET_WORKOUT_SESSION_SUCCESSFUL_RESULT: 'Workout session retrieved successfully',
-  GET_WORKOUT_SESSION_NOT_FOUND: 'Not found',
-  GET_WORKOUT_SESSION_UNAUTHORIZED: 'Unauthorized',
-
   UPDATE_WORKOUT_SESSION_PROGRESS_ENDPOINT: 'Mark a session exercise set as completed',
   UPDATE_WORKOUT_SESSION_PROGRESS_SUCCESSFUL_RESULT: 'Workout session progress updated successfully',
   UPDATE_WORKOUT_SESSION_PROGRESS_BAD_REQUEST: 'Session is not active',

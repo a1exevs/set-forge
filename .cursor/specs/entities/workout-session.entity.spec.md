@@ -63,7 +63,7 @@ See [workout-session-exercise.entity.spec.md](workout-session-exercise.entity.sp
 - `WorkoutSessionsModule` imports `WorkoutSession`, `WorkoutSessionExercise`, `WorkoutList`, `WorkoutExercise` + `AuthModule`
 - Swagger: `Docs.WORKOUT_SESSIONS_CONTROLLER`
 - Path alias: `@workout-sessions/*`
-- `GET` (history) and `GET active` registered **before** `GET /:id`
+- Controller route order: `POST /`, `GET /` (history), `GET active`, then `PATCH`/`POST` on `/:id/...`
 
 ---
 
@@ -111,7 +111,6 @@ Session exercise type: [workout-session-exercise.entity.spec.md](workout-session
 |--------|------|-------------|
 | POST | `/workout-sessions` | Start or resume active session (`200` resume / `201` create). `400` empty list; `404` list missing |
 | GET | `/workout-sessions/active?workoutListId=` | Active session or `null` in `data` |
-| GET | `/workout-sessions/:id` | One owned session |
 | PATCH | `/workout-sessions/:id/exercises/:exerciseId/progress` | +1 `completedSets`; auto-finish when all complete |
 | POST | `/workout-sessions/:id/finish` | Finish early; idempotent if already completed |
 | POST | `/workout-sessions/:id/resync` | Re-snapshot from linked list; preserves progress by `sourceExerciseId` |
@@ -153,7 +152,6 @@ Nested `exercises` shape: [workout-session-exercise.entity.spec.md](workout-sess
 |-----|-----|-------------|
 | `startWorkoutSession(listId)` | function | `POST /workout-sessions` |
 | `fetchActiveWorkoutSession(listId)` | function | `GET /workout-sessions/active` |
-| `fetchWorkoutSession(id)` | function | `GET /workout-sessions/:id` |
 | `fetchWorkoutHistory(limit, offset)` | function | `GET /workout-sessions` |
 | `incrementSessionProgress(sessionId, exerciseId)` | function | `PATCH .../progress` |
 | `finishWorkoutSession(sessionId)` | function | `POST .../finish` |

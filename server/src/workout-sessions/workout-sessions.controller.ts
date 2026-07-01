@@ -101,19 +101,6 @@ export class WorkoutSessionsController {
     return this.workoutSessionsService.getActive(request.user.id, query.workoutListId);
   }
 
-  @ApiOperation({ summary: Docs.GET_WORKOUT_SESSION_ENDPOINT })
-  @ApiResult({
-    status: 200,
-    type: WorkoutSessionResponse.Swagger.WorkoutSessionResponseDto,
-    description: Docs.GET_WORKOUT_SESSION_SUCCESSFUL_RESULT,
-  })
-  @ApiNotFoundResponse({ description: Docs.GET_WORKOUT_SESSION_NOT_FOUND })
-  @ApiUnauthorizedResponse({ description: Docs.GET_WORKOUT_SESSION_UNAUTHORIZED })
-  @Get('/:id')
-  getOne(@Param('id') id: string, @Req() request): Promise<WorkoutSessionResponse.Dto> {
-    return this.workoutSessionsService.getOne(request.user.id, id);
-  }
-
   @ApiOperation({ summary: Docs.UPDATE_WORKOUT_SESSION_PROGRESS_ENDPOINT })
   @ApiResult({
     status: 200,

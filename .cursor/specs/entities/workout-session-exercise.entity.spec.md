@@ -4,7 +4,7 @@
 
 A **snapshot exercise** inside an active or completed [workout session](workout-session.entity.spec.md). Copied from a [template exercise](workout-exercise.entity.spec.md) at session start; tracks `completedSets` for the current training run.
 
-There is **no standalone REST API**; exercises are read and mutated only through session endpoints (`GET /workout-sessions/:id`, `PATCH .../progress`, `POST .../resync`).
+There is **no standalone REST API**; exercises are read and mutated only through session endpoints (`POST /workout-sessions`, `GET active`, history, `PATCH .../progress`, `POST .../resync`).
 
 Related entities: [workout-session](workout-session.entity.spec.md), [workout-exercise](workout-exercise.entity.spec.md).
 
@@ -109,7 +109,7 @@ No dedicated endpoints. Shape is nested under `WorkoutSessionResponse` — see [
 | Operation | Endpoint | Effect on exercises |
 |-----------|----------|---------------------|
 | Start / resume | `POST /workout-sessions` | Snapshot from list template |
-| Read | `GET /workout-sessions/:id`, `GET active`, history | Nested array |
+| Read | `POST /workout-sessions`, `GET active`, history | Nested array |
 | Progress | `PATCH /workout-sessions/:id/exercises/:exerciseId/progress` | `completedSets += 1` |
 | Resync | `POST /workout-sessions/:id/resync` | Rebuild rows from list; keep progress by `sourceExerciseId` |
 

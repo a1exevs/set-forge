@@ -3,7 +3,6 @@ import { apiRequest, ApiRequestError } from '@shared';
 import {
   fetchActiveWorkoutSession,
   fetchWorkoutHistory,
-  fetchWorkoutSession,
   finishWorkoutSession,
   incrementSessionProgress,
   resyncWorkoutSession,
@@ -76,25 +75,6 @@ describe('workout-session-api', () => {
     );
 
     const result = await fetchActiveWorkoutSession('missing');
-
-    expect(result).toBeNull();
-  });
-
-  it('fetchWorkoutSession returns the session on success', async () => {
-    mockedApiRequest.mockResolvedValue(okEnvelope(SESSION));
-
-    const result = await fetchWorkoutSession('session-1');
-
-    expect(mockedApiRequest).toHaveBeenCalledWith('/workout-sessions/session-1', { method: 'GET', auth: true });
-    expect(result).toEqual(SESSION);
-  });
-
-  it('fetchWorkoutSession returns null on a 404 ApiRequestError', async () => {
-    mockedApiRequest.mockRejectedValue(
-      new ApiRequestError(404, { data: null, messages: ['Not found'], fieldsErrors: [], resultCode: 1 }),
-    );
-
-    const result = await fetchWorkoutSession('missing');
 
     expect(result).toBeNull();
   });

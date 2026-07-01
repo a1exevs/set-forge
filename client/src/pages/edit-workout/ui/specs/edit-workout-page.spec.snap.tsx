@@ -14,7 +14,6 @@ jest.mock('src/entities/workout-list/api', () => ({
 jest.mock('src/entities/workout-session/api', () => ({
   fetchActiveWorkoutSession: jest.fn().mockResolvedValue(null),
   startWorkoutSession: jest.fn(),
-  fetchWorkoutSession: jest.fn(),
   incrementSessionProgress: jest.fn(),
   finishWorkoutSession: jest.fn(),
   resyncWorkoutSession: jest.fn(),

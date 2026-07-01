@@ -50,7 +50,6 @@ describe('WorkoutSessionsController', () => {
             start: jest.fn(x => x),
             getActive: jest.fn(x => x),
             getHistory: jest.fn(x => x),
-            getOne: jest.fn(x => x),
             incrementProgress: jest.fn(x => x),
             finish: jest.fn(x => x),
             resync: jest.fn(x => x),
@@ -159,18 +158,6 @@ describe('WorkoutSessionsController', () => {
 
       expect(service.getHistory).toBeCalledWith(userId, 20, 0);
       expect(result).toEqual(page);
-    });
-  });
-
-  describe('getOne', () => {
-    it('returns a single session', async () => {
-      const session = buildSession();
-      jest.spyOn(service, 'getOne').mockResolvedValue(session);
-
-      const result = await controller.getOne('sess-1', request);
-
-      expect(service.getOne).toBeCalledWith(userId, 'sess-1');
-      expect(result).toEqual(session);
     });
   });
 
