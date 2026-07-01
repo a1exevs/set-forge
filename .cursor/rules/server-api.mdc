@@ -76,6 +76,17 @@ export namespace FooRequest {
 - `@ApiProperty({ example, description })` on every column (see `workout-list.model.ts`).
 - `synchronize: false`; schema via migrations.
 
+## Postman collection
+
+When adding or changing an endpoint, update `server/_stub/postman/set-forge-server.postman_collection.json`.
+
+- Mirror controller modules as folders under `v1.0` → `api` (e.g. `workout-lists`, `workout-sessions`).
+- One request per endpoint variant (happy path, key error cases); name requests in kebab-case like existing entries.
+- URL: `{{protocol}}://{{dev-url}}/1.0/{{<module>-end-point}}/...` — add a collection variable for new modules.
+- Auth: `Authorization: Bearer {{api/access_token}}` where the route is protected.
+- Body/query examples: match DTO `@ApiProperty` examples; chain IDs via `pm.collectionVariables.set` in test scripts when a later request depends on the response.
+- Tests: assert status code and essential fields in `data` (see existing requests in the collection).
+
 ## New endpoint checklist
 
 1. DTO (namespace + Swagger + spec)
@@ -83,4 +94,5 @@ export namespace FooRequest {
 3. Controller method + Swagger (success + all errors) + controller spec
 4. Strings in `docs.ts` and `routes.ts`
 5. Update entity spec `## API contract` in `.cursor/specs/entities/`
-6. E2E when needed
+6. Update Postman collection (`server/_stub/postman/set-forge-server.postman_collection.json`)
+7. E2E when needed
