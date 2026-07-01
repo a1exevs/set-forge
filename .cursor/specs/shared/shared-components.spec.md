@@ -176,7 +176,7 @@ type Props = AsButtonProps | AsLinkProps;
 
 ### Usage
 
-Referenced by: [home-page.spec.md](home-page.spec.md)
+Referenced by: [home-page.spec.md](../pages/home-page.spec.md)
 
 - Header: ghost `IconButton` for Export / Import (`title` + `aria-label`).
 - Fixed bottom-right FAB: primary `lg` with `as={Link}` `to="/create"`.
@@ -252,7 +252,7 @@ type Props = {
 
 ### Usage
 
-Referenced by: [edit-workout-list.spec.md](edit-workout-list.spec.md), [home-page.spec.md](home-page.spec.md)
+Referenced by: [edit-workout-page.spec.md](../pages/edit-workout-page.spec.md), [home-page.spec.md](../pages/home-page.spec.md)
 
 ---
 
@@ -319,7 +319,7 @@ type Props = {
 
 ### Usage
 
-Storybook / future account menus only. Profile logout: see [profile-page.spec.md](profile-page.spec.md).
+Storybook / future account menus only. Profile logout: see [profile-page.spec.md](../pages/profile-page.spec.md).
 
 ---
 
@@ -370,7 +370,7 @@ type Props = {
 
 ### Usage
 
-- [profile-page.spec.md](profile-page.spec.md) — account section; letter from `emailToAvatarLetter(email)`.
+- [profile-page.spec.md](../pages/profile-page.spec.md) — account section; letter from `emailToAvatarLetter(email)`.
 
 ---
 
@@ -445,7 +445,7 @@ type Props = {
 ### Usage
 
 - `widgets/main-tabs-bar` — Home + Profile tabs.
-- [home-page.spec.md](home-page.spec.md), [profile-page.spec.md](profile-page.spec.md).
+- [home-page.spec.md](../pages/home-page.spec.md), [profile-page.spec.md](../pages/profile-page.spec.md).
 
 ---
 
@@ -493,9 +493,9 @@ type Props = {
 
 ### Usage
 
-- [home-page.spec.md](home-page.spec.md) — `title="Workout lists"` (uppercase wordmark after favicon).
-- [profile-page.spec.md](profile-page.spec.md) — `title="Profile"`.
-- [auth-session.spec.md](auth-session.spec.md) — `title="Set Forge"`, centered, `titleAs="h1"`.
+- [home-page.spec.md](../pages/home-page.spec.md) — `title="Workout lists"` (uppercase wordmark after favicon).
+- [profile-page.spec.md](../pages/profile-page.spec.md) — `title="Profile"`.
+- [auth-page.spec.md](../pages/auth-page.spec.md) — `title="Set Forge"`, centered, `titleAs="h1"`.
 
 ---
 

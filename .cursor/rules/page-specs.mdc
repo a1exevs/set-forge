@@ -1,0 +1,33 @@
+---
+description: Page spec format — UI, logic, API usage links (no duplicated entity contracts)
+globs: [".cursor/specs/pages/*-page.spec.md", "client/src/pages/**"]
+---
+
+# Page specs
+
+Path: `.cursor/specs/pages/<kebab-page>-page.spec.md`
+
+## Required sections (in order)
+
+1. **Overview** — purpose, auth, links to entity and related page specs. Present tense only.
+2. **Route** — path, protected/public, params, router entry (`*-data-layer.tsx`).
+3. **Location** — `client/src/pages/<slug>/`
+4. **Files** — layers, styles, formatters, tests, stories.
+5. **UI** — `###` per screen region (header, main content, bottom nav). Visual only, no logic steps.
+6. **Current Logic** — `### Initialization`, feature flows. Data → Logic → Presentation.
+7. **Data Model** — props per layer, local types, relationships.
+8. **API usage** — table of calls (method, path, hook). Full contract → link to entity spec only.
+9. **Tech Stack**
+10. **Exposed API / Methods** — page-level hooks/exports.
+11. **Tests**
+12. **Storybook**
+13. **Edge Cases**
+14. **References** — entity specs, other pages, `../shared/shared-components.spec.md#anchor`.
+
+## Rules
+
+- Do **not** duplicate DTOs or DB tables from entity specs.
+- UI vs Logic: no initialization steps in UI; no business logic in UI sections.
+- Describe **current code state** — no Stage N, no «as of Stage 3».
+- New page → file in `specs/pages/` + `## Used by` in entity spec + line in [.cursor/README.md](../README.md).
+- Shared components: link `../shared/shared-components.spec.md#Anchor`, do not copy Props.

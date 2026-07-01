@@ -8,10 +8,11 @@ import { WorkoutList } from '@workout-lists/workout-list.model';
 import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
 import {
   CreateWorkoutListRequest,
+  ImportWorkoutListsRequest,
   ImportWorkoutListsResponse,
   UpdateWorkoutListRequest,
   WorkoutListResponse,
-  WorkoutListsExportFile,
+  WorkoutListsExportFileResponse,
   WORKOUT_LISTS_EXPORT_APP,
   WORKOUT_LISTS_EXPORT_FORMAT_VERSION,
 } from '@workout-lists/dto';
@@ -97,13 +98,13 @@ export class WorkoutListsService {
     return { result: true };
   }
 
-  public async exportAll(userId: number): Promise<WorkoutListsExportFile.Dto> {
+  public async exportAll(userId: number): Promise<WorkoutListsExportFileResponse.Dto> {
     const lists = await this.getAll(userId);
     return WorkoutListsService.toExportFile(lists);
   }
 
   // Reserved for GET /workout-lists/:id/export
-  public async exportOne(userId: number, listId: string): Promise<WorkoutListsExportFile.Dto> {
+  public async exportOne(userId: number, listId: string): Promise<WorkoutListsExportFileResponse.Dto> {
     const list = await this.getOne(userId, listId);
     return WorkoutListsService.toExportFile([list]);
   }
@@ -156,7 +157,7 @@ export class WorkoutListsService {
     return new ImportWorkoutListsResponse.Dto({ importedCount: lists.length, lists });
   }
 
-  public static toExportFile(lists: WorkoutListResponse.Dto[]): WorkoutListsExportFile.Dto {
+  public static toExportFile(lists: WorkoutListResponse.Dto[]): WorkoutListsExportFileResponse.Dto {
     return {
       formatVersion: WORKOUT_LISTS_EXPORT_FORMAT_VERSION,
       app: WORKOUT_LISTS_EXPORT_APP,
@@ -177,13 +178,13 @@ export class WorkoutListsService {
     };
   }
 
-  private static normalizeImportBody(body: unknown): WorkoutListsExportFile.Dto {
+  private static normalizeImportBody(body: unknown): WorkoutListsExportFileResponse.Dto {
     if (Array.isArray(body)) {
       return WorkoutListsService.toExportFile(body.map(item => WorkoutListsService.legacyListToResponse(item)));
     }
 
     if (typeof body === 'object' && body !== null && 'workoutLists' in body) {
-      return body as WorkoutListsExportFile.Dto;
+      return body as WorkoutListsExportFileResponse.Dto;
     }
 
     throw new BadRequestException('Invalid import file format');
@@ -223,8 +224,10 @@ export class WorkoutListsService {
     });
   }
 
-  private static async validateExportFile(file: WorkoutListsExportFile.Dto): Promise<WorkoutListsExportFile.Dto> {
-    const instance = plainToInstance(WorkoutListsExportFile.Dto, file);
+  private static async validateExportFile(
+    file: WorkoutListsExportFileResponse.Dto,
+  ): Promise<ImportWorkoutListsRequest.Dto> {
+    const instance = plainToInstance(ImportWorkoutListsRequest.Dto, file);
     const errors = await validate(instance);
     if (errors.length > 0) {
       throw new BadRequestException('Invalid import file format');

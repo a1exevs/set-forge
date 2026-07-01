@@ -18,7 +18,7 @@ import { MUSCLE_GROUPS, MuscleGroup } from '@workout-lists/constants/muscle-grou
 export const WORKOUT_LISTS_EXPORT_FORMAT_VERSION = 1;
 export const WORKOUT_LISTS_EXPORT_APP = 'set-forge';
 
-export namespace WorkoutListsExportFile {
+export namespace WorkoutListsExportFileResponse {
   export class ExerciseDto {
     @ApiProperty({ example: 'Bench Press' })
     @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
@@ -91,6 +91,6 @@ export namespace WorkoutListsExportFile {
   }
 
   export namespace Swagger {
-    export class WorkoutListsExportFileDto extends Dto {}
+    export class WorkoutListsExportFileResponseDto extends Dto {}
   }
 }

@@ -30,10 +30,11 @@ import { OperationResultResponse } from '@common/dto';
 import { WorkoutListsService } from '@workout-lists/workout-lists.service';
 import {
   CreateWorkoutListRequest,
+  ImportWorkoutListsRequest,
   ImportWorkoutListsResponse,
   UpdateWorkoutListRequest,
   WorkoutListResponse,
-  WorkoutListsExportFile,
+  WorkoutListsExportFileResponse,
 } from '@workout-lists/dto';
 
 @ApiTags(Docs.WORKOUT_LISTS_CONTROLLER)
@@ -59,17 +60,17 @@ export class WorkoutListsController {
   @ApiOperation({ summary: Docs.EXPORT_ALL_WORKOUT_LISTS_ENDPOINT })
   @ApiResult({
     status: 200,
-    type: WorkoutListsExportFile.Swagger.WorkoutListsExportFileDto,
+    type: WorkoutListsExportFileResponse.Swagger.WorkoutListsExportFileResponseDto,
     description: Docs.EXPORT_ALL_WORKOUT_LISTS_SUCCESSFUL_RESULT,
   })
   @ApiUnauthorizedResponse({ description: Docs.EXPORT_ALL_WORKOUT_LISTS_UNAUTHORIZED })
   @Get('export')
-  exportAll(@Req() request): Promise<WorkoutListsExportFile.Dto> {
+  exportAll(@Req() request): Promise<WorkoutListsExportFileResponse.Dto> {
     return this.workoutListsService.exportAll(request.user.id);
   }
 
   @ApiOperation({ summary: Docs.IMPORT_WORKOUT_LISTS_ENDPOINT })
-  @ApiBody({ type: WorkoutListsExportFile.Swagger.WorkoutListsExportFileDto })
+  @ApiBody({ type: ImportWorkoutListsRequest.Swagger.ImportWorkoutListsRequestDto })
   @ApiResult({
     status: 201,
     type: ImportWorkoutListsResponse.Swagger.ImportWorkoutListsResponseDto,

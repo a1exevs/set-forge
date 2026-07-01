@@ -9,7 +9,7 @@ import {
   ImportWorkoutListsResponse,
   UpdateWorkoutListRequest,
   WorkoutListResponse,
-  WorkoutListsExportFile,
+  WorkoutListsExportFileResponse,
   WORKOUT_LISTS_EXPORT_APP,
 } from '@workout-lists/dto';
 import { sendPseudoError } from '@test/unit/helpers';
@@ -152,7 +152,7 @@ describe('WorkoutListsController', () => {
 
   describe('exportAll', () => {
     it('exports all lists for the current user', async () => {
-      const exportFile: WorkoutListsExportFile.Dto = {
+      const exportFile: WorkoutListsExportFileResponse.Dto = {
         formatVersion: 1,
         app: WORKOUT_LISTS_EXPORT_APP,
         exportedAt: '2026-06-03T12:00:00.000Z',
