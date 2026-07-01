@@ -11,9 +11,7 @@ export {
 export type {
   CreateWorkoutListDto,
   ImportWorkoutListsResult,
-  UpdateExerciseDto,
   UpdateWorkoutListDto,
-  WorkoutExercise,
   WorkoutList,
   WorkoutListExportItem,
   WorkoutListsExportFile,

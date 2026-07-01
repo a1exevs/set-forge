@@ -8,10 +8,9 @@ export {
   useWorkoutListsQuery,
   useWorkoutQuery,
   workoutQueryKeys,
-  type WorkoutList,
-  type WorkoutExercise,
   type CreateWorkoutListDto,
-  type UpdateWorkoutListDto,
-  type WorkoutListsExportFile,
   type ImportWorkoutListsResult,
+  type UpdateWorkoutListDto,
+  type WorkoutList,
+  type WorkoutListsExportFile,
 } from 'src/entities/workout-list/model';

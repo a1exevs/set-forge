@@ -1,3 +1,5 @@
+import { apiRequest, ApiRequestError } from '@shared';
+
 import {
   createWorkoutList,
   deleteWorkoutList,
@@ -5,7 +7,6 @@ import {
   fetchWorkoutLists,
   updateWorkoutList,
 } from 'src/entities/workout-list/api/workout-list-api';
-import { apiRequest, ApiRequestError } from 'src/shared/api/http-client';
 
 jest.mock('src/shared/api/http-client', () => {
   const actual = jest.requireActual('src/shared/api/http-client');

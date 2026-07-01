@@ -1,3 +1,5 @@
+import { apiRequest, ApiRequestError, ResultCodes } from '@shared';
+
 import type {
   CreateWorkoutListDto,
   ImportWorkoutListsResult,
@@ -5,8 +7,6 @@ import type {
   WorkoutList,
   WorkoutListsExportFile,
 } from 'src/entities/workout-list/model/types';
-import { apiRequest, ApiRequestError } from 'src/shared/api/http-client';
-import { ResultCodes } from 'src/shared/api/result-codes';
 
 const BASE = '/workout-lists';
 

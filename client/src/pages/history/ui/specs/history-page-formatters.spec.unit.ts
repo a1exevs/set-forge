@@ -117,14 +117,12 @@ describe('history-page-formatters', () => {
     });
 
     it('uses the singular exercise label for a single exercise', () => {
-      const [exercise] = buildSession().exercises;
-      expect(exercise).toBeDefined();
+      const session = buildSession();
       expect(
-        formatSummary(
-          buildSession({
-            exercises: [exercise],
-          }),
-        ),
+        formatSummary({
+          ...session,
+          exercises: session.exercises.slice(0, 1),
+        }),
       ).toBe('1/1 exercise · 1 h');
     });
   });

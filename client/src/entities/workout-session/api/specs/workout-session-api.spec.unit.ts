@@ -1,3 +1,5 @@
+import { apiRequest, ApiRequestError } from '@shared';
+
 import {
   fetchActiveWorkoutSession,
   fetchWorkoutHistory,
@@ -7,7 +9,6 @@ import {
   resyncWorkoutSession,
   startWorkoutSession,
 } from 'src/entities/workout-session/api/workout-session-api';
-import { apiRequest, ApiRequestError } from 'src/shared/api/http-client';
 
 jest.mock('src/shared/api/http-client', () => {
   const actual = jest.requireActual('src/shared/api/http-client');

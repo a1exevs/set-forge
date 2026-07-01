@@ -16,9 +16,4 @@ export {
   useWorkoutSessionForListQuery,
   workoutSessionQueryKeys,
 } from 'src/entities/workout-session/model';
-export type {
-  SessionStatus,
-  WorkoutHistoryPage,
-  WorkoutSession,
-  WorkoutSessionExercise,
-} from 'src/entities/workout-session/model/types';
+export type { SessionStatus, WorkoutHistoryPage, WorkoutSession } from 'src/entities/workout-session/model/types';

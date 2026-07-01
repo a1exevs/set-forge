@@ -1,17 +1,6 @@
-import type { MuscleGroup } from '@entities';
+import type { WorkoutSessionExercise } from 'src/entities/workout-session-exercise/model/types';
 
 export type SessionStatus = 'active' | 'completed';
-
-export interface WorkoutSessionExercise {
-  id: string;
-  sourceExerciseId: string | null;
-  name: string;
-  muscleGroup: MuscleGroup;
-  weight: number;
-  reps: number;
-  sets: number;
-  completedSets: number;
-}
 
 export interface WorkoutSession {
   id: string;
