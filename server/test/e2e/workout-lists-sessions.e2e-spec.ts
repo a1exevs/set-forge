@@ -294,4 +294,67 @@ describe('Workout lists and sessions business logic', () => {
       expect(response.body.data.exercises[0].sets).toBe(2);
     });
   });
+
+  describe(`${Routes.ENDPOINT_WORKOUT_SESSIONS} history`, () => {
+    let completedFirstId: string;
+    let completedSecondId: string;
+
+    const createAndFinishSession = async (listName: string): Promise<string> => {
+      const created = await withAuth(
+        auth,
+        request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}`)
+          .send({ ...listPayload, name: listName }),
+      ).expect(HttpStatus.CREATED);
+
+      const started = await withAuth(
+        auth,
+        request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}`)
+          .send({ workoutListId: created.body.data.id }),
+      ).expect(HttpStatus.CREATED);
+
+      const finished = await withAuth(
+        auth,
+        request(app.getHttpServer()).post(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}/${started.body.data.id}/finish`),
+      ).expect(HttpStatus.CREATED);
+
+      return finished.body.data.id;
+    };
+
+    beforeAll(async () => {
+      completedFirstId = await createAndFinishSession('History Day A');
+      completedSecondId = await createAndFinishSession('History Day B');
+    });
+
+    it('returns completed sessions newest first with pagination metadata', async () => {
+      const response = await withAuth(
+        auth,
+        request(app.getHttpServer()).get(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}?limit=1&offset=0`),
+      ).expect(HttpStatus.OK);
+
+      expect(response.body.data.items).toHaveLength(1);
+      expect(response.body.data.items[0].id).toBe(completedSecondId);
+      expect(response.body.data.items[0].status).toBe(SESSION_STATUS.COMPLETED);
+      expect(response.body.data.hasMore).toBe(true);
+      expect(response.body.data.total).toBeGreaterThanOrEqual(2);
+    });
+
+    it('paginates with offset', async () => {
+      const response = await withAuth(
+        auth,
+        request(app.getHttpServer()).get(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}?limit=1&offset=1`),
+      ).expect(HttpStatus.OK);
+
+      expect(response.body.data.items).toHaveLength(1);
+      expect(response.body.data.items[0].id).toBe(completedFirstId);
+    });
+
+    it('rejects an invalid limit', async () => {
+      await withAuth(
+        auth,
+        request(app.getHttpServer()).get(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}?limit=0`),
+      ).expect(HttpStatus.BAD_REQUEST);
+    });
+  });
 });

@@ -1,4 +1,4 @@
-import type { WorkoutSession } from 'src/entities/workout-session/model/types';
+import type { WorkoutHistoryPage, WorkoutSession } from 'src/entities/workout-session/model/types';
 import { apiRequest, ApiRequestError } from 'src/shared/api/http-client';
 import { ResultCodes } from 'src/shared/api/result-codes';
 
@@ -70,4 +70,13 @@ export async function finishWorkoutSession(sessionId: string): Promise<WorkoutSe
 export async function resyncWorkoutSession(sessionId: string): Promise<WorkoutSession> {
   const res = await apiRequest<WorkoutSession>(`${BASE}/${sessionId}/resync`, { method: 'POST', auth: true });
   return unwrap(res, 'Failed to resync workout session');
+}
+
+/** Paginated completed-session history, newest first. */
+export async function fetchWorkoutHistory(limit: number, offset: number): Promise<WorkoutHistoryPage> {
+  const res = await apiRequest<WorkoutHistoryPage>(`${BASE}?limit=${limit}&offset=${offset}`, {
+    method: 'GET',
+    auth: true,
+  });
+  return unwrap(res, 'Failed to load workout history');
 }

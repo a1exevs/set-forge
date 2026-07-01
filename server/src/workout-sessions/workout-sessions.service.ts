@@ -8,7 +8,7 @@ import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
 import { WorkoutSession } from '@workout-sessions/workout-session.model';
 import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exercise.model';
 import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
-import { WorkoutSessionResponse } from '@workout-sessions/dto';
+import { WorkoutHistoryResponse, WorkoutSessionResponse } from '@workout-sessions/dto';
 
 export interface StartWorkoutSessionResult {
   session: WorkoutSessionResponse.Dto;
@@ -34,6 +34,31 @@ export class WorkoutSessionsService {
   public async getActive(userId: number, workoutListId: string): Promise<WorkoutSessionResponse.Dto | null> {
     const session = await this.findActiveSession(userId, workoutListId);
     return session ? WorkoutSessionsService.mapToResponse(session) : null;
+  }
+
+  // Paginated history of completed sessions, newest first. Exercises are ordered in mapToResponse.
+  public async getHistory(userId: number, limit?: number, offset?: number): Promise<WorkoutHistoryResponse.Dto> {
+    const take = WorkoutSessionsService.resolveLimit(limit);
+    const skip = WorkoutSessionsService.resolveOffset(offset);
+
+    const { rows, count } = await this.workoutSessionRepository.findAndCountAll({
+      where: { userId, status: SESSION_STATUS.COMPLETED },
+      include: [WorkoutSessionExercise],
+      order: [
+        ['finishedAt', 'DESC'],
+        ['startedAt', 'DESC'],
+        ['id', 'DESC'],
+      ],
+      limit: take,
+      offset: skip,
+      distinct: true,
+    });
+
+    return new WorkoutHistoryResponse.Dto({
+      items: rows.map(session => WorkoutSessionsService.mapToResponse(session)),
+      total: count,
+      hasMore: skip + rows.length < count,
+    });
   }
 
   // Idempotent start: returns the existing active session for the list, or snapshots a new one.
@@ -202,6 +227,24 @@ export class WorkoutSessionsService {
       throw new NotFoundException();
     }
     return session;
+  }
+
+  private static resolveLimit(limit?: number): number {
+    const DEFAULT_LIMIT = 20;
+    const MAX_LIMIT = 50;
+    const value = Number(limit);
+    if (!Number.isFinite(value)) {
+      return DEFAULT_LIMIT;
+    }
+    return Math.min(Math.max(Math.trunc(value), 1), MAX_LIMIT);
+  }
+
+  private static resolveOffset(offset?: number): number {
+    const value = Number(offset);
+    if (!Number.isFinite(value) || value < 0) {
+      return 0;
+    }
+    return Math.trunc(value);
   }
 
   private static isFullyCompleted(exercises: SessionExerciseProgress[]): boolean {

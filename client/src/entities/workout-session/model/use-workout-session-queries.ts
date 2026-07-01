@@ -1,15 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { workoutSessionQueryKeys } from '@entities/workout-session/model/workout-session-query-keys.ts';
+import { workoutSessionQueryKeys } from '@entities/workout-session/model/workout-session-query-keys';
 
 import {
   fetchActiveWorkoutSession,
+  fetchWorkoutHistory,
   finishWorkoutSession,
   incrementSessionProgress,
   resyncWorkoutSession,
   startWorkoutSession,
 } from 'src/entities/workout-session/api';
 import type { WorkoutSession } from 'src/entities/workout-session/model/types';
+
+const HISTORY_PAGE_SIZE = 20;
 
 const applyProgressIncrement = (session: WorkoutSession, exerciseId: string): WorkoutSession => ({
   ...session,
@@ -46,6 +49,18 @@ export function useActiveWorkoutSessionQuery(workoutListId: string, enabled = tr
     queryKey: workoutSessionQueryKeys.active(workoutListId),
     queryFn: () => fetchActiveWorkoutSession(workoutListId),
     enabled: enabled && workoutListId.length > 0,
+  });
+}
+
+/** Infinite (offset-based) history of completed sessions, newest first. */
+export function useWorkoutHistoryInfiniteQuery(enabled = true) {
+  return useInfiniteQuery({
+    queryKey: workoutSessionQueryKeys.history(HISTORY_PAGE_SIZE),
+    queryFn: ({ pageParam }) => fetchWorkoutHistory(HISTORY_PAGE_SIZE, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.hasMore ? allPages.reduce((count, page) => count + page.items.length, 0) : undefined,
+    enabled,
   });
 }
 
@@ -89,6 +104,7 @@ export function useFinishWorkoutSessionMutation() {
       qc.setQueryData(workoutSessionQueryKeys.forList(workoutListId), updated);
       qc.setQueryData(workoutSessionQueryKeys.detail(updated.id), updated);
       void qc.invalidateQueries({ queryKey: workoutSessionQueryKeys.active(workoutListId) });
+      void qc.invalidateQueries({ queryKey: ['workout-sessions', 'history'] });
     },
   });
 }

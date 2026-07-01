@@ -25,8 +25,8 @@ The profile page shows the authenticated user's account info (avatar letter, ema
 
 1. Fixed bottom [`MainTabsBar`](../../client/src/widgets/main-tabs-bar/) — Profile tab active on `/profile`.
 2. `useTabSwipeNavigation({ tabs: MAIN_TAB_ROUTES, activePath })` on container:
-   - Swipe **right** → Home (`/`).
-   - Swipe **left** → no-op (rightmost tab in current two-tab setup).
+   - Swipe **right** → History (`/history`).
+   - Swipe **left** → no-op (Profile is the rightmost tab).
 
 ---
 
@@ -102,7 +102,7 @@ type Props = {
 |----------|-----------|
 | Unauthenticated user | Root `beforeLoad` redirects to `/login` |
 | Logout in progress | Log out button disabled |
-| Swipe right on Profile | Navigate to `/` |
+| Swipe right on Profile | Navigate to `/history` |
 | Swipe left on Profile | No-op (rightmost tab) |
 
 ---

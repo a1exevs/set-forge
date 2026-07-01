@@ -1,5 +1,6 @@
 export {
   fetchActiveWorkoutSession,
+  fetchWorkoutHistory,
   fetchWorkoutSession,
   finishWorkoutSession,
   incrementSessionProgress,

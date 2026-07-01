@@ -52,11 +52,11 @@ export class WorkoutSession extends Model<WorkoutSession, IWorkoutSession> {
   status: SessionStatus;
 
   @ApiProperty({ example: '2026-06-03T12:00:00.000Z', description: 'Session start date' })
-  @Column({ type: DataType.DATE, allowNull: false })
+  @Column({ type: DataType.DATE(3), allowNull: false })
   startedAt: Date;
 
   @ApiProperty({ example: '2026-06-03T13:00:00.000Z', description: 'Session finish date', nullable: true })
-  @Column({ type: DataType.DATE, allowNull: true })
+  @Column({ type: DataType.DATE(3), allowNull: true })
   finishedAt: Date | null;
 
   @BelongsTo(() => WorkoutList)

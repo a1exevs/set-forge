@@ -13,6 +13,11 @@
  *     sessions remain available in history even after the source list is deleted
  *     (the snapshot `workout_list_name` preserves the displayed name).
  *   - `workout_session_exercises.workout_session_id` uses ON DELETE CASCADE.
+ *
+ * `started_at` / `finished_at` are DATETIME(3) (millisecond precision): workout
+ * history is ordered by `finished_at`, and second precision makes sessions
+ * finished within the same second impossible to order deterministically, which
+ * breaks stable pagination.
  */
 
 /** @type {import('sequelize-cli').Migration} */
@@ -46,8 +51,8 @@ module.exports = {
         },
         workout_list_name: { type: Sequelize.STRING, allowNull: false },
         status: { type: Sequelize.STRING, allowNull: false, defaultValue: 'active' },
-        started_at: { type: Sequelize.DATE, allowNull: false },
-        finished_at: { type: Sequelize.DATE, allowNull: true },
+        started_at: { type: Sequelize.DATE(3), allowNull: false },
+        finished_at: { type: Sequelize.DATE(3), allowNull: true },
       },
       utf8,
     );
@@ -81,6 +86,7 @@ module.exports = {
       utf8,
     );
 
+    // TODO: Add composite index (user_id, status, finished_at) when history volume warrants it.
     await queryInterface.addIndex('workout_sessions', ['user_id'], {
       name: 'workout_sessions_user_id_idx',
     });

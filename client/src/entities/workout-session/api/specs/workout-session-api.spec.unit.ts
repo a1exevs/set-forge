@@ -1,5 +1,6 @@
 import {
   fetchActiveWorkoutSession,
+  fetchWorkoutHistory,
   fetchWorkoutSession,
   finishWorkoutSession,
   incrementSessionProgress,
@@ -122,6 +123,19 @@ describe('workout-session-api', () => {
     await resyncWorkoutSession('session-1');
 
     expect(mockedApiRequest).toHaveBeenCalledWith('/workout-sessions/session-1/resync', { method: 'POST', auth: true });
+  });
+
+  it('fetchWorkoutHistory requests the paginated history endpoint and returns the page', async () => {
+    const page = { items: [{ ...SESSION, status: 'completed' as const }], total: 1, hasMore: false };
+    mockedApiRequest.mockResolvedValue(okEnvelope(page));
+
+    const result = await fetchWorkoutHistory(20, 40);
+
+    expect(mockedApiRequest).toHaveBeenCalledWith('/workout-sessions?limit=20&offset=40', {
+      method: 'GET',
+      auth: true,
+    });
+    expect(result).toEqual(page);
   });
 
   it('throws when the envelope resultCode is not OK', async () => {

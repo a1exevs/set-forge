@@ -22,3 +22,9 @@ export interface WorkoutSession {
   finishedAt: string | null;
   exercises: WorkoutSessionExercise[];
 }
+
+export interface WorkoutHistoryPage {
+  items: WorkoutSession[];
+  total: number;
+  hasMore: boolean;
+}

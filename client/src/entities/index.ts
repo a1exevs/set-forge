@@ -29,9 +29,11 @@ export {
   useFinishWorkoutSessionMutation,
   useIncrementSessionProgressMutation,
   useResyncWorkoutSessionMutation,
+  useWorkoutHistoryInfiniteQuery,
   useWorkoutSessionForListQuery,
   workoutSessionQueryKeys,
   type SessionStatus,
+  type WorkoutHistoryPage,
   type WorkoutSession,
   type WorkoutSessionExercise,
 } from 'src/entities/workout-session';

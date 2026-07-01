@@ -9,7 +9,7 @@ This spec is delivered in stages:
 - Stage 1 (this section + Data Model): Sequelize entities, tables and migration. Additive only — no endpoints, no behavior change to existing flows; `workout_exercises.completed_sets` is left untouched.
 - Stage 2 (## API contract): `workout-sessions` controller + service (start/continue, finish, progress, resync).
 - Stage 3 (## Client integration): the client moves workout mode onto sessions; the template progress (`workout_exercises.completed_sets`, list `PATCH .../progress`, list `POST .../reset`) is removed (migration `20260630130000-drop-completed-sets-from-workout-exercises.js`).
-- Stage 4: history listing endpoint and page (see [workout-history.spec.md](workout-history.spec.md)).
+- Stage 4 (delivered): history listing endpoint (`GET /workout-sessions`) and the `/history` page + tab (see [workout-history.spec.md](workout-history.spec.md)).
 
 Aligns with [auth-session.spec.md](auth-session.spec.md) (envelope, base URL, guards) and [workout-list-api.spec.md](workout-list-api.spec.md) (ownership, DTO/Swagger conventions).
 
@@ -28,10 +28,10 @@ Sequelize + MySQL, `synchronize: false` (schema via migration `20260630120000-wo
 | `workout_list_id` | UUID | FK → `workout_lists.id`, `ON DELETE SET NULL`, **nullable** (history survives list deletion) |
 | `workout_list_name` | STRING | not null — name snapshot captured at session start |
 | `status` | STRING | not null, default `'active'`, one of `active \| completed` |
-| `started_at` | DATE | not null |
-| `finished_at` | DATE | nullable — set when the session completes |
+| `started_at` | DATETIME(3) | not null — millisecond precision for stable history ordering |
+| `finished_at` | DATETIME(3) | nullable — set when the session completes |
 
-Indexes: `(user_id)`, `(workout_list_id, status)`.
+Indexes: `(user_id)`, `(workout_list_id, status)`. TODO: composite `(user_id, status, finished_at)` when history volume grows.
 
 `@BelongsTo(() => WorkoutList)`, `@HasMany(() => WorkoutSessionExercise)`. `userId` is a `@ForeignKey(() => User)` (no reverse association, mirroring `WorkoutList`).
 
@@ -91,9 +91,9 @@ Index: `(workout_session_id)`. `@BelongsTo(() => WorkoutSession)`.
 | PATCH | `/workout-sessions/:id/exercises/:exerciseId/progress` | `id`, `exerciseId` | +1 `completedSets` (clamped to `sets`). When every exercise reaches `sets`, the session **auto-finishes** (`status=completed`, `finishedAt=now`). `400` if the session is not active; `404` if the exercise is missing. |
 | POST | `/workout-sessions/:id/finish` | `id` (UUID) | Finish early: sets `status=completed`, `finishedAt=now` when active; no-op (returns as-is) when already completed. |
 | POST | `/workout-sessions/:id/resync` | `id` (UUID) | Re-snapshot the active session from its linked list, preserving `completedSets` by `sourceExerciseId` (clamped to new `sets`); new exercises start at 0, removed ones dropped; `workoutListName` refreshed. **Never auto-finishes** — even when clamping leaves every set complete the session stays `active` (resync runs off-screen while editing the list; the session is finished explicitly from workout mode so the user sees the completed session + celebration). `400` if not active, no linked list, or list missing. |
-| GET | `/workout-sessions?status=completed&limit=&offset=` | query | Paginated history (Stage 4). |
+| GET | `/workout-sessions?limit=&offset=` | `limit` (1–50, default 20), `offset` (≥0, default 0) query (`GetWorkoutHistoryQuery`) | Paginated **completed** session history, newest first (`finishedAt DESC, startedAt DESC, id DESC`). Returns `{ items, total, hasMore }`. `400` when `limit`/`offset` are non-integers or out of range. |
 
-Static route `active` is registered **before** `GET /:id` in the controller.
+The root `GET` (history) and the static `GET active` are registered **before** `GET /:id` in the controller so `/:id` never shadows them.
 
 ### Response payload (`data`)
 
@@ -128,6 +128,12 @@ Static route `active` is registered **before** `GET /:id` in the controller.
 
 // GetActiveWorkoutSessionQuery.Dto
 { workoutListId: string; }    // @IsUUID (query)
+
+// GetWorkoutHistoryQuery.Dto (query; @Type(() => Number))
+{ limit?: number; offset?: number; }   // @IsOptional @IsInt @Min(1)/@Max(50) for limit, @Min(0) for offset
+
+// WorkoutHistoryResponse.Dto
+{ items: WorkoutSessionResponse.Dto[]; total: number; hasMore: boolean; }
 ```
 
 ### Service behaviour
@@ -136,6 +142,7 @@ Static route `active` is registered **before** `GET /:id` in the controller.
 
 - `getOne(userId, id)`: owned session; `NotFoundException` if missing.
 - `getActive(userId, workoutListId)`: active session for the list or `null`.
+- `getHistory(userId, limit?, offset?)`: paginated **completed** sessions via `findAndCountAll` (`distinct: true`), ordered `finishedAt DESC, startedAt DESC, id DESC`. `limit` is clamped to `1..50` (default 20) and `offset` to `>= 0` (default 0) defensively in the service; returns `{ items, total, hasMore }` where `hasMore = offset + items.length < total`. Exercises are ordered by `position` in the mapper. Note `started_at`/`finished_at` are `DATETIME(3)` (millisecond precision, defined in the create migration `20260630120000-workout-sessions.js`) so `finishedAt` ordering is deterministic.
 - `start(userId, workoutListId)`: ownership check on the list; return existing active session (`created: false`) or snapshot a new one (`created: true`, exercises copied in `position` order with `sourceExerciseId`, `completedSets=0`); stamp list `lastUsedAt` only on create. `BadRequestException` when the list has no exercises (defense in depth — create/update already require `exercises.length >= 1`). Concurrent starts are serialized by locking the `workout_lists` row inside a transaction.
 - `incrementProgress(userId, sessionId, exerciseId)`: only on `active` (`BadRequestException` otherwise); `+1` if below `sets`; auto-finish when all exercises complete (exercise + session updates in one transaction).
 - `finish(userId, sessionId)`: complete an active session; idempotent if already completed.
@@ -145,8 +152,8 @@ Ownership: all queries filter by `userId`; another user's session is treated as 
 
 ### Tests
 
-- Unit: models, service (snapshot, progress, resync clamp + stays-active when fully complete, empty-list guard), controller, DTO validation (`GetActiveWorkoutSessionQuery`).
-- E2E (`server/test/e2e/workout-lists-sessions.e2e-spec.ts`): empty exercises on create/update, empty-list start guard, start/resume status codes, progress auto-finish, resync keeps the session active when reduced sets leave it fully complete.
+- Unit: models, service (snapshot, progress, resync clamp + stays-active when fully complete, empty-list guard, history paging + `hasMore` + limit/offset clamp), controller (incl. `getHistory`), DTO validation (`GetActiveWorkoutSessionQuery`, `GetWorkoutHistoryQuery`).
+- E2E (`server/test/e2e/workout-lists-sessions.e2e-spec.ts`): empty exercises on create/update, empty-list start guard, start/resume status codes, progress auto-finish, resync keeps the session active when reduced sets leave it fully complete, history returns completed sessions newest-first with pagination metadata + `offset` paging + `400` on invalid `limit`.
 
 ---
 
@@ -158,7 +165,7 @@ Ownership: all queries filter by `userId`; another user's session is treated as 
     - `useWorkoutSessionForListQuery(listId)` — start/resume on entering workout mode; `staleTime: Infinity`, `refetchOnWindowFocus: false`, `retry: false` (so a session is only created/resumed on mount/key change).
     - `useActiveWorkoutSessionQuery(listId)` — drives the edit-page resync prompt.
     - `useIncrementSessionProgressMutation()` — optimistic `+1` on `workoutSessionQueryKeys.forList(listId)`, then `PATCH`; server auto-finish reflected on success.
-    - `useFinishWorkoutSessionMutation()` / `useResyncWorkoutSessionMutation()` — `POST .../finish` / `.../resync`, sync `forList` + `detail` caches, invalidate `active`.
+    - `useFinishWorkoutSessionMutation()` / `useResyncWorkoutSessionMutation()` — `POST .../finish` / `.../resync`, sync `forList` + `detail` caches, invalidate `active`; finish also invalidates `history`.
   - Query keys: `workoutSessionQueryKeys.{ forList(listId), detail(id), active(listId) }`.
 - Workout mode (`pages/workout-mode`) runs on the session: start/resume on entry, double-tap → session progress, server auto-finish, and a bottom **Finish workout** button (disabled once completed). The **Reset** button and the list progress/reset hooks (`useUpdateWorkoutProgressMutation`, `useResetWorkoutProgressMutation`) and API are removed (see [workout-mode.spec.md](workout-mode.spec.md)).
 - Edit flow (`pages/edit-workout`) prompts «Also update the current session?» when an active session exists, and calls resync on confirm (see [edit-workout-list.spec.md](edit-workout-list.spec.md)).

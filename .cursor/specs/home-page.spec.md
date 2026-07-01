@@ -2,7 +2,7 @@
 
 ## Overview
 
-The home page displays a list of workout lists, allows navigation to create a new one or to workout mode, and to edit or delete a list via dot-dot-dot menu. Bottom tabs link to Home and Profile. The page requires an authenticated session (see [auth-session.spec.md](auth-session.spec.md)).
+The home page displays a list of workout lists, allows navigation to create a new one or to workout mode, and to edit or delete a list via dot-dot-dot menu. Bottom tabs link to Home, History and Profile. The page requires an authenticated session (see [auth-session.spec.md](auth-session.spec.md)).
 
 ---
 
@@ -18,9 +18,9 @@ The home page displays a list of workout lists, allows navigation to create a ne
 
 ## Bottom navigation and swipe
 
-1. Fixed bottom [`MainTabsBar`](../../client/src/widgets/main-tabs-bar/) widget — Home (active on `/`) and Profile (`/profile`).
+1. Fixed bottom [`MainTabsBar`](../../client/src/widgets/main-tabs-bar/) widget — Home (active on `/`), History (`/history`) and Profile (`/profile`).
 2. Container uses `useTabSwipeNavigation({ tabs: MAIN_TAB_ROUTES, activePath })` from `@shared`:
-   - Swipe **left** → next tab (Profile) when not on rightmost tab.
+   - Swipe **left** → next tab (History) when not on rightmost tab.
    - Swipe **right** → previous tab when not on leftmost tab.
 3. Tab order is defined once in `widgets/main-tabs-bar/model/main-tab-routes.ts` (`MAIN_TAB_ROUTES`).
 4. `.container` and `.createFab` reserve space above the tabs bar (`3.5rem` + safe-area).
@@ -169,5 +169,5 @@ type Props = {
 | Import cancelled in confirm | No API call |
 | Import invalid JSON | Error confirm; input value reset |
 | Import API error | Error confirm; lists cache unchanged |
-| Swipe left on Home | Navigate to `/profile` |
+| Swipe left on Home | Navigate to `/history` |
 | Swipe right on Home | No-op (leftmost tab) |

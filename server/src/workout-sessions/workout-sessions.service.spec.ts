@@ -84,7 +84,7 @@ const buildListModel = (exercises: Record<string, unknown>[], overrides: Record<
 
 describe('WorkoutSessionsService', () => {
   let service: WorkoutSessionsService;
-  let sessionModel: { findOne: jest.Mock; create: jest.Mock };
+  let sessionModel: { findOne: jest.Mock; create: jest.Mock; findAndCountAll: jest.Mock };
   let sessionExerciseModel: { bulkCreate: jest.Mock; destroy: jest.Mock };
   let listModel: { findOne: jest.Mock };
   let connection: { transaction: jest.Mock };
@@ -93,7 +93,7 @@ describe('WorkoutSessionsService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
 
-    sessionModel = { findOne: jest.fn(), create: jest.fn() };
+    sessionModel = { findOne: jest.fn(), create: jest.fn(), findAndCountAll: jest.fn() };
     sessionExerciseModel = { bulkCreate: jest.fn(), destroy: jest.fn() };
     listModel = { findOne: jest.fn() };
     connection = { transaction: jest.fn(async (cb: (t: unknown) => unknown) => cb({})) };
@@ -412,6 +412,53 @@ describe('WorkoutSessionsService', () => {
       );
       const rows = sessionExerciseModel.bulkCreate.mock.calls[0][0];
       expect(rows[0]).toEqual(expect.objectContaining({ completedSets: 2, sets: 2 }));
+    });
+  });
+
+  describe('getHistory', () => {
+    it('queries completed sessions for the user, newest first, with default paging', async () => {
+      const session = buildSessionModel([buildSessionExercise({ completedSets: 3, sets: 3 })], {
+        status: SESSION_STATUS.COMPLETED,
+        finishedAt: new Date('2026-06-04T10:00:00.000Z'),
+      });
+      sessionModel.findAndCountAll.mockResolvedValue({ rows: [session], count: 1 });
+
+      const result = await service.getHistory(userId);
+
+      expect(sessionModel.findAndCountAll).toBeCalledWith(
+        expect.objectContaining({
+          where: { userId, status: SESSION_STATUS.COMPLETED },
+          limit: 20,
+          offset: 0,
+          distinct: true,
+          order: [
+            ['finishedAt', 'DESC'],
+            ['startedAt', 'DESC'],
+            ['id', 'DESC'],
+          ],
+        }),
+      );
+      expect(result.total).toBe(1);
+      expect(result.hasMore).toBe(false);
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0]).toEqual(expect.objectContaining({ id: 'sess-1', status: SESSION_STATUS.COMPLETED }));
+    });
+
+    it('flags hasMore when more rows exist beyond the page', async () => {
+      const session = buildSessionModel([buildSessionExercise()], { status: SESSION_STATUS.COMPLETED });
+      sessionModel.findAndCountAll.mockResolvedValue({ rows: [session], count: 25 });
+
+      const result = await service.getHistory(userId, 20, 0);
+
+      expect(result.hasMore).toBe(true);
+    });
+
+    it('clamps an oversized limit and a negative offset', async () => {
+      sessionModel.findAndCountAll.mockResolvedValue({ rows: [], count: 0 });
+
+      await service.getHistory(userId, 999, -5);
+
+      expect(sessionModel.findAndCountAll).toBeCalledWith(expect.objectContaining({ limit: 50, offset: 0 }));
     });
   });
 });

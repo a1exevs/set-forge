@@ -1,5 +1,6 @@
 export {
   fetchActiveWorkoutSession,
+  fetchWorkoutHistory,
   fetchWorkoutSession,
   finishWorkoutSession,
   incrementSessionProgress,
@@ -11,7 +12,13 @@ export {
   useFinishWorkoutSessionMutation,
   useIncrementSessionProgressMutation,
   useResyncWorkoutSessionMutation,
+  useWorkoutHistoryInfiniteQuery,
   useWorkoutSessionForListQuery,
   workoutSessionQueryKeys,
 } from 'src/entities/workout-session/model';
-export type { SessionStatus, WorkoutSession, WorkoutSessionExercise } from 'src/entities/workout-session/model/types';
+export type {
+  SessionStatus,
+  WorkoutHistoryPage,
+  WorkoutSession,
+  WorkoutSessionExercise,
+} from 'src/entities/workout-session/model/types';

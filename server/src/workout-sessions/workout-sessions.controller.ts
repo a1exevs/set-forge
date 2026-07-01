@@ -31,7 +31,9 @@ import { ApiResult } from '@common/decorators';
 import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
 import {
   GetActiveWorkoutSessionQuery,
+  GetWorkoutHistoryQuery,
   StartWorkoutSessionRequest,
+  WorkoutHistoryResponse,
   WorkoutSessionResponse,
 } from '@workout-sessions/dto';
 
@@ -67,6 +69,19 @@ export class WorkoutSessionsController {
     const { session, created } = await this.workoutSessionsService.start(request.user.id, dto.workoutListId);
     response.status(created ? HttpStatus.CREATED : HttpStatus.OK);
     return session;
+  }
+
+  @ApiOperation({ summary: Docs.GET_WORKOUT_HISTORY_ENDPOINT })
+  @ApiResult({
+    status: 200,
+    type: WorkoutHistoryResponse.Swagger.WorkoutHistoryResponseDto,
+    description: Docs.GET_WORKOUT_HISTORY_SUCCESSFUL_RESULT,
+  })
+  @ApiBadRequestResponse({ description: Docs.GET_WORKOUT_HISTORY_BAD_REQUEST })
+  @ApiUnauthorizedResponse({ description: Docs.GET_WORKOUT_HISTORY_UNAUTHORIZED })
+  @Get()
+  getHistory(@Query() query: GetWorkoutHistoryQuery.Dto, @Req() request): Promise<WorkoutHistoryResponse.Dto> {
+    return this.workoutSessionsService.getHistory(request.user.id, query.limit, query.offset);
   }
 
   @ApiOperation({ summary: Docs.GET_ACTIVE_WORKOUT_SESSION_ENDPOINT })

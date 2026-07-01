@@ -49,6 +49,7 @@ describe('WorkoutSessionsController', () => {
           useValue: {
             start: jest.fn(x => x),
             getActive: jest.fn(x => x),
+            getHistory: jest.fn(x => x),
             getOne: jest.fn(x => x),
             incrementProgress: jest.fn(x => x),
             finish: jest.fn(x => x),
@@ -142,6 +143,22 @@ describe('WorkoutSessionsController', () => {
       const result = await controller.getActive({ workoutListId: 'list-1' }, request);
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe('getHistory', () => {
+    it('returns paginated completed sessions for the current user', async () => {
+      const page = {
+        items: [buildSession({ status: SESSION_STATUS.COMPLETED, finishedAt: '2026-06-03T13:00:00.000Z' })],
+        total: 1,
+        hasMore: false,
+      };
+      jest.spyOn(service, 'getHistory').mockResolvedValue(page);
+
+      const result = await controller.getHistory({ limit: 20, offset: 0 }, request);
+
+      expect(service.getHistory).toBeCalledWith(userId, 20, 0);
+      expect(result).toEqual(page);
     });
   });
 
