@@ -19,7 +19,7 @@ const buildList = (overrides: Partial<WorkoutListResponse.Dto> = {}): WorkoutLis
     id: 'list-1',
     name: 'Push Day',
     description: 'chest',
-    exercises: [{ id: 'ex-1', name: 'Bench', muscleGroup: 'chest', weight: 60, reps: 10, sets: 3, completedSets: 0 }],
+    exercises: [{ id: 'ex-1', name: 'Bench', muscleGroup: 'chest', weight: 60, reps: 10, sets: 3 }],
     createdAt: '2026-06-03T12:00:00.000Z',
     lastUsedAt: null,
     ...overrides,
@@ -45,8 +45,6 @@ describe('WorkoutListsController', () => {
             create: jest.fn(x => x),
             update: jest.fn(x => x),
             remove: jest.fn(x => x),
-            incrementProgress: jest.fn(x => x),
-            resetAll: jest.fn(x => x),
             exportAll: jest.fn(x => x),
             importAll: jest.fn(x => x),
           },
@@ -129,9 +127,7 @@ describe('WorkoutListsController', () => {
       const dto: UpdateWorkoutListRequest.Dto = {
         name: 'New',
         description: 'd',
-        exercises: [
-          { id: 'ex-1', name: 'Bench', muscleGroup: 'chest', weight: 65, reps: 8, sets: 4, completedSets: 1 },
-        ],
+        exercises: [{ id: 'ex-1', name: 'Bench', muscleGroup: 'chest', weight: 65, reps: 8, sets: 4 }],
       };
       const list = buildList({ name: 'New' });
       jest.spyOn(service, 'update').mockResolvedValue(list);
@@ -151,30 +147,6 @@ describe('WorkoutListsController', () => {
 
       expect(service.remove).toBeCalledWith(userId, 'list-1');
       expect(result.result).toBe(true);
-    });
-  });
-
-  describe('incrementProgress', () => {
-    it('increments exercise progress', async () => {
-      const list = buildList();
-      jest.spyOn(service, 'incrementProgress').mockResolvedValue(list);
-
-      const result = await controller.incrementProgress('list-1', 'ex-1', request);
-
-      expect(service.incrementProgress).toBeCalledWith(userId, 'list-1', 'ex-1');
-      expect(result).toEqual(list);
-    });
-  });
-
-  describe('resetAll', () => {
-    it('resets all progress', async () => {
-      const list = buildList();
-      jest.spyOn(service, 'resetAll').mockResolvedValue(list);
-
-      const result = await controller.resetAll('list-1', request);
-
-      expect(service.resetAll).toBeCalledWith(userId, 'list-1');
-      expect(result).toEqual(list);
     });
   });
 

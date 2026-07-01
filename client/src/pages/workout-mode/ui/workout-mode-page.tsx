@@ -1,4 +1,4 @@
-import type { WorkoutExercise, WorkoutList } from '@entities';
+import type { WorkoutSession, WorkoutSessionExercise } from '@entities';
 import { Transition } from '@headlessui/react';
 import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
@@ -9,25 +9,28 @@ import { NotFoundMessage } from '@widgets';
 import classes from 'src/pages/workout-mode/ui/workout-mode-page.module.scss';
 
 type Props = {
-  currentWorkout: WorkoutList | null;
+  session: WorkoutSession | null;
   justCompleted: string | null;
+  isFinished: boolean;
   totalExercises: number;
   completedExercises: number;
   overallProgress: number;
   onTap: (exerciseId: string) => void;
-  onResetAll: () => void;
+  onFinish: () => void;
 };
 
 const WorkoutModePage: FC<Props> = ({
-  currentWorkout,
+  session,
   justCompleted,
+  isFinished,
   totalExercises,
   completedExercises,
   overallProgress,
   onTap,
-  onResetAll,
+  onFinish,
 }) => {
-  if (!currentWorkout) {
+  if (!session) {
+    // TODO: Distinguish query errors from a missing list — not only "Workout list not found" (see data layer)
     return (
       <div className={classes.container}>
         <NotFoundMessage title="Workout list not found" />
@@ -42,12 +45,8 @@ const WorkoutModePage: FC<Props> = ({
           <Link to="/" className={classes.backButton}>
             ← Back
           </Link>
-          <button type="button" className={classes.resetButton} onClick={onResetAll}>
-            Reset
-          </button>
         </div>
-        <h1>{currentWorkout.name}</h1>
-        {currentWorkout.description && <p className={classes.description}>{currentWorkout.description}</p>}
+        <h1>{session.workoutListName}</h1>
         <div className={classes.overallProgress}>
           <div className={classes.progressInfo}>
             <span>
@@ -63,7 +62,7 @@ const WorkoutModePage: FC<Props> = ({
 
       <main className={classes.main}>
         <div className={classes.exerciseList}>
-          {currentWorkout.exercises.map((exercise: WorkoutExercise) => {
+          {session.exercises.map((exercise: WorkoutSessionExercise) => {
             const progress = exercise.sets > 0 ? (exercise.completedSets / exercise.sets) * 100 : 0;
             const isCompleted = exercise.sets > 0 && exercise.completedSets === exercise.sets;
 
@@ -115,10 +114,16 @@ const WorkoutModePage: FC<Props> = ({
                   />
                 </div>
 
-                {!isCompleted && <p className={classes.hint}>Double tap to mark a set</p>}
+                {!isCompleted && !isFinished && <p className={classes.hint}>Double tap to mark a set</p>}
               </div>
             );
           })}
+        </div>
+
+        <div className={classes.finishBar}>
+          <button type="button" className={classes.finishButton} onClick={onFinish} disabled={isFinished}>
+            {isFinished ? 'Workout completed' : 'Finish workout'}
+          </button>
         </div>
       </main>
     </div>

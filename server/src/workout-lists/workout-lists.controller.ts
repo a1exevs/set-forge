@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
   Put,
   Req,
@@ -140,35 +139,5 @@ export class WorkoutListsController {
   async remove(@Param('id') id: string, @Req() request): Promise<OperationResultResponse.Dto> {
     const result = await this.workoutListsService.remove(request.user.id, id);
     return new OperationResultResponse.Dto(result);
-  }
-
-  @ApiOperation({ summary: Docs.UPDATE_WORKOUT_PROGRESS_ENDPOINT })
-  @ApiResult({
-    status: 200,
-    type: WorkoutListResponse.Swagger.WorkoutListResponseDto,
-    description: Docs.UPDATE_WORKOUT_PROGRESS_SUCCESSFUL_RESULT,
-  })
-  @ApiNotFoundResponse({ description: Docs.UPDATE_WORKOUT_PROGRESS_NOT_FOUND })
-  @ApiUnauthorizedResponse({ description: Docs.UPDATE_WORKOUT_PROGRESS_UNAUTHORIZED })
-  @Patch('/:id/exercises/:exerciseId/progress')
-  incrementProgress(
-    @Param('id') id: string,
-    @Param('exerciseId') exerciseId: string,
-    @Req() request,
-  ): Promise<WorkoutListResponse.Dto> {
-    return this.workoutListsService.incrementProgress(request.user.id, id, exerciseId);
-  }
-
-  @ApiOperation({ summary: Docs.RESET_WORKOUT_PROGRESS_ENDPOINT })
-  @ApiResult({
-    status: 201,
-    type: WorkoutListResponse.Swagger.WorkoutListResponseDto,
-    description: Docs.RESET_WORKOUT_PROGRESS_SUCCESSFUL_RESULT,
-  })
-  @ApiNotFoundResponse({ description: Docs.RESET_WORKOUT_PROGRESS_NOT_FOUND })
-  @ApiUnauthorizedResponse({ description: Docs.RESET_WORKOUT_PROGRESS_UNAUTHORIZED })
-  @Post('/:id/reset')
-  resetAll(@Param('id') id: string, @Req() request): Promise<WorkoutListResponse.Dto> {
-    return this.workoutListsService.resetAll(request.user.id, id);
   }
 }

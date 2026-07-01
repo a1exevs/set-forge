@@ -2,7 +2,7 @@
 
 ## Overview
 
-Page for running a workout from a selected workout list: display exercises, double-tap to mark a set, overall progress, reset progress. Data comes from TanStack Query (`useWorkoutQuery`).
+Page for running a workout. Entering workout mode for a workout list **starts or resumes a workout session** (a snapshot of the list taken on the server). All progress is tracked on the session, not on the list template. The page shows the session's exercises, supports double-tap to mark a set, shows overall progress, and exposes a bottom **Finish workout** button to end the session early. Data comes from TanStack Query (`useWorkoutSessionForListQuery`).
 
 ---
 
@@ -10,66 +10,67 @@ Page for running a workout from a selected workout list: display exercises, doub
 
 ### Initialization
 
-1. Route `/workout/$id` renders `WorkoutModeRoute`, which extracts `id` via `useParams({ from: '/workout/$id' })`.
-2. `WorkoutModePageDataLayer` receives `id`, calls `useWorkoutQuery(id)`, `useUpdateWorkoutProgressMutation()`, `useResetWorkoutProgressMutation()`.
-3. Passes `workout` to LogicLayer: `undefined` while loading, `null` when not found, `WorkoutList` when loaded.
+1. Route `/workout/$id` renders `WorkoutModeRoute`, which extracts `id` (the **workout list id**) via `useParams({ from: '/workout/$id' })`.
+2. `WorkoutModePageDataLayer` receives `id`, calls `useWorkoutSessionForListQuery(id)`, `useIncrementSessionProgressMutation()`, `useFinishWorkoutSessionMutation()`.
+3. Passes `session` to LogicLayer: `undefined` while loading, `null` when not available (e.g. start failed), `WorkoutSession` when loaded.
 
-### Workout loading
+### Session loading (start-or-resume)
 
-4. `useWorkoutQuery(id)`: calls `GET /workout-lists/:id` (via `workout-list-api`). When the list exists — cached under `workoutQueryKeys.detail(id)`.
-5. On 404/not owned, query data is `null`.
+4. `useWorkoutSessionForListQuery(id)`: `queryFn` calls `startWorkoutSession(id)` → `POST /workout-sessions` `{ workoutListId }`. The endpoint is idempotent: it **resumes** the existing active session for the list (200) or **creates** a fresh snapshot (201). The query is configured with `staleTime: Infinity`, `refetchOnWindowFocus: false`, `retry: false` so a session is created/resumed only on mount/key change (never silently spawned on refocus). Cached under `workoutSessionQueryKeys.forList(id)`.
+5. After a session has been **completed**, re-entering workout mode starts a brand-new active session (the completed one is no longer active).
 
 ### Display
 
-6. `workout === undefined`: render nothing (loading).
-7. `workout === null`: render `NotFoundMessage` widget (from `widgets/not-found-message`): «Workout list not found» + «Back to Home» link.
-8. Otherwise: header with name, description, overall progress (completed/total exercises, %), list of exercise cards.
+6. `session === undefined`: render nothing (loading).
+7. `session === null`: render `NotFoundMessage` widget («Workout list not found» + «Back to Home»).
+8. Otherwise: header with `workoutListName`, overall progress (completed/total exercises, %), list of exercise cards, and a bottom **Finish workout** button.
 
 ### Set marking (double-tap)
 
-9. `handleTap(exerciseId)`:
-   - `lastTapRef.current[exerciseId]` stores timestamp of last tap.
-   - If `timeSinceLastTap < 300ms` and `> 0` — treat as double-tap → `handleExerciseClick(exerciseId)`.
-   - Otherwise — update `lastTapRef.current[exerciseId] = now`.
+9. `handleTap(exerciseId)`: 300ms double-tap detection via `lastTapRef`; double-tap → `handleExerciseClick`.
 10. `handleExerciseClick(exerciseId)`:
-    - Finds exercise in `workout.exercises`.
-    - If `completedSets < sets` → `updateWorkoutProgress(listId, exerciseId)`.
+    - No-op when the session is finished (`status === 'completed'`).
+    - Finds exercise in `session.exercises`. If `completedSets < sets` → `incrementProgress(sessionId, exerciseId)`.
     - When `completedSets + 1 === sets` → `setJustCompleted(exerciseId)`, reset after 1s.
 
 ### Progress update (mutation)
 
-11. `useUpdateWorkoutProgressMutation()` (async, optimistic):
-    - `onMutate`: optimistically increments `completedSets` in both `workoutQueryKeys.detail(listId)` and matching entry in `workoutQueryKeys.lists`.
-    - Calls `PATCH /workout-lists/:listId/exercises/:exerciseId/progress`; server clamps to `sets` and sets `lastUsedAt`, returning the authoritative list.
-    - `onSuccess`: writes server response into detail + lists cache.
-    - `onError`: rolls back to snapshot from `onMutate`.
+11. `useIncrementSessionProgressMutation()` (async, optimistic):
+    - vars `{ sessionId, workoutListId, exerciseId }`.
+    - `onMutate`: optimistically increments `completedSets` in `workoutSessionQueryKeys.forList(workoutListId)`.
+    - Calls `PATCH /workout-sessions/:id/exercises/:exerciseId/progress`; server clamps to `sets` and **auto-finishes** the session when every exercise is complete, returning the authoritative session.
+    - `onSuccess`: writes server response into `forList` + `detail` caches.
+    - `onError`: rolls back to the `onMutate` snapshot.
 
-### Progress reset
+### Finishing the workout
 
-12. `handleResetAll`: confirm «Reset all progress?» → on OK calls `resetAllProgress(workout.id)`.
-13. `useResetWorkoutProgressMutation()` (async, optimistic): zeros `completedSets` in detail + lists cache immediately, then calls `POST /workout-lists/:listId/reset`. UI updates immediately; progress bars animate via CSS `transition: width` on `.progressBarFill` and `.progressBar`. On error — rollback; on success — server response written to cache.
+12. **Auto-finish (last set)**: when the last remaining set is marked, the server flips the session to `completed` and stamps `finishedAt`. The returned session disables further interaction.
+13. **Auto-finish on entry (resync edge)**: a session can be entered already fully complete but still `active` — this happens when the workout list was edited mid-session and resynced down to all-complete (resync never auto-finishes server-side). On load the logic layer detects `status === 'active'` + every set complete and calls `finishSession(session.id)` once, so the user lands on the completed session with its celebration instead of a fresh empty one.
+14. **Early finish**: `handleFinish` confirms «Finish workout?» → on OK calls `finishSession(sessionId)` → `useFinishWorkoutSessionMutation()` → `POST /workout-sessions/:id/finish`. The session becomes `completed` with whatever progress exists.
+15. The **Finish workout** button is disabled once `status === 'completed'` (label becomes «Workout completed»).
+16. There is **no Reset**: finishing is terminal; re-entering a completed list creates a new session.
 
 ### Progress
 
-14. `calculateProgress()`: `totalExercises`, `completedExercises` (where `sets > 0 && completedSets === sets`), `overallProgress = completedExercises / totalExercises * 100`.
+17. `calculateProgress()`: `totalExercises`, `completedExercises` (where `sets > 0 && completedSets === sets`), `overallProgress = completedExercises / totalExercises * 100`.
 
 ### Workout completion celebration (confetti)
 
-15. When `completedExercises` **transitions** from strictly less than `totalExercises` to equal to `totalExercises`, and `totalExercises > 0`, `WorkoutModePageLogicLayer` fires a short confetti burst via **`canvas-confetti`** (explicit `package.json` dependency; do not rely on transitive `react-confetti` from dev tooling).
-16. Implementation: `useEffect` depends on `completedExercises`, `totalExercises`, route `id`, and `workout`. `prevCompletedExercisesRef: useRef<number | null>(null)` stores the previous `completedExercises`. The effect **returns early** while `workout` is null/undefined or `workout.id !== id` so progress is not sampled during route transitions (avoids treating a transient `0` completed count as “previous” before the correct list loads). After handling, the ref is updated to the current `completedExercises`. Fire only if `prev !== null`, `prev < totalExercises`, and `completedExercises === totalExercises` — so the **first paint** with an already-fully-completed list (e.g. user re-opens the page) does **not** trigger confetti.
-17. When route `id` changes (`/workout/$id`), reset `prevCompletedExercisesRef` to `null` (separate `useEffect` on `id`) so counters are not compared across different lists.
-18. After **Reset all progress** and completing the workout again, confetti runs again on the same transition (not all → all).
-19. No confetti when `totalExercises === 0`. Presentation and data-layer props are unchanged; effect stays in the logic layer only.
+18. The celebration (`canvas-confetti` burst) fires **once per session**, guarded by `confettiFiredRef`. Two triggers, handled in one `useEffect` (deps: `session`, `completedExercises`, `totalExercises`, `finishSession`):
+    - **In-session transition** — `prev !== null && prev < totalExercises && completedExercises === totalExercises` (the last set was just marked).
+    - **Already complete on entry** — `prev === null && completedExercises === totalExercises && status === 'active'` (the resync edge from item 13). In this branch the effect also calls `finishSession(session.id)`.
+19. `prevCompletedExercisesRef` stores the previous completed count; a separate effect resets both it (`null`) and `confettiFiredRef` (`false`) when the **session id** changes. The early-finish button (item 14) fires the same guarded burst after `finishSession` resolves, so a manual finish and the transition can never double-fire.
 
 ---
 
 ## Data Model
 
-### WorkoutExercise
+### WorkoutSessionExercise
 
 ```typescript
-interface WorkoutExercise {
+interface WorkoutSessionExercise {
   id: string;
+  sourceExerciseId: string | null;
   name: string;
   muscleGroup: MuscleGroup;
   weight: number;
@@ -79,37 +80,37 @@ interface WorkoutExercise {
 }
 ```
 
+> The workout list template (`WorkoutExercise`) no longer carries `completedSets`; progress lives only on the session.
+
 ### Props WorkoutModePage (Presentation)
 
 ```typescript
 type Props = {
-  currentWorkout: WorkoutList | null;
+  session: WorkoutSession | null;
   justCompleted: string | null;
+  isFinished: boolean;
   totalExercises: number;
   completedExercises: number;
   overallProgress: number;
   onTap: (exerciseId: string) => void;
-  onResetAll: () => void;
+  onFinish: () => void;
 };
 ```
-
-Note: Presentation prop remains `currentWorkout` (may be `null` for not-found inside the page component); LogicLayer receives `workout` from the data layer.
 
 ### Props WorkoutModePageLogicLayer
 
 ```typescript
 type Props = {
-  id: string;
-  workout: WorkoutList | null | undefined;
-  updateWorkoutProgress: (listId: string, exerciseId: string) => Promise<void>;
-  resetAllProgress: (listId: string) => Promise<void>;
+  session: WorkoutSession | null | undefined;
+  incrementProgress: (sessionId: string, exerciseId: string) => Promise<void>;
+  finishSession: (sessionId: string) => Promise<void>;
 };
 ```
 
 ### Relationships
 
-- `workout` — from `useWorkoutQuery(id)` cache (`GET /workout-lists/:id`).
-- Progress mutations keep `workoutQueryKeys.detail(id)` and `workoutQueryKeys.lists` in sync.
+- `session` — from `useWorkoutSessionForListQuery(id)` cache (`POST /workout-sessions`).
+- Increment/finish mutations keep `workoutSessionQueryKeys.forList(workoutListId)` and `workoutSessionQueryKeys.detail(id)` in sync.
 
 ---
 
@@ -119,14 +120,14 @@ type Props = {
 |-----------|------------|
 | Routing | TanStack Router (`useParams`, `Link`) |
 | Server state | `@tanstack/react-query` (query + optimistic mutations) |
-| UI | React 18, Headless UI (`Transition`), SCSS Modules, NotFoundMessage (from `widgets/not-found-message`) |
+| UI | React 18, Headless UI (`Transition`), SCSS Modules, `NotFoundMessage` |
 | Dialogs | `useConfirm` |
-| Animation | `Transition` for checkmark when exercise completes; progress bars use CSS `transition: width` (overall + per exercise), including when progress resets; `canvas-confetti` burst when all exercises complete (transition only, not on initial load of an already-complete workout) |
+| Animation | `Transition` checkmark; CSS `transition: width` progress bars; `canvas-confetti` burst on full completion |
 
 ### Patterns
 
 - 3-layer: Data → Logic → Presentation
-- Double-tap: `useRef` to store lastTap, 300ms threshold
+- Double-tap: `useRef` + 300ms threshold
 - Optimistic updates in mutation `onMutate` / rollback in `onError`
 
 ---
@@ -137,12 +138,12 @@ type Props = {
 
 | API | Type | Description |
 |-----|-----|----------|
-| `useWorkoutQuery(id)` | hook | Current workout from API |
-| `useUpdateWorkoutProgressMutation()` | hook | +1 completedSets (optimistic + `PATCH .../progress`) |
-| `useResetWorkoutProgressMutation()` | hook | Zero completedSets (optimistic + `POST .../reset`) |
-| `workoutQueryKeys.detail(id)` | query key | Single-list cache key |
+| `useWorkoutSessionForListQuery(id)` | hook | Start/resume the active session for a list |
+| `useIncrementSessionProgressMutation()` | hook | +1 completedSets (optimistic + `PATCH .../progress`, server auto-finishes) |
+| `useFinishWorkoutSessionMutation()` | hook | Finish session early (`POST .../finish`) |
+| `workoutSessionQueryKeys.forList(id)` / `.detail(id)` | query keys | Session caches |
 | `NotFoundMessage` | widget | From `widgets/not-found-message` |
-| Route | — | `/workout/$id` |
+| Route | — | `/workout/$id` (`$id` = workout list id) |
 
 ### Public exports
 
@@ -154,17 +155,16 @@ type Props = {
 
 | Scenario | Handling |
 |----------|-----------|
-| `workout === null` | Render `NotFoundMessage` widget + Link to home |
-| `workout === undefined` | Render nothing (loading) |
-| Non-existent `id` | `GET /workout-lists/:id` returns 404/not owned → query data `null` |
+| `session === null` | Render `NotFoundMessage` widget + Link to home |
+| `session === undefined` | Render nothing (loading) |
+| List has no exercises | `POST /workout-sessions` 400 → query error → `session` null |
 | `exercise.completedSets >= exercise.sets` | Click does not increase completedSets |
+| Session already `completed` | Taps are no-ops; Finish button disabled |
 | Double-tap < 300ms | Treated as single action, `handleExerciseClick` runs |
-| `resetAllProgress` | Detail + lists cache synced; counts and bars reflect reset with same width transition as fill |
 | API error in progress mutation | Optimistic update rolled back via `onError` |
 | Empty `exercises` | `totalExercises = 0`, `overallProgress = 0` |
 | `justCompleted` | Checkmark animation 1s, then reset |
-| `exercise.sets === 0` | `progress = 0`, `isCompleted = false`, exercise not counted in completedExercises |
-| Workout already 100% on first open | No confetti (`prevCompletedExercisesRef` initialized without a prior “incomplete” sample) |
-| All exercises complete during session | Confetti once per transition to 100% |
-| Route `id` changes | `prevCompletedExercisesRef` reset so the new list does not inherit the old comparison |
-| `totalExercises === 0` | No confetti |
+| All exercises complete during session | Server auto-finishes; confetti once per transition to 100% |
+| Enter an active session already fully complete (resync edge) | Confetti + `finishSession` called once on load, landing on the completed state |
+| Re-enter after completion | A new active session is created |
+| Session id changes | `prevCompletedExercisesRef` and `confettiFiredRef` reset so the new session does not inherit the old comparison/celebration |

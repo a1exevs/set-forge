@@ -260,7 +260,7 @@ describe('Workout lists and sessions business logic', () => {
       }
     });
 
-    it('auto-finishes on resync when template sets are reduced below preserved progress', async () => {
+    it('stays active on resync even when reduced template sets leave it fully complete', async () => {
       await withAuth(
         auth,
         request(app.getHttpServer())
@@ -286,8 +286,10 @@ describe('Workout lists and sessions business logic', () => {
         request(app.getHttpServer()).post(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}/${sessionId}/resync`),
       ).expect(HttpStatus.CREATED);
 
-      expect(response.body.data.status).toBe(SESSION_STATUS.COMPLETED);
-      expect(response.body.data.finishedAt).toBeTruthy();
+      // Resync never auto-finishes: the session is left active so workout mode can finish it
+      // explicitly (with the celebration) the next time the user enters.
+      expect(response.body.data.status).toBe(SESSION_STATUS.ACTIVE);
+      expect(response.body.data.finishedAt).toBeNull();
       expect(response.body.data.exercises[0].completedSets).toBe(2);
       expect(response.body.data.exercises[0].sets).toBe(2);
     });

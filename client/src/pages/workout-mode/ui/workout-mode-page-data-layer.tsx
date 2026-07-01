@@ -1,6 +1,10 @@
 import { FC } from 'react';
 
-import { useResetWorkoutProgressMutation, useUpdateWorkoutProgressMutation, useWorkoutQuery } from '@entities';
+import {
+  useFinishWorkoutSessionMutation,
+  useIncrementSessionProgressMutation,
+  useWorkoutSessionForListQuery,
+} from '@entities';
 
 import WorkoutModePageLogicLayer from 'src/pages/workout-mode/ui/workout-mode-page-logic-layer';
 
@@ -9,19 +13,19 @@ type Props = {
 };
 
 const WorkoutModePageDataLayer: FC<Props> = ({ id }) => {
-  const { data: workout, isLoading } = useWorkoutQuery(id);
-  const updateWorkoutProgressMutation = useUpdateWorkoutProgressMutation();
-  const resetWorkoutProgressMutation = useResetWorkoutProgressMutation();
+  const { data: session, isLoading } = useWorkoutSessionForListQuery(id);
+  const incrementSessionProgressMutation = useIncrementSessionProgressMutation();
+  const finishWorkoutSessionMutation = useFinishWorkoutSessionMutation();
 
+  // TODO: Distinguish query errors (empty list, network) from a missing list — not only "Workout list not found"
   return (
     <WorkoutModePageLogicLayer
-      id={id}
-      workout={isLoading ? undefined : (workout ?? null)}
-      updateWorkoutProgress={async (listId, exerciseId): Promise<void> => {
-        await updateWorkoutProgressMutation.mutateAsync({ listId, exerciseId });
+      session={isLoading ? undefined : (session ?? null)}
+      incrementProgress={async (sessionId, exerciseId): Promise<void> => {
+        await incrementSessionProgressMutation.mutateAsync({ sessionId, workoutListId: id, exerciseId });
       }}
-      resetAllProgress={async (listId): Promise<void> => {
-        await resetWorkoutProgressMutation.mutateAsync(listId);
+      finishSession={async (sessionId): Promise<void> => {
+        await finishWorkoutSessionMutation.mutateAsync({ sessionId, workoutListId: id });
       }}
     />
   );

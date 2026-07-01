@@ -13,9 +13,7 @@ export {
   useDeleteWorkoutListMutation,
   useExportAllWorkoutListsMutation,
   useImportWorkoutListsMutation,
-  useResetWorkoutProgressMutation,
   useUpdateWorkoutListMutation,
-  useUpdateWorkoutProgressMutation,
   useWorkoutListsQuery,
   useWorkoutQuery,
   workoutQueryKeys,
@@ -26,3 +24,14 @@ export {
   type WorkoutListsExportFile,
   type ImportWorkoutListsResult,
 } from 'src/entities/workout-list';
+export {
+  useActiveWorkoutSessionQuery,
+  useFinishWorkoutSessionMutation,
+  useIncrementSessionProgressMutation,
+  useResyncWorkoutSessionMutation,
+  useWorkoutSessionForListQuery,
+  workoutSessionQueryKeys,
+  type SessionStatus,
+  type WorkoutSession,
+  type WorkoutSessionExercise,
+} from 'src/entities/workout-session';

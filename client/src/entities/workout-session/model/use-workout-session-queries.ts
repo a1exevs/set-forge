@@ -1,0 +1,109 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { workoutSessionQueryKeys } from '@entities/workout-session/model/workout-session-query-keys.ts';
+
+import {
+  fetchActiveWorkoutSession,
+  finishWorkoutSession,
+  incrementSessionProgress,
+  resyncWorkoutSession,
+  startWorkoutSession,
+} from 'src/entities/workout-session/api';
+import type { WorkoutSession } from 'src/entities/workout-session/model/types';
+
+const applyProgressIncrement = (session: WorkoutSession, exerciseId: string): WorkoutSession => ({
+  ...session,
+  exercises: session.exercises.map(exercise => {
+    if (exercise.id !== exerciseId || exercise.completedSets >= exercise.sets) {
+      return exercise;
+    }
+    return { ...exercise, completedSets: exercise.completedSets + 1 };
+  }),
+});
+
+/** Start or resume the active session for a workout list when entering workout mode. */
+export function useWorkoutSessionForListQuery(workoutListId: string, enabled = true) {
+  return useQuery<WorkoutSession>({
+    queryKey: workoutSessionQueryKeys.forList(workoutListId),
+    queryFn: () => startWorkoutSession(workoutListId),
+    enabled: enabled && workoutListId.length > 0,
+    // Entering workout mode must always re-issue `start` (idempotent resume while the session is
+    // active, a brand-new session once the previous one is completed). The cache is kept only for
+    // the lifetime of the page so a finished session is never re-served on the next entry; `start`
+    // re-runs on every mount. Window-focus/reconnect refetches stay off so sessions are never
+    // spawned silently in the background.
+    gcTime: 0,
+    staleTime: Infinity,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: false,
+  });
+}
+
+export function useActiveWorkoutSessionQuery(workoutListId: string, enabled = true) {
+  return useQuery<WorkoutSession | null>({
+    queryKey: workoutSessionQueryKeys.active(workoutListId),
+    queryFn: () => fetchActiveWorkoutSession(workoutListId),
+    enabled: enabled && workoutListId.length > 0,
+  });
+}
+
+type IncrementProgressVars = { sessionId: string; workoutListId: string; exerciseId: string };
+
+export function useIncrementSessionProgressMutation() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ sessionId, exerciseId }: IncrementProgressVars) => incrementSessionProgress(sessionId, exerciseId),
+    onMutate: async ({ workoutListId, exerciseId }) => {
+      await qc.cancelQueries({ queryKey: workoutSessionQueryKeys.forList(workoutListId) });
+
+      const previous = qc.getQueryData<WorkoutSession>(workoutSessionQueryKeys.forList(workoutListId));
+      if (previous) {
+        qc.setQueryData(workoutSessionQueryKeys.forList(workoutListId), applyProgressIncrement(previous, exerciseId));
+      }
+
+      return { previous };
+    },
+    onSuccess: (updated, { workoutListId }) => {
+      qc.setQueryData(workoutSessionQueryKeys.forList(workoutListId), updated);
+      qc.setQueryData(workoutSessionQueryKeys.detail(updated.id), updated);
+    },
+    onError: (_error, { workoutListId }, context) => {
+      if (context?.previous) {
+        qc.setQueryData(workoutSessionQueryKeys.forList(workoutListId), context.previous);
+      }
+    },
+  });
+}
+
+type FinishSessionVars = { sessionId: string; workoutListId: string };
+
+export function useFinishWorkoutSessionMutation() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ sessionId }: FinishSessionVars) => finishWorkoutSession(sessionId),
+    onSuccess: (updated, { workoutListId }) => {
+      qc.setQueryData(workoutSessionQueryKeys.forList(workoutListId), updated);
+      qc.setQueryData(workoutSessionQueryKeys.detail(updated.id), updated);
+      void qc.invalidateQueries({ queryKey: workoutSessionQueryKeys.active(workoutListId) });
+    },
+  });
+}
+
+type ResyncSessionVars = { sessionId: string; workoutListId: string };
+
+export function useResyncWorkoutSessionMutation() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ sessionId }: ResyncSessionVars) => resyncWorkoutSession(sessionId),
+    onSuccess: (updated, { workoutListId }) => {
+      qc.setQueryData(workoutSessionQueryKeys.forList(workoutListId), updated);
+      qc.setQueryData(workoutSessionQueryKeys.detail(updated.id), updated);
+      void qc.invalidateQueries({ queryKey: workoutSessionQueryKeys.active(workoutListId) });
+    },
+  });
+}

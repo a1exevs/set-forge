@@ -11,7 +11,7 @@
 
 .headerTop {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   margin-bottom: $spacing-lg;
 }
@@ -33,20 +33,39 @@
   }
 }
 
-.resetButton {
-  background: transparent;
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  padding: $spacing-sm $spacing-md;
-  color: $text-secondary;
-  font-size: $font-size-sm;
+.finishBar {
+  margin-top: $spacing-xl;
+  display: flex;
+  justify-content: center;
+}
+
+.finishButton {
+  width: 100%;
+  max-width: 400px;
+  background: linear-gradient(90deg, $progress-fill-start, $progress-fill-end);
+  border: none;
+  border-radius: $radius-lg;
+  padding: $spacing-md $spacing-lg;
+  color: $text-primary;
+  font-size: $font-size-base;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px;
+  min-height: 52px;
 
-  &:hover {
-    background-color: $bg-hover;
-    border-color: $border-hover;
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.99);
+  }
+
+  &:disabled {
+    background: $bg-elevated;
+    border: 1px solid $success-color;
+    color: $success-color;
+    cursor: default;
   }
 }
 

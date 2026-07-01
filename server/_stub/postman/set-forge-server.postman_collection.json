@@ -751,7 +751,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"name\": \"Updated Push Day\",\n    \"description\": \"Chest, shoulders, triceps\",\n    \"exercises\": [\n        {\n            \"id\": \"{{api/exercise_id}}\",\n            \"name\": \"Bench Press\",\n            \"muscleGroup\": \"chest\",\n            \"weight\": 65,\n            \"reps\": 10,\n            \"sets\": 3,\n            \"completedSets\": 0\n        }\n    ]\n}",
+											"raw": "{\n    \"name\": \"Updated Push Day\",\n    \"description\": \"Chest, shoulders, triceps\",\n    \"exercises\": [\n        {\n            \"id\": \"{{api/exercise_id}}\",\n            \"name\": \"Bench Press\",\n            \"muscleGroup\": \"chest\",\n            \"weight\": 65,\n            \"reps\": 10,\n            \"sets\": 3\n        }\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -820,102 +820,6 @@
 												"1.0",
 												"{{workout-lists-end-point}}",
 												"{{api/workout_list_id}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "increment exercise progress",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Increment progress: successfully\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"pm.test(\"Completed sets increased\", function () {",
-													"    pm.expect(pm.response.json().data.exercises[0].completedSets).to.be.at.least(1);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "{{api/access_token}}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "PATCH",
-										"header": [],
-										"url": {
-											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-lists-end-point}}/{{api/workout_list_id}}/exercises/{{api/exercise_id}}/progress",
-											"protocol": "{{protocol}}",
-											"host": [
-												"{{dev-url}}"
-											],
-											"path": [
-												"1.0",
-												"{{workout-lists-end-point}}",
-												"{{api/workout_list_id}}",
-												"exercises",
-												"{{api/exercise_id}}",
-												"progress"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "reset workout progress",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Reset progress: successfully\", function () {",
-													"    pm.response.to.have.status(201);",
-													"});",
-													"pm.test(\"Completed sets reset to 0\", function () {",
-													"    pm.expect(pm.response.json().data.exercises[0].completedSets).to.eql(0);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "{{api/access_token}}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "POST",
-										"header": [],
-										"url": {
-											"raw": "{{protocol}}://{{dev-url}}/1.0/{{workout-lists-end-point}}/{{api/workout_list_id}}/reset",
-											"protocol": "{{protocol}}",
-											"host": [
-												"{{dev-url}}"
-											],
-											"path": [
-												"1.0",
-												"{{workout-lists-end-point}}",
-												"{{api/workout_list_id}}",
-												"reset"
 											]
 										}
 									},
@@ -1406,7 +1310,7 @@
 											"response": []
 										},
 										{
-											"name": "resync auto-finish when sets reduced",
+											"name": "resync stays active when sets reduced",
 											"item": [
 												{
 													"name": "create resync test list",
@@ -1695,19 +1599,19 @@
 													"response": []
 												},
 												{
-													"name": "resync and auto-finish",
+													"name": "resync stays active when sets reduced",
 													"event": [
 														{
 															"listen": "test",
 															"script": {
 																"exec": [
-																	"pm.test(\"Resync auto-finish: successfully\", function () {",
+																	"pm.test(\"Resync stays active: successfully\", function () {",
 																	"    pm.response.to.have.status(201);",
 																	"});",
 																	"var data = pm.response.json().data;",
-																	"pm.test(\"Session completed after resync\", function () {",
-																	"    pm.expect(data.status).to.eql(\"completed\");",
-																	"    pm.expect(data.finishedAt).to.be.a(\"string\");",
+																	"pm.test(\"Session stays active after resync\", function () {",
+																	"    pm.expect(data.status).to.eql(\"active\");",
+																	"    pm.expect(data.finishedAt).to.eql(null);",
 																	"});",
 																	"pm.test(\"Progress clamped to new sets\", function () {",
 																	"    pm.expect(data.exercises[0].completedSets).to.eql(2);",

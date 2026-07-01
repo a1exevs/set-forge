@@ -224,34 +224,6 @@ describe('User workflow', () => {
       });
     });
 
-    describe('/:id/exercises/:exerciseId/progress PATCH', () => {
-      it('Increment exercise progress', () => {
-        return request(app.getHttpServer())
-          .patch(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}/${workoutListId}/exercises/${exerciseId}/progress`)
-          .set('Cookie', cookies)
-          .set('Authorization', `Bearer ${accessToken}`)
-          .expect(HttpStatus.OK)
-          .expect(response => {
-            expect(response.body.data.exercises[0].completedSets).toBe(1);
-            expect(response.body.resultCode).toBe(ResultCodes.OK);
-          });
-      });
-    });
-
-    describe('/:id/reset POST', () => {
-      it('Reset workout progress', () => {
-        return request(app.getHttpServer())
-          .post(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}/${workoutListId}/reset`)
-          .set('Cookie', cookies)
-          .set('Authorization', `Bearer ${accessToken}`)
-          .expect(HttpStatus.CREATED)
-          .expect(response => {
-            expect(response.body.data.exercises[0].completedSets).toBe(0);
-            expect(response.body.resultCode).toBe(ResultCodes.OK);
-          });
-      });
-    });
-
     describe('/export GET', () => {
       it('Export workout lists', () => {
         return request(app.getHttpServer())

@@ -393,28 +393,21 @@ describe('WorkoutSessionsService', () => {
       expect(rows[1]).toEqual(expect.objectContaining({ sourceExerciseId: 'tpl-new', completedSets: 0, position: 1 }));
     });
 
-    it('auto-finishes when clamped progress completes every exercise after resync', async () => {
+    it('stays active even when clamped progress completes every exercise after resync', async () => {
       const session = buildSessionModel([
         buildSessionExercise({ id: 'old-1', sourceExerciseId: 'tpl-1', completedSets: 3, sets: 4 }),
       ]);
-      sessionModel.findOne.mockResolvedValueOnce(session).mockResolvedValueOnce(
-        buildSessionModel([buildSessionExercise({ completedSets: 2, sets: 2 })], {
-          status: SESSION_STATUS.COMPLETED,
-          finishedAt: new Date('2026-06-03T13:00:00.000Z'),
-        }),
-      );
+      sessionModel.findOne.mockResolvedValue(session);
 
       const list = buildListModel([buildTemplateExercise({ id: 'tpl-1', sets: 2, position: 0 })]);
       listModel.findOne.mockResolvedValue(list);
 
       await service.resync(userId, 'sess-1');
 
-      expect(session.update).toBeCalledWith(
-        expect.objectContaining({
-          workoutListName: 'Push Day',
-          status: SESSION_STATUS.COMPLETED,
-          finishedAt: expect.any(Date),
-        }),
+      // Resync never auto-finishes: only the workout list name is patched, status is left untouched.
+      expect(session.update).toBeCalledWith({ workoutListName: 'Push Day' }, expect.anything());
+      expect(session.update).not.toBeCalledWith(
+        expect.objectContaining({ status: SESSION_STATUS.COMPLETED }),
         expect.anything(),
       );
       const rows = sessionExerciseModel.bulkCreate.mock.calls[0][0];

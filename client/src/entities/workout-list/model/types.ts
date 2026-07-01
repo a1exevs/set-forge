@@ -7,7 +7,6 @@ export interface WorkoutExercise {
   weight: number;
   reps: number;
   sets: number;
-  completedSets: number;
 }
 
 export interface WorkoutList {
@@ -22,11 +21,10 @@ export interface WorkoutList {
 export interface CreateWorkoutListDto {
   name: string;
   description: string;
-  exercises: Omit<WorkoutExercise, 'id' | 'completedSets'>[];
+  exercises: Omit<WorkoutExercise, 'id'>[];
 }
 
-export type UpdateExerciseDto = Omit<WorkoutExercise, 'id' | 'completedSets'> &
-  Partial<Pick<WorkoutExercise, 'id' | 'completedSets'>>;
+export type UpdateExerciseDto = Omit<WorkoutExercise, 'id'> & Partial<Pick<WorkoutExercise, 'id'>>;
 
 export interface UpdateWorkoutListDto {
   name: string;
@@ -37,7 +35,7 @@ export interface UpdateWorkoutListDto {
 export interface WorkoutListExportItem {
   name: string;
   description: string;
-  exercises: Omit<WorkoutExercise, 'id' | 'completedSets'>[];
+  exercises: Omit<WorkoutExercise, 'id'>[];
   createdAt?: string;
   lastUsedAt?: string | null;
 }

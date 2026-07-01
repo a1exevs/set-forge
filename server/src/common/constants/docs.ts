@@ -57,16 +57,6 @@ export const Docs = {
   DELETE_WORKOUT_LIST_NOT_FOUND: 'Not found',
   DELETE_WORKOUT_LIST_UNAUTHORIZED: 'Unauthorized',
 
-  UPDATE_WORKOUT_PROGRESS_ENDPOINT: 'Mark an exercise set as completed',
-  UPDATE_WORKOUT_PROGRESS_SUCCESSFUL_RESULT: 'Workout progress updated successfully',
-  UPDATE_WORKOUT_PROGRESS_NOT_FOUND: 'Not found',
-  UPDATE_WORKOUT_PROGRESS_UNAUTHORIZED: 'Unauthorized',
-
-  RESET_WORKOUT_PROGRESS_ENDPOINT: 'Reset workout progress',
-  RESET_WORKOUT_PROGRESS_SUCCESSFUL_RESULT: 'Workout progress reset successfully',
-  RESET_WORKOUT_PROGRESS_NOT_FOUND: 'Not found',
-  RESET_WORKOUT_PROGRESS_UNAUTHORIZED: 'Unauthorized',
-
   EXPORT_ALL_WORKOUT_LISTS_ENDPOINT: 'Export all workout lists for the current user',
   EXPORT_ALL_WORKOUT_LISTS_SUCCESSFUL_RESULT: 'Workout lists exported successfully',
   EXPORT_ALL_WORKOUT_LISTS_UNAUTHORIZED: 'Unauthorized',

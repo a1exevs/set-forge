@@ -42,7 +42,6 @@ const initialDataSingleExercise = {
       weight: 80,
       reps: 10,
       sets: 3,
-      completedSets: 0,
     },
   ],
   createdAt: '2024-01-01T00:00:00Z',
@@ -61,7 +60,6 @@ const initialDataMultipleExercises = {
       weight: 80,
       reps: 10,
       sets: 3,
-      completedSets: 0,
     },
     {
       id: 'ex-2',
@@ -70,7 +68,6 @@ const initialDataMultipleExercises = {
       weight: 50,
       reps: 8,
       sets: 4,
-      completedSets: 0,
     },
   ],
   createdAt: '2024-01-01T00:00:00Z',

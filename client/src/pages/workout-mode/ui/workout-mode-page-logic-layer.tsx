@@ -1,4 +1,4 @@
-import type { WorkoutList } from '@entities';
+import type { WorkoutSession } from '@entities';
 import confetti from 'canvas-confetti';
 import { FC, useEffect, useRef, useState } from 'react';
 
@@ -13,24 +13,26 @@ const fireWorkoutCompleteConfetti = (): void => {
 };
 
 type Props = {
-  id: string;
-  workout: WorkoutList | null | undefined;
-  updateWorkoutProgress: (listId: string, exerciseId: string) => Promise<void>;
-  resetAllProgress: (listId: string) => Promise<void>;
+  session: WorkoutSession | null | undefined;
+  incrementProgress: (sessionId: string, exerciseId: string) => Promise<void>;
+  finishSession: (sessionId: string) => Promise<void>;
 };
 
-const WorkoutModePageLogicLayer: FC<Props> = ({ id, workout, updateWorkoutProgress, resetAllProgress }) => {
+const WorkoutModePageLogicLayer: FC<Props> = ({ session, incrementProgress, finishSession }) => {
   const confirmDialog = useConfirm();
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
   const lastTapRef = useRef<Record<string, number>>({});
   const prevCompletedExercisesRef = useRef<number | null>(null);
+  const confettiFiredRef = useRef(false);
+
+  const isFinished = session?.status === 'completed';
 
   const handleExerciseClick = (exerciseId: string): void => {
-    if (!workout) {
+    if (!session || isFinished) {
       return;
     }
 
-    const exercise = workout.exercises.find(ex => ex.id === exerciseId);
+    const exercise = session.exercises.find(ex => ex.id === exerciseId);
     if (!exercise) {
       return;
     }
@@ -38,7 +40,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({ id, workout, updateWorkoutProgre
     if (exercise.completedSets >= exercise.sets) {
       return;
     }
-    void updateWorkoutProgress(workout.id, exerciseId);
+    void incrementProgress(session.id, exerciseId);
 
     if (exercise.completedSets + 1 === exercise.sets) {
       setJustCompleted(exerciseId);
@@ -60,29 +62,37 @@ const WorkoutModePageLogicLayer: FC<Props> = ({ id, workout, updateWorkoutProgre
     }
   };
 
-  const handleResetAll = async (): Promise<void> => {
-    if (!workout) {
+  const handleFinish = async (): Promise<void> => {
+    if (!session || isFinished) {
       return;
     }
 
     const ok = await confirmDialog({
-      title: 'Reset all progress?',
-      description: 'All completed sets will be reset.',
-      confirmationText: 'Reset',
+      title: 'Finish workout?',
+      description: 'The session will be marked as completed and can no longer be edited.',
+      confirmationText: 'Finish',
       cancellationText: 'Cancel',
     });
     if (ok) {
-      void resetAllProgress(workout.id);
+      try {
+        await finishSession(session.id);
+        if (!confettiFiredRef.current) {
+          confettiFiredRef.current = true;
+          fireWorkoutCompleteConfetti();
+        }
+      } catch {
+        // TODO: Support common toaster
+      }
     }
   };
 
   const calculateProgress = (): { totalExercises: number; completedExercises: number; overallProgress: number } => {
-    if (!workout) {
+    if (!session) {
       return { totalExercises: 0, completedExercises: 0, overallProgress: 0 };
     }
 
-    const totalExercises = workout.exercises.length;
-    const completedExercises = workout.exercises.filter(ex => ex.sets > 0 && ex.completedSets === ex.sets).length;
+    const totalExercises = session.exercises.length;
+    const completedExercises = session.exercises.filter(ex => ex.sets > 0 && ex.completedSets === ex.sets).length;
     const overallProgress = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0;
 
     return { totalExercises, completedExercises, overallProgress };
@@ -90,34 +100,64 @@ const WorkoutModePageLogicLayer: FC<Props> = ({ id, workout, updateWorkoutProgre
 
   const { totalExercises, completedExercises, overallProgress } = calculateProgress();
 
-  useEffect((): void => {
-    prevCompletedExercisesRef.current = null;
-  }, [id]);
+  const sessionId = session?.id ?? null;
 
   useEffect((): void => {
-    if (!workout || workout.id !== id) {
+    prevCompletedExercisesRef.current = null;
+    confettiFiredRef.current = false;
+  }, [sessionId]);
+
+  useEffect((): void => {
+    if (!session) {
       return;
     }
     const prev = prevCompletedExercisesRef.current;
-    if (totalExercises > 0 && prev !== null && prev < totalExercises && completedExercises === totalExercises) {
-      fireWorkoutCompleteConfetti();
+    const allComplete = totalExercises > 0 && completedExercises === totalExercises;
+    // Celebrate once per session, in two situations:
+    //  - the user completes the last set while training (transition prev < total -> all done);
+    //  - the session is already fully complete on entry (e.g. the list was edited mid-session and
+    //    resynced to all-complete). Resync never auto-finishes, so the session is still active here
+    //    and we finish it explicitly to land on the completed state with its celebration.
+    const isTransitionComplete = prev !== null && prev < totalExercises && allComplete;
+    const isLoadedComplete = prev === null && allComplete && session.status === 'active';
+
+    if (!confettiFiredRef.current && (isTransitionComplete || isLoadedComplete)) {
+      const celebrate = (): void => {
+        confettiFiredRef.current = true;
+        fireWorkoutCompleteConfetti();
+      };
+
+      if (session.status === 'active') {
+        void (async (): Promise<void> => {
+          try {
+            await finishSession(session.id);
+            celebrate();
+          } catch {
+            // TODO: Support common toaster — user can retry via Finish workout
+            confettiFiredRef.current = false;
+          }
+        })();
+      } else {
+        celebrate();
+      }
     }
     prevCompletedExercisesRef.current = completedExercises;
-  }, [id, workout, completedExercises, totalExercises]);
+  }, [session, completedExercises, totalExercises, finishSession]);
 
-  if (workout === undefined) {
+  if (session === undefined) {
     return null;
   }
 
   return (
     <WorkoutModePage
-      currentWorkout={workout}
+      session={session}
       justCompleted={justCompleted}
+      isFinished={isFinished}
       totalExercises={totalExercises}
       completedExercises={completedExercises}
       overallProgress={overallProgress}
       onTap={handleTap}
-      onResetAll={handleResetAll}
+      onFinish={handleFinish}
     />
   );
 };

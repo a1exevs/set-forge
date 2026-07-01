@@ -52,19 +52,6 @@ export async function deleteWorkoutList(id: string): Promise<void> {
   unwrap(res, 'Failed to delete workout list');
 }
 
-export async function incrementExerciseProgress(listId: string, exerciseId: string): Promise<WorkoutList> {
-  const res = await apiRequest<WorkoutList>(`${BASE}/${listId}/exercises/${exerciseId}/progress`, {
-    method: 'PATCH',
-    auth: true,
-  });
-  return unwrap(res, 'Failed to update progress');
-}
-
-export async function resetWorkoutProgress(listId: string): Promise<WorkoutList> {
-  const res = await apiRequest<WorkoutList>(`${BASE}/${listId}/reset`, { method: 'POST', auth: true });
-  return unwrap(res, 'Failed to reset progress');
-}
-
 export async function exportAllWorkoutLists(): Promise<WorkoutListsExportFile> {
   const res = await apiRequest<WorkoutListsExportFile>(`${BASE}/export`, { method: 'GET', auth: true });
   return unwrap(res, 'Failed to export workout lists');

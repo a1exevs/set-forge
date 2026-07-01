@@ -21,9 +21,6 @@ export namespace WorkoutListResponse {
 
     @ApiProperty({ example: 3 })
     readonly sets: number;
-
-    @ApiProperty({ example: 0 })
-    readonly completedSets: number;
   }
 
   export class Dto {

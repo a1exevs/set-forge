@@ -4,9 +4,7 @@ export {
   useDeleteWorkoutListMutation,
   useExportAllWorkoutListsMutation,
   useImportWorkoutListsMutation,
-  useResetWorkoutProgressMutation,
   useUpdateWorkoutListMutation,
-  useUpdateWorkoutProgressMutation,
   useWorkoutListsQuery,
   useWorkoutQuery,
 } from 'src/entities/workout-list/model/use-workout-queries';

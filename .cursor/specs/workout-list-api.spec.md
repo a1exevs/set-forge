@@ -2,7 +2,7 @@
 
 ## Overview
 
-Backend REST API for the full Workout List lifecycle (create, read, update, delete, run in workout mode). Implemented as a NestJS `workout-lists` module (controller + service + Sequelize models) scoped to the authenticated user, documented in Swagger and covered by unit tests. The client consumes this API through TanStack Query hooks in `entities/workout-list/model/use-workout-queries.ts`.
+Backend REST API for the Workout List lifecycle (create, read, update, delete). The list is a **pure template** — it no longer tracks per-set progress. Running a workout and tracking progress is handled by the workout sessions API (see [workout-sessions.spec.md](workout-sessions.spec.md)). Implemented as a NestJS `workout-lists` module (controller + service + Sequelize models) scoped to the authenticated user, documented in Swagger and covered by unit tests. The client consumes this API through TanStack Query hooks in `entities/workout-list/model/use-workout-queries.ts`.
 
 This spec aligns with [auth-session.spec.md](auth-session.spec.md) (envelope, base URL, guards) and updates the persistence sections of [home-page.spec.md](home-page.spec.md), [create-workout.spec.md](create-workout.spec.md), [edit-workout-list.spec.md](edit-workout-list.spec.md) and [workout-mode.spec.md](workout-mode.spec.md).
 
@@ -25,8 +25,6 @@ This spec aligns with [auth-session.spec.md](auth-session.spec.md) (envelope, ba
 | POST | `/workout-lists` | `CreateWorkoutListRequest` | Create a new list, returns created list |
 | PUT | `/workout-lists/:id` | `UpdateWorkoutListRequest` | Replace name/description/exercises, returns updated list |
 | DELETE | `/workout-lists/:id` | `id` (UUID) | Delete an owned list, returns `{ result: true }` |
-| PATCH | `/workout-lists/:id/exercises/:exerciseId/progress` | `id`, `exerciseId` | +1 `completedSets` for the exercise (clamped to `sets`), set `lastUsedAt`; returns updated list |
-| POST | `/workout-lists/:id/reset` | `id` (UUID) | Zero `completedSets` for all exercises; returns updated list |
 | GET | `/workout-lists/export` | — | Export all owned lists as `WorkoutListsExportFile` |
 | POST | `/workout-lists/import` | `WorkoutListsExportFile` | Import lists from file; bulk create in one transaction; returns `{ importedCount, lists }` |
 
@@ -50,7 +48,6 @@ List endpoints return a `WorkoutList` matching the client model:
     weight: number;
     reps: number;
     sets: number;
-    completedSets: number;
   }[];                   // ordered by `position`
   createdAt: string;     // ISO
   lastUsedAt: string | null; // ISO or null
@@ -84,8 +81,8 @@ Source of truth: server DTO `WorkoutListsExportFile`. Client mirrors types for A
 }
 ```
 
-- **Export** (`GET /workout-lists/export`): server calls `exportAll(userId)` → all owned lists → `toExportFile()` strips `id` and `completedSets`.
-- **Import** (`POST /workout-lists/import`): validates `formatVersion`; maps items to `CreateWorkoutListRequest.Dto[]`; creates all lists in **one DB transaction**; `completedSets` always `0`; duplicate names allowed.
+- **Export** (`GET /workout-lists/export`): server calls `exportAll(userId)` → all owned lists → `toExportFile()` strips `id` (templates carry no progress).
+- **Import** (`POST /workout-lists/import`): validates `formatVersion`; maps items to `CreateWorkoutListRequest.Dto[]`; creates all lists in **one DB transaction**; duplicate names allowed.
 - **Legacy import**: bare `WorkoutList[]` array (localStorage v0) accepted and normalized to the envelope format before import.
 - **Future single-list export**: `GET /workout-lists/:id/export` → same file shape with one item; service method `exportOne(userId, listId)`.
 
@@ -125,8 +122,9 @@ Sequelize + MySQL, `synchronize: false` (schema via migration). Two tables.
 | `weight` | FLOAT | not null, `>= 0` |
 | `reps` | INTEGER | not null, `> 0` |
 | `sets` | INTEGER | not null, `> 0` |
-| `completed_sets` | INTEGER | not null, default `0` |
 | `position` | INTEGER | not null — preserves exercise order |
+
+> `completed_sets` was removed from `workout_exercises` (migration `20260630130000`). Progress now lives only on `workout_session_exercises`.
 
 `@BelongsTo(() => WorkoutList)`.
 
@@ -156,14 +154,14 @@ Sequelize + MySQL, `synchronize: false` (schema via migration). Two tables.
 {
   name: string;
   description: string;
-  exercises: (CreateExercise & { id?: string; completedSets?: number })[]; // @ArrayMinSize(1)
+  exercises: (CreateExercise & { id?: string })[]; // @ArrayMinSize(1)
 }
 ```
 
 - `exercises` must contain **at least one** entry on create and update (`@ArrayMinSize(1)`); empty arrays return `400`.
 
-- Existing exercises carry `id` (+ optional `completedSets`); new exercises omit `id`.
-- On update the server reconciles: keep existing by `id` (preserving `completedSets` unless provided), insert new (generate `id`, `completedSets: 0`), delete omitted. `position` follows array order.
+- Existing exercises carry `id`; new exercises omit `id`.
+- On update the server reconciles: keep existing by `id` (so an active session can resync against a stable `sourceExerciseId`), insert new (generate `id`), delete omitted. `position` follows array order.
 
 ---
 
@@ -173,14 +171,12 @@ Sequelize + MySQL, `synchronize: false` (schema via migration). Two tables.
 
 - `getAll(userId)`: lists for user, exercises ordered by `position`, mapped to `WorkoutList`.
 - `getOne(userId, id)`: single list; throws `NotFoundException` when missing or not owned.
-- `create(userId, dto)`: create list + exercises in a transaction; `createdAt = now`, `lastUsedAt = null`, `completedSets = 0`.
+- `create(userId, dto)`: create list + exercises in a transaction; `createdAt = now`, `lastUsedAt = null`.
 - `update(userId, id, dto)`: ownership check, then reconcile exercises (see DTOs); returns updated list.
 - `remove(userId, id)`: ownership check, delete (cascade removes exercises); returns `{ result: true }`.
-- `incrementProgress(userId, listId, exerciseId)`: ownership check; if `completedSets < sets` → `+1`; set `lastUsedAt = now`; returns updated list. No-op increment when already at `sets`.
-- `resetAll(userId, listId)`: ownership check; set all `completedSets = 0`; returns updated list.
 - `exportAll(userId)`: `getAll` → `toExportFile(lists)` → `WorkoutListsExportFile`.
 - `exportOne(userId, listId)` *(future)*: `getOne` → `toExportFile([list])`.
-- `toExportFile(lists)`: shared serializer; strips ids and progress; sets `exportedAt = now`.
+- `toExportFile(lists)`: shared serializer; strips ids; sets `exportedAt = now`.
 - `importAll(userId, file)`: normalize legacy array if needed; validate; map to create DTOs; one transaction calling create logic per list; returns `{ importedCount, lists }`. On any failure — rollback, `BadRequestException`.
 
 Ownership: all queries filter by `userId`. A list belonging to another user is treated as not found (`NotFoundException`).
@@ -196,8 +192,6 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
   - `useCreateWorkoutListMutation()` — `POST`; appends to lists cache on success.
   - `useUpdateWorkoutListMutation()` — `PUT`; updates detail + lists cache.
   - `useDeleteWorkoutListMutation()` — `DELETE`; removes from lists cache, drops detail key.
-  - `useUpdateWorkoutProgressMutation()` — optimistic `+1`, then `PATCH .../progress`; rollback on error, server response on success.
-  - `useResetWorkoutProgressMutation()` — optimistic zero, then `POST .../reset`; same cache sync pattern.
   - `useExportAllWorkoutListsMutation()` — `GET /workout-lists/export`; client triggers file download (`set-forge-workout-lists-YYYY-MM-DD.json`).
   - `useImportWorkoutListsMutation()` — `POST /workout-lists/import`; invalidates `workoutQueryKeys.lists` on success.
 - API functions in `workout-list-api.ts`: `exportAllWorkoutLists()`, `importWorkoutLists(file)`; reserved name `exportWorkoutList(id)` for future `GET /:id/export`.
@@ -230,13 +224,11 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
 | `useCreateWorkoutListMutation()` | hook | Create via API |
 | `useUpdateWorkoutListMutation()` | hook | Update via API |
 | `useDeleteWorkoutListMutation()` | hook | Delete via API |
-| `useUpdateWorkoutProgressMutation()` | hook | +1 completedSets (optimistic + PATCH) |
-| `useResetWorkoutProgressMutation()` | hook | Zero completedSets (optimistic + POST) |
 | `useExportAllWorkoutListsMutation()` | hook | Export all lists (`GET /workout-lists/export`) |
 | `useImportWorkoutListsMutation()` | hook | Import file (`POST /workout-lists/import`) |
 | `workoutQueryKeys.lists` | query key | Lists cache |
 | `workoutQueryKeys.detail(id)` | query key | Detail cache |
-| Routes | — | `/workout-lists`, `/workout-lists/export`, `/workout-lists/import`, `/workout-lists/:id`, `/workout-lists/:id/reset`, `/workout-lists/:id/exercises/:exerciseId/progress`; reserved: `/workout-lists/:id/export` |
+| Routes | — | `/workout-lists`, `/workout-lists/export`, `/workout-lists/import`, `/workout-lists/:id`; reserved: `/workout-lists/:id/export` |
 
 ---
 
@@ -248,11 +240,10 @@ Ownership: all queries filter by `userId`. A list belonging to another user is t
 | `:id` not owned / missing | `NotFoundException` → 404 envelope; client `useWorkoutQuery` resolves `null` |
 | Invalid create/update DTO | `class-validator` → 400 envelope with messages |
 | Empty `exercises` array on create/update | `@ArrayMinSize(1)` → 400 envelope |
-| Progress when `completedSets === sets` | No increment, list returned unchanged |
 | `sets === 0` | Disallowed by validation (`@Min(1)`) |
 | Update removes an exercise | Exercise row deleted; `position` recomputed from array order |
-| Update adds an exercise | New row, generated `id`, `completedSets: 0` |
-| Update keeps an exercise | `id` preserved; `completedSets` preserved unless supplied |
+| Update adds an exercise | New row, generated `id` |
+| Update keeps an exercise | `id` preserved (lets an active session resync against it) |
 | Delete cascade | Removing a list deletes its `workout_exercises` rows |
 | Network/API error in mutation | Mutation error; create/update data layers return `false`; navigation does not run |
 | Reload (no in-memory token) | `apiRequest` refresh flow restores session; queries refetch from server |

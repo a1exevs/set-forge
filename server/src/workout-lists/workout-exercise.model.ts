@@ -11,7 +11,6 @@ interface IWorkoutExercise {
   weight: number;
   reps: number;
   sets: number;
-  completedSets: number;
   position: number;
 }
 
@@ -52,10 +51,6 @@ export class WorkoutExercise extends Model<WorkoutExercise, IWorkoutExercise> {
   @ApiProperty({ example: 3, description: 'Number of sets' })
   @Column({ type: DataType.INTEGER, allowNull: false })
   sets: number;
-
-  @ApiProperty({ example: 0, description: 'Number of completed sets' })
-  @Column({ type: DataType.INTEGER, allowNull: false, defaultValue: 0 })
-  completedSets: number;
 
   @ApiProperty({ example: 0, description: 'Exercise position in the list' })
   @Column({ type: DataType.INTEGER, allowNull: false, defaultValue: 0 })

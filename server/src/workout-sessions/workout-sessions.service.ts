@@ -7,7 +7,7 @@ import { WorkoutList } from '@workout-lists/workout-list.model';
 import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
 import { WorkoutSession } from '@workout-sessions/workout-session.model';
 import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exercise.model';
-import { SESSION_STATUS, SessionStatus } from '@workout-sessions/constants/session-status';
+import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
 import { WorkoutSessionResponse } from '@workout-sessions/dto';
 
 export interface StartWorkoutSessionResult {
@@ -168,16 +168,12 @@ export class WorkoutSessionsService {
       };
     });
 
+    // Resync happens off-screen while editing the list, so it never auto-finishes the session even
+    // when the re-snapshot leaves every set complete. The session stays active and is finished
+    // explicitly from workout mode (on the next entry or via the Finish button) so the user always
+    // sees the completed session with its celebration.
     await this.sequelize.transaction(async transaction => {
-      const sessionPatch: { workoutListName: string; status?: SessionStatus; finishedAt?: Date } = {
-        workoutListName: list.name,
-      };
-      if (WorkoutSessionsService.isFullyCompleted(rows)) {
-        sessionPatch.status = SESSION_STATUS.COMPLETED;
-        sessionPatch.finishedAt = new Date();
-      }
-
-      await session.update(sessionPatch, { transaction });
+      await session.update({ workoutListName: list.name }, { transaction });
       await this.workoutSessionExerciseRepository.destroy({ where: { workoutSessionId: session.id }, transaction });
       await this.workoutSessionExerciseRepository.bulkCreate(rows, { transaction });
     });

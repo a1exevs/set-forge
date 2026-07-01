@@ -18,7 +18,7 @@ Ability to edit existing workout lists via dot-dot-dot menu (Edit/Delete) on Hom
 ### Edit page flow
 
 5. Route `/edit/$id` renders `EditWorkoutPage`.
-6. `EditWorkoutPageDataLayer` receives `id` from route params, calls `useWorkoutQuery(id)` and `useUpdateWorkoutListMutation()`. Passes `workout` to LogicLayer: `undefined` while loading, `null` when not found, `WorkoutList` when loaded.
+6. `EditWorkoutPageDataLayer` receives `id` from route params, calls `useWorkoutQuery(id)`, `useActiveWorkoutSessionQuery(id)`, `useUpdateWorkoutListMutation()` and `useResyncWorkoutSessionMutation()`. Passes `workout`, `activeSessionId` (`activeSession?.id ?? null`) and a `resyncSession` callback to LogicLayer.
 7. If `workout === undefined`: render nothing (loading).
 8. If `workout === null`: render `NotFoundMessage` widget («Workout list not found» + «Back to Home»).
 9. Otherwise: render `WorkoutListForm` widget with `mode="edit"`, `initialData={workout}`, `onSubmit`, `onCancel`.
@@ -30,7 +30,9 @@ Ability to edit existing workout lists via dot-dot-dot menu (Edit/Delete) on Hom
 12. Submit button: «Save» (not «Create List»).
 13. Validation: same as Create (name required, at least one exercise, valid exercise data).
 14. On submit: `useUpdateWorkoutListMutation().mutateAsync({ id, dto })` → `PUT /workout-lists/:id`; the server reconciles exercises and returns the updated list; mutation updates `workoutQueryKeys.detail(id)` and `workoutQueryKeys.lists`. Data layer returns `Promise<true>` on success, `Promise<false>` on error.
-15. On success (when awaited `updateWorkoutList` resolves `true`): `navigate({ to: '/' })`. On error — no navigation.
+15. On success (when awaited `updateWorkoutList` resolves `true`):
+    - If there is an **active session** for this list (`activeSessionId !== null`), prompt via `useConfirm` («Also update the current session?», confirm «Update session» / cancel «Keep session»). If confirmed, call `resyncSession(activeSessionId)` → `POST /workout-sessions/:id/resync` (re-snapshots from the template, preserving each matching exercise's `completedSets` clamped to the new `sets`). Resync **never auto-finishes** the session even if clamping leaves it fully complete — it stays `active`, and workout mode finishes it on the next entry (with the celebration). See [workout-mode.spec.md](workout-mode.spec.md) item 13.
+    - Then `navigate({ to: '/' })`. On error — no navigation.
 
 ### Cancel
 
@@ -43,8 +45,7 @@ Ability to edit existing workout lists via dot-dot-dot menu (Edit/Delete) on Hom
 ### UpdateWorkoutListDto (modified)
 
 ```typescript
-type UpdateExerciseDto = Omit<WorkoutExercise, 'id' | 'completedSets'> &
-  Partial<Pick<WorkoutExercise, 'id' | 'completedSets'>>;
+type UpdateExerciseDto = Omit<WorkoutExercise, 'id'> & Partial<Pick<WorkoutExercise, 'id'>>;
 
 interface UpdateWorkoutListDto {
   name: string;
@@ -53,8 +54,8 @@ interface UpdateWorkoutListDto {
 }
 ```
 
-- Existing exercises: include `id` and `completedSets` from original.
-- New exercises: omit `id` and `completedSets` — the server generates `id`, sets `completedSets: 0`.
+- Existing exercises: include `id` from original (templates no longer carry `completedSets`).
+- New exercises: omit `id` — the server generates it.
 - Removed exercises: omit from array (the server deletes their rows).
 
 ### Props EditWorkoutPageLogicLayer
@@ -63,7 +64,9 @@ interface UpdateWorkoutListDto {
 type Props = {
   id: string;
   workout: WorkoutList | null | undefined;
+  activeSessionId: string | null;
   updateWorkoutList: (id: string, dto: UpdateWorkoutListDto) => Promise<boolean>;
+  resyncSession: (sessionId: string) => Promise<void>;
 };
 ```
 
@@ -123,7 +126,9 @@ type Props = {
 | API | Type | Description |
 |-----|------|--------------|
 | `useWorkoutQuery(id)` | hook | Load list from API (`GET /workout-lists/:id`); `null` when 404/not owned |
+| `useActiveWorkoutSessionQuery(id)` | hook | Active session for the list (or `null`) — drives the resync prompt |
 | `useUpdateWorkoutListMutation()` | hook | Update via `PUT /workout-lists/:id`; data layer maps to `Promise<boolean>` |
+| `useResyncWorkoutSessionMutation()` | hook | Resync active session after edit (`POST /workout-sessions/:id/resync`) |
 | `workoutQueryKeys.detail(id)` | query key | Single-list cache key |
 | `MenuButton` | component | From [shared-components.spec.md](shared-components.spec.md) |
 | Route | — | `/edit/$id` |
@@ -146,6 +151,9 @@ type Props = {
 | Error on update mutation (API failure) | Data layer returns `false`, navigation does NOT run |
 | `WorkoutListForm` with `mode="edit"` without `initialData` | Render `NotFoundMessage` inside widget |
 | Cancel without changes | Navigate to `/` |
-| New exercise in Edit mode | Omit `id`/`completedSets` in DTO — server generates |
+| New exercise in Edit mode | Omit `id` in DTO — server generates |
 | Removed exercise in Edit mode | Omit from exercises array |
-| Existing exercise updated | Preserve `id`, `completedSets` |
+| Existing exercise updated | Preserve `id` |
+| Active session exists on save | Prompt «Also update the current session?»; on confirm call resync, then navigate |
+| No active session on save | No prompt; navigate straight to `/` |
+| Resync prompt declined | Session left untouched; navigate to `/` |

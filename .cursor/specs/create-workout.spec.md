@@ -34,8 +34,8 @@ Page for creating a new workout list. Uses shared widget `workout-list-form` in 
     - `!name.trim()` → confirm dialog «Please enter a list name», return.
     - `exercises.length === 0` → confirm «Please add at least one exercise», return.
     - Check: `exercises.find(ex => !ex.name.trim() || ex.weight < 0 || Number.isNaN(ex.weight) || ex.reps <= 0 || Number.isNaN(ex.reps) || ex.sets <= 0 || Number.isNaN(ex.sets))` → confirm «Please check exercise data validity», return.
-12. Build DTO: `name.trim()`, `description.trim()`, `exercises` (without `tempId`; `id` and `completedSets` are assigned by the server).
-13. `onSubmit(dto)` → `useCreateWorkoutListMutation().mutateAsync(dto)` calls `POST /workout-lists`; the server creates the `WorkoutList` (generates ids, `completedSets: 0`, timestamps) and returns it; the mutation appends it to `workoutQueryKeys.lists` cache. Data layer returns `Promise<true>` on success, `Promise<false>` on error.
+12. Build DTO: `name.trim()`, `description.trim()`, `exercises` (without `tempId`; `id` is assigned by the server).
+13. `onSubmit(dto)` → `useCreateWorkoutListMutation().mutateAsync(dto)` calls `POST /workout-lists`; the server creates the `WorkoutList` (generates ids, timestamps) and returns it; the mutation appends it to `workoutQueryKeys.lists` cache. Data layer returns `Promise<true>` on success, `Promise<false>` on error.
 14. On success (awaited `true`): `navigate({ to: '/' })`. On error: no navigation.
 
 ### Cancel
@@ -70,7 +70,7 @@ type ExerciseFormData = {
 interface CreateWorkoutListDto {
   name: string;
   description: string;
-  exercises: Omit<WorkoutExercise, 'id' | 'completedSets'>[];
+  exercises: Omit<WorkoutExercise, 'id'>[];
 }
 ```
 
@@ -100,7 +100,7 @@ Internal Presentation layer receives `title`, `submitButtonText`, `name`, `descr
 ### Transformation on save
 
 - `tempId` is not passed to DTO.
-- The server (on `POST /workout-lists`) generates `id` for the list and each exercise (UUID), sets `completedSets: 0`, `createdAt`, `lastUsedAt: null`, and returns the full `WorkoutList`.
+- The server (on `POST /workout-lists`) generates `id` for the list and each exercise (UUID), sets `createdAt`, `lastUsedAt: null`, and returns the full `WorkoutList`.
 
 ---
 

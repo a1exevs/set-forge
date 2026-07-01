@@ -73,7 +73,7 @@ The home page displays a list of workout lists, allows navigation to create a ne
 | Type | Source | Description |
 |-----|----------|----------|
 | `WorkoutList` | `@entities` | id, name, description, exercises[], createdAt, lastUsedAt |
-| `WorkoutExercise` | `@entities` | id, name, muscleGroup, weight, reps, sets, completedSets |
+| `WorkoutExercise` | `@entities` | id, name, muscleGroup, weight, reps, sets |
 
 ### Props HomePage (Presentation)
 
