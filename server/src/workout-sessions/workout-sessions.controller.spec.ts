@@ -53,6 +53,7 @@ describe('WorkoutSessionsController', () => {
             incrementProgress: jest.fn(x => x),
             finish: jest.fn(x => x),
             resync: jest.fn(x => x),
+            discard: jest.fn(x => x),
           },
         },
         { provide: JwtService, useValue: {} },
@@ -194,6 +195,30 @@ describe('WorkoutSessionsController', () => {
 
       expect(service.resync).toBeCalledWith(userId, 'sess-1');
       expect(result).toEqual(session);
+    });
+  });
+
+  describe('discard', () => {
+    it('discards an active session for the current user', async () => {
+      jest.spyOn(service, 'discard').mockResolvedValue({ result: true });
+
+      const result = await controller.discard('sess-1', request);
+
+      expect(service.discard).toBeCalledWith(userId, 'sess-1');
+      expect(result).toEqual({ result: true });
+    });
+
+    it('propagates BadRequestException when the session is not active', async () => {
+      jest.spyOn(service, 'discard').mockImplementation(() => {
+        throw new BadRequestException();
+      });
+
+      try {
+        await controller.discard('sess-1', request);
+        sendPseudoError();
+      } catch (error) {
+        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
+      }
     });
   });
 });

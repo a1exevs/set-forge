@@ -57,6 +57,11 @@ export async function resyncWorkoutSession(sessionId: string): Promise<WorkoutSe
   return unwrap(res, 'Failed to resync workout session');
 }
 
+export async function discardWorkoutSession(sessionId: string): Promise<void> {
+  const res = await apiRequest<{ result: boolean }>(`${BASE}/${sessionId}`, { method: 'DELETE', auth: true });
+  unwrap(res, 'Failed to discard workout session');
+}
+
 /** Paginated completed-session history, newest first. */
 export async function fetchWorkoutHistory(limit: number, offset: number): Promise<WorkoutHistoryPage> {
   const res = await apiRequest<WorkoutHistoryPage>(`${BASE}?limit=${limit}&offset=${offset}`, {

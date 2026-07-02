@@ -59,6 +59,7 @@ const buildSessionModel = (exercises: MockSessionExercise[], overrides: Record<s
     Object.assign(session, patch);
     return session;
   });
+  session.destroy = jest.fn(async () => session);
   return session;
 };
 
@@ -337,6 +338,41 @@ describe('WorkoutSessionsService', () => {
       await service.finish(userId, 'sess-1');
 
       expect(session.update).not.toBeCalled();
+    });
+  });
+
+  describe('discard', () => {
+    it('hard-deletes an active session', async () => {
+      const session = buildSessionModel([buildSessionExercise()]);
+      sessionModel.findOne.mockResolvedValue(session);
+
+      const result = await service.discard(userId, 'sess-1');
+
+      expect(session.destroy).toBeCalled();
+      expect(result).toEqual({ result: true });
+    });
+
+    it('throws BadRequestException when the session is not active', async () => {
+      const session = buildSessionModel([buildSessionExercise()], { status: SESSION_STATUS.COMPLETED });
+      sessionModel.findOne.mockResolvedValue(session);
+
+      try {
+        await service.discard(userId, 'sess-1');
+        sendPseudoError();
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+      }
+    });
+
+    it('throws NotFoundException when the session is missing', async () => {
+      sessionModel.findOne.mockResolvedValue(null);
+
+      try {
+        await service.discard(userId, 'missing');
+        sendPseudoError();
+      } catch (error) {
+        expect(error).toBeInstanceOf(NotFoundException);
+      }
     });
   });
 

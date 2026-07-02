@@ -33,13 +33,26 @@
   }
 }
 
-.finishBar {
+.previewStart {
   margin-top: $spacing-xl;
-  display: flex;
-  justify-content: center;
 }
 
-.finishButton {
+.previewHint {
+  text-align: center;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  line-height: 1.5;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.actionBar {
+  display: flex;
+  justify-content: center;
+  margin-top: $spacing-xl;
+}
+
+.actionButton {
   width: 100%;
   max-width: 400px;
   background: linear-gradient(90deg, $progress-fill-start, $progress-fill-end);

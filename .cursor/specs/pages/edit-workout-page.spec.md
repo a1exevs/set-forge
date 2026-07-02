@@ -28,6 +28,7 @@ Entities: [workout-list](../entities/workout-list.entity.spec.md), [workout-exer
 - `ui/edit-workout-page-logic-layer.tsx`
 - `ui/edit-workout-page.stories.tsx`
 - `ui/specs/edit-workout-page.spec.unit.tsx`
+- `ui/specs/edit-workout-page-logic-layer.spec.unit.tsx`
 - `ui/specs/edit-workout-page.spec.snap.tsx`
 - `ui/index.ts`, `index.ts`
 - Widgets: `workout-list-form`, `not-found-message`
@@ -53,13 +54,14 @@ Entities: [workout-list](../entities/workout-list.entity.spec.md), [workout-exer
 
 ### Submit
 
-3. `PUT /workout-lists/:id` via `useUpdateWorkoutListMutation`.
-4. On success: if `activeSessionId` → confirm «Also update the current session?» → optional `POST .../resync`.
-5. Navigate `/` on success.
+4. If `activeSessionId` → confirm first («Also update the current session?») with **Cancel** / **Keep session** / **Update session**; save runs only after Keep or Update.
+5. `PUT /workout-lists/:id` via `useUpdateWorkoutListMutation`.
+6. On success with Update session: `POST .../resync`; on Keep session: save only.
+7. Navigate `/` on successful save.
 
 ### Cancel
 
-6. `navigate({ to: '/' })`.
+8. `navigate({ to: '/' })`.
 
 ---
 
@@ -96,7 +98,7 @@ Contracts: [workout-list](../entities/workout-list.entity.spec.md#api-contract),
 
 ## Tech Stack
 
-TanStack Router (`useParams`), React Query, Headless UI, `useConfirm`, FSD `pages/edit-workout`, `widgets/`.
+TanStack Router (`useParams`), React Query, Headless UI, extended `useConfirm` (alternate action), FSD `pages/edit-workout`, `widgets/`.
 
 ---
 
@@ -110,7 +112,7 @@ TanStack Router (`useParams`), React Query, Headless UI, `useConfirm`, FSD `page
 
 ## Tests
 
-- Unit: `edit-workout-page.spec.unit.tsx`
+- Unit: `edit-workout-page.spec.unit.tsx`, `edit-workout-page-logic-layer.spec.unit.tsx` — submit confirm (cancel / keep / update)
 - Snapshot: `edit-workout-page.spec.snap.tsx`
 
 ---
@@ -127,8 +129,10 @@ TanStack Router (`useParams`), React Query, Headless UI, `useConfirm`, FSD `page
 | Scenario | Handling |
 |----------|-----------|
 | Invalid `id` | `NotFoundMessage` |
-| Active session on save | Resync prompt |
-| Resync declined | Session unchanged; still navigate home |
+| Active session on save | Three-way resync prompt before save |
+| Confirm Cancel | No save; stay on edit page |
+| Confirm Keep session | Save list only; no resync; navigate home |
+| Confirm Update session | Save list + `POST .../resync`; navigate home |
 | Update API error | No navigation |
 
 ---

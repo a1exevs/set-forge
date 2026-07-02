@@ -669,29 +669,34 @@ App-wide imperative confirmation modal. Callers use `useConfirm()` to show a pro
 - `hooks/use-confirm.ts` — `useConfirm()` hook; exported from `@shared`.
 - `contexts/confirm-dialog-context.tsx` — `ConfirmOptions`, `ConfirmContext`.
 - `confirm-dialog-logic-layer.tsx` — maps options → presentational dialog, default button labels.
-- `confirm-dialog.tsx` — title, description, Cancel/Confirm buttons inside `Dialog`.
-- `confirm-dialog.module.scss` — dialog content layout.
+- `confirm-dialog.tsx` — title, description, Cancel / optional alternate / Confirm buttons inside `Dialog`.
+- `confirm-dialog.module.scss` — dialog content layout (`singleButton`, `multiButton`).
 
 ### Props
 
 **Public API — `useConfirm()`:**
 
 ```typescript
+type ConfirmResult = 'confirm' | 'cancel' | 'alternate';
+
 type ConfirmOptions = {
   title: ReactNode;
   description?: ReactNode;
   confirmationText?: string;  // default: "Confirm"
   cancellationText?: string;  // default: "Cancel"
+  alternateText?: string;     // optional third action (e.g. "Keep session", "Discard")
   hideCancelButton?: boolean; // alert-style, single OK button
 };
 
-type UseConfirm = (options: ConfirmOptions) => Promise<boolean>;
+// Two-way (no alternateText): Promise<boolean> — true on confirm, false on cancel/dismiss
+// Three-way (alternateText set): Promise<ConfirmResult>
 ```
 
-- Resolves `true` on confirm, `false` on cancel, backdrop dismiss, or Escape.
-- Opening a new dialog while one is open resolves the previous promise with `false`.
+- Two-way: resolves `true` on confirm, `false` on cancel, backdrop dismiss, or Escape.
+- Three-way: resolves `'confirm'`, `'alternate'`, or `'cancel'` (cancel includes backdrop dismiss and Escape).
+- Opening a new dialog while one is open resolves the superseded promise with `false` (even when the new dialog is three-way).
 
-**Internal — `ConfirmDialog` presentation** (not exported): `open`, `title`, `description`, `confirmationText`, `cancellationText`, `hideCancelButton`, `onConfirm`, `onCancel`, `onClose`, `ariaLabel`.
+**Internal — `ConfirmDialog` presentation** (not exported): `open`, `title`, `description`, `confirmationText`, `cancellationText`, `alternateText`, `hideCancelButton`, `onConfirm`, `onAlternate`, `onCancel`, `onClose`, `ariaLabel`.
 
 ### Tech stack
 
@@ -702,20 +707,23 @@ type UseConfirm = (options: ConfirmOptions) => Promise<boolean>;
 
 ### UI
 
-- Panel: title (`h2`), optional description, row of Cancel (secondary) + Confirm (primary).
-- `hideCancelButton` — single primary button, right-aligned (`singleButton` layout).
+- Panel: title (`h2`), optional description, action row.
+- Two-way: Cancel (secondary) + Confirm (primary).
+- Three-way (`alternateText`): Cancel + Alternate (secondary) + Confirm (primary); `multiButton` layout (wrap, equal flex).
+- `hideCancelButton` without `alternateText` — single primary button, right-aligned (`singleButton` layout).
 - Uses `Dialog` with `disableAnimation={true}`.
 
 ### Behavior
 
 1. App wraps tree in `<ConfirmDialogProvider>` (`main.tsx`).
-2. Feature code: `const confirmDialog = useConfirm();` then `const ok = await confirmDialog({ title: '...', ... });`.
+2. Feature code: `const confirmDialog = useConfirm();` then `await confirmDialog({ title: '...', ... })`.
 3. Provider renders one modal instance; logic layer supplies default labels and derives `ariaLabel` from string `title`.
+4. Three-way callers branch on `'confirm' | 'alternate' | 'cancel'` (e.g. workout mode finish/discard; edit workout save prompt).
 
 ### Accessibility
 
 - Dialog `aria-label` from string `title`, or `"Confirmation dialog"` for non-string titles.
-- Cancel and Confirm are labeled buttons; focus trap via underlying `Dialog`.
+- Cancel, Confirm, and (when present) Alternate are labeled buttons; focus trap via underlying `Dialog`.
 - `useConfirm()` throws if called outside `ConfirmDialogProvider`.
 
 ### Storybook
@@ -726,11 +734,13 @@ type UseConfirm = (options: ConfirmOptions) => Promise<boolean>;
 
 ### Tests
 
-- Unit: `specs/confirm-dialog.spec.unit.tsx` — promise resolve, custom labels, alert mode, outside-provider throw.
+- Unit: `specs/confirm-dialog.spec.unit.tsx` — promise resolve, custom labels, alert mode, three-way `alternateText` / `ConfirmResult`, outside-provider throw.
 - Snapshot: `specs/confirm-dialog.spec.snap.tsx`
 
 ### Usage
 
 - `main.tsx` — global `ConfirmDialogProvider`.
-- `pages/home/ui/home-page-logic-layer.tsx` — delete workout list confirmation.
+- `pages/home/ui/home-page-logic-layer.tsx` — delete workout list confirmation (two-way).
+- `pages/workout-mode/ui/workout-mode-page-logic-layer.tsx` — finish / discard / cancel (three-way).
+- `pages/edit-workout/ui/edit-workout-page-logic-layer.tsx` — save with optional session resync (three-way).
 - Tests/stories wrap consumers in `ConfirmDialogProvider` (see `app/model/specs/test-utils.tsx`).

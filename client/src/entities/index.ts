@@ -32,11 +32,12 @@ export {
 export type { WorkoutSessionExercise } from 'src/entities/workout-session-exercise';
 export {
   useActiveWorkoutSessionQuery,
+  useDiscardWorkoutSessionMutation,
   useFinishWorkoutSessionMutation,
   useIncrementSessionProgressMutation,
   useResyncWorkoutSessionMutation,
+  useStartWorkoutSessionMutation,
   useWorkoutHistoryInfiniteQuery,
-  useWorkoutSessionForListQuery,
   workoutSessionQueryKeys,
   type SessionStatus,
   type WorkoutHistoryPage,

@@ -357,4 +357,98 @@ describe('Workout lists and sessions business logic', () => {
       ).expect(HttpStatus.BAD_REQUEST);
     });
   });
+
+  describe(`${Routes.ENDPOINT_WORKOUT_SESSIONS} discard`, () => {
+    let workoutListId: string;
+    let sessionId: string;
+
+    beforeAll(async () => {
+      const created = await withAuth(
+        auth,
+        request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}`)
+          .send({
+            name: 'Discard Day',
+            description: 'Discard flow',
+            exercises: [exercisePayload],
+          }),
+      ).expect(HttpStatus.CREATED);
+
+      workoutListId = created.body.data.id;
+
+      const started = await withAuth(
+        auth,
+        request(app.getHttpServer()).post(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}`).send({ workoutListId }),
+      ).expect(HttpStatus.CREATED);
+
+      sessionId = started.body.data.id;
+    });
+
+    it('removes an active session without adding it to history', async () => {
+      await withAuth(
+        auth,
+        request(app.getHttpServer()).delete(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}/${sessionId}`),
+      )
+        .expect(HttpStatus.OK)
+        .expect(response => {
+          expect(response.body.data.result).toBe(true);
+          expect(response.body.resultCode).toBe(ResultCodes.OK);
+        });
+
+      const active = await withAuth(
+        auth,
+        request(app.getHttpServer()).get(
+          `${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}/active?workoutListId=${workoutListId}`,
+        ),
+      ).expect(HttpStatus.OK);
+
+      expect(active.body.data).toBeNull();
+
+      const history = await withAuth(
+        auth,
+        request(app.getHttpServer()).get(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}?limit=20&offset=0`),
+      ).expect(HttpStatus.OK);
+
+      expect(history.body.data.items.some((item: { id: string }) => item.id === sessionId)).toBe(false);
+
+      const restarted = await withAuth(
+        auth,
+        request(app.getHttpServer()).post(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}`).send({ workoutListId }),
+      ).expect(HttpStatus.CREATED);
+
+      expect(restarted.body.data.id).not.toBe(sessionId);
+    });
+
+    it('rejects discarding a completed session', async () => {
+      const created = await withAuth(
+        auth,
+        request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}`)
+          .send({
+            name: 'Completed Discard Day',
+            description: '',
+            exercises: [exercisePayload],
+          }),
+      ).expect(HttpStatus.CREATED);
+
+      const listId = created.body.data.id;
+
+      const started = await withAuth(
+        auth,
+        request(app.getHttpServer()).post(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}`).send({ workoutListId: listId }),
+      ).expect(HttpStatus.CREATED);
+
+      const completedSessionId = started.body.data.id;
+
+      await withAuth(
+        auth,
+        request(app.getHttpServer()).post(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}/${completedSessionId}/finish`),
+      ).expect(HttpStatus.CREATED);
+
+      await withAuth(
+        auth,
+        request(app.getHttpServer()).delete(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}/${completedSessionId}`),
+      ).expect(HttpStatus.BAD_REQUEST);
+    });
+  });
 });

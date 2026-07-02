@@ -1,4 +1,4 @@
-import type { WorkoutSession } from '@entities';
+import type { WorkoutList, WorkoutSession } from '@entities';
 import confetti from 'canvas-confetti';
 import { FC, useEffect, useRef, useState } from 'react';
 
@@ -13,19 +13,44 @@ const fireWorkoutCompleteConfetti = (): void => {
 };
 
 type Props = {
-  session: WorkoutSession | null | undefined;
+  workoutList: WorkoutList | null | undefined;
+  session: WorkoutSession | null;
+  isStarting: boolean;
+  startSession: (workoutListId: string) => Promise<void>;
   incrementProgress: (sessionId: string, exerciseId: string) => Promise<void>;
   finishSession: (sessionId: string) => Promise<void>;
+  discardSession: (sessionId: string) => Promise<void>;
 };
 
-const WorkoutModePageLogicLayer: FC<Props> = ({ session, incrementProgress, finishSession }) => {
+const WorkoutModePageLogicLayer: FC<Props> = ({
+  workoutList,
+  session,
+  isStarting,
+  startSession,
+  incrementProgress,
+  finishSession,
+  discardSession,
+}) => {
   const confirmDialog = useConfirm();
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
   const lastTapRef = useRef<Record<string, number>>({});
   const prevCompletedExercisesRef = useRef<number | null>(null);
   const confettiFiredRef = useRef(false);
 
+  const phase = session != null ? 'training' : 'preview';
   const isFinished = session?.status === 'completed';
+
+  const handleStart = async (): Promise<void> => {
+    if (!workoutList || session != null) {
+      return;
+    }
+
+    try {
+      await startSession(workoutList.id);
+    } catch {
+      // TODO: Support common toaster
+    }
+  };
 
   const handleExerciseClick = (exerciseId: string): void => {
     if (!session || isFinished) {
@@ -67,13 +92,16 @@ const WorkoutModePageLogicLayer: FC<Props> = ({ session, incrementProgress, fini
       return;
     }
 
-    const ok = await confirmDialog({
+    const result = await confirmDialog({
       title: 'Finish workout?',
-      description: 'The session will be marked as completed and can no longer be edited.',
+      description:
+        'Finish saves this session to history. Discard deletes this active session without saving. Cancel keeps the workout open.',
       confirmationText: 'Finish',
+      alternateText: 'Discard',
       cancellationText: 'Cancel',
     });
-    if (ok) {
+
+    if (result === 'confirm') {
       try {
         await finishSession(session.id);
         if (!confettiFiredRef.current) {
@@ -83,10 +111,24 @@ const WorkoutModePageLogicLayer: FC<Props> = ({ session, incrementProgress, fini
       } catch {
         // TODO: Support common toaster
       }
+      return;
+    }
+
+    if (result === 'alternate') {
+      try {
+        await discardSession(session.id);
+      } catch {
+        // TODO: Support common toaster
+      }
     }
   };
 
   const calculateProgress = (): { totalExercises: number; completedExercises: number; overallProgress: number } => {
+    if (phase === 'preview') {
+      const totalExercises = workoutList?.exercises.length ?? 0;
+      return { totalExercises, completedExercises: 0, overallProgress: 0 };
+    }
+
     if (!session) {
       return { totalExercises: 0, completedExercises: 0, overallProgress: 0 };
     }
@@ -108,16 +150,11 @@ const WorkoutModePageLogicLayer: FC<Props> = ({ session, incrementProgress, fini
   }, [sessionId]);
 
   useEffect((): void => {
-    if (!session) {
+    if (!session || phase !== 'training') {
       return;
     }
     const prev = prevCompletedExercisesRef.current;
     const allComplete = totalExercises > 0 && completedExercises === totalExercises;
-    // Celebrate once per session, in two situations:
-    //  - the user completes the last set while training (transition prev < total -> all done);
-    //  - the session is already fully complete on entry (e.g. the list was edited mid-session and
-    //    resynced to all-complete). Resync never auto-finishes, so the session is still active here
-    //    and we finish it explicitly to land on the completed state with its celebration.
     const isTransitionComplete = prev !== null && prev < totalExercises && allComplete;
     const isLoadedComplete = prev === null && allComplete && session.status === 'active';
 
@@ -133,7 +170,6 @@ const WorkoutModePageLogicLayer: FC<Props> = ({ session, incrementProgress, fini
             await finishSession(session.id);
             celebrate();
           } catch {
-            // TODO: Support common toaster — user can retry via Finish workout
             confettiFiredRef.current = false;
           }
         })();
@@ -142,21 +178,25 @@ const WorkoutModePageLogicLayer: FC<Props> = ({ session, incrementProgress, fini
       }
     }
     prevCompletedExercisesRef.current = completedExercises;
-  }, [session, completedExercises, totalExercises, finishSession]);
+  }, [session, phase, completedExercises, totalExercises, finishSession]);
 
-  if (session === undefined) {
+  if (workoutList === undefined) {
     return null;
   }
 
   return (
     <WorkoutModePage
+      phase={phase}
+      workoutList={workoutList}
       session={session}
       justCompleted={justCompleted}
       isFinished={isFinished}
       totalExercises={totalExercises}
       completedExercises={completedExercises}
       overallProgress={overallProgress}
+      isStarting={isStarting}
       onTap={handleTap}
+      onStart={handleStart}
       onFinish={handleFinish}
     />
   );

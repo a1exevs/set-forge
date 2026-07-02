@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -17,6 +18,7 @@ import {
   ApiBadRequestResponse,
   ApiBody,
   ApiNotFoundResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -28,6 +30,7 @@ import { ResponseInterceptor } from '@common/interceptors';
 import { HttpExceptionFilter } from '@common/exception-filters';
 import { Routes, Docs } from '@common/constants';
 import { ApiResult } from '@common/decorators';
+import { OperationResultResponse } from '@common/dto';
 import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
 import {
   GetActiveWorkoutSessionQuery,
@@ -144,5 +147,19 @@ export class WorkoutSessionsController {
   @Post('/:id/resync')
   resync(@Param('id') id: string, @Req() request): Promise<WorkoutSessionResponse.Dto> {
     return this.workoutSessionsService.resync(request.user.id, id);
+  }
+
+  @ApiOperation({ summary: Docs.DISCARD_WORKOUT_SESSION_ENDPOINT })
+  @ApiOkResponse({
+    type: OperationResultResponse.Swagger.OperationResultResponseDto,
+    description: Docs.DISCARD_WORKOUT_SESSION_SUCCESSFUL_RESULT,
+  })
+  @ApiBadRequestResponse({ description: Docs.DISCARD_WORKOUT_SESSION_BAD_REQUEST })
+  @ApiNotFoundResponse({ description: Docs.DISCARD_WORKOUT_SESSION_NOT_FOUND })
+  @ApiUnauthorizedResponse({ description: Docs.DISCARD_WORKOUT_SESSION_UNAUTHORIZED })
+  @Delete('/:id')
+  async discard(@Param('id') id: string, @Req() request): Promise<OperationResultResponse.Dto> {
+    const result = await this.workoutSessionsService.discard(request.user.id, id);
+    return new OperationResultResponse.Dto(result);
   }
 }

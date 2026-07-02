@@ -97,6 +97,12 @@ export const Docs = {
   RESYNC_WORKOUT_SESSION_NOT_FOUND: 'Not found',
   RESYNC_WORKOUT_SESSION_UNAUTHORIZED: 'Unauthorized',
 
+  DISCARD_WORKOUT_SESSION_ENDPOINT: 'Discard an active workout session without saving to history',
+  DISCARD_WORKOUT_SESSION_SUCCESSFUL_RESULT: 'Workout session discarded successfully',
+  DISCARD_WORKOUT_SESSION_BAD_REQUEST: 'Session is not active',
+  DISCARD_WORKOUT_SESSION_NOT_FOUND: 'Not found',
+  DISCARD_WORKOUT_SESSION_UNAUTHORIZED: 'Unauthorized',
+
   GET_WORKOUT_HISTORY_ENDPOINT: 'Get completed workout sessions (history, paginated, newest first)',
   GET_WORKOUT_HISTORY_SUCCESSFUL_RESULT: 'Workout history retrieved successfully',
   GET_WORKOUT_HISTORY_BAD_REQUEST: 'limit or offset is invalid',

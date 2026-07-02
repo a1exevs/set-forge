@@ -2,7 +2,7 @@
 
 ## Overview
 
-Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/workout-list.entity.spec.md) id). Starts or resumes a [workout session](../entities/workout-session.entity.spec.md) snapshot; progress lives on session [exercises](../entities/workout-session-exercise.entity.spec.md). Requires authenticated session ([user](../entities/user.entity.spec.md)). Double-tap marks sets; **Finish workout** ends early; confetti on full completion.
+Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/workout-list.entity.spec.md) id). Opens in **preview** (no session) or **training** (active session from resume or Start). Progress lives on session [exercises](../entities/workout-session-exercise.entity.spec.md). Requires authenticated session ([user](../entities/user.entity.spec.md)). Double-tap marks sets; **Finish workout** ends early with optional discard; confetti on full completion.
 
 ---
 
@@ -27,6 +27,8 @@ Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/
 - `ui/workout-mode-page.tsx`
 - `ui/workout-mode-page.module.scss`
 - `ui/index.ts`, `index.ts`
+- `ui/specs/workout-mode-page.spec.unit.tsx`
+- `ui/specs/workout-mode-page-logic-layer.spec.unit.tsx`
 
 ---
 
@@ -34,13 +36,15 @@ Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/
 
 ### Main content
 
-1. Error (`session === null`): `NotFoundMessage`.
-2. Active session: header `workoutListName`, overall progress bar, exercise cards, bottom **Finish workout** (disabled when completed — label «Workout completed»).
-3. Double-tap exercise card: checkmark animation on last set of exercise (`justCompleted` prop).
+1. **Loading** (`workoutList === undefined`): render nothing.
+2. **Not found** (`workoutList === null`): `NotFoundMessage`.
+3. **Preview** (`workoutList` loaded, no active session): header with `workoutListName`, progress `0 / N exercises`, 0%; friendly hint above **Start workout** (tap only when ready — timer starts on Start); **Start workout** button (same style as Finish); no exercise cards.
+4. **Training** (`session !== null`): header, overall progress bar, exercise cards, bottom **Finish workout** (disabled when completed — label «Workout completed»).
+5. Double-tap exercise card (training only): checkmark animation on last set (`justCompleted` prop).
 
 ### Celebration
 
-1. `canvas-confetti` once per session on full completion or resync-all-complete-on-entry edge.
+1. `canvas-confetti` once per session on full completion or resync-all-complete-on-entry edge (training only).
 
 ---
 
@@ -48,24 +52,26 @@ Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/
 
 ### Session loading
 
-1. Data layer: `useWorkoutSessionForListQuery(id)` maps `isLoading` → `session: undefined`.
-2. Logic layer: while `session === undefined` → render nothing (loading).
-3. `POST /workout-sessions` (resume 200 / create 201); `staleTime: Infinity`, no refetch on focus.
-4. Re-entering after completion creates new active session.
+1. Data layer: `useWorkoutQuery(id)` + `useActiveWorkoutSessionQuery(id)`; `isLoading` → `workoutList: undefined`.
+2. Session derivation (data layer): `activeSession` from query cache first (kept fresh by `syncSessionCaches` on start/increment/resync), then `finishWorkoutSessionMutation.data` (completed in-page while `active` is null), then `startWorkoutSessionMutation.data` (fallback before active cache updates). After discard, mutation caches are reset and `active` is null → preview.
+3. Phase: `training` when `session !== null` (active, just-started, or completed in-page); else `preview` when list loaded.
+4. `POST /workout-sessions` only on **Start workout** click (`useStartWorkoutSessionMutation`), not on mount.
+5. Re-entering after completion: `GET /active` → null → preview; Start creates new session.
 
-### Set marking
+### Set marking (training only)
 
-5. 300ms double-tap on exercise card → `incrementProgress` if `completedSets < sets` and session active.
-4. Optimistic `PATCH .../progress`; server auto-finishes when all exercises complete.
+6. 300ms double-tap → `incrementProgress` if `completedSets < sets` and session active.
+7. Optimistic `PATCH .../progress`; server auto-finishes when all exercises complete.
 
 ### Finishing
 
-6. Early finish: confirm → `POST .../finish`.
-7. Resync edge on entry: if active but all sets complete → auto `finishSession` once + confetti.
+8. Early finish: three-way confirm → **Finish** (`POST .../finish`, saved to history) | **Discard** (`DELETE .../:id`, return to preview) | **Cancel**.
+9. Resync edge on entry: if active but all sets complete → auto `finishSession` once + confetti.
 
 ### Progress
 
-8. `completedExercises` where `completedSets === sets` (and `sets > 0`); `overallProgress` percentage.
+10. Preview: `totalExercises = workoutList.exercises.length`, `completedExercises = 0`, `overallProgress = 0`.
+11. Training: `completedExercises` where `completedSets === sets` (and `sets > 0`); `overallProgress` percentage.
 
 ---
 
@@ -74,14 +80,20 @@ Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/
 ### Props WorkoutModePage (Presentation)
 
 ```typescript
+type WorkoutPhase = 'preview' | 'training';
+
 type Props = {
+  phase: WorkoutPhase;
+  workoutList: WorkoutList | null;
   session: WorkoutSession | null;
   justCompleted: string | null;
   isFinished: boolean;
   totalExercises: number;
   completedExercises: number;
   overallProgress: number;
+  isStarting: boolean;
   onTap: (exerciseId: string) => void;
+  onStart: () => void;
   onFinish: () => void;
 };
 ```
@@ -90,9 +102,13 @@ type Props = {
 
 ```typescript
 type Props = {
-  session: WorkoutSession | null | undefined;
+  workoutList: WorkoutList | null | undefined;
+  session: WorkoutSession | null;
+  isStarting: boolean;
+  startSession: (workoutListId: string) => Promise<void>;
   incrementProgress: (sessionId: string, exerciseId: string) => Promise<void>;
   finishSession: (sessionId: string) => Promise<void>;
+  discardSession: (sessionId: string) => Promise<void>;
 };
 ```
 
@@ -100,11 +116,14 @@ type Props = {
 
 ## API usage
 
-| Method | Path | Hook |
-|--------|------|------|
-| POST | `/workout-sessions` | `useWorkoutSessionForListQuery` |
+| Method | Path | Hook / trigger |
+|--------|------|----------------|
+| GET | `/workout-lists/:id` | `useWorkoutQuery` |
+| GET | `/workout-sessions/active?workoutListId=` | `useActiveWorkoutSessionQuery` |
+| POST | `/workout-sessions` | `useStartWorkoutSessionMutation` (Start workout) |
 | PATCH | `/workout-sessions/:id/exercises/:exerciseId/progress` | `useIncrementSessionProgressMutation` |
 | POST | `/workout-sessions/:id/finish` | `useFinishWorkoutSessionMutation` |
+| DELETE | `/workout-sessions/:id` | `useDiscardWorkoutSessionMutation` |
 
 Full contract: [workout-session entity](../entities/workout-session.entity.spec.md#api-contract).
 
@@ -112,7 +131,7 @@ Full contract: [workout-session entity](../entities/workout-session.entity.spec.
 
 ## Tech Stack
 
-TanStack Router, React Query (optimistic mutations), Headless UI `Transition`, `canvas-confetti`, `NotFoundMessage` widget.
+TanStack Router, React Query (optimistic mutations), Headless UI `Transition`, `canvas-confetti`, `NotFoundMessage` widget, extended `useConfirm` (alternate action).
 
 ---
 
@@ -126,7 +145,8 @@ TanStack Router, React Query (optimistic mutations), Headless UI `Transition`, `
 
 ## Tests
 
-- No page-level unit/snapshot specs; entity API tests cover session calls
+- `ui/specs/workout-mode-page.spec.unit.tsx` — preview (Start visible, no cards), training (cards + Finish), not found
+- `ui/specs/workout-mode-page-logic-layer.spec.unit.tsx` — finish vs discard vs cancel confirm; start handler
 
 ---
 
@@ -140,10 +160,13 @@ N/A — no stories file.
 
 | Scenario | Handling |
 |----------|-----------|
-| Empty list | POST 400 → `session` null |
+| Accidental click, back without Start | No session created |
+| Resume mid-workout | `GET /active` → training, skip preview |
+| Discard after partial progress | DELETE → preview; history unchanged |
+| Empty list | POST on Start → 400; error swallowed (TODO toaster); stays in preview |
 | Completed session | Taps no-op; finish disabled |
 | Progress mutation error | Optimistic rollback |
-| Re-enter after completion | New session |
+| Re-enter after completion | Preview; Start creates new session |
 | Resync edge on entry | Auto-finish + confetti once |
 
 ---

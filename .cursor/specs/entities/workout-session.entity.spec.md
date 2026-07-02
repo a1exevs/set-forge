@@ -45,6 +45,7 @@ See [workout-session-exercise.entity.spec.md](workout-session-exercise.entity.sp
 - Exercise is **completed** when `completedSets === sets`.
 - `resync` never auto-finishes — session stays `active` even if clamping leaves all sets complete.
 - History queries only `status='completed'`, ordered `finishedAt DESC, startedAt DESC, id DESC`.
+- `discard` hard-deletes an **active** session; it never appears in history.
 
 ---
 
@@ -63,7 +64,7 @@ See [workout-session-exercise.entity.spec.md](workout-session-exercise.entity.sp
 - `WorkoutSessionsModule` imports `WorkoutSession`, `WorkoutSessionExercise`, `WorkoutList`, `WorkoutExercise` + `AuthModule`
 - Swagger: `Docs.WORKOUT_SESSIONS_CONTROLLER`
 - Path alias: `@workout-sessions/*`
-- Controller route order: `POST /`, `GET /` (history), `GET active`, then `PATCH`/`POST` on `/:id/...`
+- Controller route order: `POST /`, `GET /` (history), `GET active`, then `PATCH`/`POST`/`DELETE` on `/:id/...`
 
 ---
 
@@ -97,6 +98,8 @@ interface WorkoutHistoryPage {
 
 Session exercise type: [workout-session-exercise.entity.spec.md](workout-session-exercise.entity.spec.md).
 
+React Query keys: `workoutSessionQueryKeys` (`.forList`, `.active`, `.detail`, `.history`). Mutations call `syncSessionCaches` to keep `forList`, `active` (null when status ≠ `active`), and `detail` in sync on start, increment, finish, and resync; `discard` removes `forList` and sets `active` to null.
+
 ---
 
 ## API contract
@@ -114,6 +117,7 @@ Session exercise type: [workout-session-exercise.entity.spec.md](workout-session
 | PATCH | `/workout-sessions/:id/exercises/:exerciseId/progress` | +1 `completedSets`; auto-finish when all complete |
 | POST | `/workout-sessions/:id/finish` | Finish early; idempotent if already completed |
 | POST | `/workout-sessions/:id/resync` | Re-snapshot from linked list; preserves progress by `sourceExerciseId` |
+| DELETE | `/workout-sessions/:id` | Discard active session (hard delete + cascade exercises). `404` not found; `400` if not active. Does not appear in history |
 | GET | `/workout-sessions?limit=&offset=` | Paginated completed history → `{ items, total, hasMore }` |
 
 ### Response (`WorkoutSessionResponse.Dto`)
@@ -142,6 +146,7 @@ Nested `exercises` shape: [workout-session-exercise.entity.spec.md](workout-sess
 - `incrementProgress` — active only; auto-finish when all exercises complete
 - `finish` — idempotent complete
 - `resync` — active only; rebuilds exercises; never auto-finishes
+- `discard` — active only; hard-deletes session and cascaded exercises; not in history
 - `getHistory` — `limit` 1–50 (default 20), `offset` ≥ 0; `hasMore = offset + items.length < total`
 
 ---
@@ -156,20 +161,22 @@ Nested `exercises` shape: [workout-session-exercise.entity.spec.md](workout-sess
 | `incrementSessionProgress(sessionId, exerciseId)` | function | `PATCH .../progress` |
 | `finishWorkoutSession(sessionId)` | function | `POST .../finish` |
 | `resyncWorkoutSession(sessionId)` | function | `POST .../resync` |
-| `useWorkoutSessionForListQuery(listId)` | hook | Start/resume on workout mode entry |
-| `useActiveWorkoutSessionQuery(listId)` | hook | Edit-page resync prompt |
+| `discardWorkoutSession(sessionId)` | function | `DELETE /workout-sessions/:id` |
+| `useActiveWorkoutSessionQuery(listId)` | hook | Workout mode phase detection; edit-page resync prompt |
+| `useStartWorkoutSessionMutation()` | hook | Explicit start on workout mode preview |
 | `useWorkoutHistoryInfiniteQuery(enabled)` | hook | History page infinite query |
 | `useIncrementSessionProgressMutation()` | hook | Optimistic `PATCH .../progress` |
 | `useFinishWorkoutSessionMutation()` | hook | `POST .../finish` |
 | `useResyncWorkoutSessionMutation()` | hook | `POST .../resync` |
-| `workoutSessionQueryKeys.all` / `.forList` / `.detail` / `.active` / `.history` | keys | Query cache |
+| `useDiscardWorkoutSessionMutation()` | hook | `DELETE /workout-sessions/:id` |
+| `workoutSessionQueryKeys.all` / `.forList` / `.detail` / `.active` / `.history` | keys | Query cache (see **Client** above) |
 
 ---
 
 ## Tests
 
 - Unit: `workout-sessions.service.spec.ts`, `workout-sessions.controller.spec.ts`, `workout-sessions.model.spec.ts`, DTO specs
-- E2E: `server/test/e2e/workout-lists-sessions.e2e-spec.ts`
+- E2E: `server/test/e2e/workout-lists-sessions.e2e-spec.ts` (includes discard flow)
 - Client: `entities/workout-session/api/specs/workout-session-api.spec.unit.ts`
 
 ---

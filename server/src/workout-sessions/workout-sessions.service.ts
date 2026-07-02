@@ -155,6 +155,15 @@ export class WorkoutSessionsService {
     return this.getOne(userId, sessionId);
   }
 
+  public async discard(userId: number, sessionId: string): Promise<{ result: boolean }> {
+    const session = await this.findOwnedOrThrow(userId, sessionId);
+    if (session.status !== SESSION_STATUS.ACTIVE) {
+      throw new BadRequestException();
+    }
+    await session.destroy();
+    return { result: true };
+  }
+
   // Re-snapshot an active session from its current workout list, preserving progress by sourceExerciseId.
   public async resync(userId: number, sessionId: string): Promise<WorkoutSessionResponse.Dto> {
     const session = await this.findOwnedOrThrow(userId, sessionId);

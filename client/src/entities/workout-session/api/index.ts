@@ -1,4 +1,5 @@
 export {
+  discardWorkoutSession,
   fetchActiveWorkoutSession,
   fetchWorkoutHistory,
   finishWorkoutSession,

@@ -1,6 +1,7 @@
 import { apiRequest, ApiRequestError } from '@shared';
 
 import {
+  discardWorkoutSession,
   fetchActiveWorkoutSession,
   fetchWorkoutHistory,
   finishWorkoutSession,
@@ -104,6 +105,14 @@ describe('workout-session-api', () => {
     await resyncWorkoutSession('session-1');
 
     expect(mockedApiRequest).toHaveBeenCalledWith('/workout-sessions/session-1/resync', { method: 'POST', auth: true });
+  });
+
+  it('discardWorkoutSession deletes the session endpoint', async () => {
+    mockedApiRequest.mockResolvedValue(okEnvelope({ result: true }));
+
+    await discardWorkoutSession('session-1');
+
+    expect(mockedApiRequest).toHaveBeenCalledWith('/workout-sessions/session-1', { method: 'DELETE', auth: true });
   });
 
   it('fetchWorkoutHistory requests the paginated history endpoint and returns the page', async () => {

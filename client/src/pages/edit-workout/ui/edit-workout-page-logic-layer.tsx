@@ -32,22 +32,33 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
       initialData={workout}
       onSubmit={(dto): void => {
         void (async (): Promise<void> => {
+          let shouldResync = false;
+
+          if (activeSessionId) {
+            const result = await confirmDialog({
+              title: 'Also update the current session?',
+              description:
+                'Update session saves the list and applies these changes to the active workout. Keep session saves the list only. Cancel returns to editing.',
+              confirmationText: 'Update session',
+              alternateText: 'Keep session',
+              cancellationText: 'Cancel',
+            });
+
+            if (result === 'cancel') {
+              return;
+            }
+
+            shouldResync = result === 'confirm';
+          }
+
           const success = await updateWorkoutList(id, dto);
           if (!success) {
             // TODO: Support common toaster
             return;
           }
 
-          if (activeSessionId) {
-            const shouldResync = await confirmDialog({
-              title: 'Also update the current session?',
-              description: 'You have an active workout session for this list. Apply these changes to it as well?',
-              confirmationText: 'Update session',
-              cancellationText: 'Keep session',
-            });
-            if (shouldResync) {
-              await resyncSession(activeSessionId);
-            }
+          if (shouldResync && activeSessionId) {
+            await resyncSession(activeSessionId);
           }
 
           navigate({ to: '/' });

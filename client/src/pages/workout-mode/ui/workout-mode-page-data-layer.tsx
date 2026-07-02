@@ -1,9 +1,12 @@
 import { FC } from 'react';
 
 import {
+  useActiveWorkoutSessionQuery,
+  useDiscardWorkoutSessionMutation,
   useFinishWorkoutSessionMutation,
   useIncrementSessionProgressMutation,
-  useWorkoutSessionForListQuery,
+  useStartWorkoutSessionMutation,
+  useWorkoutQuery,
 } from '@entities';
 
 import WorkoutModePageLogicLayer from 'src/pages/workout-mode/ui/workout-mode-page-logic-layer';
@@ -13,19 +16,35 @@ type Props = {
 };
 
 const WorkoutModePageDataLayer: FC<Props> = ({ id }) => {
-  const { data: session, isLoading } = useWorkoutSessionForListQuery(id);
+  const { data: workoutList, isLoading: isListLoading } = useWorkoutQuery(id);
+  const { data: activeSession, isLoading: isSessionLoading } = useActiveWorkoutSessionQuery(id);
+  const startWorkoutSessionMutation = useStartWorkoutSessionMutation();
   const incrementSessionProgressMutation = useIncrementSessionProgressMutation();
   const finishWorkoutSessionMutation = useFinishWorkoutSessionMutation();
+  const discardWorkoutSessionMutation = useDiscardWorkoutSessionMutation();
+
+  const isLoading = isListLoading || isSessionLoading;
+  const session = activeSession ?? finishWorkoutSessionMutation.data ?? startWorkoutSessionMutation.data ?? null;
 
   // TODO: Distinguish query errors (empty list, network) from a missing list — not only "Workout list not found"
   return (
     <WorkoutModePageLogicLayer
-      session={isLoading ? undefined : (session ?? null)}
+      workoutList={isLoading ? undefined : (workoutList ?? null)}
+      session={session}
+      isStarting={startWorkoutSessionMutation.isPending}
+      startSession={async (workoutListId): Promise<void> => {
+        await startWorkoutSessionMutation.mutateAsync(workoutListId);
+      }}
       incrementProgress={async (sessionId, exerciseId): Promise<void> => {
         await incrementSessionProgressMutation.mutateAsync({ sessionId, workoutListId: id, exerciseId });
       }}
       finishSession={async (sessionId): Promise<void> => {
         await finishWorkoutSessionMutation.mutateAsync({ sessionId, workoutListId: id });
+      }}
+      discardSession={async (sessionId): Promise<void> => {
+        await discardWorkoutSessionMutation.mutateAsync({ sessionId, workoutListId: id });
+        startWorkoutSessionMutation.reset();
+        finishWorkoutSessionMutation.reset();
       }}
     />
   );
