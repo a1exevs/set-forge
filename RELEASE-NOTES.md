@@ -1,3 +1,15 @@
+# Release v0.4.0
+## What's Changed
+* [Common] RELEASE-NOTES.md update v0.3.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/37
+* [Common] Removing client Vercel deployment config by @a1exevs in https://github.com/a1exevs/set-forge/pull/38
+* [Common] Adopting shared Prettier config for server code by @a1exevs in https://github.com/a1exevs/set-forge/pull/39
+* [Common] Adding Docker log rotation and VDS log runbook by @a1exevs in https://github.com/a1exevs/set-forge/pull/40
+* [Common] Removing duplicate NumericField from root src by @a1exevs in https://github.com/a1exevs/set-forge/pull/41
+* [Feature] Profile page with bottom tabs and swipe navigation by @a1exevs in https://github.com/a1exevs/set-forge/pull/43
+* [Common] Version increase v0.4.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/44
+
+**Full Changelog**: https://github.com/a1exevs/set-forge/compare/v0.3.0...v0.4.0
+
 # Release v0.3.0
 ## What's Changed
 * [Common] RELEASE-NOTES.md update v0.2.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/16

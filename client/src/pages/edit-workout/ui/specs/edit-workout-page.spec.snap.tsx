@@ -9,8 +9,14 @@ jest.mock('src/entities/workout-list/api', () => ({
   createWorkoutList: jest.fn(),
   updateWorkoutList: jest.fn(),
   deleteWorkoutList: jest.fn(),
-  incrementExerciseProgress: jest.fn(),
-  resetWorkoutProgress: jest.fn(),
+}));
+
+jest.mock('src/entities/workout-session/api', () => ({
+  fetchActiveWorkoutSession: jest.fn().mockResolvedValue(null),
+  startWorkoutSession: jest.fn(),
+  incrementSessionProgress: jest.fn(),
+  finishWorkoutSession: jest.fn(),
+  resyncWorkoutSession: jest.fn(),
 }));
 
 const TEST_LIST_ID = 'test-list-1';
@@ -26,7 +32,6 @@ const TEST_LIST = {
       weight: 80,
       reps: 10,
       sets: 3,
-      completedSets: 0,
     },
   ],
   createdAt: '2024-01-01T00:00:00Z',

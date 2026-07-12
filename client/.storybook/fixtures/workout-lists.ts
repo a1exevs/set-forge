@@ -12,7 +12,6 @@ export const mockWorkoutList: WorkoutList = {
       weight: 80,
       reps: 10,
       sets: 3,
-      completedSets: 0,
     },
     {
       id: 'ex-2',
@@ -21,7 +20,6 @@ export const mockWorkoutList: WorkoutList = {
       weight: 50,
       reps: 8,
       sets: 4,
-      completedSets: 0,
     },
   ],
   createdAt: '2024-01-01T00:00:00Z',
@@ -42,7 +40,6 @@ export const mockWorkoutLists: WorkoutList[] = [
         weight: 120,
         reps: 5,
         sets: 3,
-        completedSets: 0,
       },
     ],
     createdAt: '2024-01-15T00:00:00Z',

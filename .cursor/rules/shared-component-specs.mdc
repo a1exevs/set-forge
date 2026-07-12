@@ -1,0 +1,22 @@
+---
+description: Shared component spec — one section per component in shared-components.spec.md
+globs: [".cursor/specs/shared/**", "client/src/shared/ui/**"]
+---
+
+# Shared component specs
+
+Path: `.cursor/specs/shared/shared-components.spec.md` — one file, one `## ComponentName` section per component.
+
+## Required subsections per component
+
+Purpose, Location, Files, Props, Tech stack, UI, Behavior, Accessibility, Storybook, Tests, Usage.
+
+## Overview table
+
+Keep the component index table at the top in sync when adding components.
+
+## Rules
+
+- New component → add section + row in Overview table.
+- Usage lists consumer paths only; do not duplicate page logic.
+- Link from page specs via `../shared/shared-components.spec.md#anchor`.

@@ -38,7 +38,6 @@ const editModeInitialData = {
       weight: 80,
       reps: 10,
       sets: 3,
-      completedSets: 0,
     },
     {
       id: 'ex-2',
@@ -47,7 +46,6 @@ const editModeInitialData = {
       weight: 50,
       reps: 8,
       sets: 4,
-      completedSets: 0,
     },
   ],
   createdAt: '2024-01-01T00:00:00Z',

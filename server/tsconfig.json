@@ -27,6 +27,7 @@
       "@security/*": ["src/security/*"],
       "@users/*": ["src/users/*"],
       "@workout-lists/*": ["src/workout-lists/*"],
+      "@workout-sessions/*": ["src/workout-sessions/*"],
       "@test/*": ["test/*"],
       "@assets/*": ["assets/*"],
     }

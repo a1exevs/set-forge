@@ -16,13 +16,17 @@ const storyTitle = 'Pages/EditWorkoutPage';
 const editWithDataProps = {
   id: mockWorkoutList.id,
   workout: mockWorkoutList,
+  activeSessionId: null,
   updateWorkoutList: async (): Promise<boolean> => true,
+  resyncSession: async (): Promise<void> => undefined,
 };
 
 const editNotFoundProps = {
   id: 'non-existent-id',
   workout: null,
+  activeSessionId: null,
   updateWorkoutList: async (): Promise<boolean> => true,
+  resyncSession: async (): Promise<void> => undefined,
 };
 
 const renderEditWithData = (): ReturnType<typeof renderWithPageRouter> =>
