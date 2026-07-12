@@ -1,3 +1,5 @@
+import { apiRequest, ApiRequestError, ResultCodes } from '@shared';
+
 import type {
   CreateWorkoutListDto,
   ImportWorkoutListsResult,
@@ -5,8 +7,6 @@ import type {
   WorkoutList,
   WorkoutListsExportFile,
 } from 'src/entities/workout-list/model/types';
-import { apiRequest, ApiRequestError } from 'src/shared/api/http-client';
-import { ResultCodes } from 'src/shared/api/result-codes';
 
 const BASE = '/workout-lists';
 
@@ -50,19 +50,6 @@ export async function updateWorkoutList(id: string, dto: UpdateWorkoutListDto): 
 export async function deleteWorkoutList(id: string): Promise<void> {
   const res = await apiRequest<{ result: boolean }>(`${BASE}/${id}`, { method: 'DELETE', auth: true });
   unwrap(res, 'Failed to delete workout list');
-}
-
-export async function incrementExerciseProgress(listId: string, exerciseId: string): Promise<WorkoutList> {
-  const res = await apiRequest<WorkoutList>(`${BASE}/${listId}/exercises/${exerciseId}/progress`, {
-    method: 'PATCH',
-    auth: true,
-  });
-  return unwrap(res, 'Failed to update progress');
-}
-
-export async function resetWorkoutProgress(listId: string): Promise<WorkoutList> {
-  const res = await apiRequest<WorkoutList>(`${BASE}/${listId}/reset`, { method: 'POST', auth: true });
-  return unwrap(res, 'Failed to reset progress');
 }
 
 export async function exportAllWorkoutLists(): Promise<WorkoutListsExportFile> {

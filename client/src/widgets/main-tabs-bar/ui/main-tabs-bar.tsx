@@ -1,5 +1,5 @@
 import { useRouterState } from '@tanstack/react-router';
-import { Home, User } from 'lucide-react';
+import { History, Home, User } from 'lucide-react';
 import { FC, useMemo } from 'react';
 
 import { TabsBar } from '@shared';
@@ -9,6 +9,7 @@ import { MAIN_TAB_ROUTES } from 'src/widgets/main-tabs-bar/model/main-tab-routes
 
 const MAIN_TAB_ITEMS: TabsBarItem[] = [
   { id: 'home', label: 'Home', to: '/', icon: Home },
+  { id: 'history', label: 'History', to: '/history', icon: History },
   { id: 'profile', label: 'Profile', to: '/profile', icon: User },
 ];
 

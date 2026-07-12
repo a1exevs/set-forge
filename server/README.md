@@ -19,7 +19,7 @@ NestJS HTTP API for Set Forge web-client: authentication, workout lists flow (Se
 
 ## Description
 
-This backend is designed for **workout planning and strength tracking** — exercise lists, logging sets and weights, perceived effort, and **progress over time**.
+Build workout lists, log sets and weights, rate perceived effort, and track strength progress over time.
 
 ## Prerequisites
 

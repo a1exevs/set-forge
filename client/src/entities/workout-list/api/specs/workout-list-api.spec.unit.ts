@@ -1,13 +1,12 @@
+import { apiRequest, ApiRequestError } from '@shared';
+
 import {
   createWorkoutList,
   deleteWorkoutList,
   fetchWorkoutList,
   fetchWorkoutLists,
-  incrementExerciseProgress,
-  resetWorkoutProgress,
   updateWorkoutList,
 } from 'src/entities/workout-list/api/workout-list-api';
-import { apiRequest, ApiRequestError } from 'src/shared/api/http-client';
 
 jest.mock('src/shared/api/http-client', () => {
   const actual = jest.requireActual('src/shared/api/http-client');
@@ -22,9 +21,7 @@ const LIST = {
   id: 'list-1',
   name: 'Push Day',
   description: 'chest',
-  exercises: [
-    { id: 'ex-1', name: 'Bench', muscleGroup: 'chest' as const, weight: 60, reps: 10, sets: 3, completedSets: 0 },
-  ],
+  exercises: [{ id: 'ex-1', name: 'Bench', muscleGroup: 'chest' as const, weight: 60, reps: 10, sets: 3 }],
   createdAt: '2026-06-03T12:00:00.000Z',
   lastUsedAt: null,
 };
@@ -95,25 +92,6 @@ describe('workout-list-api', () => {
     await deleteWorkoutList('list-1');
 
     expect(mockedApiRequest).toHaveBeenCalledWith('/workout-lists/list-1', { method: 'DELETE', auth: true });
-  });
-
-  it('incrementExerciseProgress patches the exercise progress endpoint', async () => {
-    mockedApiRequest.mockResolvedValue(okEnvelope(LIST));
-
-    await incrementExerciseProgress('list-1', 'ex-1');
-
-    expect(mockedApiRequest).toHaveBeenCalledWith('/workout-lists/list-1/exercises/ex-1/progress', {
-      method: 'PATCH',
-      auth: true,
-    });
-  });
-
-  it('resetWorkoutProgress posts to the reset endpoint', async () => {
-    mockedApiRequest.mockResolvedValue(okEnvelope(LIST));
-
-    await resetWorkoutProgress('list-1');
-
-    expect(mockedApiRequest).toHaveBeenCalledWith('/workout-lists/list-1/reset', { method: 'POST', auth: true });
   });
 
   it('throws when the envelope resultCode is not OK', async () => {

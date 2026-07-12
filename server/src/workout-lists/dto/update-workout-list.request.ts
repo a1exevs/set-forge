@@ -45,12 +45,6 @@ export namespace UpdateWorkoutListRequest {
     @IsInt({ message: ErrorMessages.MUST_BE_AN_INTEGER_NUMBER })
     @Min(1, { message: ErrorMessages.NUMERIC_MUST_NOT_BE_LESS_THAN_N.format(1) })
     readonly sets: number;
-
-    @ApiProperty({ required: false, example: 0, description: 'Completed sets (for existing exercises)' })
-    @IsOptional()
-    @IsInt({ message: ErrorMessages.MUST_BE_AN_INTEGER_NUMBER })
-    @Min(0, { message: ErrorMessages.NUMERIC_MUST_NOT_BE_LESS_THAN_N.format(0) })
-    readonly completedSets?: number;
   }
 
   export class Dto {

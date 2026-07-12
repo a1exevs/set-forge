@@ -1,7 +1,7 @@
 {
   "name": "@set-forge/server",
   "version": "0.4.0",
-  "description": "This backend is designed for workout planning and strength tracking — exercise lists, logging sets and weights, perceived effort, and progress over time.",
+  "description": "Build workout lists, log sets and weights, rate perceived effort, and track strength progress over time.",
   "private": true,
   "author": "AlexEvs",
   "bugs": {
@@ -159,6 +159,9 @@
       ],
       "@workout-lists/(.*)$": [
         "<rootDir>/src/workout-lists/$1"
+      ],
+      "@workout-sessions/(.*)$": [
+        "<rootDir>/src/workout-sessions/$1"
       ],
       "@test/(.*)$": [
         "<rootDir>/test/$1"

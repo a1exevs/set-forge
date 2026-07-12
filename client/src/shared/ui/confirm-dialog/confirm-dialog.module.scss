@@ -23,8 +23,18 @@
   display: flex;
   gap: $spacing-sm;
   margin-top: $spacing-lg;
+  flex-wrap: wrap;
 
   &.singleButton {
     justify-content: flex-end;
+  }
+
+  &.multiButton {
+    justify-content: stretch;
+
+    > * {
+      flex: 1 1 auto;
+      min-width: fit-content;
+    }
   }
 }

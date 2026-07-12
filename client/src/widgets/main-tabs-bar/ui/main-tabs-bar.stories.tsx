@@ -11,7 +11,7 @@ import type { ReactElement } from 'react';
 
 import MainTabsBar from 'src/widgets/main-tabs-bar/ui/main-tabs-bar';
 
-const renderWithRouter = (initialPath: '/' | '/profile'): ReactElement => {
+const renderWithRouter = (initialPath: '/' | '/history' | '/profile'): ReactElement => {
   const rootRoute = createRootRoute({
     component: (): JSX.Element => (
       <>
@@ -27,13 +27,19 @@ const renderWithRouter = (initialPath: '/' | '/profile'): ReactElement => {
     component: (): null => null,
   });
 
+  const historyRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/history',
+    component: (): null => null,
+  });
+
   const profileRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/profile',
     component: (): null => null,
   });
 
-  const routeTree = rootRoute.addChildren([indexRoute, profileRoute]);
+  const routeTree = rootRoute.addChildren([indexRoute, historyRoute, profileRoute]);
   const router = createRouter({
     routeTree,
     history: createMemoryHistory({ initialEntries: [initialPath] }),
@@ -52,6 +58,10 @@ type Story = StoryObj<typeof meta>;
 
 export const HomeActive: Story = {
   render: (): ReactElement => renderWithRouter('/'),
+};
+
+export const HistoryActive: Story = {
+  render: (): ReactElement => renderWithRouter('/history'),
 };
 
 export const ProfileActive: Story = {

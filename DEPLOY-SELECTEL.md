@@ -34,6 +34,7 @@ Step-by-step guide: from creating a server in the [VDS Selectel](https://vds.sel
 12. [Update the application](#12-update-the-application)
 13. [Useful commands](#13-useful-commands)
 14. [Common issues](#14-common-issues)
+15. [Copy production database to local dev](#15-copy-production-database-to-local-dev)
 
 ---
 
@@ -422,7 +423,7 @@ sudo du -sh "$mp"
 sudo find "$mp" -type f -exec du -h {} \; | sort -h
 ```
 
-**Quick summary** (Docker logs + error logs + free disk space):
+**Quick summary** (Docker logs + error logs + disk + memory):
 
 ```bash
 echo "=== Docker container logs ==="
@@ -433,7 +434,12 @@ cd ~/set-forge && docker compose --profile prod exec server-prod du -sh /app/dis
 
 echo "=== Disk free ==="
 df -h /
+
+echo "=== Memory ==="
+free -h
 ```
+
+`free -h` shows total RAM and swap. On Ubuntu, focus on the **available** column under `Mem` — that is how much memory the kernel can still hand out without swapping. If **available** is near zero and **Swap** `used` keeps growing, the VDS may need more RAM or swap (see [§14 — Not enough memory during build](#not-enough-memory-during-build)).
 
 ### Clear logs
 
@@ -492,6 +498,9 @@ docker compose --profile prod exec server-prod du -sh /app/dist/logs
 
 echo "=== Disk ==="
 df -h /
+
+echo "=== Memory ==="
+free -h
 ```
 
 **Automatic Docker log rotation** (already set in [`docker-compose.yml`](docker-compose.yml) for prod services):
@@ -553,6 +562,169 @@ sudo mkswap /swapfile
 sudo swapon /swapfile
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
+
+---
+
+## 15. Copy production database to local dev
+
+Use this when you need real prod data on your Mac (debugging, TablePlus inspection, etc.).
+
+> **Security:** the dump contains user emails and password hashes. Do not commit `.sql` files to git or share them.
+
+**How it works:** prod MySQL has **no public port** — the dump is created **on the VDS via SSH** inside the `mysql` container. Locally, `npm run db:up` starts `mysql-dev` on `127.0.0.1:3306`.
+
+### 15.1. Create a dump on the VDS
+
+```bash
+ssh root@185.10.20.30          # replace with your VDS IP
+cd ~/set-forge
+
+docker compose --profile prod exec mysql sh -c \
+  'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" \
+    --single-transaction \
+    --routines \
+    --triggers \
+    "$MYSQL_DATABASE"' \
+  > ~/set-forge-prod-$(date +%Y%m%d-%H%M).sql
+
+ls -lh ~/set-forge-prod-*.sql
+head -20 ~/set-forge-prod-*.sql
+```
+
+- `--single-transaction` — consistent dump without locking InnoDB tables.
+- `--routines --triggers` — stored procedures and triggers (if any).
+
+Optional — compress a large dump:
+
+```bash
+gzip ~/set-forge-prod-*.sql
+```
+
+### 15.2. Download the dump to your Mac
+
+```bash
+scp root@185.10.20.30:~/set-forge-prod-*.sql ~/Downloads/
+```
+
+If you compressed the file:
+
+```bash
+scp root@185.10.20.30:~/set-forge-prod-*.sql.gz ~/Downloads/
+gunzip ~/Downloads/set-forge-prod-*.sql.gz
+```
+
+### 15.3. Start local MySQL
+
+From the repo root on your Mac:
+
+```bash
+cd ~/set-forge               # or your local clone path
+npm run db:up
+docker compose --profile dev ps
+```
+
+### 15.4. Align database names
+
+The dump targets the prod database name from the VDS root `.env` (`MYSQL_DATABASE`, e.g. `set_forge`).
+
+Before importing, make sure **both** local env files use the **same** name:
+
+- repo root `.env` → `MYSQL_DATABASE`
+- `server/.development.env` → `MYSQL_DB`
+
+If names differ, import may fail on `USE set_forge` statements inside the dump. Either align the values or rewrite the dump:
+
+```bash
+sed 's/set_forge/change_me_db/g' ~/Downloads/set-forge-prod-*.sql > ~/Downloads/set-forge-local.sql
+```
+
+### 15.5. Wipe local data and import
+
+> **Warning:** this **deletes all data** in your local dev database.
+
+```bash
+cd ~/set-forge
+
+docker compose --profile dev exec mysql-dev sh -c \
+  'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "DROP DATABASE IF EXISTS \`$MYSQL_DATABASE\`; CREATE DATABASE \`$MYSQL_DATABASE\` CHARACTER SET utf8 COLLATE utf8_general_ci;"'
+
+docker compose --profile dev exec -T mysql-dev sh -c \
+  'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"' \
+  < ~/Downloads/set-forge-prod-YYYYMMDD-HHMM.sql
+```
+
+Replace `set-forge-prod-YYYYMMDD-HHMM.sql` with the actual filename.
+
+Verify:
+
+```bash
+docker compose --profile dev exec mysql-dev sh -c \
+  'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" -e "SHOW TABLES;"'
+```
+
+Expected tables include `roles`, `users`, `users_roles`, `refreshTokens`, `workout_lists`, `workout_exercises`, `SequelizeMeta`, and possibly `sessions`.
+
+No `npm run server:db:migrate` or `server:db:seed` after a full dump — schema and data are already included.
+
+If the `DROP DATABASE` / `mysql` commands fail with `ERROR 1045` (access denied for `root`), see [§15.7](#157-reset-local-mysql-completely-access-denied-or-import-fails).
+
+### 15.6. Connect with TablePlus (or another client)
+
+| Field | Value |
+|-------|-------|
+| Host | `127.0.0.1` |
+| Port | `3306` (or `MYSQL_PUBLIC_PORT` from root `.env`) |
+| User | `MYSQL_USER` from `server/.development.env` |
+| Password | `MYSQL_PASSWORD` from `server/.development.env` |
+| Database | `MYSQL_DB` from `server/.development.env` |
+
+### 15.7. Reset local MySQL completely (access denied or import fails)
+
+If [§15.5](#155-wipe-local-data-and-import) fails with:
+
+```text
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+```
+
+the root password in your **current** root `.env` does not match what MySQL stored in the Docker volume `mysql_data_dev`.
+
+**Why this happens:** `MYSQL_ROOT_PASSWORD` is applied only when the volume is **first** initialized. After that, changing `.env` updates the container environment, but MySQL keeps the old password on disk.
+
+**`--force-recreate` is not enough** — it recreates the container but leaves the volume intact:
+
+```bash
+# This alone does NOT reset the root password:
+docker compose --profile dev up -d --force-recreate mysql-dev
+```
+
+**Fix:** remove the dev volume and start fresh so MySQL re-initializes from the current `.env`:
+
+> **Warning:** this **deletes all data** in your local dev MySQL volume.
+
+```bash
+cd ~/set-forge               # or your local clone path
+
+npm run db:down
+
+docker volume ls | grep mysql_data_dev
+# usually: set-forge_mysql_data_dev  (volume name = <project-dir>_mysql_data_dev)
+
+docker volume rm set-forge_mysql_data_dev
+
+npm run db:up
+```
+
+Wait until `mysql-dev` is **healthy** (`docker compose --profile dev ps`), then repeat [§15.5](#155-wipe-local-data-and-import).
+
+**Before `db:up`**, confirm the root `.env` has the credentials you want (especially `MYSQL_ROOT_PASSWORD`, `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`) and that `MYSQL_DATABASE` / `MYSQL_DB` in `server/.development.env` still match [§15.4](#154-align-database-names).
+
+### Notes
+
+| Topic | What to expect |
+|-------|----------------|
+| Prod user passwords | Work locally — bcrypt hashes are in the dump |
+| Prod sessions / JWT | May not work — local `SESSION_SECRET_KEY` and `JWT_SECRET_KEY` differ |
+| Static uploads (avatars) | Not in the SQL dump — files live in the `server_static` Docker volume on the VDS |
 
 ---
 

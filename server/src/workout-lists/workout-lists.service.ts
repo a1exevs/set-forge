@@ -8,10 +8,11 @@ import { WorkoutList } from '@workout-lists/workout-list.model';
 import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
 import {
   CreateWorkoutListRequest,
+  ImportWorkoutListsRequest,
   ImportWorkoutListsResponse,
   UpdateWorkoutListRequest,
   WorkoutListResponse,
-  WorkoutListsExportFile,
+  WorkoutListsExportFileResponse,
   WORKOUT_LISTS_EXPORT_APP,
   WORKOUT_LISTS_EXPORT_FORMAT_VERSION,
 } from '@workout-lists/dto';
@@ -52,7 +53,6 @@ export class WorkoutListsService {
           weight: exercise.weight,
           reps: exercise.reps,
           sets: exercise.sets,
-          completedSets: 0,
           position: index,
         })),
         { transaction },
@@ -67,16 +67,10 @@ export class WorkoutListsService {
     const list = await this.findOwnedOrThrow(userId, id);
     const existingById = new Map(list.exercises.map(exercise => [exercise.id, exercise]));
 
-    // Reconcile by replace: existing exercises keep their id (so progress/currentWorkout stay
-    // stable) and completedSets, new ones get fresh ids, removed ones are dropped via destroy.
+    // Reconcile by replace: existing exercises keep their id (so active sessions can resync
+    // against a stable sourceExerciseId), new ones get fresh ids, removed ones are dropped.
     const rows = dto.exercises.map((exercise, index) => {
       const existing = exercise.id ? existingById.get(exercise.id) : undefined;
-      let completedSetsSource = 0;
-      if (exercise.completedSets !== undefined) {
-        completedSetsSource = exercise.completedSets;
-      } else if (existing) {
-        completedSetsSource = existing.completedSets;
-      }
       return {
         ...(existing ? { id: existing.id } : {}),
         workoutListId: id,
@@ -85,7 +79,6 @@ export class WorkoutListsService {
         weight: exercise.weight,
         reps: exercise.reps,
         sets: exercise.sets,
-        completedSets: Math.min(completedSetsSource, exercise.sets),
         position: index,
       };
     });
@@ -105,34 +98,13 @@ export class WorkoutListsService {
     return { result: true };
   }
 
-  public async incrementProgress(userId: number, listId: string, exerciseId: string): Promise<WorkoutListResponse.Dto> {
-    const list = await this.findOwnedOrThrow(userId, listId);
-    const exercise = list.exercises.find(item => item.id === exerciseId);
-    if (!exercise) {
-      throw new NotFoundException();
-    }
-
-    if (exercise.completedSets < exercise.sets) {
-      await exercise.update({ completedSets: exercise.completedSets + 1 });
-    }
-    await list.update({ lastUsedAt: new Date() });
-
-    return this.getOne(userId, listId);
-  }
-
-  public async resetAll(userId: number, listId: string): Promise<WorkoutListResponse.Dto> {
-    await this.findOwnedOrThrow(userId, listId);
-    await this.workoutExerciseRepository.update({ completedSets: 0 }, { where: { workoutListId: listId } });
-    return this.getOne(userId, listId);
-  }
-
-  public async exportAll(userId: number): Promise<WorkoutListsExportFile.Dto> {
+  public async exportAll(userId: number): Promise<WorkoutListsExportFileResponse.Dto> {
     const lists = await this.getAll(userId);
     return WorkoutListsService.toExportFile(lists);
   }
 
   // Reserved for GET /workout-lists/:id/export
-  public async exportOne(userId: number, listId: string): Promise<WorkoutListsExportFile.Dto> {
+  public async exportOne(userId: number, listId: string): Promise<WorkoutListsExportFileResponse.Dto> {
     const list = await this.getOne(userId, listId);
     return WorkoutListsService.toExportFile([list]);
   }
@@ -172,7 +144,6 @@ export class WorkoutListsService {
               weight: exercise.weight,
               reps: exercise.reps,
               sets: exercise.sets,
-              completedSets: 0,
               position: index,
             })),
             { transaction },
@@ -186,7 +157,7 @@ export class WorkoutListsService {
     return new ImportWorkoutListsResponse.Dto({ importedCount: lists.length, lists });
   }
 
-  public static toExportFile(lists: WorkoutListResponse.Dto[]): WorkoutListsExportFile.Dto {
+  public static toExportFile(lists: WorkoutListResponse.Dto[]): WorkoutListsExportFileResponse.Dto {
     return {
       formatVersion: WORKOUT_LISTS_EXPORT_FORMAT_VERSION,
       app: WORKOUT_LISTS_EXPORT_APP,
@@ -207,13 +178,13 @@ export class WorkoutListsService {
     };
   }
 
-  private static normalizeImportBody(body: unknown): WorkoutListsExportFile.Dto {
+  private static normalizeImportBody(body: unknown): WorkoutListsExportFileResponse.Dto {
     if (Array.isArray(body)) {
       return WorkoutListsService.toExportFile(body.map(item => WorkoutListsService.legacyListToResponse(item)));
     }
 
     if (typeof body === 'object' && body !== null && 'workoutLists' in body) {
-      return body as WorkoutListsExportFile.Dto;
+      return body as WorkoutListsExportFileResponse.Dto;
     }
 
     throw new BadRequestException('Invalid import file format');
@@ -246,7 +217,6 @@ export class WorkoutListsService {
           weight: Number(ex.weight),
           reps: Number(ex.reps),
           sets: Number(ex.sets),
-          completedSets: 0,
         };
       }),
       createdAt: typeof record.createdAt === 'string' ? record.createdAt : new Date().toISOString(),
@@ -254,8 +224,10 @@ export class WorkoutListsService {
     });
   }
 
-  private static async validateExportFile(file: WorkoutListsExportFile.Dto): Promise<WorkoutListsExportFile.Dto> {
-    const instance = plainToInstance(WorkoutListsExportFile.Dto, file);
+  private static async validateExportFile(
+    file: WorkoutListsExportFileResponse.Dto,
+  ): Promise<ImportWorkoutListsRequest.Dto> {
+    const instance = plainToInstance(ImportWorkoutListsRequest.Dto, file);
     const errors = await validate(instance);
     if (errors.length > 0) {
       throw new BadRequestException('Invalid import file format');
@@ -287,7 +259,6 @@ export class WorkoutListsService {
         weight: exercise.weight,
         reps: exercise.reps,
         sets: exercise.sets,
-        completedSets: exercise.completedSets,
       }));
 
     return new WorkoutListResponse.Dto({

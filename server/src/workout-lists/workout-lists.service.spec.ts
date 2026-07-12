@@ -21,7 +21,6 @@ type MockExercise = {
   weight: number;
   reps: number;
   sets: number;
-  completedSets: number;
   position: number;
   update: jest.Mock;
 };
@@ -33,7 +32,6 @@ const buildExercise = (overrides: Partial<MockExercise> = {}): MockExercise => (
   weight: 60,
   reps: 10,
   sets: 3,
-  completedSets: 0,
   position: 0,
   update: jest.fn().mockResolvedValue(undefined),
   ...overrides,
@@ -147,7 +145,8 @@ describe('WorkoutListsService', () => {
       );
       const bulkArgs = exerciseModel.bulkCreate.mock.calls[0][0];
       expect(bulkArgs).toHaveLength(2);
-      expect(bulkArgs[0]).toEqual(expect.objectContaining({ workoutListId: 'list-1', completedSets: 0, position: 0 }));
+      expect(bulkArgs[0]).toEqual(expect.objectContaining({ workoutListId: 'list-1', position: 0 }));
+      expect(bulkArgs[0]).not.toHaveProperty('completedSets');
       expect(bulkArgs[1]).toEqual(expect.objectContaining({ position: 1 }));
       expect(result.id).toBe('list-1');
     });
@@ -155,10 +154,7 @@ describe('WorkoutListsService', () => {
 
   describe('update', () => {
     it('keeps existing exercises by id, adds new, drops removed', async () => {
-      const existing = buildListModel([
-        buildExercise({ id: 'ex-keep', completedSets: 2, sets: 3 }),
-        buildExercise({ id: 'ex-remove' }),
-      ]);
+      const existing = buildListModel([buildExercise({ id: 'ex-keep', sets: 3 }), buildExercise({ id: 'ex-remove' })]);
       // first findOne -> owned list for reconciliation, second findOne -> getOne result
       listModel.findOne.mockResolvedValueOnce(existing).mockResolvedValueOnce(buildListModel([buildExercise()]));
 
@@ -180,27 +176,12 @@ describe('WorkoutListsService', () => {
       expect(exerciseModel.destroy).toBeCalledWith(expect.objectContaining({ where: { workoutListId: 'list-1' } }));
       const rows = exerciseModel.bulkCreate.mock.calls[0][0];
       expect(rows).toHaveLength(2);
-      // existing exercise keeps its id and preserved completedSets (clamped to new sets)
-      expect(rows[0]).toEqual(expect.objectContaining({ id: 'ex-keep', completedSets: 2, position: 0 }));
-      // new exercise has no id and completedSets 0
+      // existing exercise keeps its id (so an active session can resync against it)
+      expect(rows[0]).toEqual(expect.objectContaining({ id: 'ex-keep', position: 0 }));
+      expect(rows[0]).not.toHaveProperty('completedSets');
+      // new exercise has no id
       expect(rows[1].id).toBeUndefined();
-      expect(rows[1]).toEqual(expect.objectContaining({ completedSets: 0, position: 1 }));
-    });
-
-    it('clamps preserved completedSets to the new sets value', async () => {
-      const existing = buildListModel([buildExercise({ id: 'ex-keep', completedSets: 5, sets: 5 })]);
-      listModel.findOne.mockResolvedValueOnce(existing).mockResolvedValueOnce(buildListModel([buildExercise()]));
-
-      const dto: UpdateWorkoutListRequest.Dto = {
-        name: 'x',
-        description: '',
-        exercises: [{ id: 'ex-keep', name: 'Bench', muscleGroup: 'chest', weight: 60, reps: 10, sets: 2 }],
-      };
-
-      await service.update(userId, 'list-1', dto);
-
-      const rows = exerciseModel.bulkCreate.mock.calls[0][0];
-      expect(rows[0].completedSets).toBe(2);
+      expect(rows[1]).toEqual(expect.objectContaining({ position: 1 }));
     });
   });
 
@@ -227,59 +208,9 @@ describe('WorkoutListsService', () => {
     });
   });
 
-  describe('incrementProgress', () => {
-    it('increments completedSets when below sets and stamps lastUsedAt', async () => {
-      const exercise = buildExercise({ completedSets: 1, sets: 3 });
-      const list = buildListModel([exercise]);
-      listModel.findOne.mockResolvedValueOnce(list).mockResolvedValueOnce(buildListModel([buildExercise()]));
-
-      await service.incrementProgress(userId, 'list-1', 'ex-1');
-
-      expect(exercise.update).toBeCalledWith({ completedSets: 2 });
-      expect(list.update).toBeCalledWith(expect.objectContaining({ lastUsedAt: expect.any(Date) }));
-    });
-
-    it('does not increment when already at sets', async () => {
-      const exercise = buildExercise({ completedSets: 3, sets: 3 });
-      const list = buildListModel([exercise]);
-      listModel.findOne.mockResolvedValueOnce(list).mockResolvedValueOnce(buildListModel([buildExercise()]));
-
-      await service.incrementProgress(userId, 'list-1', 'ex-1');
-
-      expect(exercise.update).not.toBeCalled();
-    });
-
-    it('throws NotFoundException when exercise is missing', async () => {
-      const list = buildListModel([buildExercise({ id: 'other' })]);
-      listModel.findOne.mockResolvedValue(list);
-
-      try {
-        await service.incrementProgress(userId, 'list-1', 'ex-1');
-        sendPseudoError();
-      } catch (error) {
-        expect(error).toBeInstanceOf(NotFoundException);
-      }
-    });
-  });
-
-  describe('resetAll', () => {
-    it('zeros completedSets for all exercises of the list', async () => {
-      listModel.findOne
-        .mockResolvedValueOnce(buildListModel([buildExercise()]))
-        .mockResolvedValueOnce(buildListModel([buildExercise()]));
-
-      await service.resetAll(userId, 'list-1');
-
-      expect(exerciseModel.update).toBeCalledWith(
-        { completedSets: 0 },
-        expect.objectContaining({ where: { workoutListId: 'list-1' } }),
-      );
-    });
-  });
-
   describe('exportAll', () => {
     it('returns export file without ids and progress', async () => {
-      const list = buildListModel([buildExercise({ completedSets: 2 })]);
+      const list = buildListModel([buildExercise()]);
       listModel.findAll.mockResolvedValue([list]);
 
       const result = await service.exportAll(userId);
