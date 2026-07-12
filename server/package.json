@@ -1,6 +1,6 @@
 {
   "name": "@set-forge/server",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Build workout lists, log sets and weights, rate perceived effort, and track strength progress over time.",
   "private": true,
   "author": "AlexEvs",
