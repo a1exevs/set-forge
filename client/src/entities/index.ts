@@ -1,4 +1,3 @@
-export { muscleGroupLabels, muscleGroups, type MuscleGroup } from 'src/entities/exercise';
 export {
   emailToAvatarLetter,
   sessionQueryKeys,
@@ -9,20 +8,38 @@ export {
   type CurrentUser,
 } from 'src/entities/session';
 export {
+  muscleGroupLabels,
+  muscleGroups,
+  type MuscleGroup,
+  type UpdateExerciseDto,
+  type WorkoutExercise,
+} from 'src/entities/workout-exercise';
+export {
   useCreateWorkoutListMutation,
   useDeleteWorkoutListMutation,
   useExportAllWorkoutListsMutation,
   useImportWorkoutListsMutation,
-  useResetWorkoutProgressMutation,
   useUpdateWorkoutListMutation,
-  useUpdateWorkoutProgressMutation,
   useWorkoutListsQuery,
   useWorkoutQuery,
   workoutQueryKeys,
-  type WorkoutList,
-  type WorkoutExercise,
   type CreateWorkoutListDto,
-  type UpdateWorkoutListDto,
-  type WorkoutListsExportFile,
   type ImportWorkoutListsResult,
+  type UpdateWorkoutListDto,
+  type WorkoutList,
+  type WorkoutListsExportFile,
 } from 'src/entities/workout-list';
+export type { WorkoutSessionExercise } from 'src/entities/workout-session-exercise';
+export {
+  useActiveWorkoutSessionQuery,
+  useDiscardWorkoutSessionMutation,
+  useFinishWorkoutSessionMutation,
+  useIncrementSessionProgressMutation,
+  useResyncWorkoutSessionMutation,
+  useStartWorkoutSessionMutation,
+  useWorkoutHistoryInfiniteQuery,
+  workoutSessionQueryKeys,
+  type SessionStatus,
+  type WorkoutHistoryPage,
+  type WorkoutSession,
+} from 'src/entities/workout-session';

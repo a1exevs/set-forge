@@ -1,8 +1,98 @@
 ---
-description: Backend / API conventions (placeholder until server code exists)
+description: NestJS API conventions — Swagger, DTO, thin controllers, service tests
 globs: ["server/**"]
 ---
 
-# Server workspace
+# Server API
 
-Reserved for `@set-forge/server`. When this package gains code, extend this file with API style, validation, persistence, and error-handling rules consistent with the monorepo.
+## Response envelope
+
+- Global prefix: `api/1.0`.
+- Success responses are wrapped by `ResponseInterceptor` into `CommonResponse`: `{ data, messages, fieldsErrors, resultCode }`.
+- Document success in Swagger with `@ApiResult` (`server/src/common/decorators/api-result.decorator.ts`) — `CommonResponse` schema + typed `data`.
+- Errors go through `HttpExceptionFilter`; every endpoint must declare relevant `@ApiBadRequestResponse`, `@ApiNotFoundResponse`, `@ApiUnauthorizedResponse`, etc. with text from `Docs.*`.
+
+## Swagger per endpoint
+
+Reference: `server/src/workout-lists/workout-lists.controller.ts`.
+
+1. `@ApiTags(Docs.<CONTROLLER>)` on the class
+2. `@ApiOperation({ summary: Docs.<ENDPOINT> })`
+3. `@ApiBody({ type: X.Swagger.XDto })` for request body
+4. `@ApiResult({ status, type: X.Swagger.XDto, description: Docs.<SUCCESS> })` for each success status (200 and 201 when both apply)
+5. `@ApiResult({ nullable: true })` when `data` can be `null`
+6. All relevant error decorators with `Docs.<ERROR>` — list every possible response, not only success
+7. Copy only from `server/src/common/constants/docs.ts`, no inline strings
+
+## DTO naming and structure
+
+| File suffix / namespace | Purpose | Example |
+|-------------------------|---------|---------|
+| `.request.ts` / `*Request` | POST/PUT/PATCH body | `CreateWorkoutListRequest` |
+| `.response.ts` / `*Response` | Payload in `data` | `WorkoutListResponse` |
+| `.query.ts` / `*Query` | Query params (`@Query()`) | `GetWorkoutHistoryQuery` |
+
+When export response and import body share one JSON schema: canonical fields in `*.response.ts`; import `*.request.ts` extends it (`ImportWorkoutListsRequest extends WorkoutListsExportFileResponse`).
+
+Required namespace pattern:
+
+```typescript
+export namespace FooRequest {
+  export class Dto { /* class-validator + @ApiProperty */ }
+  export namespace Swagger {
+    export class FooRequestDto extends Dto {}
+  }
+}
+```
+
+- Files: kebab-case (`create-workout-list.request.ts`).
+- `dto/` folder + `index.ts` barrel re-exporting all module DTOs.
+- Every field: `@ApiProperty` / `@ApiPropertyOptional` with `example` (and `enum`, `nullable` where needed).
+- Request/Query DTO: `class-validator` + `ErrorMessages` from `@common/constants`.
+- Response DTO: constructor for mapping; nested DTOs as inner classes.
+- Shared export/import schema: full definition in `*.response.ts`; thin `*.request.ts` extends response `Dto` for import body (no duplicated fields).
+
+## DTO tests
+
+- `<dto-name>.spec.ts` next to the DTO — required for all Request, Response, and Query DTOs.
+- Request/Query: `validateDto` from `@test/unit/helpers` — happy path + key validation errors.
+- Response: `checkForApiProperties(dto, Class)` — see `server/src/auth/dto/authentication.response.spec.ts`.
+
+## Controller — thin
+
+- Only: guards/filters/interceptors, `request.user.id`, service call, status code mapping when needed (`response.status(created ? 201 : 200)`).
+- Business logic lives in the service only.
+- Register static routes (`export`, `import`, `active`) before `/:id`.
+- Every controller: `*.controller.spec.ts` — mock service, assert delegation and `userId` scoping.
+
+## Service + tests
+
+- `*.service.ts` — business logic, ownership checks, transactions.
+- `*.service.spec.ts` — mock `@InjectModel` / `@InjectConnection`, cover happy path and exceptions.
+- E2E for cross-cutting flows: `server/test/e2e/`.
+
+## Sequelize models
+
+- `@ApiProperty({ example, description })` on every column (see `workout-list.model.ts`).
+- `synchronize: false`; schema via migrations.
+
+## Postman collection
+
+When adding or changing an endpoint, update `server/_stub/postman/set-forge-server.postman_collection.json`.
+
+- Mirror controller modules as folders under `v1.0` → `api` (e.g. `workout-lists`, `workout-sessions`).
+- One request per endpoint variant (happy path, key error cases); name requests in kebab-case like existing entries.
+- URL: `{{protocol}}://{{dev-url}}/1.0/{{<module>-end-point}}/...` — add a collection variable for new modules.
+- Auth: `Authorization: Bearer {{api/access_token}}` where the route is protected.
+- Body/query examples: match DTO `@ApiProperty` examples; chain IDs via `pm.collectionVariables.set` in test scripts when a later request depends on the response.
+- Tests: assert status code and essential fields in `data` (see existing requests in the collection).
+
+## New endpoint checklist
+
+1. DTO (namespace + Swagger + spec)
+2. Service method + spec
+3. Controller method + Swagger (success + all errors) + controller spec
+4. Strings in `docs.ts` and `routes.ts`
+5. Update entity spec `## API contract` in `.cursor/specs/entities/`
+6. Update Postman collection (`server/_stub/postman/set-forge-server.postman_collection.json`)
+7. E2E when needed

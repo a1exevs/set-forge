@@ -97,6 +97,10 @@
                 "./src/workout-lists"
               ],
               [
+                "@workout-sessions",
+                "./src/workout-sessions"
+              ],
+              [
                 "@test",
                 "./test"
               ],

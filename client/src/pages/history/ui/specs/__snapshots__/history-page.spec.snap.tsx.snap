@@ -1,0 +1,139 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`HistoryPage matches snapshot with an expanded session 1`] = `
+<div>
+  <div
+    class="container"
+  >
+    <header
+      class="header"
+    >
+      <div
+        class="headerTop"
+      >
+        <div
+          class="wordmark"
+        >
+          <img
+            alt=""
+            aria-hidden="true"
+            class="icon"
+            height="512"
+            src="/favicon.svg"
+            width="512"
+          />
+          <span
+            class="title"
+          >
+            History
+          </span>
+        </div>
+        <span
+          class="count"
+        >
+          1
+           workout
+        </span>
+      </div>
+    </header>
+    <main
+      class="main"
+    >
+      <div
+        class="list"
+      >
+        <div
+          class="card"
+        >
+          <button
+            aria-expanded="true"
+            class="cardButton"
+            type="button"
+          >
+            <div
+              class="cardInfo"
+            >
+              <h2
+                class="cardTitle"
+              >
+                Push Day
+              </h2>
+              <div
+                class="cardMeta"
+              >
+                <span>
+                  2026-06-03T13:00:00.000Z
+                </span>
+                <span>
+                  1/1 exercise · 60 min
+                </span>
+              </div>
+            </div>
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-chevron-down chevron chevronOpen"
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.75"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="m6 9 6 6 6-6"
+              />
+            </svg>
+          </button>
+          <div
+            class="details"
+          >
+            <div
+              class="exerciseRow"
+            >
+              <div
+                class="exerciseMain"
+              >
+                <div
+                  class="exerciseName"
+                >
+                  Bench Press
+                  <span
+                    class="muscleBadge"
+                  >
+                    Chest
+                  </span>
+                </div>
+                <div
+                  class="exerciseSub"
+                >
+                  60
+                   kg × 
+                  10
+                   reps
+                </div>
+              </div>
+              <span
+                class="exerciseSets exerciseSetsDone"
+              >
+                3
+                /
+                3
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        aria-hidden="true"
+        class="sentinel"
+      />
+    </main>
+    <nav
+      data-testid="main-tabs-bar"
+    />
+  </div>
+</div>
+`;

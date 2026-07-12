@@ -1,10 +1,10 @@
 import type { QueryClient } from '@tanstack/react-query';
 
+import { clearAccessToken, getAccessToken, refreshAccessToken } from '@shared';
+
 import { fetchCurrentUser } from 'src/entities/session/api/session-api';
 import type { CurrentUser } from 'src/entities/session/api/session-api';
 import { sessionQueryKeys } from 'src/entities/session/model/session-keys';
-import { clearAccessToken, getAccessToken } from 'src/shared/api/access-token.store';
-import { refreshAccessToken } from 'src/shared/api/refresh-access-token';
 
 export async function bootstrapSessionAndPrimeCache(queryClient: QueryClient): Promise<CurrentUser | null> {
   if (!getAccessToken()) {
