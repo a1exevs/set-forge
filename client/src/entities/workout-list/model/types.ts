@@ -1,14 +1,4 @@
-import type { MuscleGroup } from '@entities';
-
-export interface WorkoutExercise {
-  id: string;
-  name: string;
-  muscleGroup: MuscleGroup;
-  weight: number;
-  reps: number;
-  sets: number;
-  completedSets: number;
-}
+import type { UpdateExerciseDto, WorkoutExercise } from 'src/entities/workout-exercise/model/types';
 
 export interface WorkoutList {
   id: string;
@@ -22,11 +12,8 @@ export interface WorkoutList {
 export interface CreateWorkoutListDto {
   name: string;
   description: string;
-  exercises: Omit<WorkoutExercise, 'id' | 'completedSets'>[];
+  exercises: Omit<WorkoutExercise, 'id'>[];
 }
-
-export type UpdateExerciseDto = Omit<WorkoutExercise, 'id' | 'completedSets'> &
-  Partial<Pick<WorkoutExercise, 'id' | 'completedSets'>>;
 
 export interface UpdateWorkoutListDto {
   name: string;
@@ -37,7 +24,7 @@ export interface UpdateWorkoutListDto {
 export interface WorkoutListExportItem {
   name: string;
   description: string;
-  exercises: Omit<WorkoutExercise, 'id' | 'completedSets'>[];
+  exercises: Omit<WorkoutExercise, 'id'>[];
   createdAt?: string;
   lastUsedAt?: string | null;
 }

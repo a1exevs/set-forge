@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './app/model/routes/__root'
 import { Route as RegisterRouteImport } from './app/model/routes/register'
 import { Route as ProfileRouteImport } from './app/model/routes/profile'
 import { Route as LoginRouteImport } from './app/model/routes/login'
+import { Route as HistoryRouteImport } from './app/model/routes/history'
 import { Route as CreateRouteImport } from './app/model/routes/create'
 import { Route as IndexRouteImport } from './app/model/routes/index'
 import { Route as WorkoutIdRouteImport } from './app/model/routes/workout/$id'
@@ -30,6 +31,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreateRoute = CreateRouteImport.update({
@@ -56,6 +62,7 @@ const EditIdRoute = EditIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/create': typeof CreateRoute
+  '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/create': typeof CreateRoute
+  '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/create': typeof CreateRoute
+  '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/create'
+    | '/history'
     | '/login'
     | '/profile'
     | '/register'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/create'
+    | '/history'
     | '/login'
     | '/profile'
     | '/register'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/create'
+    | '/history'
     | '/login'
     | '/profile'
     | '/register'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CreateRoute: typeof CreateRoute
+  HistoryRoute: typeof HistoryRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/create': {
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CreateRoute: CreateRoute,
+  HistoryRoute: HistoryRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,

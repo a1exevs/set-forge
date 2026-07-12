@@ -7,9 +7,20 @@ interface ApiResultOptions {
   type: Function;
   description?: string;
   status?: number;
+  nullable?: boolean;
 }
 
 export const ApiResult = (options: ApiResultOptions) => {
+  const dataSchema = options.nullable
+    ? {
+        nullable: true,
+        allOf: [{ $ref: getSchemaPath(options.type) }],
+      }
+    : {
+        type: 'object',
+        allOf: [{ $ref: getSchemaPath(options.type) }],
+      };
+
   return applyDecorators(
     ApiExtraModels(CommonResponse.Swagger.CommonResponseDto, options.type),
     ApiResponse({
@@ -20,14 +31,7 @@ export const ApiResult = (options: ApiResultOptions) => {
           { $ref: getSchemaPath(CommonResponse.Swagger.CommonResponseDto) },
           {
             properties: {
-              data: {
-                type: 'object',
-                allOf: [
-                  {
-                    $ref: getSchemaPath(options?.type),
-                  },
-                ],
-              },
+              data: dataSchema,
             },
           },
         ],

@@ -1,8 +1,12 @@
-import { clearAccessToken, getAccessToken, setAccessToken } from 'src/shared/api/access-token.store';
-import { getApiBaseUrl } from 'src/shared/api/api-base-url';
-import type { CommonResponseEnvelope } from 'src/shared/api/common-response.types';
-import { apiRequest } from 'src/shared/api/http-client';
-import { ResultCodes } from 'src/shared/api/result-codes';
+import {
+  apiRequest,
+  clearAccessToken,
+  type CommonResponseEnvelope,
+  getAccessToken,
+  getApiBaseUrl,
+  ResultCodes,
+  setAccessToken,
+} from '@shared';
 
 export function toAbsoluteFromApiOrigin(pathOrUrl: string): string {
   if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://') || pathOrUrl.startsWith('data:')) {

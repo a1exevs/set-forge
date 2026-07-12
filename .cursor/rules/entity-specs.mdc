@@ -1,0 +1,30 @@
+---
+description: Entity spec format — DB, API contract, client entity (spec-anchored truth)
+globs: [".cursor/specs/entities/*.entity.spec.md", "server/src/**/*.model.ts", "client/src/entities/**"]
+---
+
+# Entity specs
+
+Path: `.cursor/specs/entities/<kebab-domain>.entity.spec.md`
+
+One file per server module or client `entities/<name>/` slice. Child DB tables without their own REST API use a dedicated `*.entity.spec.md` when the client has a separate entity folder; canonical schema for the child table lives in that file, parent entity spec links to it.
+
+## Required sections (in order)
+
+1. **Overview** — domain purpose, related entity specs, table list. Present tense only.
+2. **Database** — `###` per table: columns, types, FK, indexes, migrations.
+3. **Invariants** — ownership, uniqueness, cascades, statuses.
+4. **Server** — Location, Models, Module wiring.
+5. **Client** — Location, Types.
+6. **API contract** — follows [server-api.mdc](server-api.mdc): endpoints, DTOs, service behaviour.
+7. **Exposed API / Methods** — hooks, query keys, client API functions (do not break).
+8. **Tests** — unit, E2E paths.
+9. **Used by** — links to consuming page specs in `specs/pages/`.
+10. **References** — related entities, migrations.
+
+## Rules
+
+- API contract lives **only** in entity specs; page specs use `## API usage` with links here.
+- Describe **current code state** — no Stage N, no delivery roadmap, no removed features as active.
+- Update entity spec first when DB schema or API changes.
+- New entity → create file + add line to [.cursor/README.md](../README.md).

@@ -160,6 +160,122 @@ describe('useConfirm', () => {
         expect(onConfirmResult).toHaveBeenCalledWith(false);
       });
     });
+
+    it('renders an alternate button when alternateText is provided', async () => {
+      const TestConsumerAlternate: FC<{ onConfirmResult?: (result: string) => void }> = ({ onConfirmResult }) => {
+        const confirmDialog = useConfirm();
+
+        const handleOpen = async (): Promise<void> => {
+          const result = await confirmDialog({
+            title: 'Finish workout?',
+            confirmationText: 'Finish',
+            alternateText: 'Exit without saving',
+            cancellationText: 'Cancel',
+          });
+          onConfirmResult?.(result);
+        };
+
+        return (
+          <button type="button" onClick={handleOpen}>
+            Open
+          </button>
+        );
+      };
+
+      const user = userEvent.setup();
+      render(
+        <ConfirmDialogProvider>
+          <TestConsumerAlternate />
+        </ConfirmDialogProvider>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Open' }));
+
+      await waitFor((): void => {
+        expect(screen.getByRole('button', { name: 'Exit without saving' })).toBeInTheDocument();
+      });
+    });
+
+    it('returns alternate when the alternate button is clicked', async () => {
+      const TestConsumerAlternate: FC<{ onConfirmResult?: (result: string) => void }> = ({ onConfirmResult }) => {
+        const confirmDialog = useConfirm();
+
+        const handleOpen = async (): Promise<void> => {
+          const result = await confirmDialog({
+            title: 'Finish workout?',
+            confirmationText: 'Finish',
+            alternateText: 'Exit without saving',
+            cancellationText: 'Cancel',
+          });
+          onConfirmResult?.(result);
+        };
+
+        return (
+          <button type="button" onClick={handleOpen}>
+            Open
+          </button>
+        );
+      };
+
+      const user = userEvent.setup();
+      const onConfirmResult = jest.fn();
+
+      render(
+        <ConfirmDialogProvider>
+          <TestConsumerAlternate onConfirmResult={onConfirmResult} />
+        </ConfirmDialogProvider>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Open' }));
+
+      await waitFor((): void => {
+        expect(screen.getByRole('button', { name: 'Exit without saving' })).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Exit without saving' }));
+
+      await waitFor((): void => {
+        expect(onConfirmResult).toHaveBeenCalledWith('alternate');
+      });
+    });
+
+    it('returns confirm when Finish is clicked in a three-way dialog', async () => {
+      const TestConsumerAlternate: FC<{ onConfirmResult?: (result: string) => void }> = ({ onConfirmResult }) => {
+        const confirmDialog = useConfirm();
+
+        const handleOpen = async (): Promise<void> => {
+          const result = await confirmDialog({
+            title: 'Finish workout?',
+            confirmationText: 'Finish',
+            alternateText: 'Exit without saving',
+            cancellationText: 'Cancel',
+          });
+          onConfirmResult?.(result);
+        };
+
+        return (
+          <button type="button" onClick={handleOpen}>
+            Open
+          </button>
+        );
+      };
+
+      const user = userEvent.setup();
+      const onConfirmResult = jest.fn();
+
+      render(
+        <ConfirmDialogProvider>
+          <TestConsumerAlternate onConfirmResult={onConfirmResult} />
+        </ConfirmDialogProvider>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Open' }));
+      await user.click(await screen.findByRole('button', { name: 'Finish' }));
+
+      await waitFor((): void => {
+        expect(onConfirmResult).toHaveBeenCalledWith('confirm');
+      });
+    });
   });
 
   describe('error', () => {

@@ -153,7 +153,6 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
             if (orig) {
               return {
                 id: orig.id,
-                completedSets: orig.completedSets,
                 ...toExerciseSubmitPayload(ex),
               };
             }

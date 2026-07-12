@@ -1,3 +1,18 @@
+// api
+export {
+  apiRequest,
+  ApiRequestError,
+  clearAccessToken,
+  getAccessToken,
+  getApiBaseUrl,
+  refreshAccessToken,
+  ResultCodes,
+  setAccessToken,
+  type ApiRequestOptions,
+  type CommonResponseEnvelope,
+  type HttpMethod,
+} from 'src/shared/api';
+
 // model
 export {
   DESKTOP_4K_SCREEN_WIDTH_PX,

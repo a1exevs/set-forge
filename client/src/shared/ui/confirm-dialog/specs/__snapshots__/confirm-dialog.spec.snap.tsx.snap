@@ -62,7 +62,7 @@ exports[`ConfirmDialog matches snapshot with custom button texts 1`] = `
                   All completed sets will be reset.
                 </p>
                 <div
-                  class="buttons "
+                  class="buttons  "
                 >
                   <button
                     class="button secondary md"
@@ -154,7 +154,7 @@ exports[`ConfirmDialog matches snapshot with default options 1`] = `
                   Confirm action
                 </h2>
                 <div
-                  class="buttons "
+                  class="buttons  "
                 >
                   <button
                     class="button secondary md"
@@ -249,7 +249,7 @@ exports[`ConfirmDialog matches snapshot with description 1`] = `
                   This action cannot be undone.
                 </p>
                 <div
-                  class="buttons "
+                  class="buttons  "
                 >
                   <button
                     class="button secondary md"
@@ -339,7 +339,7 @@ exports[`ConfirmDialog matches snapshot with hideCancelButton 1`] = `
                   Please enter a list name
                 </h2>
                 <div
-                  class="buttons singleButton"
+                  class="buttons singleButton "
                 >
                   <button
                     class="button primary md"
