@@ -73,7 +73,7 @@ Entity: [workout-list](../entities/workout-list.entity.spec.md). Related pages: 
 ### Menu actions
 
 6. **Edit** → `navigate({ to: '/edit/$id', params: { id } })`.
-7. **Delete** → confirm → `useDeleteWorkoutListMutation().mutateAsync(id)`; updates cache.
+7. **Delete** → confirm → `deleteWorkoutList(id)` then `clearWorkoutSessionCachesForDeletedList(id)` in logic layer. List mutation updates list cache only; session cache helper clears `active`, `forList`, and `detail` for the removed list. Server discards any active session for that list (not saved to history).
 
 ### Import / Export
 
@@ -153,7 +153,7 @@ Patterns: 3-layer Data → Logic → Presentation; FSD `pages/home`, `entities/w
 ## Tests
 
 - Storybook: `Pages/HomePage` — `home-page.stories.tsx`
-- No dedicated page unit/snapshot specs (widget/entity tests cover behaviour)
+- Unit: `pages/home/ui/specs/home-page-logic-layer.spec.unit.tsx` — delete confirms, list delete + session cache clear orchestration
 
 ---
 

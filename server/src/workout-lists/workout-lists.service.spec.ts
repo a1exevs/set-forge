@@ -5,6 +5,7 @@ import { HttpStatus, NotFoundException } from '@nestjs/common';
 import { WorkoutListsService } from '@workout-lists/workout-lists.service';
 import { WorkoutList } from '@workout-lists/workout-list.model';
 import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
+import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
 
 import {
   CreateWorkoutListRequest,
@@ -54,6 +55,7 @@ describe('WorkoutListsService', () => {
   let service: WorkoutListsService;
   let listModel: { findAll: jest.Mock; findOne: jest.Mock; create: jest.Mock };
   let exerciseModel: { bulkCreate: jest.Mock; destroy: jest.Mock; update: jest.Mock };
+  let workoutSessionsService: { discardActiveForList: jest.Mock };
   let connection: { transaction: jest.Mock };
   const userId = 7;
 
@@ -62,6 +64,7 @@ describe('WorkoutListsService', () => {
 
     listModel = { findAll: jest.fn(), findOne: jest.fn(), create: jest.fn() };
     exerciseModel = { bulkCreate: jest.fn(), destroy: jest.fn(), update: jest.fn() };
+    workoutSessionsService = { discardActiveForList: jest.fn().mockResolvedValue(undefined) };
     connection = { transaction: jest.fn(async (cb: (t: unknown) => unknown) => cb({})) };
 
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -69,6 +72,7 @@ describe('WorkoutListsService', () => {
         WorkoutListsService,
         { provide: getModelToken(WorkoutList), useValue: listModel },
         { provide: getModelToken(WorkoutExercise), useValue: exerciseModel },
+        { provide: WorkoutSessionsService, useValue: workoutSessionsService },
         { provide: getConnectionToken(), useValue: connection },
       ],
     }).compile();
@@ -186,13 +190,20 @@ describe('WorkoutListsService', () => {
   });
 
   describe('remove', () => {
-    it('destroys an owned list and returns result', async () => {
+    it('discards active sessions and destroys an owned list in one transaction', async () => {
       const list = buildListModel([buildExercise()]);
       listModel.findOne.mockResolvedValue(list);
+      let transaction: unknown;
+      connection.transaction.mockImplementation(async (cb: (t: unknown) => unknown) => {
+        transaction = { id: 'tx-1' };
+        return cb(transaction);
+      });
 
       const result = await service.remove(userId, 'list-1');
 
-      expect(list.destroy).toBeCalledTimes(1);
+      expect(connection.transaction).toBeCalledTimes(1);
+      expect(workoutSessionsService.discardActiveForList).toBeCalledWith(userId, 'list-1', transaction);
+      expect(list.destroy).toBeCalledWith({ transaction });
       expect(result).toEqual({ result: true });
     });
 
@@ -205,6 +216,9 @@ describe('WorkoutListsService', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(NotFoundException);
       }
+
+      expect(workoutSessionsService.discardActiveForList).not.toBeCalled();
+      expect(connection.transaction).not.toBeCalled();
     });
   });
 
