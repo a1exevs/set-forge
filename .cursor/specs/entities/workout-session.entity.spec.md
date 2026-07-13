@@ -46,6 +46,7 @@ See [workout-session-exercise.entity.spec.md](workout-session-exercise.entity.sp
 - `resync` never auto-finishes — session stays `active` even if clamping leaves all sets complete.
 - History queries only `status='completed'`, ordered `finishedAt DESC, startedAt DESC, id DESC`.
 - `discard` hard-deletes an **active** session; it never appears in history.
+- Deleting the source [workout list](workout-list.entity.spec.md) hard-discards an **active** session for that list via `discardActiveForList` (called from list `remove` before delete). **Completed** sessions remain in history with `workoutListId: null`.
 
 ---
 
@@ -98,7 +99,7 @@ interface WorkoutHistoryPage {
 
 Session exercise type: [workout-session-exercise.entity.spec.md](workout-session-exercise.entity.spec.md).
 
-React Query keys: `workoutSessionQueryKeys` (`.forList`, `.active`, `.detail`, `.history`). Mutations call `syncSessionCaches` to keep `forList`, `active` (null when status ≠ `active`), and `detail` in sync on start, increment, finish, and resync; `discard` removes `forList` and sets `active` to null.
+React Query keys: `workoutSessionQueryKeys` (`.forList`, `.active`, `.detail`, `.history`). Mutations call `syncSessionCaches` to keep `forList`, `active` (null when status ≠ `active`), and `detail` in sync on start, increment, finish, and resync; `discard` removes `forList` and sets `active` to null. List delete on home page calls `clearWorkoutSessionCachesForDeletedList` after the list mutation (logic layer).
 
 ---
 
@@ -147,6 +148,7 @@ Nested `exercises` shape: [workout-session-exercise.entity.spec.md](workout-sess
 - `finish` — idempotent complete
 - `resync` — active only; rebuilds exercises; never auto-finishes
 - `discard` — active only; hard-deletes session and cascaded exercises; not in history
+- `discardActiveForList` — hard-deletes all active sessions for a list; used by list `remove`; accepts optional transaction
 - `getHistory` — `limit` 1–50 (default 20), `offset` ≥ 0; `hasMore = offset + items.length < total`
 
 ---
@@ -162,6 +164,7 @@ Nested `exercises` shape: [workout-session-exercise.entity.spec.md](workout-sess
 | `finishWorkoutSession(sessionId)` | function | `POST .../finish` |
 | `resyncWorkoutSession(sessionId)` | function | `POST .../resync` |
 | `discardWorkoutSession(sessionId)` | function | `DELETE /workout-sessions/:id` |
+| `clearWorkoutSessionCachesForDeletedList(qc, listId)` | function | Clears `active`, `forList`, and cached `detail` after list delete |
 | `useActiveWorkoutSessionQuery(listId)` | hook | Workout mode phase detection; edit-page resync prompt |
 | `useStartWorkoutSessionMutation()` | hook | Explicit start on workout mode preview |
 | `useWorkoutHistoryInfiniteQuery(enabled)` | hook | History page infinite query |
@@ -176,8 +179,8 @@ Nested `exercises` shape: [workout-session-exercise.entity.spec.md](workout-sess
 ## Tests
 
 - Unit: `workout-sessions.service.spec.ts`, `workout-sessions.controller.spec.ts`, `workout-sessions.model.spec.ts`, DTO specs
-- E2E: `server/test/e2e/workout-lists-sessions.e2e-spec.ts` (includes discard flow)
-- Client: `entities/workout-session/api/specs/workout-session-api.spec.unit.ts`
+- E2E: `server/test/e2e/workout-lists-sessions.e2e-spec.ts` (discard flow; list delete discards active session, keeps completed history)
+- Client: `entities/workout-session/api/specs/workout-session-api.spec.unit.ts`, `entities/workout-session/model/specs/clear-workout-session-caches-for-deleted-list.spec.unit.ts`
 
 ---
 

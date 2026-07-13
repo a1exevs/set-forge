@@ -34,6 +34,8 @@ export class WorkoutSessionExercise extends Model<WorkoutSessionExercise, IWorko
   @Column({ type: DataType.UUID, allowNull: false })
   workoutSessionId: string;
 
+  // TODO: add DB FK → workout_exercises.id (ON DELETE SET NULL) after list update uses
+  // selective upsert instead of destroy-all + bulkCreate.
   @ApiProperty({
     example: 'b7e2d1f4-...',
     description: 'Source template exercise identifier used to resync progress (null when not linked)',

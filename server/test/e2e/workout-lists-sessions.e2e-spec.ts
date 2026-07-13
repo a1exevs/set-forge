@@ -3,6 +3,7 @@ import { getModelToken } from '@nestjs/sequelize';
 
 import { Routes, ResultCodes } from '@common/constants';
 import { WorkoutList } from '@workout-lists/workout-list.model';
+import { WorkoutSession } from '@workout-sessions/workout-session.model';
 import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
 
 import * as request from 'supertest';
@@ -449,6 +450,100 @@ describe('Workout lists and sessions business logic', () => {
         auth,
         request(app.getHttpServer()).delete(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}/${completedSessionId}`),
       ).expect(HttpStatus.BAD_REQUEST);
+    });
+  });
+
+  describe(`${Routes.ENDPOINT_WORKOUT_LISTS} delete`, () => {
+    it('discards an active session when the source list is deleted', async () => {
+      const created = await withAuth(
+        auth,
+        request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}`)
+          .send({
+            name: 'Delete With Active Session',
+            description: '',
+            exercises: [exercisePayload],
+          }),
+      ).expect(HttpStatus.CREATED);
+
+      const listId = created.body.data.id;
+
+      const started = await withAuth(
+        auth,
+        request(app.getHttpServer()).post(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}`).send({ workoutListId: listId }),
+      ).expect(HttpStatus.CREATED);
+
+      const sessionId = started.body.data.id;
+      const sessionExerciseId = started.body.data.exercises[0].id;
+
+      await withAuth(auth, request(app.getHttpServer()).delete(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}/${listId}`))
+        .expect(HttpStatus.OK)
+        .expect(response => {
+          expect(response.body.data.result).toBe(true);
+          expect(response.body.resultCode).toBe(ResultCodes.OK);
+        });
+
+      const sessionRepo = app.get<typeof WorkoutSession>(getModelToken(WorkoutSession));
+      const deletedSession = await sessionRepo.findByPk(sessionId);
+      expect(deletedSession).toBeNull();
+
+      await withAuth(
+        auth,
+        request(app.getHttpServer()).patch(
+          `${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}/${sessionId}/exercises/${sessionExerciseId}/progress`,
+        ),
+      ).expect(HttpStatus.NOT_FOUND);
+
+      const history = await withAuth(
+        auth,
+        request(app.getHttpServer()).get(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}?limit=20&offset=0`),
+      ).expect(HttpStatus.OK);
+
+      expect(history.body.data.items.some((item: { id: string }) => item.id === sessionId)).toBe(false);
+    });
+
+    it('keeps completed sessions in history when the source list is deleted', async () => {
+      const created = await withAuth(
+        auth,
+        request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}`)
+          .send({
+            name: 'Delete With Completed Session',
+            description: '',
+            exercises: [exercisePayload],
+          }),
+      ).expect(HttpStatus.CREATED);
+
+      const listId = created.body.data.id;
+
+      const started = await withAuth(
+        auth,
+        request(app.getHttpServer()).post(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}`).send({ workoutListId: listId }),
+      ).expect(HttpStatus.CREATED);
+
+      const completedSessionId = started.body.data.id;
+
+      await withAuth(
+        auth,
+        request(app.getHttpServer()).post(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}/${completedSessionId}/finish`),
+      ).expect(HttpStatus.CREATED);
+
+      await withAuth(
+        auth,
+        request(app.getHttpServer()).delete(`${api}/${Routes.ENDPOINT_WORKOUT_LISTS}/${listId}`),
+      ).expect(HttpStatus.OK);
+
+      const sessionRepo = app.get<typeof WorkoutSession>(getModelToken(WorkoutSession));
+      const completedSession = await sessionRepo.findByPk(completedSessionId);
+      expect(completedSession?.status).toBe(SESSION_STATUS.COMPLETED);
+      expect(completedSession?.workoutListId).toBeNull();
+
+      const history = await withAuth(
+        auth,
+        request(app.getHttpServer()).get(`${api}/${Routes.ENDPOINT_WORKOUT_SESSIONS}?limit=20&offset=0`),
+      ).expect(HttpStatus.OK);
+
+      expect(history.body.data.items.some((item: { id: string }) => item.id === completedSessionId)).toBe(true);
     });
   });
 });
