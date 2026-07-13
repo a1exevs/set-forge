@@ -1,3 +1,16 @@
+# Release v0.5.0
+## What's Changed
+* [Common] RELEASE-NOTES.md update v0.4.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/50
+* [Bugfix] Register /profile route in Storybook page router by @a1exevs in https://github.com/a1exevs/set-forge/pull/48
+* [Common] Add memory checks to Selectel deploy runbook by @a1exevs in https://github.com/a1exevs/set-forge/pull/49
+* [Bugfix] Fix OG image layout and unify site metadata by @a1exevs in https://github.com/a1exevs/set-forge/pull/52
+* [Common] Extend Selectel deploy runbook with memory checks and prod DB copy by @a1exevs in https://github.com/a1exevs/set-forge/pull/51
+* [Common] Align local MySQL env examples and document volume reset for ERROR 1045 by @a1exevs in https://github.com/a1exevs/set-forge/pull/53
+* [Feature] Workout sessions and history page by @a1exevs in https://github.com/a1exevs/set-forge/pull/54
+* [Common] Version increase v0.5.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/55
+
+**Full Changelog**: https://github.com/a1exevs/set-forge/compare/v0.4.0...v0.5.0
+
 # Release v0.4.0
 ## What's Changed
 * [Common] RELEASE-NOTES.md update v0.3.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/37
