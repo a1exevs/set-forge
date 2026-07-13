@@ -551,6 +551,8 @@ Check that `SERVER_URL` and `CLIENT_URL` in `server/.production.env` **exactly**
 
 `VITE_PUBLIC_ORIGIN` in the root `.env` must match `CLIENT_URL` (see [§8.3](#83-vite_public_origin-og-meta-tags)). Rebuild `client-prod` after changing it. Crawlers need absolute URLs — placeholders like `%VITE_PUBLIC_ORIGIN%` in the served HTML mean the image was built without the variable set.
 
+If the image opens directly in the browser but a preview tool (e.g. opengraph.xyz) shows a broken image, check `Cross-Origin-Resource-Policy` on `/logo-og.png` — it must be `cross-origin` for `client/public/` assets (see [`client/nginx.conf`](client/nginx.conf)). Rebuild `client-prod` after changing nginx config.
+
 ### Not enough memory during build
 
 Increase VDS RAM or add swap:
