@@ -2,7 +2,7 @@
   "short_name": "Set Forge",
   "name": "Set Forge — Workout Planner & Strength Training Tracker",
   "description": "Build workout lists, log sets and weights, rate perceived effort, and track strength progress over time.",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "icons": [
     {
       "src": "favicon.ico",
