@@ -42,13 +42,12 @@ const WORKOUT_LIST: WorkoutList = {
 };
 
 describe('HomePageLogicLayer', () => {
-  const deleteWorkoutList = jest.fn<Promise<void>, [string]>();
-  const clearWorkoutSessionCachesForDeletedList = jest.fn<(workoutListId: string) => void>();
+  const deleteWorkoutList = jest.fn(async (_id: string): Promise<void> => undefined);
+  const clearWorkoutSessionCachesForDeletedList = jest.fn((_workoutListId: string): void => undefined);
 
   beforeEach(() => {
     jest.clearAllMocks();
     confirmDialogMock.mockResolvedValue(true);
-    deleteWorkoutList.mockResolvedValue(undefined);
   });
 
   it('deletes the list and clears workout session caches after confirmation', async () => {
