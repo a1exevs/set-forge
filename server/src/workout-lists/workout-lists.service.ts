@@ -6,6 +6,7 @@ import { Sequelize } from 'sequelize-typescript';
 
 import { WorkoutList } from '@workout-lists/workout-list.model';
 import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
+import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
 import {
   CreateWorkoutListRequest,
   ImportWorkoutListsRequest,
@@ -22,6 +23,7 @@ export class WorkoutListsService {
   constructor(
     @InjectModel(WorkoutList) private workoutListRepository: typeof WorkoutList,
     @InjectModel(WorkoutExercise) private workoutExerciseRepository: typeof WorkoutExercise,
+    private workoutSessionsService: WorkoutSessionsService,
     @InjectConnection() private sequelize: Sequelize,
   ) {}
 
@@ -94,7 +96,12 @@ export class WorkoutListsService {
 
   public async remove(userId: number, id: string): Promise<{ result: boolean }> {
     const list = await this.findOwnedOrThrow(userId, id);
-    await list.destroy();
+
+    await this.sequelize.transaction(async transaction => {
+      await this.workoutSessionsService.discardActiveForList(userId, id, transaction);
+      await list.destroy({ transaction });
+    });
+
     return { result: true };
   }
 

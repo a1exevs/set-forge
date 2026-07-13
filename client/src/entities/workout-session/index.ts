@@ -8,6 +8,7 @@ export {
   startWorkoutSession,
 } from 'src/entities/workout-session/api';
 export {
+  clearWorkoutSessionCachesForDeletedList,
   useActiveWorkoutSessionQuery,
   useDiscardWorkoutSessionMutation,
   useFinishWorkoutSessionMutation,

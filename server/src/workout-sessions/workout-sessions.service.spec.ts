@@ -85,7 +85,7 @@ const buildListModel = (exercises: Record<string, unknown>[], overrides: Record<
 
 describe('WorkoutSessionsService', () => {
   let service: WorkoutSessionsService;
-  let sessionModel: { findOne: jest.Mock; create: jest.Mock; findAndCountAll: jest.Mock };
+  let sessionModel: { findOne: jest.Mock; create: jest.Mock; findAndCountAll: jest.Mock; destroy: jest.Mock };
   let sessionExerciseModel: { bulkCreate: jest.Mock; destroy: jest.Mock };
   let listModel: { findOne: jest.Mock };
   let connection: { transaction: jest.Mock };
@@ -94,7 +94,7 @@ describe('WorkoutSessionsService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
 
-    sessionModel = { findOne: jest.fn(), create: jest.fn(), findAndCountAll: jest.fn() };
+    sessionModel = { findOne: jest.fn(), create: jest.fn(), findAndCountAll: jest.fn(), destroy: jest.fn() };
     sessionExerciseModel = { bulkCreate: jest.fn(), destroy: jest.fn() };
     listModel = { findOne: jest.fn() };
     connection = { transaction: jest.fn(async (cb: (t: unknown) => unknown) => cb({})) };
@@ -373,6 +373,27 @@ describe('WorkoutSessionsService', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(NotFoundException);
       }
+    });
+  });
+
+  describe('discardActiveForList', () => {
+    it('hard-deletes active sessions for the list', async () => {
+      await service.discardActiveForList(userId, 'list-1');
+
+      expect(sessionModel.destroy).toBeCalledWith({
+        where: { userId, workoutListId: 'list-1', status: SESSION_STATUS.ACTIVE },
+      });
+    });
+
+    it('passes the transaction when provided', async () => {
+      const transaction = { id: 'tx-1' };
+
+      await service.discardActiveForList(userId, 'list-1', transaction as never);
+
+      expect(sessionModel.destroy).toBeCalledWith({
+        where: { userId, workoutListId: 'list-1', status: SESSION_STATUS.ACTIVE },
+        transaction,
+      });
     });
   });
 

@@ -20,7 +20,7 @@ Table: `workout_session_exercises`.
 |--------|------|-------|
 | `id` | UUID | PK, default `UUIDV4` |
 | `workout_session_id` | UUID | FK → `workout_sessions.id`, `ON DELETE CASCADE`, not null |
-| `source_exercise_id` | UUID | nullable — template `workout_exercises.id` for resync |
+| `source_exercise_id` | UUID | nullable — soft ref to template `workout_exercises.id` for resync (no DB FK yet; see TODO below) |
 | `name` | STRING | not null |
 | `muscle_group` | STRING | not null, `MuscleGroup` |
 | `weight` | FLOAT | not null, default `0` |
@@ -44,6 +44,8 @@ Migration: `20260630120000-workout-sessions.js`.
 - Exercise is **complete** when `completedSets === sets`.
 - `incrementProgress` caps at `sets`; `resync` preserves `completedSets` per matching `sourceExerciseId` (clamped to new `sets`).
 - `resync` never auto-finishes the session.
+- `sourceExerciseId` is a soft link for resync only; snapshot fields remain authoritative for display and history.
+- TODO: add DB FK `source_exercise_id` → `workout_exercises.id` with `ON DELETE SET NULL` after list `update` stops using destroy-all + bulkCreate (that pattern would null every link on save).
 
 ---
 
