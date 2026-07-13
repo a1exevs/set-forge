@@ -103,6 +103,8 @@ For local development, Vite proxies `/api` to a backend target:
 
 `VITE_PUBLIC_ORIGIN` (see [`.env.example`](.env.example)) is substituted into `index.html` OG/Twitter meta tags at dev/build time. Use the same public origin as `CLIENT_URL` in production (no trailing slash). For the Docker stack, set it in the root `.env` — compose passes it as a build arg; env files are not copied into the image. See [DEPLOY-SELECTEL.md](../DEPLOY-SELECTEL.md#83-vite_public_origin-og-meta-tags).
 
+In production, [`nginx.conf`](nginx.conf) sets `Cross-Origin-Resource-Policy: same-origin` on HTML and `/assets/` chunks, but `cross-origin` on root files from `public/` (`logo-og.png`, favicons, `manifest.json`, etc.) so browser-based OG preview tools can load the image. When adding a new root static file in `public/`, extend the `map` in `nginx.conf` if its name does not match the existing patterns.
+
 The app intentionally keeps one same-origin API base for both prod and dev.
 
 ## Environment used for verification

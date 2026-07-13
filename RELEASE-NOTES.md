@@ -1,3 +1,11 @@
+# Release v0.5.1
+## What's Changed
+* [Common] RELEASE-NOTES.md update v0.5.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/58
+* [Bugfix] Discarding active workout sessions when deleting a list by @a1exevs in https://github.com/a1exevs/set-forge/pull/59
+* [Common] Version increase v0.5.1 by @a1exevs in https://github.com/a1exevs/set-forge/pull/60
+
+**Full Changelog**: https://github.com/a1exevs/set-forge/compare/v0.5.0...v0.5.1
+
 # Release v0.5.0
 ## What's Changed
 * [Common] RELEASE-NOTES.md update v0.4.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/50
