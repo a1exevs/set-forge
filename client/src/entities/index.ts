@@ -32,6 +32,7 @@ export {
 export type { WorkoutSessionExercise } from 'src/entities/workout-session-exercise';
 export {
   useActiveWorkoutSessionQuery,
+  clearWorkoutSessionCachesForDeletedList,
   useDiscardWorkoutSessionMutation,
   useFinishWorkoutSessionMutation,
   useIncrementSessionProgressMutation,

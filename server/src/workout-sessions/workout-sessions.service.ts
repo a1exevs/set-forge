@@ -164,6 +164,14 @@ export class WorkoutSessionsService {
     return { result: true };
   }
 
+  // Hard-deletes active sessions for a workout list (e.g. before the list itself is removed).
+  public async discardActiveForList(userId: number, workoutListId: string, transaction?: Transaction): Promise<void> {
+    await this.workoutSessionRepository.destroy({
+      where: { userId, workoutListId, status: SESSION_STATUS.ACTIVE },
+      ...(transaction ? { transaction } : {}),
+    });
+  }
+
   // Re-snapshot an active session from its current workout list, preserving progress by sourceExerciseId.
   public async resync(userId: number, sessionId: string): Promise<WorkoutSessionResponse.Dto> {
     const session = await this.findOwnedOrThrow(userId, sessionId);

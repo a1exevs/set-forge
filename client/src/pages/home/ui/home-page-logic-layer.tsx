@@ -8,6 +8,7 @@ import HomePage from 'src/pages/home/ui/home-page';
 type Props = {
   workoutLists: WorkoutList[];
   deleteWorkoutList: (id: string) => Promise<void>;
+  clearWorkoutSessionCachesForDeletedList: (workoutListId: string) => void;
   exportAllWorkoutLists: () => Promise<WorkoutListsExportFile>;
   importWorkoutLists: (file: WorkoutListsExportFile) => Promise<void>;
   onEdit: (id: string) => void;
@@ -17,6 +18,7 @@ type Props = {
 const HomePageLogicLayer: FC<Props> = ({
   workoutLists,
   deleteWorkoutList,
+  clearWorkoutSessionCachesForDeletedList,
   exportAllWorkoutLists,
   importWorkoutLists,
   onEdit,
@@ -34,6 +36,7 @@ const HomePageLogicLayer: FC<Props> = ({
     });
     if (ok) {
       await deleteWorkoutList(id);
+      clearWorkoutSessionCachesForDeletedList(id);
     }
   };
 

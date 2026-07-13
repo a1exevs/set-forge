@@ -22,6 +22,7 @@ const renderHomePage = (): ReturnType<typeof renderWithPageRouter> =>
       <HomePageLogicLayer
         workoutLists={mockWorkoutLists}
         deleteWorkoutList={async (): Promise<void> => undefined}
+        clearWorkoutSessionCachesForDeletedList={(): void => undefined}
         exportAllWorkoutLists={async () => ({
           formatVersion: 1,
           app: 'set-forge',

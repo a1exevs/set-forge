@@ -37,6 +37,7 @@ See [workout-exercise.entity.spec.md](workout-exercise.entity.spec.md) for colum
 - `exercises` must contain at least one entry on create and update (`@ArrayMinSize(1)`). Per-exercise rules: [workout-exercise.entity.spec.md](workout-exercise.entity.spec.md).
 - On update: existing exercises keep `id`; new omit `id` (server generates); removed are deleted; `position` follows array order.
 - Delete cascades to `workout_exercises`.
+- Delete hard-discards any **active** [workout session](workout-session.entity.spec.md) for the list (same effect as `discard`; not saved to history). **Completed** sessions are kept: `workout_list_id` becomes `null` via `ON DELETE SET NULL`; snapshot `workout_list_name` and exercises remain in history.
 
 ---
 
@@ -101,7 +102,7 @@ Exercise and `MuscleGroup` types: [workout-exercise.entity.spec.md](workout-exer
 | GET | `/workout-lists/:id` | `id` (UUID) | One owned list; 404 if missing |
 | POST | `/workout-lists` | `CreateWorkoutListRequest` | Create list |
 | PUT | `/workout-lists/:id` | `UpdateWorkoutListRequest` | Replace name/description/exercises |
-| DELETE | `/workout-lists/:id` | `id` (UUID) | Delete list → `{ result: true }` |
+| DELETE | `/workout-lists/:id` | `id` (UUID) | Delete list → `{ result: true }`. Discards active session for the list; completed history preserved |
 | GET | `/workout-lists/export` | — | Export all as `WorkoutListsExportFileResponse` |
 | POST | `/workout-lists/import` | `ImportWorkoutListsRequest` | Bulk import in one transaction |
 
@@ -148,6 +149,7 @@ Import response: `{ importedCount: number; lists: WorkoutList[] }`. Legacy bare 
 ### Service behaviour
 
 - `getAll`, `getOne`, `create`, `update`, `remove`, `exportAll`, `importAll`
+- `remove` runs in a transaction: calls `WorkoutSessionsService.discardActiveForList`, then deletes the list
 - `create`/`update` in transactions; `importAll` rolls back on any failure
 - `exportAll` → `toExportFile()` strips ids
 
