@@ -64,6 +64,27 @@
   min-width: 10rem;
 }
 
+.legal {
+  margin-top: $spacing-2xl;
+  text-align: center;
+  font-size: $font-size-sm;
+}
+
+.legalSep {
+  margin: 0 $spacing-sm;
+  color: $text-tertiary;
+}
+
+.legalLink {
+  color: $text-secondary;
+  text-decoration: none;
+
+  &:hover {
+    color: $text-primary;
+    text-decoration: underline;
+  }
+}
+
 @media (min-width: 768px) {
   .container {
     padding: $spacing-xl;

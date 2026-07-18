@@ -1,10 +1,12 @@
 import { render } from '@testing-library/react';
+import type { ReactNode } from 'react';
 
 import ProfilePage from 'src/pages/profile/ui/profile-page';
 
 jest.mock('@tanstack/react-router', () => ({
   useRouterState: ({ select }: { select: (state: { location: { pathname: string } }) => string }) =>
     select({ location: { pathname: '/profile' } }),
+  Link: ({ to, children }: { to: string; children: ReactNode }) => <a href={to}>{children}</a>,
 }));
 
 jest.mock('@widgets', () => ({

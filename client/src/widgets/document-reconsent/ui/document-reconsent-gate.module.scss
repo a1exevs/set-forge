@@ -1,0 +1,59 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-xl;
+  max-width: 30rem;
+}
+
+.title {
+  margin: 0;
+  font-size: $font-size-lg;
+  color: $text-primary;
+}
+
+.text {
+  margin: 0;
+  font-size: $font-size-base;
+  line-height: 1.5;
+  color: $text-secondary;
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  cursor: pointer;
+}
+
+.checkbox {
+  margin-top: 0.15rem;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.link {
+  color: $primary-color;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.error {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: $danger-color;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-sm;
+  margin-top: $spacing-sm;
+}

@@ -205,6 +205,12 @@ const AuthPage: FC<Props> = ({
           <Link to="/privacy" className={classes.legalLink}>
             Privacy Policy
           </Link>
+          <span className={classes.legalSep} aria-hidden>
+            ·
+          </span>
+          <Link to="/terms" className={classes.legalLink}>
+            Terms of Service
+          </Link>
         </p>
       </div>
     </div>

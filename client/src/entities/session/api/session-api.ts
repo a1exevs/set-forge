@@ -23,6 +23,7 @@ export function toAbsoluteFromApiOrigin(pathOrUrl: string): string {
 export type CurrentUser = {
   id: number;
   email: string;
+  documentsPendingAcceptance: boolean;
 };
 
 type AuthData = { userId: number; accessToken: string };
@@ -97,6 +98,17 @@ export async function deleteLogout(): Promise<void> {
   } finally {
     clearAccessToken();
   }
+}
+
+export async function patchDocumentsAcceptance(): Promise<CurrentUser> {
+  const res = await apiRequest<CurrentUser>('/auth/documents-acceptance', {
+    method: 'PATCH',
+    auth: true,
+  });
+  if (res.resultCode !== ResultCodes.OK || !res.data) {
+    throw new Error(res.messages[0] ?? 'Could not record document acceptance');
+  }
+  return res.data;
 }
 
 export async function deleteAccount(): Promise<void> {

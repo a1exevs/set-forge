@@ -75,6 +75,26 @@ exports[`ProfilePage matches snapshot 1`] = `
           Delete account
         </button>
       </div>
+      <footer
+        class="legal"
+      >
+        <a
+          href="/privacy"
+        >
+          Privacy Policy
+        </a>
+        <span
+          aria-hidden="true"
+          class="legalSep"
+        >
+          ·
+        </span>
+        <a
+          href="/terms"
+        >
+          Terms of Service
+        </a>
+      </footer>
     </main>
     <nav
       data-testid="main-tabs-bar"

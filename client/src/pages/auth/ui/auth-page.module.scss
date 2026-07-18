@@ -167,6 +167,11 @@
   font-size: $font-size-sm;
 }
 
+.legalSep {
+  margin: 0 $spacing-sm;
+  color: $text-tertiary;
+}
+
 .legalLink {
   color: $text-secondary;
   text-decoration: none;

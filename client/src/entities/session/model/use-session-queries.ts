@@ -6,6 +6,7 @@ import {
   deleteAccount,
   deleteLogout,
   fetchCurrentUser,
+  patchDocumentsAcceptance,
   postLogin,
   postRegistration,
 } from 'src/entities/session/api/session-api';
@@ -87,6 +88,17 @@ export function useLogoutMutation() {
     onSettled: () => {
       qc.removeQueries({ queryKey: sessionQueryKeys.me });
       void navigate({ to: '/login' });
+    },
+  });
+}
+
+export function useAcceptDocumentsMutation() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: patchDocumentsAcceptance,
+    onSuccess: user => {
+      qc.setQueryData(sessionQueryKeys.me, user);
     },
   });
 }

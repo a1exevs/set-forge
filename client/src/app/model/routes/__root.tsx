@@ -1,6 +1,8 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext, Outlet, redirect } from '@tanstack/react-router';
 
+import { DocumentReconsentGate } from '@widgets';
+
 import type { CurrentUser } from 'src/entities/session/api/session-api';
 import { bootstrapSessionAndPrimeCache } from 'src/entities/session/lib/bootstrap-session';
 import { sessionQueryKeys } from 'src/entities/session/model/session-keys';
@@ -48,5 +50,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       });
     }
   },
-  component: (): JSX.Element => <Outlet />,
+  component: (): JSX.Element => (
+    <>
+      <Outlet />
+      <DocumentReconsentGate />
+    </>
+  ),
 });

@@ -1,4 +1,4 @@
-import { useRouterState } from '@tanstack/react-router';
+import { Link, useRouterState } from '@tanstack/react-router';
 import { FC } from 'react';
 
 import { BrandWordmark, Button, UserAvatar, useTabSwipeNavigation } from '@shared';
@@ -61,6 +61,18 @@ const ProfilePage: FC<Props> = ({
             Delete account
           </Button>
         </div>
+
+        <footer className={classes.legal}>
+          <Link to="/privacy" className={classes.legalLink}>
+            Privacy Policy
+          </Link>
+          <span className={classes.legalSep} aria-hidden>
+            ·
+          </span>
+          <Link to="/terms" className={classes.legalLink}>
+            Terms of Service
+          </Link>
+        </footer>
       </main>
 
       <MainTabsBar />
