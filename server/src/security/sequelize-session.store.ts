@@ -12,6 +12,10 @@ type SessionAttributes = {
 
 const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000;
 
+// TODO: expired sessions are only removed lazily on access (see `get`). Rows whose sid is never
+// requested again (e.g. after the client gets a new session cookie) accumulate in the `sessions`
+// table indefinitely. Add a periodic reaper (`DELETE FROM sessions WHERE expiresAt <= NOW()` on an
+// unref'd interval or a cron) when volume warrants it.
 export class SequelizeSessionStore extends session.Store {
   private readonly sequelize: Sequelize;
   private readonly SessionModel: ReturnType<Sequelize['define']>;
