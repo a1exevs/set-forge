@@ -20,7 +20,13 @@ export function useCurrentUserQuery(enabled: boolean) {
 }
 
 type LoginVars = { email: string; password: string; captcha?: string; redirectTo?: string };
-type RegisterVars = { email: string; password: string; consent: boolean; redirectTo?: string };
+type RegisterVars = {
+  email: string;
+  password: string;
+  consent: boolean;
+  termsAccepted: boolean;
+  redirectTo?: string;
+};
 
 export function useLoginMutation() {
   const navigate = useNavigate();
@@ -54,7 +60,7 @@ export function useRegisterMutation() {
   return useMutation({
     mutationFn: async (vars: RegisterVars) => {
       const { redirectTo: _r, ...rest } = vars;
-      return postRegistration(rest.email, rest.password, rest.consent);
+      return postRegistration(rest.email, rest.password, rest.consent, rest.termsAccepted);
     },
     onSuccess: async (_data, vars) => {
       const user = await fetchCurrentUser();

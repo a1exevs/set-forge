@@ -69,7 +69,7 @@ describe('Account deletion cascade', () => {
   it('registers a user', () => {
     return request(app.getHttpServer())
       .post(`${api}/${Routes.ENDPOINT_AUTH}/registration`)
-      .send({ email: userEmail, password: userPassword, consent: true })
+      .send({ email: userEmail, password: userPassword, consent: true, termsAccepted: true })
       .expect(HttpStatus.CREATED)
       .expect(response => {
         userId = response.body.data.userId;

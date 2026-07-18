@@ -14,18 +14,21 @@ type Props = {
   email: string;
   password: string;
   consent: boolean;
+  termsAccepted: boolean;
   captcha: string;
   captchaImageUrl: string | null;
   showCaptcha: boolean;
   emailError: string | null;
   passwordError: string | null;
   consentError: string | null;
+  termsError: string | null;
   captchaError: string | null;
   formError: string | null;
   isSubmitting: boolean;
   onEmailChange: (v: string) => void;
   onPasswordChange: (v: string) => void;
   onConsentChange: (v: boolean) => void;
+  onTermsChange: (v: boolean) => void;
   onCaptchaChange: (v: string) => void;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
   redirectSearch: Record<string, string | undefined>;
@@ -56,18 +59,21 @@ const AuthPage: FC<Props> = ({
   email,
   password,
   consent,
+  termsAccepted,
   captcha,
   captchaImageUrl,
   showCaptcha,
   emailError,
   passwordError,
   consentError,
+  termsError,
   captchaError,
   formError,
   isSubmitting,
   onEmailChange,
   onPasswordChange,
   onConsentChange,
+  onTermsChange,
   onCaptchaChange,
   onSubmit,
   redirectSearch,
@@ -161,13 +167,30 @@ const AuthPage: FC<Props> = ({
                   disabled={isSubmitting}
                 />
                 <span>
-                  I have read and accept the{' '}
+                  I consent to the processing of my personal data as described in the{' '}
                   <Link to="/privacy" className={classes.consentLink} target="_blank" rel="noopener noreferrer">
                     Privacy Policy
                   </Link>
                 </span>
               </label>
               {consentError && <p className={classes.fieldError}>{consentError}</p>}
+
+              <label className={classes.consent}>
+                <input
+                  type="checkbox"
+                  className={classes.consentCheckbox}
+                  checked={termsAccepted}
+                  onChange={(e): void => onTermsChange(e.target.checked)}
+                  disabled={isSubmitting}
+                />
+                <span>
+                  I accept the{' '}
+                  <Link to="/terms" className={classes.consentLink} target="_blank" rel="noopener noreferrer">
+                    Terms of Use
+                  </Link>
+                </span>
+              </label>
+              {termsError && <p className={classes.fieldError}>{termsError}</p>}
             </>
           )}
 

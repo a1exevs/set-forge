@@ -11,7 +11,7 @@ describe('CreateUserRequest', () => {
 
   describe('Validation', () => {
     it('should be successful result', async () => {
-      const dto = new CreateUserRequest.Dto('test@gmail.com', '12345678', true);
+      const dto = new CreateUserRequest.Dto('test@gmail.com', '12345678', true, true);
       const errors = await validateDto(CreateUserRequest.Dto, dto);
       expect(errors.length).toBe(0);
     });
@@ -20,12 +20,13 @@ describe('CreateUserRequest', () => {
         'test@gmail.com',
         '12345678901234567890123456789012345678901234567890',
         true,
+        true,
       );
       const errors = await validateDto(CreateUserRequest.Dto, dto);
       expect(errors.length).toBe(0);
     });
     it('should has errors (values are not strings)', async () => {
-      const dto = new CreateUserRequest.Dto(1, 1, true);
+      const dto = new CreateUserRequest.Dto(1, 1, true, true);
       const errors = await validateDto(CreateUserRequest.Dto, dto);
       expect(errors.length).toBe(2);
       expect(errors[0].property).toBe('email');
@@ -38,7 +39,7 @@ describe('CreateUserRequest', () => {
       );
     });
     it('should has error (incorrect email)', async () => {
-      const dto = new CreateUserRequest.Dto('emailmailcom', '12345678', true);
+      const dto = new CreateUserRequest.Dto('emailmailcom', '12345678', true, true);
       const errors = await validateDto(CreateUserRequest.Dto, dto);
       expect(errors.length).toBe(1);
       expect(errors[0].property).toBe('email');
@@ -46,7 +47,7 @@ describe('CreateUserRequest', () => {
       expect(errors[0].constraints.isEmail).toBe(ErrorMessages.MUST_HAS_EMAIL_FORMAT);
     });
     it('should has error (password has less symbols than 8)', async () => {
-      const dto = new CreateUserRequest.Dto('email@mail.com', '1234567', true);
+      const dto = new CreateUserRequest.Dto('email@mail.com', '1234567', true, true);
       const errors = await validateDto(CreateUserRequest.Dto, dto);
       expect(errors.length).toBe(1);
       expect(errors[0].property).toBe('password');
@@ -59,6 +60,7 @@ describe('CreateUserRequest', () => {
       const dto = new CreateUserRequest.Dto(
         'email@mail.com',
         '123456789012345678901234567890123456789012345678901',
+        true,
         true,
       );
       const errors = await validateDto(CreateUserRequest.Dto, dto);
