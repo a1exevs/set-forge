@@ -61,6 +61,10 @@ const ru: LegalContent = {
           type: 'p',
           text: 'Сервис не запрашивает и не собирает специальные категории данных (о здоровье в юридическом смысле, биометрию), а также ФИО, телефон, адрес или платёжные данные.',
         },
+        {
+          type: 'p',
+          text: 'Обработка персональных данных осуществляется с использованием средств автоматизации.',
+        },
       ],
     },
     {
@@ -93,11 +97,15 @@ const ru: LegalContent = {
       blocks: [
         {
           type: 'p',
-          text: 'Данные хранятся на серверах, расположенных на территории Российской Федерации, что соответствует требованию о локализации (ч. 5 ст. 18 152-ФЗ).',
+          text: 'Данные хранятся на серверах, расположенных на территории Российской Федерации, что соответствует требованию о локализации (ч. 5 ст. 18 152-ФЗ). Трансграничная передача персональных данных не осуществляется.',
         },
         {
           type: 'p',
           text: 'Данные аккаунта хранятся до тех пор, пока существует учётная запись. При удалении аккаунта все связанные данные удаляются без возможности восстановления.',
+        },
+        {
+          type: 'p',
+          text: 'Технические данные и журналы (IP-адрес, user-agent, идентификатор сессии и т. п.) хранятся не более 12 месяцев.',
         },
       ],
     },
@@ -180,6 +188,10 @@ const en: LegalContent = {
           type: 'p',
           text: 'The Service does not request or collect special categories of data (health data in the legal sense, biometrics), nor your full name, phone number, address, or payment details.',
         },
+        {
+          type: 'p',
+          text: 'Personal data is processed using automated means.',
+        },
       ],
     },
     {
@@ -208,11 +220,15 @@ const en: LegalContent = {
       blocks: [
         {
           type: 'p',
-          text: 'Data is stored on servers located in the Russian Federation, in line with the data-localization requirement (Art. 18(5) of 152-FZ).',
+          text: 'Data is stored on servers located in the Russian Federation, in line with the data-localization requirement (Art. 18(5) of 152-FZ). No cross-border transfer of personal data takes place.',
         },
         {
           type: 'p',
           text: 'Account data is kept for as long as the account exists. When you delete your account, all related data is permanently erased.',
+        },
+        {
+          type: 'p',
+          text: 'Technical data and logs (IP address, user-agent, session identifier, etc.) are kept for no more than 12 months.',
         },
       ],
     },

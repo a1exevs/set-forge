@@ -57,6 +57,10 @@ const ru: LegalContent = {
     {
       heading: '4. Учётная запись и правила использования',
       blocks: [
+        {
+          type: 'p',
+          text: 'Регистрируясь, вы подтверждаете, что достигли возраста, при котором вправе заключить настоящее Соглашение по законодательству Российской Федерации, и обладаете необходимой дееспособностью.',
+        },
         { type: 'p', text: 'Используя Сервис, вы обязуетесь:' },
         {
           type: 'ul',
@@ -168,6 +172,10 @@ const en: LegalContent = {
     {
       heading: '4. Account and acceptable use',
       blocks: [
+        {
+          type: 'p',
+          text: 'By registering, you confirm that you have reached the age at which you may lawfully enter into these Terms under the law of the Russian Federation and that you have the required legal capacity.',
+        },
         { type: 'p', text: 'When using the Service, you agree to:' },
         {
           type: 'ul',
