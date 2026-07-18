@@ -2,7 +2,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 
 import type { CurrentUser } from 'src/entities/session/api/session-api';
-import { deleteLogout, fetchCurrentUser, postLogin, postRegistration } from 'src/entities/session/api/session-api';
+import {
+  deleteAccount,
+  deleteLogout,
+  fetchCurrentUser,
+  postLogin,
+  postRegistration,
+} from 'src/entities/session/api/session-api';
 import { sessionQueryKeys } from 'src/entities/session/model/session-keys';
 
 export function useCurrentUserQuery(enabled: boolean) {
@@ -74,6 +80,20 @@ export function useLogoutMutation() {
     mutationFn: deleteLogout,
     onSettled: () => {
       qc.removeQueries({ queryKey: sessionQueryKeys.me });
+      void navigate({ to: '/login' });
+    },
+  });
+}
+
+export function useDeleteAccountMutation() {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteAccount,
+    onSettled: () => {
+      // The account is gone: drop every cached query (profile, workout lists, sessions, history).
+      qc.clear();
       void navigate({ to: '/login' });
     },
   });

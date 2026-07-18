@@ -29,6 +29,7 @@ describe('AuthService', () => {
             getUserByEmail: jest.fn(x => x),
             getUserById: jest.fn(x => x),
             createUser: jest.fn(x => x),
+            deleteUser: jest.fn(x => x),
           },
         },
         {
@@ -374,6 +375,37 @@ describe('AuthService', () => {
         expect(error.getResponse()).toMatchObject({ message: ErrorMessages.REFRESH_TOKEN_EXPIRED });
         expect(tokenService.removeRefreshToken).toBeCalledTimes(1);
         expect(tokenService.removeRefreshToken).toBeCalledWith(refreshToken);
+      }
+    });
+  });
+
+  describe('AuthService - deleteAccount', () => {
+    it('deleteAccount method: should delete the user and return true', async () => {
+      const userId = 1;
+      const mockUser = { id: userId, email: 'user@yandex.ru', password: 'asdfsafas' };
+      jest.spyOn(userService, 'getUserById').mockImplementation(async () => Promise.resolve(mockUser as User));
+      jest.spyOn(userService, 'deleteUser').mockImplementation(async () => Promise.resolve(true));
+
+      const result = await authService.deleteAccount(userId);
+
+      expect(result).toBe(true);
+      expect(userService.getUserById).toBeCalledTimes(1);
+      expect(userService.getUserById).toBeCalledWith(userId);
+      expect(userService.deleteUser).toBeCalledTimes(1);
+      expect(userService.deleteUser).toBeCalledWith(userId);
+    });
+    it('deleteAccount method: should be unauthorized (user not found)', async () => {
+      const userId = 1;
+      jest.spyOn(userService, 'getUserById').mockImplementation(async () => Promise.resolve(undefined));
+
+      try {
+        await authService.deleteAccount(userId);
+        sendPseudoError();
+      } catch (error) {
+        expect(error.status).toBe(401);
+        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.UNAUTHORIZED });
+        expect(userService.getUserById).toBeCalledTimes(1);
+        expect(userService.deleteUser).toBeCalledTimes(0);
       }
     });
   });

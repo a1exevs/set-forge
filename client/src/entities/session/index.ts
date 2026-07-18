@@ -19,6 +19,7 @@ export {
 export { sessionQueryKeys } from 'src/entities/session/model/session-keys';
 export {
   useCurrentUserQuery,
+  useDeleteAccountMutation,
   useLoginMutation,
   useLogoutMutation,
   useRegisterMutation,

@@ -70,6 +70,14 @@ export class AuthService {
     return this.tokensService.removeRefreshToken(refreshToken);
   }
 
+  public async deleteAccount(userId: number): Promise<boolean> {
+    const user = await this.userService.getUserById(userId);
+    if (!user) {
+      throw new UnauthorizedException({ message: ErrorMessages.UNAUTHORIZED });
+    }
+    return this.userService.deleteUser(userId);
+  }
+
   private async validateUser(dto: CreateUserRequest.Dto) {
     const user = await this.userService.getUserByEmail(dto.email, true);
     if (user) {

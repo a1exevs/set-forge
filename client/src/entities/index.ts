@@ -2,6 +2,7 @@ export {
   emailToAvatarLetter,
   sessionQueryKeys,
   useCurrentUserQuery,
+  useDeleteAccountMutation,
   useLoginMutation,
   useLogoutMutation,
   useRegisterMutation,

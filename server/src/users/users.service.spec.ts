@@ -29,6 +29,7 @@ describe('UsersService', () => {
           useValue: {
             create: jest.fn(x => x),
             findOne: jest.fn(x => x),
+            destroy: jest.fn(x => x),
           },
         },
         {
@@ -153,6 +154,25 @@ describe('UsersService', () => {
       expect(model.findOne).toBeCalledTimes(1);
       expect(model.findOne).toBeCalledWith({ where: { id: userId }, include: { all: true } });
       expect(result).toEqual(user);
+    });
+  });
+
+  describe('UsersService - deleteUser', () => {
+    it('should return true when a row was deleted', async () => {
+      const userId = 1;
+      jest.spyOn(model, 'destroy').mockImplementation(() => Promise.resolve(1));
+      const result = await usersService.deleteUser(userId);
+      expect(model.destroy).toBeCalledTimes(1);
+      expect(model.destroy).toBeCalledWith({ where: { id: userId } });
+      expect(result).toBe(true);
+    });
+    it('should return false when no row was deleted', async () => {
+      const userId = 999;
+      jest.spyOn(model, 'destroy').mockImplementation(() => Promise.resolve(0));
+      const result = await usersService.deleteUser(userId);
+      expect(model.destroy).toBeCalledTimes(1);
+      expect(model.destroy).toBeCalledWith({ where: { id: userId } });
+      expect(result).toBe(false);
     });
   });
 });

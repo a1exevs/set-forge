@@ -26,7 +26,14 @@ jest.mock('@shared', () => {
 describe('ProfilePage', () => {
   it('matches snapshot', () => {
     const { container } = render(
-      <ProfilePage email="jane@example.com" avatarLetter="J" onLogout={(): void => undefined} isLoggingOut={false} />,
+      <ProfilePage
+        email="jane@example.com"
+        avatarLetter="J"
+        onLogout={(): void => undefined}
+        isLoggingOut={false}
+        onDeleteAccount={(): Promise<void> => Promise.resolve()}
+        isDeletingAccount={false}
+      />,
     );
     expect(container).toMatchSnapshot();
   });

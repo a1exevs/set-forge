@@ -44,4 +44,15 @@ export class UsersService {
   async getUserById(id: number) {
     return this.userRepository.findOne({ where: { id }, include: { all: true } });
   }
+
+  /**
+   * Deletes the user row. All user-owned data is removed by DB-level
+   * `ON DELETE CASCADE` foreign keys (workout lists → exercises, workout
+   * sessions → session exercises, refresh tokens, user roles). A `where`-based
+   * destroy issues a single DELETE so InnoDB applies the cascade.
+   */
+  async deleteUser(id: number): Promise<boolean> {
+    const deletedCount = await this.userRepository.destroy({ where: { id } });
+    return deletedCount > 0;
+  }
 }

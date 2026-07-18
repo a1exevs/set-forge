@@ -11,9 +11,18 @@ type Props = {
   avatarLetter: string;
   onLogout: () => void | Promise<void>;
   isLoggingOut: boolean;
+  onDeleteAccount: () => void | Promise<void>;
+  isDeletingAccount: boolean;
 };
 
-const ProfilePage: FC<Props> = ({ email, avatarLetter, onLogout, isLoggingOut }) => {
+const ProfilePage: FC<Props> = ({
+  email,
+  avatarLetter,
+  onLogout,
+  isLoggingOut,
+  onDeleteAccount,
+  isDeletingAccount,
+}) => {
   const pathname = useRouterState({ select: state => state.location.pathname });
   const swipeRef = useTabSwipeNavigation({ tabs: MAIN_TAB_ROUTES, activePath: pathname });
 
@@ -36,6 +45,20 @@ const ProfilePage: FC<Props> = ({ email, avatarLetter, onLogout, isLoggingOut })
             className={classes.logoutButton}
           >
             Log out
+          </Button>
+        </div>
+
+        <div className={classes.dangerZone}>
+          <p className={classes.dangerHint}>
+            Deleting your account permanently removes all your data. This cannot be undone.
+          </p>
+          <Button
+            variant="danger"
+            onClick={(): void => void onDeleteAccount()}
+            disabled={isDeletingAccount}
+            className={classes.deleteButton}
+          >
+            Delete account
           </Button>
         </div>
       </main>

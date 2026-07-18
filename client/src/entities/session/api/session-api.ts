@@ -94,6 +94,17 @@ export async function deleteLogout(): Promise<void> {
   }
 }
 
+export async function deleteAccount(): Promise<void> {
+  try {
+    await apiRequest<unknown>('/auth/account', {
+      method: 'DELETE',
+      auth: true,
+    });
+  } finally {
+    clearAccessToken();
+  }
+}
+
 export function isNeedCaptchaEnvelope(envelope: CommonResponseEnvelope<unknown>): boolean {
   return envelope.resultCode === ResultCodes.NEED_CAPTCHA_AUTHORIZATION;
 }

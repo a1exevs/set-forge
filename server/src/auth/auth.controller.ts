@@ -122,6 +122,21 @@ export class AuthController {
     return new OperationResultResponse.Dto({ result });
   }
 
+  @ApiOperation({ summary: Docs.DELETE_ACCOUNT_ENDPOINT })
+  @ApiOkResponse({
+    type: OperationResultResponse.Swagger.OperationResultResponseDto,
+    description: Docs.DELETE_ACCOUNT_SUCCESSFUL_RESULT,
+  })
+  @ApiUnauthorizedResponse({ description: Docs.DELETE_ACCOUNT_UNAUTHORIZED })
+  @ApiForbiddenResponse({ description: Docs.DELETE_ACCOUNT_FORBIDDEN })
+  @UseGuards(JwtAuthGuard, RefreshTokenGuard)
+  @Delete('/account')
+  async deleteAccount(@Req() request, @Res({ passthrough: true }) response: Response) {
+    const result = await this.authService.deleteAccount(request.user.id);
+    response.clearCookie('refreshToken', AuthController.refreshCookieBaseOptions());
+    return new OperationResultResponse.Dto({ result });
+  }
+
   private static setupCookies(response: Response, data: IAuthenticationResult) {
     if ('refreshToken' in data.data.payload) {
       response.cookie('refreshToken', data.data.payload.refreshToken, {
