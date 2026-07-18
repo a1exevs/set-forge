@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './app/model/routes/__root'
+import { Route as TermsRouteImport } from './app/model/routes/terms'
 import { Route as RegisterRouteImport } from './app/model/routes/register'
 import { Route as ProfileRouteImport } from './app/model/routes/profile'
 import { Route as PrivacyRouteImport } from './app/model/routes/privacy'
@@ -19,6 +20,11 @@ import { Route as IndexRouteImport } from './app/model/routes/index'
 import { Route as WorkoutIdRouteImport } from './app/model/routes/workout/$id'
 import { Route as EditIdRouteImport } from './app/model/routes/edit/$id'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/terms': typeof TermsRoute
   '/edit/$id': typeof EditIdRoute
   '/workout/$id': typeof WorkoutIdRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/terms': typeof TermsRoute
   '/edit/$id': typeof EditIdRoute
   '/workout/$id': typeof WorkoutIdRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/terms': typeof TermsRoute
   '/edit/$id': typeof EditIdRoute
   '/workout/$id': typeof WorkoutIdRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/register'
+    | '/terms'
     | '/edit/$id'
     | '/workout/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/register'
+    | '/terms'
     | '/edit/$id'
     | '/workout/$id'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/register'
+    | '/terms'
     | '/edit/$id'
     | '/workout/$id'
   fileRoutesById: FileRoutesById
@@ -143,12 +155,20 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
+  TermsRoute: typeof TermsRoute
   EditIdRoute: typeof EditIdRoute
   WorkoutIdRoute: typeof WorkoutIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -223,6 +243,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
+  TermsRoute: TermsRoute,
   EditIdRoute: EditIdRoute,
   WorkoutIdRoute: WorkoutIdRoute,
 }

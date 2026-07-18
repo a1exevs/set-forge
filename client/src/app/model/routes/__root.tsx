@@ -5,7 +5,7 @@ import type { CurrentUser } from 'src/entities/session/api/session-api';
 import { bootstrapSessionAndPrimeCache } from 'src/entities/session/lib/bootstrap-session';
 import { sessionQueryKeys } from 'src/entities/session/model/session-keys';
 
-const PUBLIC_PATHS = new Set(['/login', '/register', '/privacy']);
+const PUBLIC_PATHS = new Set(['/login', '/register', '/privacy', '/terms']);
 
 const buildRedirectTarget = (pathname: string, search: unknown): string => {
   if (typeof search === 'string') {
