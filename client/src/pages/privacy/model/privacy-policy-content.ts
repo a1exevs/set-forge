@@ -2,19 +2,20 @@ export type PrivacyLang = 'ru' | 'en';
 
 /**
  * Operator identity shown in the policy and used as the contact point for data-subject requests.
- * Both 152-ФЗ (ст. 18.1) and GDPR (Art. 13) require the operator to be identifiable and reachable.
+ * 152-ФЗ (ст. 18.1) requires the operator to be identifiable and reachable.
  *
- * `contactEmail` is injected at build time from `VITE_PRIVACY_CONTACT_EMAIL` (see vite.config.ts),
- * so the real address lives only in the deployer's local env and never in the (public) source. It
- * falls back to a reserved-`.example` placeholder when unset (dev, tests, or an unconfigured build).
- *
- * TODO: set the real operator `name` before going public.
+ * Both `name` and `contactEmail` are injected at build time from `VITE_PRIVACY_OPERATOR_NAME` and
+ * `VITE_PRIVACY_CONTACT_EMAIL` (see vite.config.ts), so the real operator identity lives only in the
+ * deployer's local env and never in the (public) source. They fall back to placeholders when unset
+ * (dev, tests, or an unconfigured build) — set the real values before going public.
  */
+const operatorName =
+  (typeof __PRIVACY_OPERATOR_NAME__ !== 'undefined' && __PRIVACY_OPERATOR_NAME__) || 'Set Forge Operator';
 const contactEmail =
   (typeof __PRIVACY_CONTACT_EMAIL__ !== 'undefined' && __PRIVACY_CONTACT_EMAIL__) || 'privacy@set-forge.example';
 
 export const PRIVACY_OPERATOR = {
-  name: 'Alexander Evstafiadi',
+  name: operatorName,
   contactEmail,
 } as const;
 
@@ -51,9 +52,10 @@ const ru: PrivacyContent = {
           type: 'ul',
           items: [
             'адрес электронной почты — используется как логин и для связанных с аккаунтом уведомлений;',
-            'пароль — хранится только в виде необратимого хеша, Оператор не имеет доступа к исходному паролю;',
+            'пароль — хранится в виде криптографического хеша; исходный пароль Оператор не хранит и доступа к нему не имеет;',
             'данные о тренировках, которые вы вносите сами (списки упражнений, веса, повторения, история подходов);',
-            'технические данные сессии (защищённые cookie для поддержания авторизации).',
+            'технические данные и журналы: IP-адрес, дата и время обращения, запрошенный URL, сведения о браузере и устройстве (user-agent), идентификатор сессии — сохраняются в журналах веб-сервера и приложения для обеспечения работы и безопасности Сервиса;',
+            'строго необходимые cookie для поддержания авторизованной сессии.',
           ],
         },
         {
@@ -75,7 +77,7 @@ const ru: PrivacyContent = {
         },
         {
           type: 'p',
-          text: 'Для пользователей из ЕС правовые основания соответствуют ст. 6(1)(a) и 6(1)(b) GDPR; для пользователей из РФ — ст. 6 Федерального закона № 152-ФЗ.',
+          text: 'Правовые основания обработки предусмотрены ст. 6 Федерального закона № 152-ФЗ «О персональных данных».',
         },
       ],
     },
@@ -97,7 +99,11 @@ const ru: PrivacyContent = {
       blocks: [
         {
           type: 'p',
-          text: 'Оператор не продаёт и не передаёт персональные данные третьим лицам. Сервис не использует рекламные сети, системы веб-аналитики и трекеры. Рекламные рассылки не осуществляются; электронная почта используется только для сервисных и связанных с аккаунтом сообщений.',
+          text: 'Оператор не продаёт персональные данные и не передаёт их третьим лицам для самостоятельного использования или в рекламных целях.',
+        },
+        {
+          type: 'p',
+          text: 'Для технического функционирования Сервиса данные могут обрабатываться поставщиком хостинга (серверы на территории РФ) по поручению Оператора и только в объёме, необходимом для оказания услуги; Оператор остаётся ответственным за обработку. Сервис не использует рекламные сети, системы веб-аналитики и трекеры, рекламные рассылки не осуществляются.',
         },
       ],
     },
@@ -106,7 +112,7 @@ const ru: PrivacyContent = {
       blocks: [
         {
           type: 'p',
-          text: 'Сервис использует только строго необходимые cookie для поддержания авторизованной сессии. Рекламные и аналитические cookie не устанавливаются, поэтому отдельный баннер согласия на cookie не требуется.',
+          text: 'Сервис использует только строго необходимые cookie — для поддержания авторизованной сессии и обеспечения безопасности. Рекламные и аналитические cookie не используются.',
         },
       ],
     },
@@ -125,7 +131,7 @@ const ru: PrivacyContent = {
         },
         {
           type: 'p',
-          text: `Для реализации прав, не покрытых интерфейсом, напишите на ${PRIVACY_OPERATOR.contactEmail}. Для пользователей из ЕС дополнительно применяются права на доступ, переносимость и ограничение обработки (ст. 15–21 GDPR).`,
+          text: `Для реализации прав, не покрытых интерфейсом, напишите на ${PRIVACY_OPERATOR.contactEmail}.`,
         },
       ],
     },
@@ -157,9 +163,10 @@ const en: PrivacyContent = {
           type: 'ul',
           items: [
             'email address — used as your login and for account-related notifications;',
-            'password — stored only as an irreversible hash; the Operator has no access to the original password;',
+            'password — stored as a cryptographic hash; the Operator does not store or have access to the original password;',
             'workout data you enter yourself (exercise lists, weights, reps, set history);',
-            'technical session data (secure cookies used to keep you signed in).',
+            'technical data and logs: IP address, date and time of the request, requested URL, browser and device information (user-agent), session identifier — recorded in the web-server and application logs to operate and secure the Service;',
+            'strictly necessary cookies to keep your session signed in.',
           ],
         },
         {
@@ -181,7 +188,7 @@ const en: PrivacyContent = {
         },
         {
           type: 'p',
-          text: 'For EU users the legal bases are Art. 6(1)(a) and 6(1)(b) GDPR; for users in Russia — Art. 6 of Federal Law No. 152-FZ.',
+          text: 'The legal bases for processing are set out in Art. 6 of Federal Law No. 152-FZ "On Personal Data".',
         },
       ],
     },
@@ -203,7 +210,11 @@ const en: PrivacyContent = {
       blocks: [
         {
           type: 'p',
-          text: 'The Operator does not sell or share personal data with third parties. The Service uses no ad networks, web-analytics systems, or trackers. No marketing emails are sent; email is used only for service and account-related messages.',
+          text: 'The Operator does not sell personal data and does not share it with third parties for their own use or for advertising.',
+        },
+        {
+          type: 'p',
+          text: 'To operate the Service technically, data may be processed by the hosting provider (servers located in the Russian Federation) on the Operator’s behalf and only to the extent necessary to provide the service; the Operator remains responsible for the processing. The Service uses no ad networks, web-analytics systems, or trackers, and sends no marketing emails.',
         },
       ],
     },
@@ -212,7 +223,7 @@ const en: PrivacyContent = {
       blocks: [
         {
           type: 'p',
-          text: 'The Service uses only strictly necessary cookies to maintain your authenticated session. No advertising or analytics cookies are set, so a separate cookie-consent banner is not required.',
+          text: 'The Service uses only strictly necessary cookies — to maintain your authenticated session and for security. No advertising or analytics cookies are used.',
         },
       ],
     },
@@ -231,7 +242,7 @@ const en: PrivacyContent = {
         },
         {
           type: 'p',
-          text: `To exercise rights not covered by the interface, contact ${PRIVACY_OPERATOR.contactEmail}. EU users additionally have the rights of access, portability, and restriction of processing (Art. 15–21 GDPR).`,
+          text: `To exercise rights not covered by the interface, contact ${PRIVACY_OPERATOR.contactEmail}.`,
         },
       ],
     },
