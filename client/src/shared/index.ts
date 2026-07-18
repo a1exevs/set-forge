@@ -51,6 +51,8 @@ export {
   TabsBar,
   type LegalContent,
   type LegalLang,
+  type LegalLink,
   type LegalSection,
+  type LegalText,
   type TabsBarItem,
 } from 'src/shared/ui';

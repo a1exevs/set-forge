@@ -1,16 +1,45 @@
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft } from 'lucide-react';
-import { FC, useState } from 'react';
+import { FC, Fragment, ReactNode, useState } from 'react';
 
 import BrandWordmark from 'src/shared/ui/brand-wordmark/brand-wordmark';
 import classes from 'src/shared/ui/legal-document/legal-document.module.scss';
 
 export type LegalLang = 'ru' | 'en';
 
+/** An inline link inside paragraph text: `to` for an in-app route, `href` for external (e.g. mailto:). */
+export type LegalLink = { text: string; to?: '/privacy' | '/terms'; href?: string };
+
+/** Paragraph text: a plain string, or a sequence of strings and inline links. */
+export type LegalText = string | Array<string | LegalLink>;
+
 export type LegalSection = {
   heading: string;
   /** Paragraphs and/or bullet lists rendered in order. */
-  blocks: Array<{ type: 'p'; text: string } | { type: 'ul'; items: string[] }>;
+  blocks: Array<{ type: 'p'; text: LegalText } | { type: 'ul'; items: string[] }>;
+};
+
+const renderText = (text: LegalText): ReactNode => {
+  if (typeof text === 'string') {
+    return text;
+  }
+  return text.map((run, index) => {
+    if (typeof run === 'string') {
+      return <Fragment key={index}>{run}</Fragment>;
+    }
+    if (run.to) {
+      return (
+        <Link key={index} to={run.to} className={classes.link}>
+          {run.text}
+        </Link>
+      );
+    }
+    return (
+      <a key={index} href={run.href} className={classes.link}>
+        {run.text}
+      </a>
+    );
+  });
 };
 
 export type LegalContent = {
@@ -71,7 +100,7 @@ const LegalDocument: FC<Props> = ({ content, effectiveDate, backTo = '/login' })
             {section.blocks.map((block, index) =>
               block.type === 'p' ? (
                 <p key={index} className={classes.paragraph}>
-                  {block.text}
+                  {renderText(block.text)}
                 </p>
               ) : (
                 <ul key={index} className={classes.list}>

@@ -126,3 +126,12 @@
   line-height: 1.5;
   color: $text-secondary;
 }
+
+.link {
+  color: $primary-color;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

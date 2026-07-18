@@ -1,4 +1,4 @@
-export type PrivacyLang = 'ru' | 'en';
+import type { LegalContent, LegalLang } from '@shared';
 
 /**
  * Operator identity shown in the policy and used as the contact point for data-subject requests.
@@ -22,20 +22,7 @@ export const PRIVACY_OPERATOR = {
 /** Effective date of the current version. Bump when the policy text changes. */
 export const PRIVACY_EFFECTIVE_DATE = '2026-07-18';
 
-export type PrivacySection = {
-  heading: string;
-  /** Paragraphs and/or bullet lists rendered in order. */
-  blocks: Array<{ type: 'p'; text: string } | { type: 'ul'; items: string[] }>;
-};
-
-export type PrivacyContent = {
-  title: string;
-  effectiveLabel: string;
-  intro: string;
-  sections: PrivacySection[];
-};
-
-const ru: PrivacyContent = {
+const ru: LegalContent = {
   title: 'Политика обработки персональных данных',
   effectiveLabel: 'Действует с',
   intro:
@@ -78,6 +65,14 @@ const ru: PrivacyContent = {
         {
           type: 'p',
           text: 'Правовые основания обработки предусмотрены ст. 6 Федерального закона № 152-ФЗ «О персональных данных».',
+        },
+        {
+          type: 'p',
+          text: [
+            'Использование Сервиса также регулируется ',
+            { text: 'Пользовательским соглашением', to: '/terms' },
+            '.',
+          ],
         },
       ],
     },
@@ -147,7 +142,7 @@ const ru: PrivacyContent = {
   ],
 };
 
-const en: PrivacyContent = {
+const en: LegalContent = {
   title: 'Privacy Policy',
   effectiveLabel: 'Effective from',
   intro:
@@ -189,6 +184,10 @@ const en: PrivacyContent = {
         {
           type: 'p',
           text: 'The legal bases for processing are set out in Art. 6 of Federal Law No. 152-FZ "On Personal Data".',
+        },
+        {
+          type: 'p',
+          text: ['Use of the Service is also governed by the ', { text: 'Terms of Use', to: '/terms' }, '.'],
         },
       ],
     },
@@ -258,4 +257,4 @@ const en: PrivacyContent = {
   ],
 };
 
-export const privacyContent: Record<PrivacyLang, PrivacyContent> = { ru, en };
+export const privacyContent: Record<LegalLang, LegalContent> = { ru, en };

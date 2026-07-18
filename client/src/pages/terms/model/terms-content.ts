@@ -3,6 +3,11 @@ import type { LegalContent, LegalLang } from '@shared';
 /** Effective date of the current version. Bump when the terms text changes. */
 export const TERMS_EFFECTIVE_DATE = '2026-07-18';
 
+// Same build-time contact as the privacy policy (see vite.config.ts / privacy-policy-content.ts),
+// so the Terms show a reachable address directly instead of pointing to another document.
+const contactEmail =
+  (typeof __PRIVACY_CONTACT_EMAIL__ !== 'undefined' && __PRIVACY_CONTACT_EMAIL__) || 'privacy@set-forge.example';
+
 const ru: LegalContent = {
   title: 'Пользовательское соглашение',
   effectiveLabel: 'Действует с',
@@ -15,7 +20,11 @@ const ru: LegalContent = {
       blocks: [
         {
           type: 'p',
-          text: 'Сервис предоставляет инструменты для составления списков упражнений, ведения тренировок и отслеживания прогресса. Обработка персональных данных регулируется отдельной Политикой обработки персональных данных.',
+          text: [
+            'Сервис предоставляет инструменты для составления списков упражнений, ведения тренировок и отслеживания прогресса. Обработка персональных данных регулируется отдельной ',
+            { text: 'Политикой обработки персональных данных', to: '/privacy' },
+            '.',
+          ],
         },
       ],
     },
@@ -24,7 +33,11 @@ const ru: LegalContent = {
       blocks: [
         {
           type: 'p',
-          text: 'Сервис предоставляется «как есть» (as is) и «как доступно» (as available). Оператор не гарантирует бесперебойную работу, отсутствие ошибок и сохранность данных, а также вправе в любой момент изменить или прекратить работу Сервиса.',
+          text: 'Сервис предоставляется «как есть» (as is) и «как доступно» (as available). Оператор не гарантирует бесперебойную работу, отсутствие ошибок и сохранность данных.',
+        },
+        {
+          type: 'p',
+          text: 'Оператор вправе временно приостанавливать работу Сервиса, проводить технические работы, изменять функциональность или полностью прекратить предоставление Сервиса.',
         },
       ],
     },
@@ -60,7 +73,11 @@ const ru: LegalContent = {
       blocks: [
         {
           type: 'p',
-          text: 'Данные о тренировках, которые вы вносите, принадлежат вам. Вы можете в любой момент удалить свою учётную запись вместе со всеми связанными данными в разделе «Профиль». Обработка персональных данных описана в Политике обработки персональных данных.',
+          text: [
+            'Вы сохраняете контроль над данными, которые самостоятельно размещаете в Сервисе, и можете в любой момент удалить учётную запись вместе со всеми связанными данными в разделе «Профиль». Обработка персональных данных описана в ',
+            { text: 'Политике обработки персональных данных', to: '/privacy' },
+            '.',
+          ],
         },
       ],
     },
@@ -78,16 +95,24 @@ const ru: LegalContent = {
       blocks: [
         {
           type: 'p',
-          text: 'Оператор вправе изменять условия Соглашения. Актуальная версия всегда доступна на этой странице; при существенных изменениях обновляется дата вступления в силу. Продолжение использования Сервиса означает согласие с новой редакцией.',
+          text: 'Оператор вправе изменять настоящее Соглашение. Новая редакция вступает в силу с момента её публикации на этой странице, если иное не указано в новой редакции. При существенных изменениях обновляется дата вступления в силу.',
         },
       ],
     },
     {
-      heading: '8. Применимое право',
+      heading: '8. Применимое право и контакты',
       blocks: [
         {
           type: 'p',
-          text: 'К Соглашению применяется законодательство Российской Федерации. По вопросам, связанным с Соглашением, используйте контакт, указанный в Политике обработки персональных данных.',
+          text: 'К Соглашению применяется законодательство Российской Федерации.',
+        },
+        {
+          type: 'p',
+          text: [
+            'По вопросам, связанным с Сервисом и настоящим Соглашением, можно обратиться по адресу ',
+            { text: contactEmail, href: `mailto:${contactEmail}` },
+            '.',
+          ],
         },
       ],
     },
@@ -106,7 +131,11 @@ const en: LegalContent = {
       blocks: [
         {
           type: 'p',
-          text: 'The Service provides tools to build exercise lists, run workouts, and track progress. Processing of personal data is governed by the separate Privacy Policy.',
+          text: [
+            'The Service provides tools to build exercise lists, run workouts, and track progress. Processing of personal data is governed by the separate ',
+            { text: 'Privacy Policy', to: '/privacy' },
+            '.',
+          ],
         },
       ],
     },
@@ -115,7 +144,11 @@ const en: LegalContent = {
       blocks: [
         {
           type: 'p',
-          text: 'The Service is provided "as is" and "as available". The Operator does not guarantee uninterrupted or error-free operation or the preservation of data, and may change or discontinue the Service at any time.',
+          text: 'The Service is provided "as is" and "as available". The Operator does not guarantee uninterrupted or error-free operation or the preservation of data.',
+        },
+        {
+          type: 'p',
+          text: 'The Operator may temporarily suspend the Service, carry out maintenance, change its functionality, or discontinue the Service entirely.',
         },
       ],
     },
@@ -151,7 +184,11 @@ const en: LegalContent = {
       blocks: [
         {
           type: 'p',
-          text: 'The workout data you enter belongs to you. You can delete your account and all related data at any time in the "Profile" section. Processing of personal data is described in the Privacy Policy.',
+          text: [
+            'You keep control of the data you place in the Service yourself, and can delete your account and all related data at any time in the "Profile" section. Processing of personal data is described in the ',
+            { text: 'Privacy Policy', to: '/privacy' },
+            '.',
+          ],
         },
       ],
     },
@@ -169,16 +206,24 @@ const en: LegalContent = {
       blocks: [
         {
           type: 'p',
-          text: 'The Operator may amend these Terms. The current version is always available on this page; for material changes the effective date is updated. Continued use of the Service means acceptance of the new version.',
+          text: 'The Operator may amend these Terms. A new version takes effect when published on this page, unless the new version states otherwise. For material changes the effective date is updated.',
         },
       ],
     },
     {
-      heading: '8. Governing law',
+      heading: '8. Governing law and contact',
       blocks: [
         {
           type: 'p',
-          text: 'These Terms are governed by the law of the Russian Federation. For questions related to these Terms, use the contact listed in the Privacy Policy.',
+          text: 'These Terms are governed by the law of the Russian Federation.',
+        },
+        {
+          type: 'p',
+          text: [
+            'For questions related to the Service and these Terms, contact ',
+            { text: contactEmail, href: `mailto:${contactEmail}` },
+            '.',
+          ],
         },
       ],
     },
