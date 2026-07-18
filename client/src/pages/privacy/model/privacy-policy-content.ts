@@ -2,14 +2,20 @@ export type PrivacyLang = 'ru' | 'en';
 
 /**
  * Operator identity shown in the policy and used as the contact point for data-subject requests.
- *
- * TODO: Replace these placeholders with the real operator details before going public.
  * Both 152-ФЗ (ст. 18.1) and GDPR (Art. 13) require the operator to be identifiable and reachable.
- * `contactEmail` uses the reserved `.example` TLD on purpose so an unfilled value is obvious.
+ *
+ * `contactEmail` is injected at build time from `VITE_PRIVACY_CONTACT_EMAIL` (see vite.config.ts),
+ * so the real address lives only in the deployer's local env and never in the (public) source. It
+ * falls back to a reserved-`.example` placeholder when unset (dev, tests, or an unconfigured build).
+ *
+ * TODO: set the real operator `name` before going public.
  */
+const contactEmail =
+  (typeof __PRIVACY_CONTACT_EMAIL__ !== 'undefined' && __PRIVACY_CONTACT_EMAIL__) || 'privacy@set-forge.example';
+
 export const PRIVACY_OPERATOR = {
   name: 'Alexander Evstafiadi',
-  contactEmail: 'privacy@set-forge.example',
+  contactEmail,
 } as const;
 
 /** Effective date of the current version. Bump when the policy text changes. */

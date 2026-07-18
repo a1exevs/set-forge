@@ -83,6 +83,7 @@ services:
       dockerfile: client/Dockerfile
       args:
         VITE_PUBLIC_ORIGIN: ${VITE_PUBLIC_ORIGIN:-https://localhost}
+        VITE_PRIVACY_CONTACT_EMAIL: ${VITE_PRIVACY_CONTACT_EMAIL:-}
     depends_on:
       server-prod:
         condition: service_healthy
