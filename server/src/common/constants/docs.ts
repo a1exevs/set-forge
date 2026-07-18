@@ -29,6 +29,11 @@ export const Docs = {
   DELETE_ACCOUNT_SUCCESSFUL_RESULT: 'Account and all related data deleted successfully',
   DELETE_ACCOUNT_UNAUTHORIZED: 'Unauthorized',
   DELETE_ACCOUNT_FORBIDDEN: 'Forbidden',
+
+  ACCEPT_DOCUMENTS_ENDPOINT: 'Accept the current legal documents (records accepted versions)',
+  ACCEPT_DOCUMENTS_SUCCESSFUL_RESULT: 'Documents accepted successfully',
+  ACCEPT_DOCUMENTS_UNAUTHORIZED: 'Unauthorized',
+  ACCEPT_DOCUMENTS_FORBIDDEN: 'Forbidden',
   LOGOUT_FORBIDDEN: 'Forbidden',
 
   SECURITY_CONTROLLER: 'Security',

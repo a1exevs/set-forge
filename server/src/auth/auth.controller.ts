@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Post, Req, Res, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseFilters,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -104,6 +116,21 @@ export class AuthController {
   me(@Req() request): Promise<GetCurrentUserResponse.Dto> {
     const userId = request.user.id;
     return this.authService.me(userId);
+  }
+
+  @ApiOperation({ summary: Docs.ACCEPT_DOCUMENTS_ENDPOINT })
+  @ApiResult({
+    status: 200,
+    type: GetCurrentUserResponse.Swagger.GetCurrentUserResponseDto,
+    description: Docs.ACCEPT_DOCUMENTS_SUCCESSFUL_RESULT,
+  })
+  @ApiUnauthorizedResponse({ description: Docs.ACCEPT_DOCUMENTS_UNAUTHORIZED })
+  @ApiForbiddenResponse({ description: Docs.ACCEPT_DOCUMENTS_FORBIDDEN })
+  @UseGuards(JwtAuthGuard, RefreshTokenGuard)
+  @UseInterceptors(ResponseInterceptor)
+  @Patch('/documents-acceptance')
+  acceptDocuments(@Req() request): Promise<GetCurrentUserResponse.Dto> {
+    return this.authService.acceptDocuments(request.user.id);
   }
 
   @ApiOperation({ summary: Docs.LOGOUT_ENDPOINT })

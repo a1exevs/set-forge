@@ -131,6 +131,7 @@ describe('User workflow', () => {
           .expect(response => {
             expect(response.body.data.id).toBe(userId);
             expect(response.body.data.email).toBe(userEmail);
+            expect(response.body.data.documentsPendingAcceptance).toBe(false);
             expect(response.body.resultCode).toBe(ResultCodes.OK);
           });
       });

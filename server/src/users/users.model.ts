@@ -7,6 +7,9 @@ import { UserRole } from '@users/users-roles.model';
 interface IUser {
   email: string;
   password: string;
+  acceptedTermsVersion?: number | null;
+  acceptedPrivacyVersion?: number | null;
+  acceptedAt?: Date | null;
 }
 
 @Table({
@@ -29,6 +32,18 @@ export class User extends Model<User, IUser> {
   @ApiProperty({ example: '1234', description: 'User account password' })
   @Column({ type: DataType.STRING, allowNull: false })
   password: string;
+
+  @ApiProperty({ example: 1, description: 'Accepted Terms of Use version', nullable: true })
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  acceptedTermsVersion: number | null;
+
+  @ApiProperty({ example: 1, description: 'Accepted Privacy Policy version', nullable: true })
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  acceptedPrivacyVersion: number | null;
+
+  @ApiProperty({ example: '2026-07-18T12:00:00.000Z', description: 'When the documents were accepted', nullable: true })
+  @Column({ type: DataType.DATE, allowNull: true })
+  acceptedAt: Date | null;
 
   @BelongsToMany(() => Role, () => UserRole)
   roles: Role[];

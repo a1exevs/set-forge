@@ -8,6 +8,7 @@ import { TokensService } from '@auth/tokens.service';
 import { RegisterRequest, LoginRequest, GetCurrentUserResponse } from '@auth/dto';
 import { IAuthenticationResult } from '@auth/interfaces';
 import { ErrorMessages } from '@common/constants/error-messages';
+import { DocumentVersions } from '@common/constants';
 
 import * as bcrypt from 'bcryptjs';
 
@@ -63,7 +64,29 @@ export class AuthService {
     return new GetCurrentUserResponse.Dto({
       id: user.id,
       email: user.email,
+      documentsPendingAcceptance: AuthService.documentsPendingAcceptance(user),
     });
+  }
+
+  public async acceptDocuments(userId: number): Promise<GetCurrentUserResponse.Dto> {
+    const user = await this.userService.getUserById(userId);
+    if (!user) {
+      throw new UnauthorizedException({ message: ErrorMessages.UNAUTHORIZED });
+    }
+    await this.userService.updateDocumentAcceptance(userId);
+    return this.me(userId);
+  }
+
+  // Re-acceptance is required when a stored version is missing (legacy users) or older than the
+  // current required version (a document changed materially — see DocumentVersions).
+  private static documentsPendingAcceptance(user: User): boolean {
+    const { acceptedTermsVersion, acceptedPrivacyVersion } = user;
+    return (
+      acceptedTermsVersion == null ||
+      acceptedPrivacyVersion == null ||
+      acceptedTermsVersion < DocumentVersions.terms() ||
+      acceptedPrivacyVersion < DocumentVersions.privacy()
+    );
   }
 
   public async logout(refreshToken: string): Promise<boolean> {

@@ -320,6 +320,7 @@ describe('AuthController', () => {
       const mockGetCurrentUserResponseDto: GetCurrentUserResponse.Dto = {
         id: userId,
         email: 'user@yandex.ru',
+        documentsPendingAcceptance: false,
       };
       const mockMeF = jest
         .spyOn(authService, 'me')
