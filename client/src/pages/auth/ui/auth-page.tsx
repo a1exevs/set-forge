@@ -150,6 +150,12 @@ const AuthPage: FC<Props> = ({
             {activeTab === 'login' ? 'Log in' : 'Create account'}
           </Button>
         </form>
+
+        <p className={classes.legal}>
+          <Link to="/privacy" className={classes.legalLink}>
+            Privacy Policy
+          </Link>
+        </p>
       </div>
     </div>
   );

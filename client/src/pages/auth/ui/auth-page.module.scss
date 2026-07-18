@@ -133,3 +133,19 @@
   margin-top: $spacing-md;
   width: 100%;
 }
+
+.legal {
+  margin: $spacing-lg 0 0;
+  text-align: center;
+  font-size: $font-size-sm;
+}
+
+.legalLink {
+  color: $text-secondary;
+  text-decoration: none;
+
+  &:hover {
+    color: $text-primary;
+    text-decoration: underline;
+  }
+}
