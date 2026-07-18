@@ -1,28 +1,33 @@
 import { Link } from '@tanstack/react-router';
-import { FC, useState } from 'react';
+import { ChangeEvent, FC } from 'react';
 
-import { useAcceptDocumentsMutation, useCurrentUserQuery, useLogoutMutation } from '@entities';
-import { Button } from '@shared';
+import { Button, Dialog } from '@shared';
 
-import Dialog from 'src/shared/ui/dialog/dialog';
 import classes from 'src/widgets/document-reconsent/ui/document-reconsent-gate.module.scss';
 
-/**
- * Blocking gate shown when the signed-in user must (re-)accept the current legal documents
- * (see `documentsPendingAcceptance`). It cannot be dismissed — the user either accepts both
- * documents or logs out. Renders nothing when acceptance is up to date.
- */
-const DocumentReconsentGate: FC = () => {
-  const { data: user } = useCurrentUserQuery(true);
-  const acceptMutation = useAcceptDocumentsMutation();
-  const logoutMutation = useLogoutMutation();
+type Props = {
+  open: boolean;
+  busy: boolean;
+  isError: boolean;
+  consent: boolean;
+  termsAccepted: boolean;
+  onConsentChange: (value: boolean) => void;
+  onTermsChange: (value: boolean) => void;
+  onAccept: () => void;
+  onLogout: () => void;
+};
 
-  const [consent, setConsent] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
-
-  const open = Boolean(user?.documentsPendingAcceptance);
-  const busy = acceptMutation.isPending || logoutMutation.isPending;
-
+const DocumentReconsentGate: FC<Props> = ({
+  open,
+  busy,
+  isError,
+  consent,
+  termsAccepted,
+  onConsentChange,
+  onTermsChange,
+  onAccept,
+  onLogout,
+}) => {
   return (
     <Dialog open={open} onClose={(): void => undefined} disableAnimation ariaLabel="Updated documents">
       <div className={classes.content}>
@@ -34,7 +39,7 @@ const DocumentReconsentGate: FC = () => {
             type="checkbox"
             className={classes.checkbox}
             checked={consent}
-            onChange={(e): void => setConsent(e.target.checked)}
+            onChange={(e: ChangeEvent<HTMLInputElement>): void => onConsentChange(e.target.checked)}
             disabled={busy}
           />
           <span>
@@ -50,7 +55,7 @@ const DocumentReconsentGate: FC = () => {
             type="checkbox"
             className={classes.checkbox}
             checked={termsAccepted}
-            onChange={(e): void => setTermsAccepted(e.target.checked)}
+            onChange={(e: ChangeEvent<HTMLInputElement>): void => onTermsChange(e.target.checked)}
             disabled={busy}
           />
           <span>
@@ -61,19 +66,14 @@ const DocumentReconsentGate: FC = () => {
           </span>
         </label>
 
-        {acceptMutation.isError && <p className={classes.error}>Something went wrong. Please try again.</p>}
+        {isError && <p className={classes.error}>Something went wrong. Please try again.</p>}
 
         <div className={classes.actions}>
-          <Button
-            variant="secondary"
-            onClick={(): void => logoutMutation.mutate()}
-            disabled={busy}
-            className={classes.action}
-          >
+          <Button variant="secondary" onClick={(): void => onLogout()} disabled={busy} className={classes.action}>
             Log out
           </Button>
           <Button
-            onClick={(): void => void acceptMutation.mutateAsync().catch(() => undefined)}
+            onClick={(): void => onAccept()}
             disabled={busy || !consent || !termsAccepted}
             className={classes.action}
           >

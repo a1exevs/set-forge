@@ -157,6 +157,7 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: Docs.DELETE_ACCOUNT_UNAUTHORIZED })
   @ApiForbiddenResponse({ description: Docs.DELETE_ACCOUNT_FORBIDDEN })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
+  @UseInterceptors(ResponseInterceptor)
   @Delete('/account')
   async deleteAccount(@Req() request, @Res({ passthrough: true }) response: Response) {
     const result = await this.authService.deleteAccount(request.user.id);

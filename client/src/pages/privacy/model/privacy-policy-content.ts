@@ -4,18 +4,30 @@ import type { LegalContent, LegalLang } from '@shared';
  * Operator identity shown in the policy and used as the contact point for data-subject requests.
  * 152-ФЗ (ст. 18.1) requires the operator to be identifiable and reachable.
  *
- * Both `name` and `contactEmail` are injected at build time from `VITE_PRIVACY_OPERATOR_NAME` and
- * `VITE_PRIVACY_CONTACT_EMAIL` (see vite.config.ts), so the real operator identity lives only in the
- * deployer's local env and never in the (public) source. They fall back to placeholders when unset
- * (dev, tests, or an unconfigured build) — set the real values before going public.
+ * `name` is per-language (`ru`/`en`) because a legal entity is named differently in each language
+ * (e.g. «ИП Иванов Иван Иванович» vs "Ivan Ivanov, sole proprietor"). Both names and `contactEmail`
+ * are injected at build time (see vite.config.ts) so the real operator identity lives only in the
+ * deployer's local env and never in the (public) source:
+ *   - `VITE_PRIVACY_OPERATOR_NAME_RU` / `VITE_PRIVACY_OPERATOR_NAME_EN` — language-specific names;
+ *   - `VITE_PRIVACY_OPERATOR_NAME` — optional shared fallback used for any language left unset;
+ *   - `VITE_PRIVACY_CONTACT_EMAIL` — contact mailbox (language-agnostic).
+ * Each falls back to a placeholder when unset (dev, tests, unconfigured build) — set the real values
+ * before going public.
  */
-const operatorName =
-  (typeof __PRIVACY_OPERATOR_NAME__ !== 'undefined' && __PRIVACY_OPERATOR_NAME__) || 'Set Forge Operator';
+const operatorNameShared = (typeof __PRIVACY_OPERATOR_NAME__ !== 'undefined' && __PRIVACY_OPERATOR_NAME__) || '';
+const operatorNameRu =
+  (typeof __PRIVACY_OPERATOR_NAME_RU__ !== 'undefined' && __PRIVACY_OPERATOR_NAME_RU__) ||
+  operatorNameShared ||
+  'Оператор сервиса Set Forge';
+const operatorNameEn =
+  (typeof __PRIVACY_OPERATOR_NAME_EN__ !== 'undefined' && __PRIVACY_OPERATOR_NAME_EN__) ||
+  operatorNameShared ||
+  'Set Forge Operator';
 const contactEmail =
   (typeof __PRIVACY_CONTACT_EMAIL__ !== 'undefined' && __PRIVACY_CONTACT_EMAIL__) || 'privacy@set-forge.example';
 
 export const PRIVACY_OPERATOR = {
-  name: operatorName,
+  name: { ru: operatorNameRu, en: operatorNameEn } as Record<LegalLang, string>,
   contactEmail,
 } as const;
 
@@ -28,7 +40,7 @@ const ru: LegalContent = {
   intro:
     `Настоящая Политика описывает, какие персональные данные обрабатывает Set Forge (далее — «Сервис»), ` +
     `с какой целью и на каком основании, а также какие права есть у пользователя. Оператором персональных ` +
-    `данных является ${PRIVACY_OPERATOR.name} (далее — «Оператор»). По любым вопросам об обработке ` +
+    `данных является ${PRIVACY_OPERATOR.name.ru} (далее — «Оператор»). По любым вопросам об обработке ` +
     `персональных данных можно написать на ${PRIVACY_OPERATOR.contactEmail}.`,
   sections: [
     {
@@ -147,7 +159,7 @@ const en: LegalContent = {
   effectiveLabel: 'Effective from',
   intro:
     `This Policy explains what personal data Set Forge (the "Service") processes, for what purpose and on ` +
-    `what legal basis, and what rights you have. The data controller is ${PRIVACY_OPERATOR.name} (the ` +
+    `what legal basis, and what rights you have. The data controller is ${PRIVACY_OPERATOR.name.en} (the ` +
     `"Operator"). For any questions about the processing of personal data, contact ${PRIVACY_OPERATOR.contactEmail}.`,
   sections: [
     {

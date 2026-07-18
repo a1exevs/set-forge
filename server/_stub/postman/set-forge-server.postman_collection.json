@@ -84,7 +84,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"12345678\"\n}",
+											"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"12345678\",\n    \"consent\": true,\n    \"termsAccepted\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -266,10 +266,11 @@
 													"pm.test(\"Get current user: successfully\", function () {",
 													"    pm.response.to.have.status(200);",
 													"});",
-													"pm.test(\"Response contains id and email\", function () {",
+													"pm.test(\"Response contains id, email and documentsPendingAcceptance\", function () {",
 													"    var data = pm.response.json().data;",
 													"    pm.expect(data.id).to.eql(Number(pm.collectionVariables.get(\"api/current_user_id\")));",
 													"    pm.expect(data.email).to.be.a(\"string\");",
+													"    pm.expect(data.documentsPendingAcceptance).to.be.a(\"boolean\");",
 													"});"
 												],
 												"type": "text/javascript"
@@ -299,6 +300,105 @@
 												"1.0",
 												"{{auth-end-point}}",
 												"me"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "accept documents",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Accept documents: successfully\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"pm.test(\"documentsPendingAcceptance is false after acceptance\", function () {",
+													"    pm.expect(pm.response.json().data.documentsPendingAcceptance).to.eql(false);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{auth-end-point}}/documents-acceptance",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{auth-end-point}}",
+												"documents-acceptance"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete account",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Delete account: successfully\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"pm.test(\"Response result is true\", function () {",
+													"    pm.expect(pm.response.json().data.result).to.eql(true);",
+													"});",
+													"// Account is gone — drop the chained variables so later requests do not reuse a dead user.",
+													"pm.collectionVariables.unset(\"api/access_token\");",
+													"pm.collectionVariables.unset(\"api/current_user_id\");",
+													"pm.collectionVariables.unset(\"api/workout_list_id\");",
+													"pm.collectionVariables.unset(\"api/exercise_id\");",
+													"pm.collectionVariables.unset(\"api/session_id\");",
+													"pm.collectionVariables.unset(\"api/session_exercise_id\");"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{auth-end-point}}/account",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{auth-end-point}}",
+												"account"
 											]
 										}
 									},

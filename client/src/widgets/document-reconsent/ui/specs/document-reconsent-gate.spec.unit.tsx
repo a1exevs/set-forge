@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 
 import { useAcceptDocumentsMutation, useCurrentUserQuery, useLogoutMutation } from '@entities';
 
-import DocumentReconsentGate from 'src/widgets/document-reconsent/ui/document-reconsent-gate';
+import DocumentReconsentGate from 'src/widgets/document-reconsent/ui/document-reconsent-gate-data-layer';
 
 jest.mock('@entities', () => ({
   useCurrentUserQuery: jest.fn(),

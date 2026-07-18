@@ -11,6 +11,7 @@ Login and registration on `/login` and `/register` (same component, tab follows 
 - Paths: `/login`, `/register` (public)
 - Router entry: `auth-page-data-layer.tsx` (same component for both routes)
 - Route files: `client/src/app/model/routes/login.tsx`, `register.tsx`
+- Other public routes: `/privacy`, `/terms` (see [privacy-page](privacy-page.spec.md), [terms-page](terms-page.spec.md))
 - Protected routes (all others): `/`, `/history`, `/profile`, `/create`, `/edit/$id`, `/workout/$id`
 
 ### Redirects
@@ -44,7 +45,9 @@ Login and registration on `/login` and `/register` (same component, tab follows 
 1. Centered [`BrandWordmark`](../shared/shared-components.spec.md#brandwordmark) (`title="Set Forge"`, `titleAs="h1"`) + subtitle.
 2. TanStack Router `Link` tab links: Login / Register (`LogIn` / `UserPlus` icons); `role="tablist"` on nav.
 3. Forms: email + password fields; optional captcha image + input when visible.
-4. Server errors: `messages` / field errors on form.
+4. **Register only**: two consent checkboxes — personal-data processing (links to `/privacy`) and Terms of Use acceptance (links to `/terms`); each shows its own error text when unchecked on submit.
+5. Legal footer: `Link`s to `/privacy` (Privacy Policy) and `/terms` (Terms of Service) below the form.
+6. Server errors: `messages` / field errors on form.
 
 ---
 
@@ -59,7 +62,7 @@ Login and registration on `/login` and `/register` (same component, tab follows 
 
 3. Login/register → mutation → on success persist token, prefetch `me`, navigate to `/` or `redirect` search param.
 4. Tab change navigates between `/login` and `/register`.
-5. Register: client-side email/password validation (`validateRegisterEmail`, `validateRegisterPassword`) before submit.
+5. Register: client-side email/password validation (`validateRegisterEmail`, `validateRegisterPassword`) plus `consent` and `termsAccepted` must both be checked before submit; `useRegisterMutation` sends `{ email, password, consent, termsAccepted }`.
 6. Login: client-side email/password validation (`validateLoginEmail`, `validateLoginPassword`) before submit.
 7. Failed login with captcha requirement (`resultCode === 10`) → fetch captcha URL, show image, retry with `captcha` field.
 
@@ -73,7 +76,7 @@ Login and registration on `/login` and `/register` (same component, tab follows 
 
 ### Props AuthPage (Presentation)
 
-Controlled form fields: `activeTab`, `email`, `password`, `captcha`, `captchaImageUrl`, `showCaptcha`, field errors, `isSubmitting`, handlers.
+Controlled form fields: `activeTab`, `email`, `password`, `consent`, `termsAccepted`, `captcha`, `captchaImageUrl`, `showCaptcha`, field errors (`emailError`, `passwordError`, `consentError`, `termsError`, `captchaError`, `formError`), `isSubmitting`, handlers (`onEmailChange`, `onPasswordChange`, `onConsentChange`, `onTermsChange`, `onCaptchaChange`, `onSubmit`).
 
 ---
 

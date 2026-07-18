@@ -40,6 +40,7 @@ export {
 export {
   Button,
   ConfirmDialogProvider,
+  Dialog,
   IconButton,
   BrandWordmark,
   LegalDocument,

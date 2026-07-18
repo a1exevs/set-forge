@@ -19,10 +19,14 @@ Tables: `users`, `roles`, `users_roles`, `refreshTokens`.
 | `id` | INTEGER | PK, auto-increment |
 | `email` | STRING | unique, not null |
 | `password` | STRING | hashed, not null |
+| `accepted_terms_version` | INTEGER | nullable — Terms of Use version the user accepted |
+| `accepted_privacy_version` | INTEGER | nullable — Privacy Policy version the user accepted |
+| `accepted_at` | DATE | nullable — when the documents were accepted |
 
 `@BelongsToMany(() => Role, () => UserRole)`.
 
 Model: `server/src/users/users.model.ts`.
+Migration (document-acceptance columns): `server/database/migrations/20260718120000-user-document-acceptance.js` — columns are nullable so legacy users are treated as "not yet accepted".
 
 ### roles
 
@@ -62,6 +66,9 @@ Model: `server/src/auth/refresh-tokens.model.ts`.
 - Email is unique across users.
 - Refresh tokens are httpOnly cookies; access token is short-lived and held in client memory only.
 - All workout and session APIs scope data to `request.user.id`.
+- **Document acceptance / consent**: registration requires two separate, explicit acts of will — `consent` (personal-data processing, 152-ФЗ) and `termsAccepted` (Terms of Use); both must be `true` (`@Equals(true)`), validated at the boundary only and not persisted as flags. On registration the current document versions are stamped onto the user.
+- **Re-acceptance**: a user must re-accept when a stored accepted version is `null` (legacy user) or lower than the current required version (`TERMS_VERSION` / `PRIVACY_VERSION` env, default `1`; read via `DocumentVersions`). `documentsPendingAcceptance` is derived, never stored.
+- **Account deletion cascade**: deleting a user removes all user-owned data via DB-level `ON DELETE CASCADE` FKs (workout lists → exercises, workout sessions → session exercises, refresh tokens, users_roles). A single `where`-based `destroy` issues one DELETE so InnoDB applies the cascade.
 
 ---
 
@@ -99,6 +106,7 @@ Access token storage: `client/src/shared/api/access-token.store.ts` (via `@share
 interface CurrentUser {
   id: number;
   email: string;
+  documentsPendingAcceptance: boolean;
 }
 ```
 
@@ -118,11 +126,13 @@ Query key: `sessionQueryKeys.me` → `['session', 'me']`.
 
 | Method | Path | Body / notes |
 |--------|------|----------------|
-| POST | `/auth/registration` | `{ email, password }` — password 8–50, valid email |
+| POST | `/auth/registration` | `{ email, password, consent, termsAccepted }` — password 8–50, valid email; `consent` and `termsAccepted` must be `true` |
 | POST | `/auth/login` | `{ email, password, captcha? }` |
 | GET | `/security/get-captcha-url` | Sets session captcha; returns `{ captchaURL }` in `data` |
 | POST | `/auth/refresh` | Cookie `refreshToken` only |
-| GET | `/auth/me` | `Authorization: Bearer <access>` + refresh cookie |
+| GET | `/auth/me` | `Authorization: Bearer <access>` + refresh cookie → `{ id, email, documentsPendingAcceptance }` |
+| PATCH | `/auth/documents-acceptance` | Bearer + refresh cookie — records acceptance of the current versions, returns updated `CurrentUser` |
+| DELETE | `/auth/account` | Bearer + refresh cookie — deletes the account and all related data (cascade); clears the `refreshToken` cookie |
 | DELETE | `/auth/logout` | Bearer + refresh cookie |
 
 ### Login captcha
@@ -142,12 +152,14 @@ When `authFailedCount >= 5`, failed login returns `resultCode === 10` (`NEED_CAP
 |-----|-----|-------------|
 | `useCurrentUserQuery(enabled)` | hook | `GET /auth/me` → `CurrentUser` |
 | `useLoginMutation()` | hook | `POST /auth/login` |
-| `useRegisterMutation()` | hook | `POST /auth/registration` |
+| `useRegisterMutation()` | hook | `POST /auth/registration` (`{ email, password, consent, termsAccepted }`) |
+| `useAcceptDocumentsMutation()` | hook | `PATCH /auth/documents-acceptance`; updates `sessionQueryKeys.me` cache |
+| `useDeleteAccountMutation()` | hook | `DELETE /auth/account`; clears the whole query cache and redirects to `/login` |
 | `useLogoutMutation()` | hook | `DELETE /auth/logout` |
 | `bootstrapSessionAndPrimeCache(queryClient)` | function | Root `beforeLoad` session bootstrap |
 | `sessionQueryKeys.me` | query key | Current user cache |
 | `emailToAvatarLetter(email)` | function | Avatar letter for profile |
-| `fetchCurrentUser`, `postLogin`, `postRegistration`, `deleteLogout` | functions | Raw API calls (`session-api.ts`) |
+| `fetchCurrentUser`, `postLogin`, `postRegistration`, `deleteLogout`, `patchDocumentsAcceptance`, `deleteAccount` | functions | Raw API calls (`session-api.ts`) |
 | `getCaptchaUrl`, `isNeedCaptchaEnvelope`, `toAbsoluteFromApiOrigin` | functions | Captcha / envelope helpers |
 | `validateLoginEmail`, `validateLoginPassword`, `validateRegisterEmail`, `validateRegisterPassword` | functions | Client-side form validation |
 
@@ -155,22 +167,29 @@ When `authFailedCount >= 5`, failed login returns `resultCode === 10` (`NEED_CAP
 
 ## Tests
 
-- Unit: `server/src/auth/auth.controller.spec.ts`, `auth.service.spec.ts`, DTO specs in `auth/dto/`
-- Client: `entities/session/model/specs/avatar-letter.spec.unit.ts`
+- Unit: `server/src/auth/auth.controller.spec.ts`, `auth.service.spec.ts` (incl. `deleteAccount`, `acceptDocuments`, legacy-user `documentsPendingAcceptance`), `users/users.service.spec.ts` (`deleteUser`, `updateDocumentAcceptance`), DTO specs in `auth/dto/` and `users/dto/` (consent/terms validation)
+- E2E: `server/test/e2e/account-deletion-cascade.e2e-spec.ts` (cascade removal), `server/test/e2e/user-workflow.e2e-spec.ts` (registration consent + `documentsPendingAcceptance`)
+- Client: `entities/session/model/specs/avatar-letter.spec.unit.ts`; `widgets/document-reconsent/ui/specs/document-reconsent-gate.spec.unit.tsx`
 
 ---
 
 ## Used by
 
-- [auth-page](../pages/auth-page.spec.md) — login/register UI (API usage)
-- [profile-page](../pages/profile-page.spec.md) — `GET /auth/me`, logout
+- [auth-page](../pages/auth-page.spec.md) — login/register UI, consent + terms checkboxes (API usage)
+- [profile-page](../pages/profile-page.spec.md) — `GET /auth/me`, logout, delete account
+- [privacy-page](../pages/privacy-page.spec.md) — Privacy Policy document
+- [terms-page](../pages/terms-page.spec.md) — Terms of Use document
 - [home-page](../pages/home-page.spec.md) — gates `useWorkoutListsQuery` on user
 - [history-page](../pages/history-page.spec.md) — gates history query on user
+- `widgets/document-reconsent` — blocking re-acceptance gate rendered at the root (`useAcceptDocumentsMutation`, `documentsPendingAcceptance`)
 - All protected pages — root `beforeLoad` session bootstrap
 
 ---
 
 ## References
 
-- Backend DTOs: `server/src/auth/dto/`
+- Backend DTOs: `server/src/auth/dto/`, `server/src/users/dto/`
+- Document versions: `server/src/common/constants/document-versions.ts` (`TERMS_VERSION` / `PRIVACY_VERSION`)
+- Migration: `server/database/migrations/20260718120000-user-document-acceptance.js`
 - [server-api.mdc](../../rules/server-api.mdc)
+- [personal-data-compliance.mdc](../../rules/personal-data-compliance.mdc)

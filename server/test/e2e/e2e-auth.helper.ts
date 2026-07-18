@@ -18,7 +18,7 @@ export async function registerAndLogin(
 
   await request(app.getHttpServer())
     .post(`${api}/auth/registration`)
-    .send({ email, password })
+    .send({ email, password, consent: true, termsAccepted: true })
     .expect(HttpStatus.CREATED)
     .expect(response => {
       userId = response.body.data.userId;

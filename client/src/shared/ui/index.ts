@@ -1,5 +1,6 @@
 export { default as Button } from 'src/shared/ui/button/button';
 export { default as BrandWordmark } from 'src/shared/ui/brand-wordmark/brand-wordmark';
+export { default as Dialog } from 'src/shared/ui/dialog/dialog';
 export { default as IconButton } from 'src/shared/ui/icon-button/icon-button';
 export { default as LegalDocument } from 'src/shared/ui/legal-document/legal-document';
 export type {

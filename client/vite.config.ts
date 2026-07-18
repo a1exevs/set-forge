@@ -17,6 +17,8 @@ export default defineConfig(({ mode }) => {
     // (public) source. Empty when unset — the privacy page falls back to placeholders.
     define: {
       __PRIVACY_OPERATOR_NAME__: JSON.stringify(env.VITE_PRIVACY_OPERATOR_NAME || ''),
+      __PRIVACY_OPERATOR_NAME_RU__: JSON.stringify(env.VITE_PRIVACY_OPERATOR_NAME_RU || ''),
+      __PRIVACY_OPERATOR_NAME_EN__: JSON.stringify(env.VITE_PRIVACY_OPERATOR_NAME_EN || ''),
       __PRIVACY_CONTACT_EMAIL__: JSON.stringify(env.VITE_PRIVACY_CONTACT_EMAIL || ''),
     },
     server: {

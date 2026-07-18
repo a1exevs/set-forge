@@ -212,6 +212,11 @@ MYSQL_PASSWORD=strong_db_password
 
 SITE_ADDRESS=185-10-20-30.sslip.io
 VITE_PUBLIC_ORIGIN=https://185-10-20-30.sslip.io
+
+# Legal/privacy — baked into the client bundle at build time (see §8.3)
+VITE_PRIVACY_OPERATOR_NAME_RU=ИП Иванов Иван Иванович
+VITE_PRIVACY_OPERATOR_NAME_EN=Ivan Ivanov, sole proprietor
+VITE_PRIVACY_CONTACT_EMAIL=privacy@set-forge.example.com
 ```
 
 Example **with your own domain** (domain A record points to the server IP):
@@ -224,6 +229,11 @@ MYSQL_PASSWORD=strong_db_password
 
 SITE_ADDRESS=set-forge.example.com
 VITE_PUBLIC_ORIGIN=https://set-forge.example.com
+
+# Legal/privacy — baked into the client bundle at build time (see §8.3)
+VITE_PRIVACY_OPERATOR_NAME_RU=ИП Иванов Иван Иванович
+VITE_PRIVACY_OPERATOR_NAME_EN=Ivan Ivanov, sole proprietor
+VITE_PRIVACY_CONTACT_EMAIL=privacy@set-forge.example.com
 ```
 
 > **Do not override** `HTTP_PORT` and `HTTPS_PORT` on the VDS — Caddy must listen on standard ports 80 and 443 for automatic TLS.
@@ -252,6 +262,11 @@ SERVER_STATIC=static
 SERVER_LOGS=logs
 JWT_SECRET_KEY=long_random_string_1
 SESSION_SECRET_KEY=long_random_string_2
+
+# Current legal-document versions (default 1). Bump when a document changes
+# materially — users who accepted an older version are prompted to re-accept.
+TERMS_VERSION=1
+PRIVACY_VERSION=1
 ```
 
 Generate secrets:
@@ -261,6 +276,24 @@ openssl rand -hex 32
 ```
 
 `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` must match the root `.env`.
+
+### 8.3. Legal documents & privacy
+
+The app ships a Privacy Policy (`/privacy`) and Terms of Use (`/terms`) and requires new users to consent to personal-data processing and accept the terms at registration (152-ФЗ).
+
+**Operator identity (client, build time).** The operator name is shown per language, so set both `VITE_PRIVACY_OPERATOR_NAME_RU` and `VITE_PRIVACY_OPERATOR_NAME_EN` (root `.env`) — the RU name appears on the Russian Privacy Policy, the EN name on the English one. `VITE_PRIVACY_OPERATOR_NAME` (unsuffixed) is an optional shared fallback used for any language you leave unset. `VITE_PRIVACY_CONTACT_EMAIL` is the language-agnostic contact address. All are baked into the client bundle at build time and shown in the Privacy Policy / Terms as the data controller and contact point. They are **required for a public deployment** — set the real operator names and a reachable mailbox before going live. When unset the pages fall back to placeholders (`Оператор сервиса Set Forge` / `Set Forge Operator` / `privacy@set-forge.example`). Because they are compiled into the bundle, you must **rebuild `client-prod`** after changing them:
+
+```bash
+npm run prod:up   # rebuilds images (client-prod picks up the new build args)
+```
+
+**Document versions (server, runtime).** `TERMS_VERSION` and `PRIVACY_VERSION` (`server/.production.env`, default `1`) record which version a user accepted. When you change a document materially:
+
+1. Update the document text (`client/src/pages/privacy/model/privacy-policy-content.ts` or `.../terms/model/terms-content.ts`) and bump its `*_EFFECTIVE_DATE`.
+2. Increment the matching `TERMS_VERSION` / `PRIVACY_VERSION` in `server/.production.env`.
+3. Restart `server-prod` (`npm run prod:up`). Users who accepted an older version are shown a blocking re-consent gate on their next visit and must re-accept or log out.
+
+See the [personal-data-compliance rule](.cursor/rules/personal-data-compliance.mdc) for the full checklist.
 
 ---
 
@@ -549,7 +582,7 @@ Check that `SERVER_URL` and `CLIENT_URL` in `server/.production.env` **exactly**
 
 ### Wrong or missing link preview (OG image)
 
-`VITE_PUBLIC_ORIGIN` in the root `.env` must match `CLIENT_URL` (see [§8.3](#83-vite_public_origin-og-meta-tags)). Rebuild `client-prod` after changing it. Crawlers need absolute URLs — placeholders like `%VITE_PUBLIC_ORIGIN%` in the served HTML mean the image was built without the variable set.
+`VITE_PUBLIC_ORIGIN` in the root `.env` must match `CLIENT_URL` (see [§8.1](#81-root-env)). Rebuild `client-prod` after changing it. Crawlers need absolute URLs — placeholders like `%VITE_PUBLIC_ORIGIN%` in the served HTML mean the image was built without the variable set.
 
 If the image opens directly in the browser but a preview tool (e.g. opengraph.xyz) shows a broken image, check `Cross-Origin-Resource-Policy` on `/logo-og.png` — it must be `cross-origin` for `client/public/` assets (see [`client/nginx.conf`](client/nginx.conf)). Rebuild `client-prod` after changing nginx config.
 
