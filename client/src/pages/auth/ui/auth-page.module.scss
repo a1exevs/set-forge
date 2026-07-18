@@ -129,6 +129,33 @@
   border: 1px solid $border-color;
 }
 
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  margin-top: $spacing-sm;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  cursor: pointer;
+}
+
+.consentCheckbox {
+  margin-top: 0.15rem;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.consentLink {
+  color: $primary-color;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .submit {
   margin-top: $spacing-md;
   width: 100%;

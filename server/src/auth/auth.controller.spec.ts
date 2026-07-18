@@ -20,9 +20,9 @@ import { ResponseInterceptor } from '@common/interceptors';
 import { sendPseudoError } from '@test/unit/helpers';
 import { ErrorMessages } from '@common/constants';
 
-const getValidationPipeDataForUserRegistration = function (email, password) {
+const getValidationPipeDataForUserRegistration = function (email, password, consent: unknown = true) {
   const target: ValidationPipe = new ValidationPipe();
-  const registerDto: RegisterRequest.Dto = { email, password };
+  const registerDto: RegisterRequest.Dto = { email, password, consent } as RegisterRequest.Dto;
   const metadata: ArgumentMetadata = { type: 'body', metatype: RegisterRequest.Dto };
   return { target, metadata, registerDto };
 };
@@ -153,6 +153,20 @@ describe('AuthController', () => {
         expect(err.getResponse()).toContainEqual(
           `password - ${ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(8, 50)}`,
         );
+      }
+    });
+    it('Input params validation: should return bad request (consent not given)', async () => {
+      const { target, metadata, registerDto } = getValidationPipeDataForUserRegistration(
+        'user@yandex.ru',
+        '12345678',
+        false,
+      );
+      try {
+        await target.transform(registerDto, metadata);
+        sendPseudoError();
+      } catch (err) {
+        expect(err.status).toBe(400);
+        expect(err.getResponse()).toContainEqual(`consent - ${ErrorMessages.CONSENT_TO_PRIVACY_POLICY_IS_REQUIRED}`);
       }
     });
     it('Input params validation: should be successful', async () => {

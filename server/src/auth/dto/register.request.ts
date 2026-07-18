@@ -1,4 +1,4 @@
-import { IsEmail, IsString, Length } from 'class-validator';
+import { Equals, IsEmail, IsString, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { ErrorMessages } from '@common/constants';
@@ -24,9 +24,17 @@ export namespace RegisterRequest {
     })
     readonly password: string;
 
-    constructor(email, password) {
+    // Explicit consent to the privacy policy (152-ФЗ / GDPR). Must be `true`.
+    // No default: `plainToInstance` runs this constructor with no args, so a request that
+    // omits `consent` leaves it `undefined` and is rejected. Validated at the boundary only; not persisted.
+    @ApiProperty({ description: 'Consent to the privacy policy', example: true })
+    @Equals(true, { message: ErrorMessages.CONSENT_TO_PRIVACY_POLICY_IS_REQUIRED })
+    readonly consent?: boolean;
+
+    constructor(email, password, consent?: boolean) {
       this.email = email;
       this.password = password;
+      this.consent = consent;
     }
   }
 

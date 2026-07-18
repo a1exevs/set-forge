@@ -13,16 +13,19 @@ type Props = {
   activeTab: AuthTab;
   email: string;
   password: string;
+  consent: boolean;
   captcha: string;
   captchaImageUrl: string | null;
   showCaptcha: boolean;
   emailError: string | null;
   passwordError: string | null;
+  consentError: string | null;
   captchaError: string | null;
   formError: string | null;
   isSubmitting: boolean;
   onEmailChange: (v: string) => void;
   onPasswordChange: (v: string) => void;
+  onConsentChange: (v: boolean) => void;
   onCaptchaChange: (v: string) => void;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
   redirectSearch: Record<string, string | undefined>;
@@ -52,16 +55,19 @@ const AuthPage: FC<Props> = ({
   activeTab,
   email,
   password,
+  consent,
   captcha,
   captchaImageUrl,
   showCaptcha,
   emailError,
   passwordError,
+  consentError,
   captchaError,
   formError,
   isSubmitting,
   onEmailChange,
   onPasswordChange,
+  onConsentChange,
   onCaptchaChange,
   onSubmit,
   redirectSearch,
@@ -141,6 +147,27 @@ const AuthPage: FC<Props> = ({
                 disabled={isSubmitting}
               />
               {captchaError && <p className={classes.fieldError}>{captchaError}</p>}
+            </>
+          )}
+
+          {activeTab === 'register' && (
+            <>
+              <label className={classes.consent}>
+                <input
+                  type="checkbox"
+                  className={classes.consentCheckbox}
+                  checked={consent}
+                  onChange={(e): void => onConsentChange(e.target.checked)}
+                  disabled={isSubmitting}
+                />
+                <span>
+                  I have read and accept the{' '}
+                  <Link to="/privacy" className={classes.consentLink} target="_blank" rel="noopener noreferrer">
+                    Privacy Policy
+                  </Link>
+                </span>
+              </label>
+              {consentError && <p className={classes.fieldError}>{consentError}</p>}
             </>
           )}
 

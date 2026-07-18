@@ -27,10 +27,10 @@ export type CurrentUser = {
 
 type AuthData = { userId: number; accessToken: string };
 
-export async function postRegistration(email: string, password: string): Promise<AuthData> {
+export async function postRegistration(email: string, password: string, consent: boolean): Promise<AuthData> {
   const res = await apiRequest<AuthData>('/auth/registration', {
     method: 'POST',
-    body: { email, password },
+    body: { email, password, consent },
   });
   if (res.resultCode !== ResultCodes.OK || !res.data) {
     throw new Error(res.messages[0] ?? 'Registration failed');

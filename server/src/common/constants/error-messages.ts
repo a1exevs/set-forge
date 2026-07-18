@@ -5,6 +5,7 @@ export const ErrorMessages = {
   MUST_BE_A_STRING: 'Must be a string',
   MUST_BE_A_BOOLEAN: 'Must be a boolean',
   MUST_HAS_EMAIL_FORMAT: 'Invalid email format',
+  CONSENT_TO_PRIVACY_POLICY_IS_REQUIRED: 'Consent to the privacy policy is required',
   STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N:
     'Length must be greater than {0} and less than {1} characters',
   STRING_LENGTH_MUST_NOT_BE_GREATER_THAN_N: 'Length must be less than {0} characters',
