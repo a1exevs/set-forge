@@ -753,7 +753,7 @@ type ConfirmOptions = {
 
 ### Purpose
 
-Renders a structured legal document (Privacy Policy, Terms of Use) from a data model, with a RU/EN language switch, an effective-date header, and a back link. Keeps the two legal pages presentation-free — each page only supplies content and an effective date.
+Renders a structured legal document (Privacy Policy, Terms of Use) from a data model, with a RU/EN language switch, an effective-date header, and a Back button. Keeps the two legal pages presentation-free — each page only supplies content and an effective date.
 
 ### Location
 
@@ -761,7 +761,8 @@ Renders a structured legal document (Privacy Policy, Terms of Use) from a data m
 
 ### Files
 
-- `legal-document.tsx` — renderer + exported content types; default export.
+- `legal-document-logic-layer.tsx` — language state + router-history Back handler; public default export (no data layer, so the logic layer is exported).
+- `legal-document.tsx` — pure presentation renderer + exported content types.
 - `legal-document.module.scss` — page, card, language switch, section, list styles.
 - `legal-document.stories.tsx` — Storybook (wrapped in a memory `RouterProvider`).
 - `specs/legal-document.spec.unit.tsx` — unit tests.
@@ -780,24 +781,25 @@ type Props = {
 - `LegalContent` — `{ title, effectiveLabel, intro, sections }`.
 - `LegalSection` — `{ heading, blocks }` where a block is `{ type: 'p'; text: LegalText }` or `{ type: 'ul'; items: string[] }`.
 - `LegalText` — a plain string or a sequence of strings and inline `LegalLink`s (`{ text, to?, href? }`) for in-app routes (`to`) or external links such as `mailto:` (`href`).
-- `backTo` defaults to `/login`.
+- `backTo` defaults to `/login` and is used only as a fallback (see Behavior).
 
 ### Tech stack
 
 | Category | Technology |
 |----------|------------|
-| UI | TanStack Router `Link`, `lucide-react` (`ArrowLeft`), shared `BrandWordmark` |
+| UI | TanStack Router `Link` / `useRouter`, `lucide-react` (`ArrowLeft`), shared `BrandWordmark` |
 | State | local `useState` for the selected language |
 | Styling | SCSS Modules |
 
 ### UI
 
-- Header: back link + RU/EN language switch (`role="group"`, `aria-pressed`), `BrandWordmark`, title, effective date.
+- Header: Back button + RU/EN language switch (`role="group"`, `aria-pressed`), `BrandWordmark`, title, effective date.
 - Intro paragraph, then sections; each section renders paragraphs and bullet lists in order.
 
 ### Behavior
 
 - Language switch toggles between `content.ru` and `content.en` in place.
+- Back button: steps back through router history (`router.history.canGoBack()` → `back()`) so the user returns to where they came from (e.g. Profile); when there is no in-app history (direct load / new tab) it navigates to `backTo`.
 - Inline links: `to` → router `Link`; `href` → plain anchor.
 
 ### Accessibility
@@ -812,7 +814,7 @@ type Props = {
 
 ### Tests
 
-- Unit: `specs/legal-document.spec.unit.tsx` — default language render, EN switch, `backTo` link target.
+- Unit: `specs/legal-document.spec.unit.tsx` — default language render, EN switch, Back button (history back vs `backTo` fallback).
 
 ### Usage
 

@@ -55,5 +55,4 @@ export {
   type LegalLink,
   type LegalSection,
   type LegalText,
-  type TabsBarItem,
 } from 'src/shared/ui';

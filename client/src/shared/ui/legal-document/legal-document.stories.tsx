@@ -1,4 +1,3 @@
-import type { LegalContent, LegalLang } from '@shared';
 import type { Meta } from '@storybook/react';
 import { createMemoryHistory, createRootRoute, createRouter, RouterProvider } from '@tanstack/react-router';
 import type { ReactElement } from 'react';
@@ -10,7 +9,8 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 
-import LegalDocument from 'src/shared/ui/legal-document/legal-document';
+import type { LegalContent, LegalLang } from 'src/shared/ui/legal-document/legal-document';
+import LegalDocument from 'src/shared/ui/legal-document/legal-document-logic-layer';
 
 const storyTitle = 'Shared/LegalDocument';
 

@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft } from 'lucide-react';
-import { FC, Fragment, ReactNode, useState } from 'react';
+import { FC, Fragment, ReactNode } from 'react';
 
 import BrandWordmark from 'src/shared/ui/brand-wordmark/brand-wordmark';
 import classes from 'src/shared/ui/legal-document/legal-document.module.scss';
@@ -50,27 +50,26 @@ export type LegalContent = {
 };
 
 type Props = {
-  content: Record<LegalLang, LegalContent>;
+  doc: LegalContent;
+  lang: LegalLang;
   effectiveDate: string;
-  backTo?: '/login' | '/register';
+  onLangChange: (lang: LegalLang) => void;
+  onBack: () => void;
 };
 
 const LANG_LABEL: Record<LegalLang, string> = { ru: 'RU', en: 'EN' };
 const BACK_LABEL: Record<LegalLang, string> = { ru: 'Назад', en: 'Back' };
 
-const LegalDocument: FC<Props> = ({ content, effectiveDate, backTo = '/login' }) => {
-  const [lang, setLang] = useState<LegalLang>('ru');
-  const doc = content[lang];
-
+const LegalDocument: FC<Props> = ({ doc, lang, effectiveDate, onLangChange, onBack }) => {
   return (
     <div className={classes.page}>
       <div className={classes.card}>
         <header className={classes.header}>
           <div className={classes.topBar}>
-            <Link to={backTo} className={classes.backLink}>
+            <button type="button" className={classes.backLink} onClick={onBack}>
               <ArrowLeft size={18} strokeWidth={1.75} aria-hidden />
               {BACK_LABEL[lang]}
-            </Link>
+            </button>
             <div className={classes.langSwitch} role="group" aria-label="Language">
               {(Object.keys(LANG_LABEL) as LegalLang[]).map(code => (
                 <button
@@ -78,7 +77,7 @@ const LegalDocument: FC<Props> = ({ content, effectiveDate, backTo = '/login' })
                   type="button"
                   className={code === lang ? `${classes.langButton} ${classes.langButtonActive}` : classes.langButton}
                   aria-pressed={code === lang}
-                  onClick={(): void => setLang(code)}
+                  onClick={(): void => onLangChange(code)}
                 >
                   {LANG_LABEL[code]}
                 </button>
