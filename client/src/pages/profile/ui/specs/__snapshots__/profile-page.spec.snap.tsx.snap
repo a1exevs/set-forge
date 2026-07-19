@@ -76,25 +76,8 @@ exports[`ProfilePage matches snapshot 1`] = `
         </button>
       </div>
       <footer
-        class="legal"
-      >
-        <a
-          href="/privacy"
-        >
-          Privacy Policy
-        </a>
-        <span
-          aria-hidden="true"
-          class="legalSep"
-        >
-          ·
-        </span>
-        <a
-          href="/terms"
-        >
-          Terms of Service
-        </a>
-      </footer>
+        data-testid="legal-footer"
+      />
     </main>
     <nav
       data-testid="main-tabs-bar"

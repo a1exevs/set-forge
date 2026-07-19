@@ -53,7 +53,7 @@ Shows authenticated user avatar letter, email, **Log out** button, and a **Delet
 
 ### Legal footer
 
-1. `Link`s to `/privacy` (Privacy Policy) and `/terms` (Terms of Service).
+1. Shared [`LegalFooter`](../../../client/src/widgets/legal-footer/) widget — links to `/privacy` (Privacy Policy) and `/terms` (Terms of Service). Page supplies only outer spacing via `className`.
 
 ### Bottom navigation
 

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { FC, FormEvent } from 'react';
 
 import { BrandWordmark, Button } from '@shared';
+import { LegalFooter } from '@widgets';
 
 import classes from 'src/pages/auth/ui/auth-page.module.scss';
 
@@ -201,17 +202,7 @@ const AuthPage: FC<Props> = ({
           </Button>
         </form>
 
-        <p className={classes.legal}>
-          <Link to="/privacy" className={classes.legalLink}>
-            Privacy Policy
-          </Link>
-          <span className={classes.legalSep} aria-hidden>
-            ·
-          </span>
-          <Link to="/terms" className={classes.legalLink}>
-            Terms of Service
-          </Link>
-        </p>
+        <LegalFooter className={classes.legal} />
       </div>
     </div>
   );

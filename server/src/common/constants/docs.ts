@@ -24,6 +24,7 @@ export const Docs = {
   LOGOUT_SUCCESSFUL_RESULT: 'Session closed successfully',
   LOGOUT_UNPROCESSABLE_ENTITY: 'Unprocessable entity',
   LOGOUT_UNAUTHORIZED: 'Unauthorized',
+  LOGOUT_FORBIDDEN: 'Forbidden',
 
   DELETE_ACCOUNT_ENDPOINT: 'Delete the current user account and all related data',
   DELETE_ACCOUNT_SUCCESSFUL_RESULT: 'Account and all related data deleted successfully',
@@ -34,7 +35,6 @@ export const Docs = {
   ACCEPT_DOCUMENTS_SUCCESSFUL_RESULT: 'Documents accepted successfully',
   ACCEPT_DOCUMENTS_UNAUTHORIZED: 'Unauthorized',
   ACCEPT_DOCUMENTS_FORBIDDEN: 'Forbidden',
-  LOGOUT_FORBIDDEN: 'Forbidden',
 
   SECURITY_CONTROLLER: 'Security',
 

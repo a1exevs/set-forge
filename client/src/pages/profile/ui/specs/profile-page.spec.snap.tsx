@@ -15,6 +15,7 @@ jest.mock('@widgets', () => ({
     { id: 'home', to: '/' },
     { id: 'profile', to: '/profile' },
   ],
+  LegalFooter: (): JSX.Element => <footer data-testid="legal-footer" />,
 }));
 
 jest.mock('@shared', () => {

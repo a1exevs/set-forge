@@ -46,7 +46,7 @@ Login and registration on `/login` and `/register` (same component, tab follows 
 2. TanStack Router `Link` tab links: Login / Register (`LogIn` / `UserPlus` icons); `role="tablist"` on nav.
 3. Forms: email + password fields; optional captcha image + input when visible.
 4. **Register only**: two consent checkboxes — personal-data processing (links to `/privacy`) and Terms of Use acceptance (links to `/terms`); each shows its own error text when unchecked on submit.
-5. Legal footer: `Link`s to `/privacy` (Privacy Policy) and `/terms` (Terms of Service) below the form.
+5. Legal footer: shared [`LegalFooter`](../../../client/src/widgets/legal-footer/) widget with `Link`s to `/privacy` (Privacy Policy) and `/terms` (Terms of Service) below the form.
 6. Server errors: `messages` / field errors on form.
 
 ---

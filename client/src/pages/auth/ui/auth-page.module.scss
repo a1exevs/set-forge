@@ -163,21 +163,4 @@
 
 .legal {
   margin: $spacing-lg 0 0;
-  text-align: center;
-  font-size: $font-size-sm;
-}
-
-.legalSep {
-  margin: 0 $spacing-sm;
-  color: $text-tertiary;
-}
-
-.legalLink {
-  color: $text-secondary;
-  text-decoration: none;
-
-  &:hover {
-    color: $text-primary;
-    text-decoration: underline;
-  }
 }
