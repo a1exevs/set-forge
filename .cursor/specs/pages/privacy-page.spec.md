@@ -8,7 +8,7 @@ Public Privacy Policy page on `/privacy`. Presentation-only wrapper around the s
 
 ## Route
 
-- Path: `/privacy` (public — listed in root `PUBLIC_PATHS`)
+- Path: `/privacy` (always-public — listed in root `ALWAYS_PUBLIC_PATHS`; no auth required, no guest-only redirect)
 - Router entry: `privacy-page.tsx` (presentation only, no data/logic layer)
 - Route file: `client/src/app/model/routes/privacy.tsx`
 
@@ -33,7 +33,7 @@ Public Privacy Policy page on `/privacy`. Presentation-only wrapper around the s
 
 ### Document
 
-1. Shared `LegalDocument` renders header (back link, RU/EN switch, wordmark, title, effective date), intro, and sections (data-driven).
+1. Shared `LegalDocument` renders header (Back button, RU/EN switch, wordmark, title, effective date), intro, and sections (data-driven).
 
 ---
 
@@ -46,6 +46,10 @@ Public Privacy Policy page on `/privacy`. Presentation-only wrapper around the s
 ### Operator identity
 
 2. `PRIVACY_OPERATOR.name` is per-language (`{ ru, en }`) and `contactEmail` is language-agnostic; all are injected at build time (via Vite `define`) so the real operator identity stays out of the public source: `VITE_PRIVACY_OPERATOR_NAME_RU` → `__PRIVACY_OPERATOR_NAME_RU__` (RU document) and `VITE_PRIVACY_OPERATOR_NAME_EN` → `__PRIVACY_OPERATOR_NAME_EN__` (EN document), with `VITE_PRIVACY_OPERATOR_NAME` → `__PRIVACY_OPERATOR_NAME__` as a shared fallback, plus `VITE_PRIVACY_CONTACT_EMAIL` → `__PRIVACY_CONTACT_EMAIL__`. Fall back to placeholders when unset (dev, tests, unconfigured build).
+
+### Re-consent gate
+
+3. The root `DocumentReconsentGate` is **suppressed** on `/privacy` (and `/terms`) even when `documentsPendingAcceptance` is true, so a user who must re-accept can still read the document. The gate returns when they navigate back to an app route.
 
 ---
 

@@ -8,10 +8,10 @@ Login and registration on `/login` and `/register` (same component, tab follows 
 
 ## Route
 
-- Paths: `/login`, `/register` (public)
+- Paths: `/login`, `/register` (guest-only — listed in root `GUEST_ONLY_PATHS`; signed-in users are redirected home)
 - Router entry: `auth-page-data-layer.tsx` (same component for both routes)
 - Route files: `client/src/app/model/routes/login.tsx`, `register.tsx`
-- Other public routes: `/privacy`, `/terms` (see [privacy-page](privacy-page.spec.md), [terms-page](terms-page.spec.md))
+- Always-public routes: `/privacy`, `/terms` (root `ALWAYS_PUBLIC_PATHS`; see [privacy-page](privacy-page.spec.md), [terms-page](terms-page.spec.md))
 - Protected routes (all others): `/`, `/history`, `/profile`, `/create`, `/edit/$id`, `/workout/$id`
 
 ### Redirects

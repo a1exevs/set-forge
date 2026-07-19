@@ -8,7 +8,7 @@ Public Terms of Use page on `/terms`. Presentation-only wrapper around the share
 
 ## Route
 
-- Path: `/terms` (public — listed in root `PUBLIC_PATHS`)
+- Path: `/terms` (always-public — listed in root `ALWAYS_PUBLIC_PATHS`; no auth required, no guest-only redirect)
 - Router entry: `terms-page.tsx` (presentation only, no data/logic layer)
 - Route file: `client/src/app/model/routes/terms.tsx`
 
@@ -33,7 +33,7 @@ Public Terms of Use page on `/terms`. Presentation-only wrapper around the share
 
 ### Document
 
-1. Shared `LegalDocument` renders header (back link, RU/EN switch, wordmark, title, effective date), intro, and sections (data-driven). Includes a health/liability disclaimer and cross-links to the Privacy Policy.
+1. Shared `LegalDocument` renders header (Back button, RU/EN switch, wordmark, title, effective date), intro, and sections (data-driven). Includes a health/liability disclaimer and cross-links to the Privacy Policy.
 
 ---
 
@@ -46,6 +46,10 @@ Public Terms of Use page on `/terms`. Presentation-only wrapper around the share
 ### Contact
 
 2. The contact email is the same build-time value as the Privacy Policy (`__PRIVACY_CONTACT_EMAIL__`), shown directly as a `mailto:` link; falls back to a placeholder when unset.
+
+### Re-consent gate
+
+3. The root `DocumentReconsentGate` is **suppressed** on `/terms` (and `/privacy`) even when `documentsPendingAcceptance` is true, so a user who must re-accept can still read the document. The gate returns when they navigate back to an app route.
 
 ---
 

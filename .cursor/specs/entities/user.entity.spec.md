@@ -181,7 +181,7 @@ When `authFailedCount >= 5`, failed login returns `resultCode === 10` (`NEED_CAP
 - [terms-page](../pages/terms-page.spec.md) — Terms of Use document
 - [home-page](../pages/home-page.spec.md) — gates `useWorkoutListsQuery` on user
 - [history-page](../pages/history-page.spec.md) — gates history query on user
-- `widgets/document-reconsent` — blocking re-acceptance gate rendered at the root (`useAcceptDocumentsMutation`, `documentsPendingAcceptance`)
+- `widgets/document-reconsent` — blocking re-acceptance gate rendered at the root (`useAcceptDocumentsMutation`, `documentsPendingAcceptance`). **Suppressed on `/privacy` and `/terms`** so the legal documents remain readable while pending; non-dismissable on all other routes (accept or log out).
 - All protected pages — root `beforeLoad` session bootstrap
 
 ---

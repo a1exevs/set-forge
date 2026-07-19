@@ -44,7 +44,7 @@ If a change is purely internal and does not alter *what* PD is handled or *what*
 ## Hard invariants (do not break)
 
 1. **Separate consent.** Registration keeps `consent` (PD processing) and `termsAccepted` (Terms) as two distinct, explicit, non-defaulted `@Equals(true)` fields. Never merge them or default them to `true`.
-2. **Re-consent gate.** `documentsPendingAcceptance` stays *derived* from stored vs required versions (never persisted as a flag); the root re-consent gate must remain reachable and non-dismissable (accept or log out).
+2. **Re-consent gate.** `documentsPendingAcceptance` stays *derived* from stored vs required versions (never persisted as a flag); the root re-consent gate must remain reachable and non-dismissable on app routes (accept or log out). **Exception:** the gate must stay closed on `/privacy` and `/terms` so the user can read the documents before accepting — never bootstrap/session-restore in a way that re-blocks those pages.
 3. **Deletion cascade.** Account deletion must remove *all* user-owned data (DB `ON DELETE CASCADE`); a new user-owned table MUST add a cascading FK and be covered by `account-deletion-cascade.e2e-spec.ts`.
 4. **Operator identity stays out of source.** Real operator name / contact come from build-time env — the per-language operator name (`VITE_PRIVACY_OPERATOR_NAME_RU` / `VITE_PRIVACY_OPERATOR_NAME_EN`, with `VITE_PRIVACY_OPERATOR_NAME` as a shared fallback) and `VITE_PRIVACY_CONTACT_EMAIL`; do not hardcode real values in the repo.
 5. **Data localization & minimization.** Do not add collection of data the policy says is not collected (full name, phone, address, payments, biometrics, analytics) without first updating the policy and legal basis.

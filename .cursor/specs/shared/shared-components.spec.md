@@ -651,7 +651,7 @@ type Props = {
 ### Usage
 
 - `shared/ui/confirm-dialog/confirm-dialog.tsx` — wraps `Dialog` with title, description, and action buttons.
-- `widgets/document-reconsent/ui/document-reconsent-gate.tsx` — non-dismissable re-consent modal (`onClose` no-op, `disableAnimation`).
+- `widgets/document-reconsent/ui/document-reconsent-gate.tsx` — non-dismissable re-consent modal (`onClose` no-op, `disableAnimation`); open state is suppressed on `/privacy` and `/terms` in the data layer.
 
 ---
 
