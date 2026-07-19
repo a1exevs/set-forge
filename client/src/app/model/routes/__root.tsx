@@ -36,6 +36,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     const path = location.pathname;
 
     // Legal documents are open to everyone — never redirect and never require a session.
+    // Do not bootstrap here: signed-in users with pending reconsent must still be able to
+    // read these pages; the reconsent gate is suppressed on these paths in the widget.
     if (ALWAYS_PUBLIC_PATHS.has(path)) {
       return;
     }

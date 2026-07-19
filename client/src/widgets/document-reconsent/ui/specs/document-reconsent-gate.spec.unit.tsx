@@ -14,7 +14,11 @@ jest.mock('@entities', () => ({
 
 jest.mock('@tanstack/react-router', () => ({
   Link: ({ to, children }: { to: string; children: ReactNode }) => <a href={to}>{children}</a>,
+  useRouterState: ({ select }: { select: (state: { location: { pathname: string } }) => string }) =>
+    select({ location: { pathname: mockPathname } }),
 }));
+
+let mockPathname = '/';
 
 const mockedCurrentUser = useCurrentUserQuery as jest.Mock;
 const mockedAccept = useAcceptDocumentsMutation as jest.Mock;
@@ -26,6 +30,7 @@ describe('DocumentReconsentGate', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPathname = '/';
     acceptMutation.mutateAsync.mockResolvedValue(undefined);
     mockedAccept.mockReturnValue(acceptMutation);
     mockedLogout.mockReturnValue(logoutMutation);
@@ -34,6 +39,17 @@ describe('DocumentReconsentGate', () => {
   it('renders nothing when acceptance is up to date', () => {
     mockedCurrentUser.mockReturnValue({ data: { id: 1, email: 'a@b.c', documentsPendingAcceptance: false } });
     render(<DocumentReconsentGate />);
+    expect(screen.queryByText(/updated our documents/i)).not.toBeInTheDocument();
+  });
+
+  it('stays closed on /privacy and /terms so the documents remain readable', () => {
+    mockedCurrentUser.mockReturnValue({ data: { id: 1, email: 'a@b.c', documentsPendingAcceptance: true } });
+    mockPathname = '/privacy';
+    const { rerender } = render(<DocumentReconsentGate />);
+    expect(screen.queryByText(/updated our documents/i)).not.toBeInTheDocument();
+
+    mockPathname = '/terms';
+    rerender(<DocumentReconsentGate />);
     expect(screen.queryByText(/updated our documents/i)).not.toBeInTheDocument();
   });
 

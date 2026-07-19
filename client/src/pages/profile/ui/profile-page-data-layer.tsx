@@ -17,9 +17,7 @@ const ProfilePageDataLayer: FC = () => {
         logoutMutation.mutate();
       }}
       isLoggingOut={logoutMutation.isPending}
-      onDeleteAccount={async (): Promise<void> => {
-        await deleteAccountMutation.mutateAsync();
-      }}
+      onDeleteAccount={(): Promise<void> => deleteAccountMutation.mutateAsync().catch(() => undefined)}
       isDeletingAccount={deleteAccountMutation.isPending}
     />
   );
