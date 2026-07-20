@@ -23,14 +23,20 @@ export function toAbsoluteFromApiOrigin(pathOrUrl: string): string {
 export type CurrentUser = {
   id: number;
   email: string;
+  documentsPendingAcceptance: boolean;
 };
 
 type AuthData = { userId: number; accessToken: string };
 
-export async function postRegistration(email: string, password: string): Promise<AuthData> {
+export async function postRegistration(
+  email: string,
+  password: string,
+  consent: boolean,
+  termsAccepted: boolean,
+): Promise<AuthData> {
   const res = await apiRequest<AuthData>('/auth/registration', {
     method: 'POST',
-    body: { email, password },
+    body: { email, password, consent, termsAccepted },
   });
   if (res.resultCode !== ResultCodes.OK || !res.data) {
     throw new Error(res.messages[0] ?? 'Registration failed');
@@ -86,6 +92,28 @@ export async function fetchCurrentUser(): Promise<CurrentUser | null> {
 export async function deleteLogout(): Promise<void> {
   try {
     await apiRequest<unknown>('/auth/logout', {
+      method: 'DELETE',
+      auth: true,
+    });
+  } finally {
+    clearAccessToken();
+  }
+}
+
+export async function patchDocumentsAcceptance(): Promise<CurrentUser> {
+  const res = await apiRequest<CurrentUser>('/auth/documents-acceptance', {
+    method: 'PATCH',
+    auth: true,
+  });
+  if (res.resultCode !== ResultCodes.OK || !res.data) {
+    throw new Error(res.messages[0] ?? 'Could not record document acceptance');
+  }
+  return res.data;
+}
+
+export async function deleteAccount(): Promise<void> {
+  try {
+    await apiRequest<unknown>('/auth/account', {
       method: 'DELETE',
       auth: true,
     });

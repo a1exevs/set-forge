@@ -2,7 +2,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 
 import type { CurrentUser } from 'src/entities/session/api/session-api';
-import { deleteLogout, fetchCurrentUser, postLogin, postRegistration } from 'src/entities/session/api/session-api';
+import {
+  deleteAccount,
+  deleteLogout,
+  fetchCurrentUser,
+  patchDocumentsAcceptance,
+  postLogin,
+  postRegistration,
+} from 'src/entities/session/api/session-api';
 import { sessionQueryKeys } from 'src/entities/session/model/session-keys';
 
 export function useCurrentUserQuery(enabled: boolean) {
@@ -14,7 +21,13 @@ export function useCurrentUserQuery(enabled: boolean) {
 }
 
 type LoginVars = { email: string; password: string; captcha?: string; redirectTo?: string };
-type RegisterVars = { email: string; password: string; redirectTo?: string };
+type RegisterVars = {
+  email: string;
+  password: string;
+  consent: boolean;
+  termsAccepted: boolean;
+  redirectTo?: string;
+};
 
 export function useLoginMutation() {
   const navigate = useNavigate();
@@ -48,7 +61,7 @@ export function useRegisterMutation() {
   return useMutation({
     mutationFn: async (vars: RegisterVars) => {
       const { redirectTo: _r, ...rest } = vars;
-      return postRegistration(rest.email, rest.password);
+      return postRegistration(rest.email, rest.password, rest.consent, rest.termsAccepted);
     },
     onSuccess: async (_data, vars) => {
       const user = await fetchCurrentUser();
@@ -74,6 +87,31 @@ export function useLogoutMutation() {
     mutationFn: deleteLogout,
     onSettled: () => {
       qc.removeQueries({ queryKey: sessionQueryKeys.me });
+      void navigate({ to: '/login' });
+    },
+  });
+}
+
+export function useAcceptDocumentsMutation() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: patchDocumentsAcceptance,
+    onSuccess: user => {
+      qc.setQueryData(sessionQueryKeys.me, user);
+    },
+  });
+}
+
+export function useDeleteAccountMutation() {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteAccount,
+    onSettled: () => {
+      // The account is gone: drop every cached query (profile, workout lists, sessions, history).
+      qc.clear();
       void navigate({ to: '/login' });
     },
   });

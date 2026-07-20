@@ -5,7 +5,7 @@ import { FindOptions } from 'sequelize';
 import { User } from '@users/users.model';
 import { CreateUserRequest } from '@users/dto';
 import { RolesService } from '@roles/roles.service';
-import { ErrorMessages } from '@common/constants';
+import { ErrorMessages, DocumentVersions } from '@common/constants';
 
 @Injectable()
 export class UsersService {
@@ -23,13 +23,31 @@ export class UsersService {
       );
     let user: User;
     try {
-      user = await this.userRepository.create(dto);
+      // Registration is where the user just accepted the documents — stamp the current versions.
+      user = await this.userRepository.create({
+        ...dto,
+        acceptedTermsVersion: DocumentVersions.terms(),
+        acceptedPrivacyVersion: DocumentVersions.privacy(),
+        acceptedAt: new Date(),
+      });
     } catch (e) {
       throw new HttpException(`${ErrorMessages.FAILED_TO_CREATE_USER}. ${e.message}`, HttpStatus.BAD_REQUEST);
     }
     await user.$set('roles', [role.id]);
     user.roles = [role];
     return user;
+  }
+
+  /** Records acceptance of the current document versions (used on registration and re-acceptance). */
+  async updateDocumentAcceptance(userId: number): Promise<void> {
+    await this.userRepository.update(
+      {
+        acceptedTermsVersion: DocumentVersions.terms(),
+        acceptedPrivacyVersion: DocumentVersions.privacy(),
+        acceptedAt: new Date(),
+      },
+      { where: { id: userId } },
+    );
   }
 
   public async getUserByEmail(email: string, withAllData = false) {
@@ -43,5 +61,16 @@ export class UsersService {
 
   async getUserById(id: number) {
     return this.userRepository.findOne({ where: { id }, include: { all: true } });
+  }
+
+  /**
+   * Deletes the user row. All user-owned data is removed by DB-level
+   * `ON DELETE CASCADE` foreign keys (workout lists → exercises, workout
+   * sessions → session exercises, refresh tokens, user roles). A `where`-based
+   * destroy issues a single DELETE so InnoDB applies the cascade.
+   */
+  async deleteUser(id: number): Promise<boolean> {
+    const deletedCount = await this.userRepository.destroy({ where: { id } });
+    return deletedCount > 0;
   }
 }

@@ -4,7 +4,7 @@
 
 Specification for shared UI components in `client/src/shared/ui/`. New components are added as sections in this file.
 
-**Components (10):**
+**Components (11):**
 
 | Component | Public export (`@shared`) | Storybook title |
 |-----------|---------------------------|-----------------|
@@ -16,8 +16,9 @@ Specification for shared UI components in `client/src/shared/ui/`. New component
 | UserAvatar | `UserAvatar` | `Shared/UserAvatar` |
 | UserAvatarMenu | `UserAvatarMenu` | `Shared/UserAvatarMenu` |
 | NumericField | `NumericField` | `Shared/NumericField` |
-| Dialog | internal only (used by ConfirmDialog) | `Shared/Dialog` |
+| Dialog | `Dialog` | `Shared/Dialog` |
 | ConfirmDialog | `ConfirmDialogProvider`, `useConfirm` | `Shared/ConfirmDialog` |
+| LegalDocument | `LegalDocument`, `LegalContent`/`LegalLang`/`LegalLink`/`LegalSection`/`LegalText` types | `Shared/LegalDocument` |
 
 All components use Headless UI where applicable, **lucide-react** for icons, and SCSS Modules for styling. The `styles/` directory (themes, variables, global) is not a component and is out of scope here.
 
@@ -583,7 +584,7 @@ type Props = {
 
 ### Purpose
 
-Modal overlay shell: backdrop, centered panel, open/close lifecycle, optional animations. Building block for `ConfirmDialog`; not re-exported from `@shared`.
+Modal overlay shell: backdrop, centered panel, open/close lifecycle, optional animations. Building block for `ConfirmDialog`; also re-exported from `@shared` for widgets that need a raw blocking modal (e.g. the document re-consent gate).
 
 ### Location
 
@@ -650,6 +651,7 @@ type Props = {
 ### Usage
 
 - `shared/ui/confirm-dialog/confirm-dialog.tsx` — wraps `Dialog` with title, description, and action buttons.
+- `widgets/document-reconsent/ui/document-reconsent-gate.tsx` — non-dismissable re-consent modal (`onClose` no-op, `disableAnimation`); open state is suppressed on `/privacy` and `/terms` in the data layer.
 
 ---
 
@@ -744,3 +746,77 @@ type ConfirmOptions = {
 - `pages/workout-mode/ui/workout-mode-page-logic-layer.tsx` — finish / discard / cancel (three-way).
 - `pages/edit-workout/ui/edit-workout-page-logic-layer.tsx` — save with optional session resync (three-way).
 - Tests/stories wrap consumers in `ConfirmDialogProvider` (see `app/model/specs/test-utils.tsx`).
+
+---
+
+## LegalDocument
+
+### Purpose
+
+Renders a structured legal document (Privacy Policy, Terms of Use) from a data model, with a RU/EN language switch, an effective-date header, and a Back button. Keeps the two legal pages presentation-free — each page only supplies content and an effective date.
+
+### Location
+
+`shared/ui/legal-document/`
+
+### Files
+
+- `legal-document-logic-layer.tsx` — language state + router-history Back handler; public default export (no data layer, so the logic layer is exported).
+- `legal-document.tsx` — pure presentation renderer + exported content types.
+- `legal-document.module.scss` — page, card, language switch, section, list styles.
+- `legal-document.stories.tsx` — Storybook (wrapped in a memory `RouterProvider`).
+- `specs/legal-document.spec.unit.tsx` — unit tests.
+
+### Props
+
+```typescript
+type Props = {
+  content: Record<LegalLang, LegalContent>;
+  effectiveDate: string;
+  backTo?: '/login' | '/register';
+};
+```
+
+- `LegalLang` — `'ru' | 'en'` (default `'ru'`).
+- `LegalContent` — `{ title, effectiveLabel, intro, sections }`.
+- `LegalSection` — `{ heading, blocks }` where a block is `{ type: 'p'; text: LegalText }` or `{ type: 'ul'; items: string[] }`.
+- `LegalText` — a plain string or a sequence of strings and inline `LegalLink`s (`{ text, to?, href? }`) for in-app routes (`to`) or external links such as `mailto:` (`href`).
+- `backTo` defaults to `/login` and is used only as a fallback (see Behavior).
+
+### Tech stack
+
+| Category | Technology |
+|----------|------------|
+| UI | TanStack Router `Link` / `useRouter`, `lucide-react` (`ArrowLeft`), shared `BrandWordmark` |
+| State | local `useState` for the selected language |
+| Styling | SCSS Modules |
+
+### UI
+
+- Header: Back button + RU/EN language switch (`role="group"`, `aria-pressed`), `BrandWordmark`, title, effective date.
+- Intro paragraph, then sections; each section renders paragraphs and bullet lists in order.
+
+### Behavior
+
+- Language switch toggles between `content.ru` and `content.en` in place.
+- Back button: steps back through router history (`router.history.canGoBack()` → `back()`) so the user returns to where they came from (e.g. Profile); when there is no in-app history (direct load / new tab) it navigates to `backTo`.
+- Inline links: `to` → router `Link`; `href` → plain anchor.
+
+### Accessibility
+
+- Language buttons expose `aria-pressed`; language group has `aria-label="Language"`.
+
+### Storybook
+
+- Title: `Shared/LegalDocument`
+- File: `legal-document.stories.tsx`
+- Stories: Desktop4k/Desktop/Tablet/Mobile with sample RU/EN content.
+
+### Tests
+
+- Unit: `specs/legal-document.spec.unit.tsx` — default language render, EN switch, Back button (history back vs `backTo` fallback).
+
+### Usage
+
+- `pages/privacy/ui/privacy-page.tsx` — Privacy Policy (`privacyContent`, `PRIVACY_EFFECTIVE_DATE`).
+- `pages/terms/ui/terms-page.tsx` — Terms of Use (`termsContent`, `TERMS_EFFECTIVE_DATE`).

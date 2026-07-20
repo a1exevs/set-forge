@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { FC, FormEvent } from 'react';
 
 import { BrandWordmark, Button } from '@shared';
+import { LegalFooter } from '@widgets';
 
 import classes from 'src/pages/auth/ui/auth-page.module.scss';
 
@@ -13,16 +14,22 @@ type Props = {
   activeTab: AuthTab;
   email: string;
   password: string;
+  consent: boolean;
+  termsAccepted: boolean;
   captcha: string;
   captchaImageUrl: string | null;
   showCaptcha: boolean;
   emailError: string | null;
   passwordError: string | null;
+  consentError: string | null;
+  termsError: string | null;
   captchaError: string | null;
   formError: string | null;
   isSubmitting: boolean;
   onEmailChange: (v: string) => void;
   onPasswordChange: (v: string) => void;
+  onConsentChange: (v: boolean) => void;
+  onTermsChange: (v: boolean) => void;
   onCaptchaChange: (v: string) => void;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
   redirectSearch: Record<string, string | undefined>;
@@ -52,16 +59,22 @@ const AuthPage: FC<Props> = ({
   activeTab,
   email,
   password,
+  consent,
+  termsAccepted,
   captcha,
   captchaImageUrl,
   showCaptcha,
   emailError,
   passwordError,
+  consentError,
+  termsError,
   captchaError,
   formError,
   isSubmitting,
   onEmailChange,
   onPasswordChange,
+  onConsentChange,
+  onTermsChange,
   onCaptchaChange,
   onSubmit,
   redirectSearch,
@@ -144,12 +157,54 @@ const AuthPage: FC<Props> = ({
             </>
           )}
 
+          {activeTab === 'register' && (
+            <>
+              <label className={classes.consent}>
+                {/** TODO implement shared chackbox via Headless UI and use it **/}
+                <input
+                  type="checkbox"
+                  className={classes.consentCheckbox}
+                  checked={consent}
+                  onChange={(e): void => onConsentChange(e.target.checked)}
+                  disabled={isSubmitting}
+                />
+                <span>
+                  I consent to the processing of my personal data as described in the{' '}
+                  <Link to="/privacy" className={classes.consentLink} target="_blank" rel="noopener noreferrer">
+                    Privacy Policy
+                  </Link>
+                </span>
+              </label>
+              {consentError && <p className={classes.fieldError}>{consentError}</p>}
+
+              <label className={classes.consent}>
+                {/** TODO implement shared chackbox via Headless UI and use it **/}
+                <input
+                  type="checkbox"
+                  className={classes.consentCheckbox}
+                  checked={termsAccepted}
+                  onChange={(e): void => onTermsChange(e.target.checked)}
+                  disabled={isSubmitting}
+                />
+                <span>
+                  I accept the{' '}
+                  <Link to="/terms" className={classes.consentLink} target="_blank" rel="noopener noreferrer">
+                    Terms of Use
+                  </Link>
+                </span>
+              </label>
+              {termsError && <p className={classes.fieldError}>{termsError}</p>}
+            </>
+          )}
+
           {formError && <p className={classes.formError}>{formError}</p>}
 
           <Button type="submit" size="lg" disabled={isSubmitting} className={classes.submit}>
             {activeTab === 'login' ? 'Log in' : 'Create account'}
           </Button>
         </form>
+
+        <LegalFooter className={classes.legal} />
       </div>
     </div>
   );

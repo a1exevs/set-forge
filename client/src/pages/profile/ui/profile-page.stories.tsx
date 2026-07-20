@@ -17,7 +17,14 @@ const renderProfilePage = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
     initialEntries: ['/profile'],
     component: (): JSX.Element => (
-      <ProfilePageLogicLayer email="jane@example.com" avatarLetter="J" onLogout={fn()} isLoggingOut={false} />
+      <ProfilePageLogicLayer
+        email="jane@example.com"
+        avatarLetter="J"
+        onLogout={fn()}
+        isLoggingOut={false}
+        onDeleteAccount={fn(() => Promise.resolve())}
+        isDeletingAccount={false}
+      />
     ),
   });
 

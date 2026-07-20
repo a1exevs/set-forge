@@ -260,6 +260,7 @@ const DialogWithMultipleFocusableElements: FC = () => {
 
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'flex', alignItems: 'center', color: '#212f79', cursor: 'pointer' }}>
+              {/** TODO implement shared chackbox via Headless UI and use it **/}
               <input
                 type="checkbox"
                 checked={formData.agree}

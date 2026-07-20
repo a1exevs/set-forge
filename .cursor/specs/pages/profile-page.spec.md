@@ -2,7 +2,7 @@
 
 ## Overview
 
-Shows authenticated user avatar letter, email, and **Log out** button. Shares bottom tab bar and swipe with Home and History. Session via [user entity](../entities/user.entity.spec.md).
+Shows authenticated user avatar letter, email, **Log out** button, and a **Delete account** danger zone. Shares bottom tab bar and swipe with Home and History. Session via [user entity](../entities/user.entity.spec.md).
 
 ---
 
@@ -46,6 +46,15 @@ Shows authenticated user avatar letter, email, and **Log out** button. Shares bo
 3. **Log out** — [`Button`](../shared/shared-components.spec.md#button) `variant="secondary"`; disabled while `isLoggingOut`.
 4. No `UserAvatarMenu` dropdown.
 
+### Danger zone
+
+1. Hint text warning that deletion is permanent and irreversible.
+2. **Delete account** — [`Button`](../shared/shared-components.spec.md#button) `variant="danger"`; disabled while `isDeletingAccount`. Opens a confirm dialog before deleting.
+
+### Legal footer
+
+1. Shared [`LegalFooter`](../../../client/src/widgets/legal-footer/) widget — links to `/privacy` (Privacy Policy) and `/terms` (Terms of Service). Page supplies only outer spacing via `className`.
+
 ### Bottom navigation
 
 1. [`MainTabsBar`](../../../client/src/widgets/main-tabs-bar/) — Profile tab active.
@@ -56,16 +65,20 @@ Shows authenticated user avatar letter, email, and **Log out** button. Shares bo
 
 ### Initialization
 
-1. `ProfilePageDataLayer`: `useCurrentUserQuery(true)`, `useLogoutMutation()`.
-2. Passes `email`, `avatarLetter`, `onLogout`, `isLoggingOut` to presentation.
+1. `ProfilePageDataLayer`: `useCurrentUserQuery(true)`, `useLogoutMutation()`, `useDeleteAccountMutation()`.
+2. Passes `email`, `avatarLetter`, `onLogout`, `isLoggingOut`, `onDeleteAccount`, `isDeletingAccount` to logic layer.
 
 ### Logout
 
 3. Log out → `DELETE /auth/logout` → clear session cache → redirect `/login`.
 
+### Delete account
+
+4. Logic layer (`useConfirm`) shows a confirm dialog ("Delete account?"); on confirm → `onDeleteAccount()` → `DELETE /auth/account` → `useDeleteAccountMutation` clears the entire query cache and redirects to `/login`.
+
 ### Tab swipe (presentation)
 
-4. `ProfilePage` mounts `useTabSwipeNavigation` — swipe right → `/history`; swipe left → no-op (rightmost tab).
+5. `ProfilePage` mounts `useTabSwipeNavigation` — swipe right → `/history`; swipe left → no-op (rightmost tab).
 
 ---
 
@@ -79,8 +92,12 @@ type Props = {
   avatarLetter: string;
   onLogout: () => void | Promise<void>;
   isLoggingOut: boolean;
+  onDeleteAccount: () => void | Promise<void>;
+  isDeletingAccount: boolean;
 };
 ```
+
+The confirm dialog lives in the logic layer (`useConfirm`), which wraps `onDeleteAccount` from the data layer.
 
 ---
 
@@ -90,6 +107,7 @@ type Props = {
 |--------|------|------|
 | GET | `/auth/me` | `useCurrentUserQuery` |
 | DELETE | `/auth/logout` | `useLogoutMutation` |
+| DELETE | `/auth/account` | `useDeleteAccountMutation` |
 
 Full contract: [user entity](../entities/user.entity.spec.md#api-contract).
 
@@ -134,6 +152,8 @@ Full contract: [user entity](../entities/user.entity.spec.md#api-contract).
 |----------|-----------|
 | Unauthenticated | Root redirect `/login` |
 | Logout in progress | Button disabled |
+| Delete in progress | Delete button disabled |
+| Delete confirm cancelled | No request sent |
 | Swipe right | Navigate to `/history` |
 
 ---

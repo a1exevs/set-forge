@@ -18,7 +18,9 @@ export {
 } from 'src/entities/session/model/auth-validation';
 export { sessionQueryKeys } from 'src/entities/session/model/session-keys';
 export {
+  useAcceptDocumentsMutation,
   useCurrentUserQuery,
+  useDeleteAccountMutation,
   useLoginMutation,
   useLogoutMutation,
   useRegisterMutation,

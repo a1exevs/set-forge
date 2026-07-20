@@ -29,6 +29,8 @@ describe('AuthService', () => {
             getUserByEmail: jest.fn(x => x),
             getUserById: jest.fn(x => x),
             createUser: jest.fn(x => x),
+            deleteUser: jest.fn(x => x),
+            updateDocumentAcceptance: jest.fn(x => x),
           },
         },
         {
@@ -301,13 +303,15 @@ describe('AuthService', () => {
   });
 
   describe('AuthService - me', () => {
-    it('Me method: should be successful result', async () => {
+    it('Me method: should be successful result (documents up to date)', async () => {
       const userId = 1;
       const userEmail = 'user@yandex.ru';
       const mockUser = {
         id: userId,
         email: userEmail,
         password: 'asdfsafas',
+        acceptedTermsVersion: 1,
+        acceptedPrivacyVersion: 1,
       };
       jest.spyOn(userService, 'getUserById').mockImplementation(async () => {
         return Promise.resolve(mockUser as User);
@@ -315,8 +319,16 @@ describe('AuthService', () => {
       const result = await authService.me(userId);
       expect(result.id).toBe(userId);
       expect(result.email).toBe(userEmail);
+      expect(result.documentsPendingAcceptance).toBe(false);
       expect(userService.getUserById).toBeCalledTimes(1);
       expect(userService.getUserById).toBeCalledWith(userId);
+    });
+    it('Me method: documentsPendingAcceptance is true for a legacy user (null versions)', async () => {
+      const userId = 1;
+      const mockUser = { id: userId, email: 'user@yandex.ru', password: 'x', acceptedTermsVersion: null };
+      jest.spyOn(userService, 'getUserById').mockImplementation(async () => Promise.resolve(mockUser as User));
+      const result = await authService.me(userId);
+      expect(result.documentsPendingAcceptance).toBe(true);
     });
     it('Me method: should be unauthorized (user not found', async () => {
       const userId = 1;
@@ -374,6 +386,72 @@ describe('AuthService', () => {
         expect(error.getResponse()).toMatchObject({ message: ErrorMessages.REFRESH_TOKEN_EXPIRED });
         expect(tokenService.removeRefreshToken).toBeCalledTimes(1);
         expect(tokenService.removeRefreshToken).toBeCalledWith(refreshToken);
+      }
+    });
+  });
+
+  describe('AuthService - deleteAccount', () => {
+    it('deleteAccount method: should delete the user and return true', async () => {
+      const userId = 1;
+      const mockUser = { id: userId, email: 'user@yandex.ru', password: 'asdfsafas' };
+      jest.spyOn(userService, 'getUserById').mockImplementation(async () => Promise.resolve(mockUser as User));
+      jest.spyOn(userService, 'deleteUser').mockImplementation(async () => Promise.resolve(true));
+
+      const result = await authService.deleteAccount(userId);
+
+      expect(result).toBe(true);
+      expect(userService.getUserById).toBeCalledTimes(1);
+      expect(userService.getUserById).toBeCalledWith(userId);
+      expect(userService.deleteUser).toBeCalledTimes(1);
+      expect(userService.deleteUser).toBeCalledWith(userId);
+    });
+    it('deleteAccount method: should be unauthorized (user not found)', async () => {
+      const userId = 1;
+      jest.spyOn(userService, 'getUserById').mockImplementation(async () => Promise.resolve(undefined));
+
+      try {
+        await authService.deleteAccount(userId);
+        sendPseudoError();
+      } catch (error) {
+        expect(error.status).toBe(401);
+        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.UNAUTHORIZED });
+        expect(userService.getUserById).toBeCalledTimes(1);
+        expect(userService.deleteUser).toBeCalledTimes(0);
+      }
+    });
+  });
+
+  describe('AuthService - acceptDocuments', () => {
+    it('acceptDocuments method: records acceptance and returns an up-to-date user', async () => {
+      const userId = 1;
+      const mockUser = {
+        id: userId,
+        email: 'user@yandex.ru',
+        password: 'x',
+        acceptedTermsVersion: 1,
+        acceptedPrivacyVersion: 1,
+      };
+      jest.spyOn(userService, 'getUserById').mockImplementation(async () => Promise.resolve(mockUser as User));
+      const updateSpy = jest
+        .spyOn(userService, 'updateDocumentAcceptance')
+        .mockImplementation(async () => Promise.resolve());
+
+      const result = await authService.acceptDocuments(userId);
+
+      expect(updateSpy).toBeCalledTimes(1);
+      expect(updateSpy).toBeCalledWith(userId);
+      expect(result.documentsPendingAcceptance).toBe(false);
+    });
+    it('acceptDocuments method: should be unauthorized (user not found)', async () => {
+      const userId = 1;
+      jest.spyOn(userService, 'getUserById').mockImplementation(async () => Promise.resolve(undefined));
+
+      try {
+        await authService.acceptDocuments(userId);
+        sendPseudoError();
+      } catch (error) {
+        expect(error.status).toBe(401);
+        expect(userService.updateDocumentAcceptance).toBeCalledTimes(0);
       }
     });
   });

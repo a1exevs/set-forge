@@ -29,6 +29,8 @@ describe('UsersService', () => {
           useValue: {
             create: jest.fn(x => x),
             findOne: jest.fn(x => x),
+            destroy: jest.fn(x => x),
+            update: jest.fn(x => x),
           },
         },
         {
@@ -73,7 +75,14 @@ describe('UsersService', () => {
       expect(rolesService.getRoleByValue).toBeCalledTimes(1);
       expect(rolesService.getRoleByValue).toBeCalledWith('user');
       expect(model.create).toBeCalledTimes(1);
-      expect(model.create).toBeCalledWith(dto);
+      expect(model.create).toBeCalledWith(
+        expect.objectContaining({
+          ...dto,
+          acceptedTermsVersion: 1,
+          acceptedPrivacyVersion: 1,
+          acceptedAt: expect.any(Date),
+        }),
+      );
       expect(mockUser.$set).toBeCalledTimes(1);
       expect(mockUser.$set).toBeCalledWith('roles', [mockRole.id]);
     });
@@ -111,7 +120,14 @@ describe('UsersService', () => {
         expect(rolesService.getRoleByValue).toBeCalledTimes(1);
         expect(rolesService.getRoleByValue).toBeCalledWith('user');
         expect(model.create).toBeCalledTimes(1);
-        expect(model.create).toBeCalledWith(dto);
+        expect(model.create).toBeCalledWith(
+          expect.objectContaining({
+            ...dto,
+            acceptedTermsVersion: 1,
+            acceptedPrivacyVersion: 1,
+            acceptedAt: expect.any(Date),
+          }),
+        );
         expect(mockUser.$set).toBeCalledTimes(0);
       }
     });
@@ -153,6 +169,42 @@ describe('UsersService', () => {
       expect(model.findOne).toBeCalledTimes(1);
       expect(model.findOne).toBeCalledWith({ where: { id: userId }, include: { all: true } });
       expect(result).toEqual(user);
+    });
+  });
+
+  describe('UsersService - deleteUser', () => {
+    it('should return true when a row was deleted', async () => {
+      const userId = 1;
+      jest.spyOn(model, 'destroy').mockImplementation(() => Promise.resolve(1));
+      const result = await usersService.deleteUser(userId);
+      expect(model.destroy).toBeCalledTimes(1);
+      expect(model.destroy).toBeCalledWith({ where: { id: userId } });
+      expect(result).toBe(true);
+    });
+    it('should return false when no row was deleted', async () => {
+      const userId = 999;
+      jest.spyOn(model, 'destroy').mockImplementation(() => Promise.resolve(0));
+      const result = await usersService.deleteUser(userId);
+      expect(model.destroy).toBeCalledTimes(1);
+      expect(model.destroy).toBeCalledWith({ where: { id: userId } });
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('UsersService - updateDocumentAcceptance', () => {
+    it('should stamp the current document versions and acceptance time', async () => {
+      const userId = 1;
+      jest.spyOn(model, 'update').mockImplementation(() => Promise.resolve([1]));
+      await usersService.updateDocumentAcceptance(userId);
+      expect(model.update).toBeCalledTimes(1);
+      expect(model.update).toBeCalledWith(
+        expect.objectContaining({
+          acceptedTermsVersion: 1,
+          acceptedPrivacyVersion: 1,
+          acceptedAt: expect.any(Date),
+        }),
+        { where: { id: userId } },
+      );
     });
   });
 });
