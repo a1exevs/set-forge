@@ -35,6 +35,7 @@ const DocumentReconsentGate: FC<Props> = ({
         <p className={classes.text}>Please review and accept the updated documents to keep using Set Forge.</p>
 
         <label className={classes.check}>
+          {/** TODO implement shared chackbox via Headless UI and use it **/}
           <input
             type="checkbox"
             className={classes.checkbox}
@@ -51,6 +52,7 @@ const DocumentReconsentGate: FC<Props> = ({
         </label>
 
         <label className={classes.check}>
+          {/** TODO implement shared chackbox via Headless UI and use it **/}
           <input
             type="checkbox"
             className={classes.checkbox}

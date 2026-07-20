@@ -160,6 +160,7 @@ const AuthPage: FC<Props> = ({
           {activeTab === 'register' && (
             <>
               <label className={classes.consent}>
+                {/** TODO implement shared chackbox via Headless UI and use it **/}
                 <input
                   type="checkbox"
                   className={classes.consentCheckbox}
@@ -177,6 +178,7 @@ const AuthPage: FC<Props> = ({
               {consentError && <p className={classes.fieldError}>{consentError}</p>}
 
               <label className={classes.consent}>
+                {/** TODO implement shared chackbox via Headless UI and use it **/}
                 <input
                   type="checkbox"
                   className={classes.consentCheckbox}

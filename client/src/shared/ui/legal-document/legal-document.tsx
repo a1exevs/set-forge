@@ -5,6 +5,7 @@ import { FC, Fragment, ReactNode } from 'react';
 import BrandWordmark from 'src/shared/ui/brand-wordmark/brand-wordmark';
 import classes from 'src/shared/ui/legal-document/legal-document.module.scss';
 
+// TODO Support language switcher across the site
 export type LegalLang = 'ru' | 'en';
 
 /** An inline link inside paragraph text: `to` for an in-app route, `href` for external (e.g. mailto:). */
