@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Post, Req, Res, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseFilters,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -106,6 +118,21 @@ export class AuthController {
     return this.authService.me(userId);
   }
 
+  @ApiOperation({ summary: Docs.ACCEPT_DOCUMENTS_ENDPOINT })
+  @ApiResult({
+    status: 200,
+    type: GetCurrentUserResponse.Swagger.GetCurrentUserResponseDto,
+    description: Docs.ACCEPT_DOCUMENTS_SUCCESSFUL_RESULT,
+  })
+  @ApiUnauthorizedResponse({ description: Docs.ACCEPT_DOCUMENTS_UNAUTHORIZED })
+  @ApiForbiddenResponse({ description: Docs.ACCEPT_DOCUMENTS_FORBIDDEN })
+  @UseGuards(JwtAuthGuard, RefreshTokenGuard)
+  @UseInterceptors(ResponseInterceptor)
+  @Patch('/documents-acceptance')
+  acceptDocuments(@Req() request): Promise<GetCurrentUserResponse.Dto> {
+    return this.authService.acceptDocuments(request.user.id);
+  }
+
   @ApiOperation({ summary: Docs.LOGOUT_ENDPOINT })
   @ApiOkResponse({
     type: OperationResultResponse.Swagger.OperationResultResponseDto,
@@ -118,6 +145,22 @@ export class AuthController {
   @Delete('/logout')
   async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
     const result = await this.authService.logout(request.cookies.refreshToken);
+    response.clearCookie('refreshToken', AuthController.refreshCookieBaseOptions());
+    return new OperationResultResponse.Dto({ result });
+  }
+
+  @ApiOperation({ summary: Docs.DELETE_ACCOUNT_ENDPOINT })
+  @ApiOkResponse({
+    type: OperationResultResponse.Swagger.OperationResultResponseDto,
+    description: Docs.DELETE_ACCOUNT_SUCCESSFUL_RESULT,
+  })
+  @ApiUnauthorizedResponse({ description: Docs.DELETE_ACCOUNT_UNAUTHORIZED })
+  @ApiForbiddenResponse({ description: Docs.DELETE_ACCOUNT_FORBIDDEN })
+  @UseGuards(JwtAuthGuard, RefreshTokenGuard)
+  @UseInterceptors(ResponseInterceptor)
+  @Delete('/account')
+  async deleteAccount(@Req() request, @Res({ passthrough: true }) response: Response) {
+    const result = await this.authService.deleteAccount(request.user.id);
     response.clearCookie('refreshToken', AuthController.refreshCookieBaseOptions());
     return new OperationResultResponse.Dto({ result });
   }

@@ -42,6 +42,32 @@
   min-width: 10rem;
 }
 
+.dangerZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-top: $spacing-2xl;
+  padding-top: $spacing-xl;
+  border-top: 1px solid $border-color;
+}
+
+.dangerHint {
+  max-width: 28rem;
+  margin: 0;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: $text-tertiary;
+}
+
+.deleteButton {
+  min-width: 10rem;
+}
+
+.legal {
+  margin-top: $spacing-2xl;
+}
+
 @media (min-width: 768px) {
   .container {
     padding: $spacing-xl;

@@ -2,7 +2,7 @@ import { useRouterState } from '@tanstack/react-router';
 import { FC } from 'react';
 
 import { BrandWordmark, Button, UserAvatar, useTabSwipeNavigation } from '@shared';
-import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets';
+import { LegalFooter, MAIN_TAB_ROUTES, MainTabsBar } from '@widgets';
 
 import classes from 'src/pages/profile/ui/profile-page.module.scss';
 
@@ -11,9 +11,18 @@ type Props = {
   avatarLetter: string;
   onLogout: () => void | Promise<void>;
   isLoggingOut: boolean;
+  onDeleteAccount: () => void | Promise<void>;
+  isDeletingAccount: boolean;
 };
 
-const ProfilePage: FC<Props> = ({ email, avatarLetter, onLogout, isLoggingOut }) => {
+const ProfilePage: FC<Props> = ({
+  email,
+  avatarLetter,
+  onLogout,
+  isLoggingOut,
+  onDeleteAccount,
+  isDeletingAccount,
+}) => {
   const pathname = useRouterState({ select: state => state.location.pathname });
   const swipeRef = useTabSwipeNavigation({ tabs: MAIN_TAB_ROUTES, activePath: pathname });
 
@@ -38,6 +47,22 @@ const ProfilePage: FC<Props> = ({ email, avatarLetter, onLogout, isLoggingOut })
             Log out
           </Button>
         </div>
+
+        <div className={classes.dangerZone}>
+          <p className={classes.dangerHint}>
+            Deleting your account permanently removes all your data. This cannot be undone.
+          </p>
+          <Button
+            variant="danger"
+            onClick={(): void => void onDeleteAccount()}
+            disabled={isDeletingAccount}
+            className={classes.deleteButton}
+          >
+            Delete account
+          </Button>
+        </div>
+
+        <LegalFooter className={classes.legal} />
       </main>
 
       <MainTabsBar />

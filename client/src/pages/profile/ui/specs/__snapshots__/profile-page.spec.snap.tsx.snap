@@ -59,6 +59,25 @@ exports[`ProfilePage matches snapshot 1`] = `
           Log out
         </button>
       </div>
+      <div
+        class="dangerZone"
+      >
+        <p
+          class="dangerHint"
+        >
+          Deleting your account permanently removes all your data. This cannot be undone.
+        </p>
+        <button
+          class="button danger md deleteButton"
+          data-headlessui-state=""
+          type="button"
+        >
+          Delete account
+        </button>
+      </div>
+      <footer
+        data-testid="legal-footer"
+      />
     </main>
     <nav
       data-testid="main-tabs-bar"

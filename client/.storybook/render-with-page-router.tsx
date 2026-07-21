@@ -66,6 +66,18 @@ export function renderWithPageRouter({ component, initialEntries }: RenderWithPa
     component: PlaceholderPage,
   });
 
+  const privacyRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/privacy',
+    component,
+  });
+
+  const termsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/terms',
+    component,
+  });
+
   const routeTree = rootRoute.addChildren([
     indexRoute,
     profileRoute,
@@ -73,6 +85,8 @@ export function renderWithPageRouter({ component, initialEntries }: RenderWithPa
     createRouteNode,
     editRoute,
     workoutRoute,
+    privacyRoute,
+    termsRoute,
   ]);
   const router = createRouter({
     routeTree,

@@ -1,10 +1,12 @@
 import { render } from '@testing-library/react';
+import type { ReactNode } from 'react';
 
 import ProfilePage from 'src/pages/profile/ui/profile-page';
 
 jest.mock('@tanstack/react-router', () => ({
   useRouterState: ({ select }: { select: (state: { location: { pathname: string } }) => string }) =>
     select({ location: { pathname: '/profile' } }),
+  Link: ({ to, children }: { to: string; children: ReactNode }) => <a href={to}>{children}</a>,
 }));
 
 jest.mock('@widgets', () => ({
@@ -13,6 +15,7 @@ jest.mock('@widgets', () => ({
     { id: 'home', to: '/' },
     { id: 'profile', to: '/profile' },
   ],
+  LegalFooter: (): JSX.Element => <footer data-testid="legal-footer" />,
 }));
 
 jest.mock('@shared', () => {
@@ -26,7 +29,14 @@ jest.mock('@shared', () => {
 describe('ProfilePage', () => {
   it('matches snapshot', () => {
     const { container } = render(
-      <ProfilePage email="jane@example.com" avatarLetter="J" onLogout={(): void => undefined} isLoggingOut={false} />,
+      <ProfilePage
+        email="jane@example.com"
+        avatarLetter="J"
+        onLogout={(): void => undefined}
+        isLoggingOut={false}
+        onDeleteAccount={(): Promise<void> => Promise.resolve()}
+        isDeletingAccount={false}
+      />,
     );
     expect(container).toMatchSnapshot();
   });
