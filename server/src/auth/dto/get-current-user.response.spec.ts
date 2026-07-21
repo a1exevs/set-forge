@@ -7,7 +7,7 @@ describe('GetCurrentUserResponse', () => {
   });
 
   it('should has ApiProperty decorator for all properties', () => {
-    const dto = new GetCurrentUserResponse.Dto({ id: 1, email: 'email' });
+    const dto = new GetCurrentUserResponse.Dto({ id: 1, email: 'email', documentsPendingAcceptance: false });
     checkForApiProperties(dto, GetCurrentUserResponse.Dto);
   });
 });

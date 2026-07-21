@@ -50,7 +50,7 @@ describe('User workflow', () => {
       it('Register user', () => {
         return request(app.getHttpServer())
           .post(`${api}/${Routes.ENDPOINT_AUTH}/registration`)
-          .send({ email: userEmail, password: userPassword })
+          .send({ email: userEmail, password: userPassword, consent: true, termsAccepted: true })
           .expect(HttpStatus.CREATED)
           .expect(response => {
             expect(response.body.data).toBeDefined();
@@ -66,7 +66,7 @@ describe('User workflow', () => {
       it('Register user (bad request - user was registered before)', () => {
         return request(app.getHttpServer())
           .post(`${api}/${Routes.ENDPOINT_AUTH}/registration`)
-          .send({ email: userEmail, password: userPassword })
+          .send({ email: userEmail, password: userPassword, consent: true, termsAccepted: true })
           .expect(HttpStatus.BAD_REQUEST)
           .expect(response => {
             expect(response.body.data).toBeNull();
@@ -131,6 +131,7 @@ describe('User workflow', () => {
           .expect(response => {
             expect(response.body.data.id).toBe(userId);
             expect(response.body.data.email).toBe(userEmail);
+            expect(response.body.data.documentsPendingAcceptance).toBe(false);
             expect(response.body.resultCode).toBe(ResultCodes.OK);
           });
       });

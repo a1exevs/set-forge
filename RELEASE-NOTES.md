@@ -1,3 +1,12 @@
+# Release v0.5.2
+## What's Changed
+* [Common] RELEASE-NOTES.md update v0.5.1 by @a1exevs in https://github.com/a1exevs/set-forge/pull/63
+* [Bugfix] Allowing cross-origin embed for public static assets by @a1exevs in https://github.com/a1exevs/set-forge/pull/64
+* [Common] Fixing update-version.sh merge failures by @a1exevs in https://github.com/a1exevs/set-forge/pull/65
+* [Common] Version increase v0.5.2 by @a1exevs in https://github.com/a1exevs/set-forge/pull/66
+
+**Full Changelog**: https://github.com/a1exevs/set-forge/compare/v0.5.1...v0.5.2
+
 # Release v0.5.1
 ## What's Changed
 * [Common] RELEASE-NOTES.md update v0.5.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/58

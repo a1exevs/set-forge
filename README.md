@@ -124,9 +124,9 @@ Persistent Docker volumes:
 
 Create these files before running `npm run prod:up`:
 
-- Root `.env` (copy from [`.env.example`](.env.example)): compose-level values such as MySQL bootstrap credentials, `SITE_ADDRESS`, `VITE_PUBLIC_ORIGIN` (OG meta for the client Docker build), and optional host port overrides.
-- `client/.env` (copy from [`client/.env.example`](client/.env.example), **local dev only**): Vite dev overrides such as `VITE_DEV_API_PROXY` and `VITE_PUBLIC_ORIGIN` for manual `vite build`.
-- `server/.production.env` (copy from [`server/.production.env.example`](server/.production.env.example)): Nest runtime values such as `SERVER_URL`, `CLIENT_URL`, MySQL connection credentials, JWT/session secrets, `SERVER_STATIC`, and `SERVER_LOGS`.
+- Root `.env` (copy from [`.env.example`](.env.example)): compose-level values such as MySQL bootstrap credentials, `SITE_ADDRESS`, `VITE_PUBLIC_ORIGIN` (OG meta for the client Docker build), the legal/privacy build args `VITE_PRIVACY_OPERATOR_NAME_RU` / `VITE_PRIVACY_OPERATOR_NAME_EN` (per-language data-controller name shown in the Privacy Policy / Terms; `VITE_PRIVACY_OPERATOR_NAME` is an optional shared fallback) and `VITE_PRIVACY_CONTACT_EMAIL`, and optional host port overrides.
+- `client/.env` (copy from [`client/.env.example`](client/.env.example), **local dev only**): Vite dev overrides such as `VITE_DEV_API_PROXY`, `VITE_PUBLIC_ORIGIN`, and `VITE_PRIVACY_OPERATOR_NAME_RU` / `VITE_PRIVACY_OPERATOR_NAME_EN` / `VITE_PRIVACY_CONTACT_EMAIL` for manual `vite build`.
+- `server/.production.env` (copy from [`server/.production.env.example`](server/.production.env.example)): Nest runtime values such as `SERVER_URL`, `CLIENT_URL`, MySQL connection credentials, JWT/session secrets, `SERVER_STATIC`, `SERVER_LOGS`, and the legal-document versions `TERMS_VERSION` / `PRIVACY_VERSION` (bump to trigger re-consent).
 
 For local HTTPS checks on Windows, ports 80/443 are often occupied by `HTTP.sys`. Use this in the root `.env` and open `https://localhost:8443/`:
 
@@ -198,6 +198,9 @@ For local development against `mysql-dev`, the equivalent flow is `npm run db:up
 - Real-time progress bars with gradient fills
 - Double tap to mark sets complete
 - Data persistence via backend API (MySQL) with authenticated sessions
+- Bilingual (RU/EN) Privacy Policy and Terms of Use with explicit consent at registration (152-ФЗ)
+- Versioned legal-document acceptance with a blocking re-consent gate after updates
+- Self-service account deletion with full cascade removal of user data
 - Dark theme by default (light theme ready)
 - Mobile-first responsive design
 - Touch-friendly UI (min 44px tap targets)

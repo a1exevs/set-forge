@@ -31,6 +31,8 @@
 - [create-workout](specs/pages/create-workout-page.spec.md)
 - [edit-workout](specs/pages/edit-workout-page.spec.md)
 - [workout-mode](specs/pages/workout-mode-page.spec.md)
+- [privacy](specs/pages/privacy-page.spec.md)
+- [terms](specs/pages/terms-page.spec.md)
 
 ## Shared components
 
@@ -51,6 +53,7 @@
 | [styling-guidelines](rules/styling-guidelines.mdc) | SCSS modules |
 | [typescript-guidelines](rules/typescript-guidelines.mdc) | TypeScript |
 | [component-typing](rules/component-typing.mdc) | FC / Props |
+| [personal-data-compliance](rules/personal-data-compliance.mdc) | User PD, privacy policy, terms, doc versioning |
 
 ## Adding new artifacts
 
