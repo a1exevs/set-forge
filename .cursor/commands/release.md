@@ -21,8 +21,12 @@ Usage: `/release patch` (or `minor` / `major`).
 6. Before any mutating git/`gh` action in a phase, briefly state what you will do and get approval for that phase (except when the user already said "continue" into a clearly defined next phase — then execute that phase, still confirming before publish/force-push style actions).
 7. Track and reuse `vX.X.X` (without inventing a version). Prefer reading it from `client/package.json` after the bump, or from the version-increase PR/commit if resuming mid-flow.
 8. Prefer `gh` for GitHub operations. Use `required_permissions: ["all"]` when push/network/`gh` need it.
-9. If the user resumes mid-release (e.g. "continue after version PR merged"), detect the current phase from git/`gh` state and continue from the next incomplete phase. Ask only if ambiguous.
-10. At each STOP, print a short status block:
+9. When creating a release PR, always attach the matching GitHub label via `gh pr create --label …` (or `gh pr edit --add-label …` if the PR already exists without it):
+   - Phase A / Phase E (`common/*` → `develop`): `common`
+   - Phase B (`develop` → `testing`): `testing`
+   - Phase C (`testing` → `main`): `release`
+10. If the user resumes mid-release (e.g. "continue after version PR merged"), detect the current phase from git/`gh` state and continue from the next incomplete phase. Ask only if ambiguous.
+11. At each STOP, print a short status block:
 
 ```
 Release status
@@ -45,6 +49,7 @@ Goal: bump version and open the version-increase PR.
    - head: `common/version-increase`
    - base: `develop`
    - title: `[Common] Version increase vX.X.X`
+   - label: `common`
    - body: brief note that this is an automated version bump for release `vX.X.X`
 6. **STOP.** Ask the user to review/merge that PR manually, then say `continue`.
 
@@ -57,6 +62,7 @@ Precondition: version PR is merged into `develop` (verify via `gh pr view` / `gi
    - head: `develop`
    - base: `testing`
    - title: `[Testing] Release vX.X.X`
+   - label: `testing`
 3. **STOP.** Wait for manual merge + `continue`.
 
 ## Phase C — Promote testing → main
@@ -68,6 +74,7 @@ Precondition: Phase B PR is merged into `testing`.
    - head: `testing`
    - base: `main`
    - title: `Release vX.X.X`
+   - label: `release`
 3. **STOP.** Wait for manual merge + `continue`.
 
 ## Phase D — GitHub Release (tag + notes)
@@ -111,6 +118,7 @@ Precondition: GitHub Release `vX.X.X` is published; you have the final notes bod
    - head: `common/release-notes-update-vX.X.X`
    - base: `develop`
    - title: `[Common] RELEASE-NOTES.md update vX.X.X`
+   - label: `common`
 5. Report the PR URL. Release command is **done** after this PR is created (merge remains manual unless user asks).
 
 ## Resume / continue behavior
