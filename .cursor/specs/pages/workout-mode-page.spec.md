@@ -44,7 +44,7 @@ Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/
 
 ### Celebration
 
-1. `canvas-confetti` once per session on full completion or resync-all-complete-on-entry edge (training only).
+1. `canvas-confetti` once per session: after progress auto-finishes the last set, on the resync-all-complete-on-entry edge, or after manual Finish (training only).
 
 ---
 
@@ -53,7 +53,7 @@ Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/
 ### Session loading
 
 1. Data layer: `useWorkoutQuery(id)` + `useActiveWorkoutSessionQuery(id)`; `isLoading` → `workoutList: undefined`.
-2. Session derivation (data layer): `activeSession` from query cache first (kept fresh by `syncSessionCaches` on start/increment/resync), then `finishWorkoutSessionMutation.data` (completed in-page while `active` is null), then `startWorkoutSessionMutation.data` (fallback before active cache updates). After discard, mutation caches are reset and `active` is null → preview.
+2. Session derivation (data layer): `activeSession` from query cache first (kept fresh by `syncSessionCaches` on start/increment/resync), then `finishWorkoutSessionMutation.data` / `incrementSessionProgressMutation.data` (completed in-page while `active` is null), then `startWorkoutSessionMutation.data` (fallback before active cache updates). After discard, mutation caches are reset and `active` is null → preview.
 3. Phase: `training` when `session !== null` (active, just-started, or completed in-page); else `preview` when list loaded.
 4. `POST /workout-sessions` only on **Start workout** click (`useStartWorkoutSessionMutation`), not on mount.
 5. Re-entering after completion: `GET /active` → null → preview; Start creates new session.
@@ -61,12 +61,12 @@ Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/
 ### Set marking (training only)
 
 6. 300ms double-tap → `incrementProgress` if `completedSets < sets` and session active.
-7. Optimistic `PATCH .../progress`; server auto-finishes when all exercises complete.
+7. Optimistic `PATCH .../progress` (serialized; `onSuccess` merges with `max(completedSets)` so slow responses cannot rewind the UI). Server auto-finishes when all exercises complete; confetti when progress returns `status: completed` (no client `finish` on this path — avoids racing the last PATCH).
 
 ### Finishing
 
 8. Early finish: three-way confirm → **Finish** (`POST .../finish`, saved to history) | **Discard** (`DELETE .../:id`, return to preview) | **Cancel**.
-9. Resync edge on entry: if active but all sets complete → auto `finishSession` once + confetti.
+9. Resync edge on entry: on first observation of a session, if `active` but all sets already complete → auto `finishSession` once + confetti. Not re-run when sets become complete mid-workout.
 
 ### Progress
 
@@ -106,7 +106,7 @@ type Props = {
   session: WorkoutSession | null;
   isStarting: boolean;
   startSession: (workoutListId: string) => Promise<void>;
-  incrementProgress: (sessionId: string, exerciseId: string) => Promise<void>;
+  incrementProgress: (sessionId: string, exerciseId: string) => Promise<WorkoutSession>;
   finishSession: (sessionId: string) => Promise<void>;
   discardSession: (sessionId: string) => Promise<void>;
 };
@@ -146,7 +146,7 @@ TanStack Router, React Query (optimistic mutations), Headless UI `Transition`, `
 ## Tests
 
 - `ui/specs/workout-mode-page.spec.unit.tsx` — preview (Start visible, no cards), training (cards + Finish), not found
-- `ui/specs/workout-mode-page-logic-layer.spec.unit.tsx` — finish vs discard vs cancel confirm; start handler
+- `ui/specs/workout-mode-page-logic-layer.spec.unit.tsx` — finish vs discard vs cancel confirm; start handler; resync-edge auto-finish on entry (complete vs incomplete)
 
 ---
 
@@ -165,7 +165,7 @@ N/A — no stories file.
 | Discard after partial progress | DELETE → preview; history unchanged |
 | Empty list | POST on Start → 400; error swallowed (TODO toaster); stays in preview |
 | Completed session | Taps no-op; finish disabled |
-| Progress mutation error | Optimistic rollback |
+| Progress mutation error | Optimistic rollback to `previous`, unless cache is already `completed` or ahead of this mutation’s baseline (later taps) |
 | Re-enter after completion | Preview; Start creates new session |
 | Resync edge on entry | Auto-finish + confetti once |
 
