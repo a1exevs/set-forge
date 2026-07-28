@@ -1,6 +1,7 @@
 import type { WorkoutList, WorkoutSession } from '@entities';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import confetti from 'canvas-confetti';
 
 import WorkoutModePageLogicLayer from 'src/pages/workout-mode/ui/workout-mode-page-logic-layer';
 
@@ -55,6 +56,22 @@ const SESSION: WorkoutSession = {
       reps: 10,
       sets: 3,
       completedSets: 0,
+    },
+  ],
+};
+
+const COMPLETE_ACTIVE_SESSION: WorkoutSession = {
+  ...SESSION,
+  exercises: [
+    {
+      id: 'sx-1',
+      sourceExerciseId: 'ex-1',
+      name: 'Bench Press',
+      muscleGroup: 'chest',
+      weight: 60,
+      reps: 10,
+      sets: 3,
+      completedSets: 3,
     },
   ],
 };
@@ -183,5 +200,49 @@ describe('WorkoutModePageLogicLayer', () => {
       expect(finishSession).not.toHaveBeenCalled();
       expect(discardSession).not.toHaveBeenCalled();
     });
+  });
+
+  it('auto-finishes once on entry when an active session is already fully complete', async () => {
+    const finishSession = jest.fn().mockResolvedValue(undefined);
+
+    render(
+      <WorkoutModePageLogicLayer
+        workoutList={WORKOUT_LIST}
+        session={COMPLETE_ACTIVE_SESSION}
+        isStarting={false}
+        startSession={jest.fn()}
+        incrementProgress={jest.fn()}
+        finishSession={finishSession}
+        discardSession={jest.fn()}
+      />,
+    );
+
+    await waitFor((): void => {
+      expect(finishSession).toHaveBeenCalledTimes(1);
+      expect(finishSession).toHaveBeenCalledWith('sess-1');
+      expect(confetti).toHaveBeenCalled();
+    });
+  });
+
+  it('does not auto-finish on entry when the active session is incomplete', async () => {
+    const finishSession = jest.fn().mockResolvedValue(undefined);
+
+    render(
+      <WorkoutModePageLogicLayer
+        workoutList={WORKOUT_LIST}
+        session={SESSION}
+        isStarting={false}
+        startSession={jest.fn()}
+        incrementProgress={jest.fn()}
+        finishSession={finishSession}
+        discardSession={jest.fn()}
+      />,
+    );
+
+    await waitFor((): void => {
+      expect(screen.getByRole('button', { name: 'Finish workout' })).toBeInTheDocument();
+    });
+
+    expect(finishSession).not.toHaveBeenCalled();
   });
 });

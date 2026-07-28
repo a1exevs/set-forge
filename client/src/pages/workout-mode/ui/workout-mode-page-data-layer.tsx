@@ -24,7 +24,13 @@ const WorkoutModePageDataLayer: FC<Props> = ({ id }) => {
   const discardWorkoutSessionMutation = useDiscardWorkoutSessionMutation();
 
   const isLoading = isListLoading || isSessionLoading;
-  const session = activeSession ?? finishWorkoutSessionMutation.data ?? startWorkoutSessionMutation.data ?? null;
+  // After completion, `active` is null — prefer finish/progress mutation snapshots over start.
+  const session =
+    activeSession ??
+    finishWorkoutSessionMutation.data ??
+    incrementSessionProgressMutation.data ??
+    startWorkoutSessionMutation.data ??
+    null;
 
   // TODO: Distinguish query errors (empty list, network) from a missing list — not only "Workout list not found"
   return (
@@ -35,9 +41,9 @@ const WorkoutModePageDataLayer: FC<Props> = ({ id }) => {
       startSession={async (workoutListId): Promise<void> => {
         await startWorkoutSessionMutation.mutateAsync(workoutListId);
       }}
-      incrementProgress={async (sessionId, exerciseId): Promise<void> => {
-        await incrementSessionProgressMutation.mutateAsync({ sessionId, workoutListId: id, exerciseId });
-      }}
+      incrementProgress={async (sessionId, exerciseId) =>
+        incrementSessionProgressMutation.mutateAsync({ sessionId, workoutListId: id, exerciseId })
+      }
       finishSession={async (sessionId): Promise<void> => {
         await finishWorkoutSessionMutation.mutateAsync({ sessionId, workoutListId: id });
       }}
@@ -45,6 +51,7 @@ const WorkoutModePageDataLayer: FC<Props> = ({ id }) => {
         await discardWorkoutSessionMutation.mutateAsync({ sessionId, workoutListId: id });
         startWorkoutSessionMutation.reset();
         finishWorkoutSessionMutation.reset();
+        incrementSessionProgressMutation.reset();
       }}
     />
   );

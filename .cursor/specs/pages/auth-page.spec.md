@@ -68,7 +68,7 @@ Login and registration on `/login` and `/register` (same component, tab follows 
 
 ### Session bootstrap (root, not this page)
 
-8. `bootstrapSessionAndPrimeCache` in `__root.tsx` `beforeLoad`: refresh → me; 401 retry once.
+8. `bootstrapSessionAndPrimeCache` in `__root.tsx` `beforeLoad`: refresh → me; 401 retry once; on no user clears the whole query cache.
 
 ---
 

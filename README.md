@@ -180,6 +180,17 @@ For local development against `mysql-dev`, the equivalent flow is `npm run db:up
 | `npm run update-version:patch` / `npm run update-version:minor` / `npm run update-version:major` | Version branch workflow (`scripts/update-version.sh`) |
 
 ## Release steps
+1. run npm update-version:patch (or :minor, :major)
+2. create PR with message "[Common] Version increase vX.X.X" from "common/version-increase" into "develop"
+3. create PR with message "[Testing] Release vX.X.X" from "develop" into "testing"
+4. create PR with message "Release vX.X.X" from "testing" into "main"
+5. go to Github Repo Home page -> Tags -> Releases -> Draft a new release.
+- create a new tag via "Choose a tag" autocomplete
+- select "develop" branch as a target
+- click the "Generate release notes" button, remove unnecessary notes if necessary, check PR messages and correct the messages if necessary (via PR editing)
+- select "main" branch as a target
+- click the "Publish release"
+6. update RELEASE-NOTES.md with using generated notes in step 5, create PR from "common/release-notes-update-vX.X.X" to "develop" with message "[Common] RELEASE-NOTES.md update vX.X.X"
 
 **Full-stack production on [VDS Selectel](https://vds.selectel.ru/):** step-by-step deploy guide — [`DEPLOY-SELECTEL.md`](DEPLOY-SELECTEL.md) (Docker Compose + Caddy + MySQL on Ubuntu).
 // TODO add details after release

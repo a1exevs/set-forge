@@ -12,12 +12,16 @@ const fireWorkoutCompleteConfetti = (): void => {
   void confetti({ particleCount: 70, angle: 125, spread: 58, origin: { x: 1, y: 0.62 } });
 };
 
+const isSessionFullyComplete = (session: WorkoutSession): boolean =>
+  session.exercises.length > 0 &&
+  session.exercises.every(exercise => exercise.sets > 0 && exercise.completedSets === exercise.sets);
+
 type Props = {
   workoutList: WorkoutList | null | undefined;
   session: WorkoutSession | null;
   isStarting: boolean;
   startSession: (workoutListId: string) => Promise<void>;
-  incrementProgress: (sessionId: string, exerciseId: string) => Promise<void>;
+  incrementProgress: (sessionId: string, exerciseId: string) => Promise<WorkoutSession>;
   finishSession: (sessionId: string) => Promise<void>;
   discardSession: (sessionId: string) => Promise<void>;
 };
@@ -34,11 +38,20 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   const confirmDialog = useConfirm();
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
   const lastTapRef = useRef<Record<string, number>>({});
-  const prevCompletedExercisesRef = useRef<number | null>(null);
   const confettiFiredRef = useRef(false);
+  /** First observation of this sessionId — used only for the resync-all-complete-on-entry edge. */
+  const entryHandledForSessionRef = useRef<string | null>(null);
 
   const phase = session != null ? 'training' : 'preview';
   const isFinished = session?.status === 'completed';
+
+  const celebrateOnce = (): void => {
+    if (confettiFiredRef.current) {
+      return;
+    }
+    confettiFiredRef.current = true;
+    fireWorkoutCompleteConfetti();
+  };
 
   const handleStart = async (): Promise<void> => {
     if (!workoutList || session != null) {
@@ -65,12 +78,23 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     if (exercise.completedSets >= exercise.sets) {
       return;
     }
-    void incrementProgress(session.id, exerciseId);
 
     if (exercise.completedSets + 1 === exercise.sets) {
       setJustCompleted(exerciseId);
       setTimeout((): void => setJustCompleted(null), 1000);
     }
+
+    // Server auto-finishes on last set; do not call finishSession here (races with progress).
+    void (async (): Promise<void> => {
+      try {
+        const updated = await incrementProgress(session.id, exerciseId);
+        if (updated.status === 'completed') {
+          celebrateOnce();
+        }
+      } catch {
+        // TODO: Support common toaster
+      }
+    })();
   };
 
   const handleTap = (exerciseId: string): void => {
@@ -104,10 +128,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     if (result === 'confirm') {
       try {
         await finishSession(session.id);
-        if (!confettiFiredRef.current) {
-          confettiFiredRef.current = true;
-          fireWorkoutCompleteConfetti();
-        }
+        celebrateOnce();
       } catch {
         // TODO: Support common toaster
       }
@@ -145,40 +166,34 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   const sessionId = session?.id ?? null;
 
   useEffect((): void => {
-    prevCompletedExercisesRef.current = null;
     confettiFiredRef.current = false;
+    entryHandledForSessionRef.current = null;
   }, [sessionId]);
 
+  // Resync edge only: first time we see this session, if it is already fully complete while still
+  // active, finish once + confetti. Normal last-set completion is handled by progress auto-finish.
   useEffect((): void => {
     if (!session || phase !== 'training') {
       return;
     }
-    const prev = prevCompletedExercisesRef.current;
-    const allComplete = totalExercises > 0 && completedExercises === totalExercises;
-    const isTransitionComplete = prev !== null && prev < totalExercises && allComplete;
-    const isLoadedComplete = prev === null && allComplete && session.status === 'active';
-
-    if (!confettiFiredRef.current && (isTransitionComplete || isLoadedComplete)) {
-      const celebrate = (): void => {
-        confettiFiredRef.current = true;
-        fireWorkoutCompleteConfetti();
-      };
-
-      if (session.status === 'active') {
-        void (async (): Promise<void> => {
-          try {
-            await finishSession(session.id);
-            celebrate();
-          } catch {
-            confettiFiredRef.current = false;
-          }
-        })();
-      } else {
-        celebrate();
-      }
+    if (entryHandledForSessionRef.current === session.id) {
+      return;
     }
-    prevCompletedExercisesRef.current = completedExercises;
-  }, [session, phase, completedExercises, totalExercises, finishSession]);
+    entryHandledForSessionRef.current = session.id;
+
+    if (session.status !== 'active' || !isSessionFullyComplete(session)) {
+      return;
+    }
+
+    void (async (): Promise<void> => {
+      try {
+        await finishSession(session.id);
+        celebrateOnce();
+      } catch {
+        entryHandledForSessionRef.current = null;
+      }
+    })();
+  }, [session, phase, finishSession]);
 
   if (workoutList === undefined) {
     return null;
