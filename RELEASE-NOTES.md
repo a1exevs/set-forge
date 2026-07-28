@@ -1,3 +1,16 @@
+# Release v0.6.1
+## What's Changed
+* [Common] Adding Cursor /release command and restoring release steps by @a1exevs in https://github.com/a1exevs/set-forge/pull/75
+* [Common] Version increase v0.6.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/71
+* [Common] RELEASE-NOTES.md update v0.6.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/74
+* [Bugfix] Stabilizing workout session progress updates by @a1exevs in https://github.com/a1exevs/set-forge/pull/76
+* [Bugfix] Clearing query cache on logout and session loss by @a1exevs in https://github.com/a1exevs/set-forge/pull/77
+* [Common] Version increase v0.6.1 by @a1exevs in https://github.com/a1exevs/set-forge/pull/78
+* [Testing] Release v0.6.1 by @a1exevs in https://github.com/a1exevs/set-forge/pull/79
+* Release v0.6.1 by @a1exevs in https://github.com/a1exevs/set-forge/pull/80
+
+**Full Changelog**: https://github.com/a1exevs/set-forge/compare/v0.6.0...v0.6.1
+
 # Release v0.6.0
 ## What's Changed
 * [Common] RELEASE-NOTES.md update v0.5.2 by @a1exevs in https://github.com/a1exevs/set-forge/pull/69
