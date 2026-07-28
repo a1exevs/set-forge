@@ -142,7 +142,7 @@ When `authFailedCount >= 5`, failed login returns `resultCode === 10` (`NEED_CAP
 ### HTTP wrapper (authenticated requests)
 
 - Adds `Authorization: Bearer` when token exists.
-- On **401**: await shared refresh mutex; on success retry once; on failure clear session and redirect to `/login`.
+- On **401**: await shared refresh mutex; on success retry once; on failure clear the whole query cache and redirect to `/login`.
 
 ---
 
@@ -155,8 +155,8 @@ When `authFailedCount >= 5`, failed login returns `resultCode === 10` (`NEED_CAP
 | `useRegisterMutation()` | hook | `POST /auth/registration` (`{ email, password, consent, termsAccepted }`) |
 | `useAcceptDocumentsMutation()` | hook | `PATCH /auth/documents-acceptance`; updates `sessionQueryKeys.me` cache |
 | `useDeleteAccountMutation()` | hook | `DELETE /auth/account`; clears the whole query cache and redirects to `/login` |
-| `useLogoutMutation()` | hook | `DELETE /auth/logout` |
-| `bootstrapSessionAndPrimeCache(queryClient)` | function | Root `beforeLoad` session bootstrap |
+| `useLogoutMutation()` | hook | `DELETE /auth/logout`; clears the whole query cache and redirects to `/login` |
+| `bootstrapSessionAndPrimeCache(queryClient)` | function | Root `beforeLoad` session bootstrap; on no user clears the whole query cache |
 | `sessionQueryKeys.me` | query key | Current user cache |
 | `emailToAvatarLetter(email)` | function | Avatar letter for profile |
 | `fetchCurrentUser`, `postLogin`, `postRegistration`, `deleteLogout`, `patchDocumentsAcceptance`, `deleteAccount` | functions | Raw API calls (`session-api.ts`) |
