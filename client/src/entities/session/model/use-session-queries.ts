@@ -86,7 +86,7 @@ export function useLogoutMutation() {
   return useMutation({
     mutationFn: deleteLogout,
     onSettled: () => {
-      qc.removeQueries({ queryKey: sessionQueryKeys.me });
+      qc.clear();
       void navigate({ to: '/login' });
     },
   });

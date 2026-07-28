@@ -4,7 +4,6 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { queryClient, router } from '@app';
-import { sessionQueryKeys } from '@entities';
 import { ConfirmDialogProvider } from '@shared';
 
 import { clearAccessToken, setSessionExpiredHandler } from 'src/shared/api';
@@ -13,7 +12,7 @@ import 'src/shared/ui/styles/global.scss';
 
 setSessionExpiredHandler(() => {
   clearAccessToken();
-  queryClient.removeQueries({ queryKey: sessionQueryKeys.me });
+  queryClient.clear();
   void router.navigate({ to: '/login' });
 });
 

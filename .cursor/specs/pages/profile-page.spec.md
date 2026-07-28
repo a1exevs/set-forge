@@ -70,7 +70,7 @@ Shows authenticated user avatar letter, email, **Log out** button, and a **Delet
 
 ### Logout
 
-3. Log out → `DELETE /auth/logout` → clear session cache → redirect `/login`.
+3. Log out → `DELETE /auth/logout` → `useLogoutMutation` clears the entire query cache and redirects to `/login`.
 
 ### Delete account
 
