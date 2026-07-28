@@ -1,3 +1,10 @@
+# Release v0.6.0
+## What's Changed
+* [Common] RELEASE-NOTES.md update v0.5.2 by @a1exevs in https://github.com/a1exevs/set-forge/pull/69
+* [Feature] Privacy policy and Terms of Use by @a1exevs in https://github.com/a1exevs/set-forge/pull/70
+
+**Full Changelog**: https://github.com/a1exevs/set-forge/compare/v0.5.2...v0.6.0
+
 # Release v0.5.2
 ## What's Changed
 * [Common] RELEASE-NOTES.md update v0.5.1 by @a1exevs in https://github.com/a1exevs/set-forge/pull/63
