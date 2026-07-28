@@ -19,7 +19,7 @@ export async function bootstrapSessionAndPrimeCache(queryClient: QueryClient): P
 
   if (!user) {
     clearAccessToken();
-    queryClient.removeQueries({ queryKey: sessionQueryKeys.me });
+    queryClient.clear();
     return null;
   }
 
