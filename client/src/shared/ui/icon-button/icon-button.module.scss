@@ -24,11 +24,9 @@
     transform: scale(0.97);
   }
 
+  // Color / surface
   &.ghost {
-    min-width: 44px;
-    min-height: 44px;
     padding: $spacing-xs;
-    border-radius: $radius-md;
     background-color: transparent;
     color: $text-primary;
 
@@ -38,7 +36,6 @@
   }
 
   &.primary {
-    border-radius: 50%;
     background-color: $primary-color;
     color: $bg-primary;
     box-shadow: $shadow-lg;
@@ -47,6 +44,26 @@
       opacity: 0.9;
       box-shadow: $shadow-lg;
     }
+  }
+
+  // Shape
+  &.square {
+    border-radius: $radius-md;
+  }
+
+  &.sm.square {
+    border-radius: $radius-sm;
+  }
+
+  &.circle {
+    border-radius: 50%;
+  }
+
+  // Size
+  &.sm {
+    min-width: 1.75rem;
+    min-height: 1.75rem;
+    padding: 0;
   }
 
   &.md {

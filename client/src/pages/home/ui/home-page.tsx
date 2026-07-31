@@ -112,6 +112,7 @@ const HomePage: FC<Props> = ({
         to="/create"
         className={classes.createFab}
         variant="primary"
+        shape="circle"
         size="lg"
         aria-label="Create workout list"
         title="Create workout list"
