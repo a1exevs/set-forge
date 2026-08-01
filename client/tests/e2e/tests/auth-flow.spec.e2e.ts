@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { randomUUID } from 'crypto';
 
-
 import { E2E_SERVER_ORIGIN } from 'tests/e2e/stack/ports';
 
 test.describe('Auth register and login', () => {
