@@ -12,6 +12,7 @@ export {
 export {
   muscleGroupLabels,
   muscleGroups,
+  WorkoutExerciseCard,
   type MuscleGroup,
   type UpdateExerciseDto,
   type WorkoutExercise,
@@ -31,7 +32,7 @@ export {
   type WorkoutList,
   type WorkoutListsExportFile,
 } from 'src/entities/workout-list';
-export type { WorkoutSessionExercise } from 'src/entities/workout-session-exercise';
+export { WorkoutSessionExerciseCard, type WorkoutSessionExercise } from 'src/entities/workout-session-exercise';
 export {
   useActiveWorkoutSessionQuery,
   clearWorkoutSessionCachesForDeletedList,

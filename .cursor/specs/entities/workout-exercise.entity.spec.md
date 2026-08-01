@@ -69,9 +69,9 @@ Model only: `server/src/workout-lists/workout-exercise.model.ts` (wired via `Wor
 
 ### Location
 
-`client/src/entities/workout-exercise/` — `model/types.ts`, `model/muscle-group-labels.ts`
+`client/src/entities/workout-exercise/` — `model/types.ts`, `model/muscle-group-labels.ts`, `ui/workout-exercise-card/`
 
-No API layer or React Query hooks — types and UI helpers only.
+No API layer or React Query hooks — types, UI helpers, and preview card only.
 
 ### Types
 
@@ -94,6 +94,10 @@ type UpdateExerciseDto = Omit<WorkoutExercise, 'id'> & Partial<Pick<WorkoutExerc
 
 - `muscleGroupLabels` — display labels for selects and chips
 - `muscleGroups` — ordered array for form options
+
+### UI
+
+- `WorkoutExerciseCard` (`ui/workout-exercise-card/`) — read-only preview card (name, muscle badge, weight/reps/sets). No progress bar, no double-tap hint, not clickable. Used on [workout-mode](../pages/workout-mode-page.spec.md) preview phase.
 
 ---
 
@@ -124,6 +128,7 @@ Create/update request exercise (no `id` on create; optional `id` on update).
 | `UpdateExerciseDto` | type | Form / list update shape |
 | `muscleGroupLabels` | const | UI labels |
 | `muscleGroups` | const | Select options |
+| `WorkoutExerciseCard` | component | Read-only preview exercise card |
 
 Re-exported from `@entities` / `client/src/entities/workout-exercise`.
 
@@ -133,6 +138,13 @@ Re-exported from `@entities` / `client/src/entities/workout-exercise`.
 
 - Covered indirectly: `workout-lists.service.spec.ts`, `workout-lists.controller.spec.ts`, list DTO specs, E2E `workout-lists-sessions.e2e-spec.ts`
 - Model associations: `workout-sessions.model.spec.ts` (module fixture includes `WorkoutExercise`)
+- UI: `ui/workout-exercise-card/specs/workout-exercise-card.spec.unit.tsx`, `ui/workout-exercise-card/specs/workout-exercise-card.spec.snap.tsx`
+
+---
+
+## Storybook
+
+- `ui/workout-exercise-card/workout-exercise-card.stories.tsx` — `Entities/WorkoutExerciseCard`
 
 ---
 
@@ -141,6 +153,7 @@ Re-exported from `@entities` / `client/src/entities/workout-exercise`.
 - [workout-list.entity.spec.md](workout-list.entity.spec.md) — parent aggregate
 - [create-workout-page](../pages/create-workout-page.spec.md)
 - [edit-workout-page](../pages/edit-workout-page.spec.md)
+- [workout-mode-page](../pages/workout-mode-page.spec.md) — preview cards via `WorkoutExerciseCard`
 - [workout-session-exercise.entity.spec.md](workout-session-exercise.entity.spec.md) — `sourceExerciseId` link
 
 ---
