@@ -5,7 +5,8 @@ import classes from 'src/shared/ui/icon-button/icon-button.module.scss';
 
 type CommonProps = PropsWithChildren<{
   variant?: 'ghost' | 'primary';
-  size?: 'md' | 'lg';
+  shape?: 'square' | 'circle';
+  size?: 'sm' | 'md' | 'lg';
 }>;
 
 type AsButtonProps = CommonProps &
@@ -23,12 +24,22 @@ type AsLinkProps = CommonProps &
 type Props = AsButtonProps | AsLinkProps;
 
 const IconButton: FC<Props> = props => {
-  const { as = 'button', children, variant = 'ghost', size = 'md', className = undefined, ...rest } = props;
+  const {
+    as = 'button',
+    children,
+    variant = 'ghost',
+    shape = 'square',
+    size = 'md',
+    className = undefined,
+    ...rest
+  } = props;
 
   const type = as === 'button' ? ((props as AsButtonProps).type ?? 'button') : undefined;
   const { type: _type, ...headlessRest } = rest as AsButtonProps;
 
-  const classNames: string = [classes.iconButton, classes[variant], classes[size], className].filter(Boolean).join(' ');
+  const classNames: string = [classes.iconButton, classes[variant], classes[shape], classes[size], className]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <HeadlessButton as={as} type={type} className={classNames} {...headlessRest}>

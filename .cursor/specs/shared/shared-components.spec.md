@@ -4,7 +4,7 @@
 
 Specification for shared UI components in `client/src/shared/ui/`. New components are added as sections in this file.
 
-**Components (11):**
+**Components (12):**
 
 | Component | Public export (`@shared`) | Storybook title |
 |-----------|---------------------------|-----------------|
@@ -16,6 +16,7 @@ Specification for shared UI components in `client/src/shared/ui/`. New component
 | UserAvatar | `UserAvatar` | `Shared/UserAvatar` |
 | UserAvatarMenu | `UserAvatarMenu` | `Shared/UserAvatarMenu` |
 | NumericField | `NumericField` | `Shared/NumericField` |
+| PasswordField | `PasswordField` | `Shared/PasswordField` |
 | Dialog | `Dialog` | `Shared/Dialog` |
 | ConfirmDialog | `ConfirmDialogProvider`, `useConfirm` | `Shared/ConfirmDialog` |
 | LegalDocument | `LegalDocument`, `LegalContent`/`LegalLang`/`LegalLink`/`LegalSection`/`LegalText` types | `Shared/LegalDocument` |
@@ -116,7 +117,8 @@ Square or circular icon-only button. Used on the Home page for import/export (gh
 ```typescript
 type CommonProps = PropsWithChildren<{
   variant?: 'ghost' | 'primary';
-  size?: 'md' | 'lg';
+  shape?: 'square' | 'circle';
+  size?: 'sm' | 'md' | 'lg';
 }>;
 
 type AsButtonProps = CommonProps &
@@ -134,7 +136,9 @@ type AsLinkProps = CommonProps &
 type Props = AsButtonProps | AsLinkProps;
 ```
 
-- `variant` defaults to `ghost`; `size` defaults to `md`.
+- `variant` defaults to `ghost` (color / surface only).
+- `shape` defaults to `square` (`$radius-md`; `sm` + `square` → `$radius-sm`). `circle` → `border-radius: 50%` (independent of size).
+- `size` defaults to `md`.
 - `as` — render as another element (e.g. TanStack Router `Link` with `to="/create"`); `to` is **required** when `as` is not `'button'`.
 - `type` defaults to `button`; omitted when `as` is not `'button'`.
 - Callers pass icon SVG as `children`; use `aria-label` and optional `title` for browser tooltip.
@@ -148,8 +152,11 @@ type Props = AsButtonProps | AsLinkProps;
 
 ### UI
 
-- **ghost** — 44×44px min, rounded `$radius-md`, transparent background, `$text-primary` icon; hover `$bg-hover`.
-- **primary** — circular (`border-radius: 50%`), 56×56px when `size="lg"`, `$primary-color` background, `$bg-primary` icon color, `$shadow-lg`.
+- **variant / ghost** — transparent background, `$text-primary` icon; hover `$bg-hover`.
+- **variant / primary** — `$primary-color` background, `$bg-primary` icon color, `$shadow-lg`.
+- **shape / square** — rounded rectangle (`$radius-md`, or `$radius-sm` when `size="sm"`).
+- **shape / circle** — fully circular (`border-radius: 50%`).
+- **sm** — 1.75rem×1.75rem, no padding (for tight layouts e.g. in-input toggles).
 - **md** — 44×44px; **lg** — 56×56px.
 - SVG children block-level; press scale via `[data-active]`.
 
@@ -163,24 +170,26 @@ type Props = AsButtonProps | AsLinkProps;
 - **`aria-label` is required** for icon-only controls (screen readers).
 - **`title`** — optional native browser tooltip (used for import/export/create hints on Home page).
 - Focus, keyboard, and disabled semantics via Headless UI.
+- Prefer `md`/`lg` for standalone controls (≈44px+ touch target); `sm` is for compact embedded use.
 
 ### Storybook
 
 - Title: `Shared/IconButton`
 - File: `icon-button.stories.tsx`
-- Stories: Ghost, Primary (FAB example), Large, Disabled, WithTitle.
+- Stories: all 12 `variant × shape × size` combinations (`GhostSquareSm` … `PrimaryCircleLg`), `AllCombinations` grid, Disabled, WithTitle, AsLinkFab.
 
 ### Tests
 
-- Unit: `specs/icon-button.spec.unit.tsx`
-- Snapshot: `specs/icon-button.spec.snap.tsx`
+- Unit: `specs/icon-button.spec.unit.tsx` — defaults; each variant / shape / size; all 12 class combinations; Link FAB; attrs; clicks.
+- Snapshot: `specs/icon-button.spec.snap.tsx` — default; all 12 combinations; disabled; title; Link FAB.
 
 ### Usage
 
-Referenced by: [home-page.spec.md](../pages/home-page.spec.md)
+Referenced by: [home-page.spec.md](../pages/home-page.spec.md), [PasswordField](#passwordfield)
 
-- Header: ghost `IconButton` for Export / Import (`title` + `aria-label`).
-- Fixed bottom-right FAB: primary `lg` with `as={Link}` `to="/create"`.
+- Header: ghost square `IconButton` for Export / Import (`title` + `aria-label`).
+- Fixed bottom-right FAB: primary circle `lg` with `as={Link}` `to="/create"`.
+- `PasswordField` — ghost square `sm` toggle for show/hide password.
 
 ---
 
@@ -577,6 +586,85 @@ type Props = {
 
 - `widgets/workout-list-form` — exercise weight, reps, sets.
 - Domain validation messages for that form: `widgets/workout-list-form/model/exercise-numeric-validation.ts`.
+
+---
+
+## PasswordField
+
+### Purpose
+
+Controlled password input with a show/hide toggle. Visibility state is owned by the field (not by page logic layers). Used on the Auth page for login/register password entry.
+
+### Location
+
+`shared/ui/password-field/`
+
+### Files
+
+- `password-field-logic-layer.tsx` — visibility `useState`; **default export is the public `PasswordField`**.
+- `password-field.tsx` — presentation only (`PasswordFieldView`): Headless `Input` + shared `IconButton`.
+- `password-field.module.scss` — field layout, input, compact in-input toggle.
+- `password-field.stories.tsx` — Storybook.
+- `specs/password-field.spec.unit.tsx` / `specs/password-field.spec.snap.tsx`.
+
+### Props
+
+Public component (internal type, not exported):
+
+```typescript
+type Props = {
+  id?: string;
+  name?: string;
+  value: string;
+  autoComplete?: string;
+  disabled?: boolean;
+  onChange: (value: string) => void;
+};
+```
+
+### Tech stack
+
+| Category | Technology |
+|----------|------------|
+| UI | Headless UI `Input`; shared `IconButton` (`variant="ghost"` `shape="square"` `size="sm"`) |
+| Icons | lucide-react (`Eye`, `EyeOff`) |
+| Styling | SCSS Modules |
+
+### UI
+
+- Relative field wrapper; full-width `Input` with right padding for the toggle.
+- Toggle: ghost square `IconButton` with `size="sm"` (1.75rem), vertically centered with a small right inset so hover background stays inside the input border.
+- Icons: `Eye` when hidden, `EyeOff` when visible (18px, decorative).
+
+### Behavior
+
+- Default `type="password"`; toggle switches to `type="text"` and back.
+- Visibility is local to the component; `value` / `onChange` stay controlled by the parent.
+- `disabled` disables both the input and the toggle.
+- Optional `name` / `autoComplete` forwarded to the input (password managers / form semantics).
+
+### Accessibility
+
+- Toggle has `aria-label` (`Show password` / `Hide password`) and `aria-pressed`.
+- Toggle `type="button"` so it does not submit surrounding forms.
+- Callers associate an external `<label htmlFor>` when `id` is set (Auth page pattern).
+
+### Storybook
+
+- Title: `Shared/PasswordField`
+- File: `password-field.stories.tsx`
+- Stories: Empty, WithValue, Visible (`play` clicks show), Disabled (controlled wrappers).
+
+### Tests
+
+- Unit: `specs/password-field.spec.unit.tsx` — default password type, toggle show/hide, `onChange`, `name`, `autoComplete`, disabled.
+- Snapshot: `specs/password-field.spec.snap.tsx` — empty, with value, visible (`PasswordFieldView`), disabled.
+
+### Usage
+
+Referenced by: [auth-page.spec.md](../pages/auth-page.spec.md)
+
+- Auth login/register password field.
 
 ---
 

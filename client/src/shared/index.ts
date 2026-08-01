@@ -46,6 +46,7 @@ export {
   LegalDocument,
   MenuButton,
   NumericField,
+  PasswordField,
   UserAvatar,
   UserAvatarMenu,
   useConfirm,
