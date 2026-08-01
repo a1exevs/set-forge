@@ -99,7 +99,7 @@ interface WorkoutHistoryPage {
 
 Session exercise type: [workout-session-exercise.entity.spec.md](workout-session-exercise.entity.spec.md).
 
-React Query keys: `workoutSessionQueryKeys` (`.forList`, `.active`, `.detail`, `.history`). Mutations call `syncSessionCaches` to keep `forList`, `active` (null when status ≠ `active`), and `detail` in sync on start, increment, finish, and resync; `discard` removes `forList` and sets `active` to null. List delete on home page calls `clearWorkoutSessionCachesForDeletedList` after the list mutation (logic layer).
+React Query keys: `workoutSessionQueryKeys` (`.forList`, `.active`, `.detail`, `.historyRoot`, `.history`). Mutations call `syncSessionCaches` to keep `forList`, `active` (null when status ≠ `active`), and `detail` in sync on start, increment, finish, and resync; `discard` removes `forList` and sets `active` to null. Finish and progress that returns `status: completed` (server auto-finish) invalidate `.historyRoot` so History refetches. List delete on home page calls `clearWorkoutSessionCachesForDeletedList` after the list mutation (logic layer).
 
 ---
 
@@ -172,7 +172,7 @@ Nested `exercises` shape: [workout-session-exercise.entity.spec.md](workout-sess
 | `useFinishWorkoutSessionMutation()` | hook | `POST .../finish` |
 | `useResyncWorkoutSessionMutation()` | hook | `POST .../resync` |
 | `useDiscardWorkoutSessionMutation()` | hook | `DELETE /workout-sessions/:id` |
-| `workoutSessionQueryKeys.all` / `.forList` / `.detail` / `.active` / `.history` | keys | Query cache (see **Client** above) |
+| `workoutSessionQueryKeys.all` / `.forList` / `.detail` / `.active` / `.historyRoot` / `.history` | keys | Query cache (see **Client** above) |
 
 ---
 

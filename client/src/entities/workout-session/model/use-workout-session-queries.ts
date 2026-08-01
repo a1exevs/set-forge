@@ -126,6 +126,9 @@ export function useIncrementSessionProgressMutation() {
     onSuccess: (updated, { workoutListId }) => {
       const current = getCachedSession(qc, workoutListId);
       syncSessionCaches(qc, workoutListId, current ? mergeSessionProgress(current, updated) : updated);
+      if (updated.status === 'completed') {
+        void qc.invalidateQueries({ queryKey: workoutSessionQueryKeys.historyRoot });
+      }
     },
     onError: (_error, { workoutListId }, context) => {
       const cached = getCachedSession(qc, workoutListId);
@@ -164,7 +167,7 @@ export function useFinishWorkoutSessionMutation() {
     mutationFn: ({ sessionId }: FinishSessionVars) => finishWorkoutSession(sessionId),
     onSuccess: (updated, { workoutListId }) => {
       syncSessionCaches(qc, workoutListId, updated);
-      void qc.invalidateQueries({ queryKey: ['workout-sessions', 'history'] });
+      void qc.invalidateQueries({ queryKey: workoutSessionQueryKeys.historyRoot });
     },
   });
 }
