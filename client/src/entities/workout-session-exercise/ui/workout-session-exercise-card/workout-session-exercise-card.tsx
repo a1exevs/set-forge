@@ -9,32 +9,29 @@ type Props = {
   exercise: WorkoutSessionExercise;
   justCompleted: boolean;
   isFinished: boolean;
-  onTap: (exerciseId: string) => void;
+  isCompleted: boolean;
+  progress: number;
+  onActivate: () => void;
+  onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
 };
 
-const WorkoutSessionExerciseCard: FC<Props> = ({ exercise, justCompleted, isFinished, onTap }) => {
-  const progress = exercise.sets > 0 ? (exercise.completedSets / exercise.sets) * 100 : 0;
-  const isCompleted = exercise.sets > 0 && exercise.completedSets === exercise.sets;
-
-  const handleActivate = (): void => {
-    onTap(exercise.id);
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleActivate();
-    }
-  };
-
+const WorkoutSessionExerciseCard: FC<Props> = ({
+  exercise,
+  justCompleted,
+  isFinished,
+  isCompleted,
+  progress,
+  onActivate,
+  onKeyDown,
+}) => {
   return (
     <div
       className={`${classes.exerciseCard} ${isCompleted ? classes.completed : ''}`}
       role="button"
       tabIndex={0}
       aria-label={`${exercise.name}: ${exercise.completedSets} of ${exercise.sets} sets`}
-      onClick={handleActivate}
-      onKeyDown={handleKeyDown}
+      onClick={onActivate}
+      onKeyDown={onKeyDown}
     >
       <div className={classes.exerciseHeader}>
         <div className={classes.exerciseInfo}>

@@ -91,7 +91,7 @@ interface WorkoutSessionExercise {
 
 ### UI
 
-- `WorkoutSessionExerciseCard` (`ui/workout-session-exercise-card/`) — interactive training card with progress bar, completed sets, double-tap hint, checkmark transition. Keyboard-activatable (`role="button"`, Enter/Space). Props: `exercise`, `justCompleted`, `isFinished`, `onTap`. Used on [workout-mode](../pages/workout-mode-page.spec.md) training phase.
+- `WorkoutSessionExerciseCard` (`ui/workout-session-exercise-card/`) — interactive training card with progress bar, completed sets, double-tap hint, checkmark transition. Keyboard-activatable (`role="button"`, Enter/Space). Logic layer owns activation handlers and progress/`isCompleted` derivation; presentation is props-only. Props: `exercise`, `justCompleted`, `isFinished`, `onTap`. Used on [workout-mode](../pages/workout-mode-page.spec.md) training phase.
 
 ---
 
