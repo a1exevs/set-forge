@@ -2,12 +2,12 @@
  * Playwright webServer entry: ephemeral MySQL (Testcontainers) → migrate/seed → Nest on E2E_SERVER_PORT.
  * Stays alive until Playwright sends SIGTERM/SIGINT, then stops Nest and the container.
  */
+const { MySqlContainer } = require('@testcontainers/mysql');
 const { spawn, execSync } = require('child_process');
 const fs = require('fs');
 const net = require('net');
 const path = require('path');
 
-const { MySqlContainer } = require('@testcontainers/mysql');
 
 const ports = require('./ports.json');
 const E2E_CLIENT_PORT = ports.clientPort;
