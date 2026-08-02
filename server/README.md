@@ -23,7 +23,7 @@ Build workout lists, log sets and weights, rate perceived effort, and track stre
 
 ## Prerequisites
 
-From the **repository root**: Node `v22.20.0`, npm `v10.9.3` (see root README). Run `npm install` once at the root to install all workspaces and git hooks.
+From the **repository root**: Node `v22.23.2`, npm `v10.9.8` (see root README). Run `npm install` once at the root to install all workspaces and git hooks.
 
 Local development typically needs MySQL (see root **Docker** scripts: `db:up` / `db:down`) and env files such as `.development.env` expected by `ConfigModule`.
 
@@ -117,5 +117,5 @@ Keep migrations forward-only and reversible (`up`/`down`). Never edit a migratio
 
 ## Environment used for verification
 
-- Node: `v22.20.0`
-- npm: `10.9.3`
+- Node: `v22.23.2`
+- npm: `10.9.8`

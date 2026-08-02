@@ -19,7 +19,7 @@ Shared release notes: [`RELEASE-NOTES.md`](RELEASE-NOTES.md) (repository root).
 
 ## Prerequisites
 
-- Node **22.20.0**, npm **10.9.3**
+- Node **22.23.2**, npm **10.9.8**
 
 ## Install
 
@@ -197,8 +197,8 @@ For local development against `mysql-dev`, the equivalent flow is `npm run db:up
 
 ## Environment used for verification
 
-- Node: `v22.20.0`
-- npm: `10.9.3`
+- Node: `v22.23.2`
+- npm: `10.9.8`
 - Docker: `28.0.4`
 - Docker Compose: `v2.34.0-desktop.1`
 

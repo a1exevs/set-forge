@@ -199,7 +199,7 @@ exports[`App Page with route / matches snapshot, route / 1`] = `
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-history icon"
+            class="lucide lucide-rotate-ccw-clock icon"
             fill="none"
             height="24"
             stroke="currentColor"

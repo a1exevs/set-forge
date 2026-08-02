@@ -47,7 +47,7 @@ exports[`Dialog matches snapshot when open 1`] = `
               class="dialogPanel"
               data-headlessui-state="open"
               data-open=""
-              id="headlessui-dialog-panel-:r7:"
+              id="headlessui-dialog-panel-:r6:"
             >
               <div>
                 Dialog content
@@ -89,7 +89,7 @@ exports[`Dialog matches snapshot with ariaLabel 1`] = `
           class="dialogRoot"
           data-headlessui-state="open"
           data-open=""
-          id="headlessui-dialog-:ro:"
+          id="headlessui-dialog-:rl:"
           role="dialog"
           tabindex="-1"
         >
@@ -107,7 +107,7 @@ exports[`Dialog matches snapshot with ariaLabel 1`] = `
               class="dialogPanel"
               data-headlessui-state="open"
               data-open=""
-              id="headlessui-dialog-panel-:rv:"
+              id="headlessui-dialog-panel-:rr:"
             >
               <div>
                 Dialog content
@@ -148,7 +148,7 @@ exports[`Dialog matches snapshot with custom backdropColor 1`] = `
           class="dialogRoot"
           data-headlessui-state="open"
           data-open=""
-          id="headlessui-dialog-:rg:"
+          id="headlessui-dialog-:re:"
           role="dialog"
           tabindex="-1"
         >
@@ -166,7 +166,7 @@ exports[`Dialog matches snapshot with custom backdropColor 1`] = `
               class="dialogPanel"
               data-headlessui-state="open"
               data-open=""
-              id="headlessui-dialog-panel-:rn:"
+              id="headlessui-dialog-panel-:rk:"
             >
               <div>
                 Dialog content
@@ -207,7 +207,7 @@ exports[`Dialog matches snapshot with disableAnimation 1`] = `
           class="dialogRoot"
           data-headlessui-state="open"
           data-open=""
-          id="headlessui-dialog-:r8:"
+          id="headlessui-dialog-:r7:"
           role="dialog"
           tabindex="-1"
         >
@@ -225,7 +225,7 @@ exports[`Dialog matches snapshot with disableAnimation 1`] = `
               class="dialogPanel"
               data-headlessui-state="open"
               data-open=""
-              id="headlessui-dialog-panel-:rf:"
+              id="headlessui-dialog-panel-:rd:"
             >
               <div>
                 Dialog content
