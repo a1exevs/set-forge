@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`WorkoutExerciseCard matches snapshot 1`] = `
+<div>
+  <div
+    class="exerciseCard"
+  >
+    <div
+      class="exerciseHeader"
+    >
+      <div
+        class="exerciseInfo"
+      >
+        <h3>
+          Bench Press
+        </h3>
+        <span
+          class="muscleBadge"
+        >
+          Chest
+        </span>
+      </div>
+    </div>
+    <div
+      class="exerciseDetails"
+    >
+      <div
+        class="detail"
+      >
+        <span
+          class="detailLabel"
+        >
+          Weight
+        </span>
+        <span
+          class="detailValue"
+        >
+          60
+           kg
+        </span>
+      </div>
+      <div
+        class="detail"
+      >
+        <span
+          class="detailLabel"
+        >
+          Reps
+        </span>
+        <span
+          class="detailValue"
+        >
+          10
+        </span>
+      </div>
+      <div
+        class="detail"
+      >
+        <span
+          class="detailLabel"
+        >
+          Sets
+        </span>
+        <span
+          class="detailValue"
+        >
+          3
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;

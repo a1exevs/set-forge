@@ -1,10 +1,10 @@
+import { BrandWordmark, Button, PasswordField } from '@shared';
 import { Link } from '@tanstack/react-router';
+import { LegalFooter } from '@widgets';
 import { LogIn, UserPlus } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { FC, FormEvent } from 'react';
 
-import { BrandWordmark, Button } from '@shared';
-import { LegalFooter } from '@widgets';
 
 import classes from 'src/pages/auth/ui/auth-page.module.scss';
 
@@ -124,14 +124,13 @@ const AuthPage: FC<Props> = ({
           <label className={classes.label} htmlFor="auth-password">
             Password
           </label>
-          <input
+          <PasswordField
             id="auth-password"
-            className={classes.input}
-            type="password"
-            autoComplete={activeTab === 'login' ? 'current-password' : 'new-password'}
+            name="password"
             value={password}
-            onChange={(e): void => onPasswordChange(e.target.value)}
+            autoComplete={activeTab === 'login' ? 'current-password' : 'new-password'}
             disabled={isSubmitting}
+            onChange={onPasswordChange}
           />
           {passwordError && <p className={classes.fieldError}>{passwordError}</p>}
 

@@ -29,6 +29,10 @@ const TestIcon = (): JSX.Element => (
   </svg>
 );
 
+const VARIANTS = ['ghost', 'primary'] as const;
+const SHAPES = ['square', 'circle'] as const;
+const SIZES = ['sm', 'md', 'lg'] as const;
+
 describe('IconButton', () => {
   it('matches snapshot for default', () => {
     const { container } = render(
@@ -39,32 +43,17 @@ describe('IconButton', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('matches snapshot for ghost variant', () => {
-    const { container } = render(
-      <IconButton variant="ghost" aria-label="Action">
-        <TestIcon />
-      </IconButton>,
-    );
-    expect(container).toMatchSnapshot();
-  });
-
-  it('matches snapshot for primary variant', () => {
-    const { container } = render(
-      <IconButton variant="primary" aria-label="Create">
-        <TestIcon />
-      </IconButton>,
-    );
-    expect(container).toMatchSnapshot();
-  });
-
-  it('matches snapshot for lg size', () => {
-    const { container } = render(
-      <IconButton size="lg" aria-label="Create">
-        <TestIcon />
-      </IconButton>,
-    );
-    expect(container).toMatchSnapshot();
-  });
+  it.each(VARIANTS.flatMap(variant => SHAPES.flatMap(shape => SIZES.map(size => [variant, shape, size] as const))))(
+    'matches snapshot for %s / %s / %s',
+    (variant, shape, size) => {
+      const { container } = render(
+        <IconButton variant={variant} shape={shape} size={size} aria-label="Action">
+          <TestIcon />
+        </IconButton>,
+      );
+      expect(container).toMatchSnapshot();
+    },
+  );
 
   it('matches snapshot for disabled', () => {
     const { container } = render(
@@ -84,9 +73,9 @@ describe('IconButton', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('matches snapshot as Link', () => {
+  it('matches snapshot as Link FAB', () => {
     const { container } = render(
-      <IconButton as={Link} to="/create" variant="primary" size="lg" aria-label="Create workout list">
+      <IconButton as={Link} to="/create" variant="primary" shape="circle" size="lg" aria-label="Create workout list">
         <TestIcon />
       </IconButton>,
     );

@@ -1,6 +1,7 @@
 import eslintJs from '@eslint/js';
 import prettierConfig from 'eslint-config-prettier';
 import storyBookPlugin from 'eslint-plugin-storybook';
+import globals from 'globals';
 import tsEslint from 'typescript-eslint';
 
 import languageOptions from './linter/language-options';
@@ -47,6 +48,19 @@ export default tsEslint.config(
     files: ['tests/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': 'off',
+    },
+  },
+  {
+    // Playwright webServer bootstrap (Node CJS)
+    files: ['tests/**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
     },
   },
   {

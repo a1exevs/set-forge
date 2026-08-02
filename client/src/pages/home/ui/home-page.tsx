@@ -1,10 +1,10 @@
 import type { WorkoutList } from '@entities';
+import { BrandWordmark, IconButton, MenuButton, useTabSwipeNavigation } from '@shared';
 import { Link, useRouterState } from '@tanstack/react-router';
+import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets';
 import { Download, Plus, Upload } from 'lucide-react';
 import { ChangeEvent, FC, MouseEvent, RefObject } from 'react';
 
-import { BrandWordmark, IconButton, MenuButton, useTabSwipeNavigation } from '@shared';
-import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets';
 
 import classes from 'src/pages/home/ui/home-page.module.scss';
 
@@ -112,6 +112,7 @@ const HomePage: FC<Props> = ({
         to="/create"
         className={classes.createFab}
         variant="primary"
+        shape="circle"
         size="lg"
         aria-label="Create workout list"
         title="Create workout list"
