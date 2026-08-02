@@ -5,7 +5,6 @@ import { FC } from 'react';
 import { WorkoutExerciseCard, WorkoutSessionExerciseCard } from '@entities';
 import { NotFoundMessage } from '@widgets';
 
-
 import classes from 'src/pages/workout-mode/ui/workout-mode-page.module.scss';
 
 export type WorkoutPhase = 'preview' | 'training';
