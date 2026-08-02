@@ -28,7 +28,7 @@ exports[`ConfirmDialog matches snapshot with custom button texts 1`] = `
           class="dialogRoot"
           data-headlessui-state="open"
           data-open=""
-          id="headlessui-dialog-:ro:"
+          id="headlessui-dialog-:rl:"
           role="dialog"
           tabindex="-1"
         >
@@ -46,7 +46,7 @@ exports[`ConfirmDialog matches snapshot with custom button texts 1`] = `
               class="dialogPanel"
               data-headlessui-state="open"
               data-open=""
-              id="headlessui-dialog-panel-:rv:"
+              id="headlessui-dialog-panel-:rr:"
             >
               <div
                 class="container"
@@ -143,7 +143,7 @@ exports[`ConfirmDialog matches snapshot with default options 1`] = `
               class="dialogPanel"
               data-headlessui-state="open"
               data-open=""
-              id="headlessui-dialog-panel-:r7:"
+              id="headlessui-dialog-panel-:r6:"
             >
               <div
                 class="container"
@@ -215,7 +215,7 @@ exports[`ConfirmDialog matches snapshot with description 1`] = `
           class="dialogRoot"
           data-headlessui-state="open"
           data-open=""
-          id="headlessui-dialog-:r8:"
+          id="headlessui-dialog-:r7:"
           role="dialog"
           tabindex="-1"
         >
@@ -233,7 +233,7 @@ exports[`ConfirmDialog matches snapshot with description 1`] = `
               class="dialogPanel"
               data-headlessui-state="open"
               data-open=""
-              id="headlessui-dialog-panel-:rf:"
+              id="headlessui-dialog-panel-:rd:"
             >
               <div
                 class="container"
@@ -310,7 +310,7 @@ exports[`ConfirmDialog matches snapshot with hideCancelButton 1`] = `
           class="dialogRoot"
           data-headlessui-state="open"
           data-open=""
-          id="headlessui-dialog-:rg:"
+          id="headlessui-dialog-:re:"
           role="dialog"
           tabindex="-1"
         >
@@ -328,7 +328,7 @@ exports[`ConfirmDialog matches snapshot with hideCancelButton 1`] = `
               class="dialogPanel"
               data-headlessui-state="open"
               data-open=""
-              id="headlessui-dialog-panel-:rn:"
+              id="headlessui-dialog-panel-:rk:"
             >
               <div
                 class="container"
