@@ -103,7 +103,7 @@ services:
   caddy:
     profiles: ["prod"]
     logging: *json-file-logging
-    image: caddy:2.8-alpine
+    image: caddy:2.11-alpine
     depends_on:
       - client-prod
     environment:

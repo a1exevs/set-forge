@@ -155,7 +155,7 @@ docker run --rm hello-world
 
 Scripts like `npm run prod:up`, `npm run prod:db:migrate`, and others are Docker Compose wrappers in [`package.json`](package.json). This guide uses **those scripts**, not raw `docker compose` commands — **except** in [§13 Log and disk usage](#log-and-disk-usage), where host-level log inspection and cleanup require direct `docker` / `docker compose` commands.
 
-> **`npm install` in the repo root on the VDS is not required.** Images `server-prod` and `client-prod` are built inside Docker with exact Node **22.20.0** / npm **10.9.3** versions (see Dockerfiles). On the host, the **npm** CLI is enough to invoke the scripts.
+> **`npm install` in the repo root on the VDS is not required.** Images `server-prod` and `client-prod` are built inside Docker with exact Node **22.23.2** / npm **10.9.8** versions (see Dockerfiles). On the host, the **npm** CLI is enough to invoke the scripts.
 
 Install Node.js 22 (includes npm) via the [NodeSource](https://github.com/nodesource/distributions) repository:
 

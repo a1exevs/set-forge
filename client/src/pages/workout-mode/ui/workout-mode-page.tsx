@@ -1,9 +1,8 @@
-import type { WorkoutList, WorkoutSession, WorkoutSessionExercise } from '@entities';
-import { Transition } from '@headlessui/react';
+import type { WorkoutExercise, WorkoutList, WorkoutSession, WorkoutSessionExercise } from '@entities';
 import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
 
-import { muscleGroupLabels } from '@entities';
+import { WorkoutExerciseCard, WorkoutSessionExerciseCard } from '@entities';
 import { NotFoundMessage } from '@widgets';
 
 import classes from 'src/pages/workout-mode/ui/workout-mode-page.module.scss';
@@ -84,67 +83,25 @@ const WorkoutModePage: FC<Props> = ({
                 {isStarting ? 'Starting…' : 'Start workout'}
               </button>
             </div>
+            <div className={`${classes.exerciseList} ${classes.previewExerciseList}`}>
+              {workoutList.exercises.map((exercise: WorkoutExercise) => (
+                <WorkoutExerciseCard key={exercise.id} exercise={exercise} />
+              ))}
+            </div>
           </div>
         ) : (
           session && (
             <>
               <div className={classes.exerciseList}>
-                {session.exercises.map((exercise: WorkoutSessionExercise) => {
-                  const progress = exercise.sets > 0 ? (exercise.completedSets / exercise.sets) * 100 : 0;
-                  const isCompleted = exercise.sets > 0 && exercise.completedSets === exercise.sets;
-
-                  return (
-                    <div
-                      key={exercise.id}
-                      className={`${classes.exerciseCard} ${isCompleted ? classes.completed : ''}`}
-                      onClick={(): void => onTap(exercise.id)}
-                    >
-                      <div className={classes.exerciseHeader}>
-                        <div className={classes.exerciseInfo}>
-                          <h3>{exercise.name}</h3>
-                          <span className={classes.muscleBadge}>{muscleGroupLabels[exercise.muscleGroup]}</span>
-                        </div>
-                        <Transition
-                          show={justCompleted === exercise.id}
-                          enter={classes.checkEnter}
-                          enterFrom={classes.checkEnterFrom}
-                          enterTo={classes.checkEnterTo}
-                          leave={classes.checkLeave}
-                          leaveFrom={classes.checkLeaveFrom}
-                          leaveTo={classes.checkLeaveTo}
-                        >
-                          <span className={classes.checkmark}>✓</span>
-                        </Transition>
-                      </div>
-
-                      <div className={classes.exerciseDetails}>
-                        <div className={classes.detail}>
-                          <span className={classes.detailLabel}>Weight</span>
-                          <span className={classes.detailValue}>{exercise.weight} kg</span>
-                        </div>
-                        <div className={classes.detail}>
-                          <span className={classes.detailLabel}>Reps</span>
-                          <span className={classes.detailValue}>{exercise.reps}</span>
-                        </div>
-                        <div className={classes.detail}>
-                          <span className={classes.detailLabel}>Sets</span>
-                          <span className={classes.detailValue}>
-                            {exercise.completedSets} / {exercise.sets}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className={classes.progressBarContainer}>
-                        <div
-                          className={`${classes.progressBar} ${isCompleted ? classes.progressCompleted : ''}`}
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-
-                      {!isCompleted && !isFinished && <p className={classes.hint}>Double tap to mark a set</p>}
-                    </div>
-                  );
-                })}
+                {session.exercises.map((exercise: WorkoutSessionExercise) => (
+                  <WorkoutSessionExerciseCard
+                    key={exercise.id}
+                    exercise={exercise}
+                    justCompleted={justCompleted === exercise.id}
+                    isFinished={isFinished}
+                    onTap={onTap}
+                  />
+                ))}
               </div>
 
               <div className={classes.actionBar}>

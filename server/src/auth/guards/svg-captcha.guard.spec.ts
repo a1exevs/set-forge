@@ -14,7 +14,7 @@ describe('SwgCaptchaGuard', () => {
       const authFailedCount = `${MAX_AUTH_FAILED_COUNT}`;
       const captchaText = '1234';
       const loginDto = { email: 'user@yandex.ru', password: '12345678', captcha: captchaText };
-      const { mockContext, mockGetRequest, mockGetResponse, request } = getMockExecutionContextData({
+      const { mockContext, mockGetRequest, request } = getMockExecutionContextData({
         sessionVariables: [
           { key: 'authFailedCount', value: authFailedCount },
           { key: 'captcha', value: captchaText },
@@ -33,7 +33,7 @@ describe('SwgCaptchaGuard', () => {
       const authFailedCount = `${MAX_AUTH_FAILED_COUNT + 1}`;
       const captchaText = '1234';
       const loginDto = { email: 'user@yandex.ru', password: '12345678', captcha: captchaText };
-      const { mockContext, mockGetRequest, mockGetResponse, request } = getMockExecutionContextData({
+      const { mockContext, mockGetRequest, request } = getMockExecutionContextData({
         sessionVariables: [
           { key: 'authFailedCount', value: authFailedCount },
           { key: 'captcha', value: captchaText },
@@ -53,7 +53,7 @@ describe('SwgCaptchaGuard', () => {
       const correctCaptchaText = '1234';
       const incorrectCaptchaText = '1254';
       const loginDto = { email: 'user@yandex.ru', password: '12345678', captcha: incorrectCaptchaText };
-      const { mockContext, mockGetRequest, mockGetResponse, request } = getMockExecutionContextData({
+      const { mockContext, mockGetRequest, request } = getMockExecutionContextData({
         sessionVariables: [
           { key: 'authFailedCount', value: authFailedCount },
           { key: 'captcha', value: correctCaptchaText },
@@ -70,7 +70,7 @@ describe('SwgCaptchaGuard', () => {
     it('captcha text correct. Authorization failed MAX-1 times', async () => {
       const authFailedCount = `${MAX_AUTH_FAILED_COUNT - 1}`;
       const loginDto = { email: 'user@yandex.ru', password: '12345678' };
-      const { mockContext, mockGetRequest, mockGetResponse, request } = getMockExecutionContextData({
+      const { mockContext, mockGetRequest, request } = getMockExecutionContextData({
         sessionVariables: [{ key: 'authFailedCount', value: authFailedCount }],
         body: loginDto,
       });

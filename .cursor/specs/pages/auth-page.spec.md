@@ -44,7 +44,7 @@ Login and registration on `/login` and `/register` (same component, tab follows 
 
 1. Centered [`BrandWordmark`](../shared/shared-components.spec.md#brandwordmark) (`title="Set Forge"`, `titleAs="h1"`) + subtitle.
 2. TanStack Router `Link` tab links: Login / Register (`LogIn` / `UserPlus` icons); `role="tablist"` on nav.
-3. Forms: email + password fields; optional captcha image + input when visible.
+3. Forms: email + [`PasswordField`](../shared/shared-components.spec.md#passwordfield) (show/hide toggle); optional captcha image + input when visible.
 4. **Register only**: two consent checkboxes — personal-data processing (links to `/privacy`) and Terms of Use acceptance (links to `/terms`); each shows its own error text when unchecked on submit.
 5. Legal footer: shared [`LegalFooter`](../../../client/src/widgets/legal-footer/) widget with `Link`s to `/privacy` (Privacy Policy) and `/terms` (Terms of Service) below the form.
 6. Server errors: `messages` / field errors on form.
@@ -100,7 +100,7 @@ Full contract: [user entity](../entities/user.entity.spec.md#api-contract).
 |-----------|------------|
 | Routing | TanStack Router `beforeLoad`, `redirect` |
 | Server state | `@tanstack/react-query` |
-| UI | TanStack Router `Link`, SCSS modules |
+| UI | TanStack Router `Link`, shared `BrandWordmark` / `Button` / `PasswordField`, SCSS modules |
 | FSD | `pages/auth`, `entities/session` |
 
 ---
