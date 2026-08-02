@@ -90,7 +90,7 @@ npm run e2e:install          # from client/
 npm run client:e2e:install
 ```
 
-`test:e2e` starts (or reuses) the Vite dev server on port **5173**; the Nest API is **not** required for current smoke tests. To watch tests in a real browser window, use `test:e2e:headed` or `test:e2e:ui`.
+`test:e2e` runs **full-stack** Playwright scenarios: ephemeral MySQL (Testcontainers) + Nest on port **5101** + Vite on port **5174** (separate from local `client:dev` / `server:start:dev`). Docker must be running. Copy `server/.e2e.env.example` to `server/.e2e.env` once if needed (CI does this automatically). To watch tests in a real browser window, use `test:e2e:headed` or `test:e2e:ui`.
 
 ## API base and dev proxy
 

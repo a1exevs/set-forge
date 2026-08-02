@@ -1,11 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-import { mockUnauthenticatedSession } from 'tests/e2e/helpers/auth-mocks';
-
 test.describe('Auth gate', () => {
-  test('redirects home to login when refresh has no session', async ({ page }) => {
-    await mockUnauthenticatedSession(page);
-
+  test('redirects home to login when there is no session', async ({ page }) => {
     await page.goto('/');
 
     await expect(page).toHaveURL(/\/login/);

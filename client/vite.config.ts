@@ -8,8 +8,9 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, __dirname, '');
   const publicOrigin = env.VITE_PUBLIC_ORIGIN || 'https://localhost';
   process.env.VITE_PUBLIC_ORIGIN = publicOrigin;
-  const devServerPort = 5173;
-  const apiProxyTarget = env.VITE_DEV_API_PROXY || 'http://localhost:5001';
+  // Prefer process.env so Playwright e2e can override without a .env file (ports 5174 / 5101).
+  const devServerPort = Number(process.env.VITE_DEV_SERVER_PORT || env.VITE_DEV_SERVER_PORT || 5173);
+  const apiProxyTarget = process.env.VITE_DEV_API_PROXY || env.VITE_DEV_API_PROXY || 'http://localhost:5001';
   const devClientOrigin = `http://localhost:${devServerPort}`;
 
   return {
