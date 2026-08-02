@@ -78,7 +78,7 @@ exports[`NumericField matches snapshot with inline error 1`] = `
     </label>
     <input
       aria-describedby="headlessui-description-:r9:"
-      aria-invalid=""
+      aria-invalid="true"
       aria-labelledby="headlessui-label-:r7:"
       class="input inputSm inputInvalid"
       data-headlessui-state="invalid"

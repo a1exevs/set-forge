@@ -31,6 +31,10 @@ const config: Config = {
   collectCoverageFrom: ['**/*.(j|t)sx'],
   coverageDirectory: `${COVERAGE_DIR_NAME}/${SNAPSHOT_TESTS_COVERAGE_DIR_NAME}`,
   moduleNameMapper: {
+    // seroval@1.6+ is ESM-only (breaks Jest CJS). Pin 1.5.6 under client/ and map to its CJS builds.
+    '^seroval$': '<rootDir>/node_modules/seroval/dist/cjs/production/index.cjs',
+    '^seroval-plugins/web$': '<rootDir>/node_modules/seroval-plugins/dist/cjs/production/web.cjs',
+    '^seroval-plugins$': '<rootDir>/node_modules/seroval-plugins/dist/cjs/production/web.cjs',
     ...PATH_ALIASES_MAP,
     ...MOCK_STYLES_MODULES_MAP,
     ...MOCK_FILES_MODULES_MAP,
