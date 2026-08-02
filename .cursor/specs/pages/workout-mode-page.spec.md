@@ -38,8 +38,8 @@ Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/
 
 1. **Loading** (`workoutList === undefined`): render nothing.
 2. **Not found** (`workoutList === null`): `NotFoundMessage`.
-3. **Preview** (`workoutList` loaded, no active session): header with `workoutListName`, progress `0 / N exercises`, 0%; friendly hint above **Start workout** (tap only when ready — timer starts on Start); **Start workout** button (same style as Finish); no exercise cards.
-4. **Training** (`session !== null`): header, overall progress bar, exercise cards, bottom **Finish workout** (disabled when completed — label «Workout completed»).
+3. **Preview** (`workoutList` loaded, no active session): header with `workoutListName`, progress `0 / N exercises`, 0%; friendly hint above **Start workout** (tap only when ready — timer starts on Start); **Start workout** button (same style as Finish); below it, read-only `WorkoutExerciseCard` list from `workoutList.exercises` (no progress bar, no double-tap hint).
+4. **Training** (`session !== null`): header, overall progress bar, `WorkoutSessionExerciseCard` list, bottom **Finish workout** (disabled when completed — label «Workout completed»).
 5. Double-tap exercise card (training only): checkmark animation on last set (`justCompleted` prop).
 
 ### Celebration
@@ -131,7 +131,7 @@ Full contract: [workout-session entity](../entities/workout-session.entity.spec.
 
 ## Tech Stack
 
-TanStack Router, React Query (optimistic mutations), Headless UI `Transition`, `canvas-confetti`, `NotFoundMessage` widget, extended `useConfirm` (alternate action).
+TanStack Router, React Query (optimistic mutations), Headless UI `Transition` (inside `WorkoutSessionExerciseCard`), `canvas-confetti`, `NotFoundMessage` widget, `WorkoutExerciseCard` / `WorkoutSessionExerciseCard` entity UI, extended `useConfirm` (alternate action).
 
 ---
 
@@ -145,7 +145,7 @@ TanStack Router, React Query (optimistic mutations), Headless UI `Transition`, `
 
 ## Tests
 
-- `ui/specs/workout-mode-page.spec.unit.tsx` — preview (Start visible, no cards), training (cards + Finish), not found
+- `ui/specs/workout-mode-page.spec.unit.tsx` — preview (Start + exercise cards below), training (session cards + Finish), not found
 - `ui/specs/workout-mode-page-logic-layer.spec.unit.tsx` — finish vs discard vs cancel confirm; start handler; resync-edge auto-finish on entry (complete vs incomplete)
 
 ---
@@ -174,6 +174,7 @@ N/A — no stories file.
 ## References
 
 - [workout-list.entity.spec.md](../entities/workout-list.entity.spec.md)
+- [workout-exercise.entity.spec.md](../entities/workout-exercise.entity.spec.md)
 - [workout-session.entity.spec.md](../entities/workout-session.entity.spec.md)
 - [workout-session-exercise.entity.spec.md](../entities/workout-session-exercise.entity.spec.md)
 - [user.entity.spec.md](../entities/user.entity.spec.md)

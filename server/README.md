@@ -63,6 +63,8 @@ npm run server:test:e2e
 
 On startup, Jest `globalSetup` migrates and seeds the container database using `server/.e2e.env` (see `.e2e.env.example`). Runtime `MYSQL_*` values are written to `test/e2e/.runtime-env.json` (gitignored) and injected before each spec file runs.
 
+Browser full-stack e2e (`npm run client:test:e2e`) uses the same `.e2e.env` secrets and a separate ephemeral MySQL container, but starts a **listening** Nest process on port **5101** with `CLIENT_URL=http://localhost:5174`.
+
 ## Database schema (Sequelize migrations)
 
 The schema is owned by [`sequelize-cli`](https://github.com/sequelize/cli) migrations under `server/database/`. `synchronize` is hard-coded to `false` in `app.module.ts`, so neither dev nor prod will ever auto-create or auto-mutate tables — every change must land as a migration.

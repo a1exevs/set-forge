@@ -74,14 +74,15 @@ describe('WorkoutModePage', () => {
     expect(screen.getByText('Workout list not found')).toBeInTheDocument();
   });
 
-  it('renders preview with Start workout and no exercise cards', () => {
+  it('renders preview with Start workout and exercise cards below', () => {
     render(<WorkoutModePage {...baseProps} phase="preview" workoutList={WORKOUT_LIST} session={null} />);
 
     expect(screen.getByText('Push Day')).toBeInTheDocument();
     expect(screen.getByText('0 / 1 exercises')).toBeInTheDocument();
     expect(screen.getByText(/Ready to train\?/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Start workout' })).toBeInTheDocument();
-    expect(screen.queryByText('Bench Press')).not.toBeInTheDocument();
+    expect(screen.getByText('Bench Press')).toBeInTheDocument();
+    expect(screen.queryByText('Double tap to mark a set')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Finish workout' })).not.toBeInTheDocument();
   });
 

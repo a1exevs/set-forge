@@ -30,6 +30,10 @@ const TestIcon = (): JSX.Element => (
   </svg>
 );
 
+const VARIANTS = ['ghost', 'primary'] as const;
+const SHAPES = ['square', 'circle'] as const;
+const SIZES = ['sm', 'md', 'lg'] as const;
+
 describe('IconButton', () => {
   describe('rendering', () => {
     it('renders children correctly', () => {
@@ -42,7 +46,7 @@ describe('IconButton', () => {
       expect(screen.getByTestId('test-icon')).toBeInTheDocument();
     });
 
-    it('applies default variant (ghost) and size (md)', () => {
+    it('applies default variant (ghost), shape (square), and size (md)', () => {
       const { container } = render(
         <IconButton aria-label="Test action">
           <TestIcon />
@@ -50,26 +54,51 @@ describe('IconButton', () => {
       );
       const button = container.querySelector('button');
       expect(button).toHaveClass('ghost');
+      expect(button).toHaveClass('square');
       expect(button).toHaveClass('md');
     });
 
-    it('renders with primary variant', () => {
+    it.each(VARIANTS)('renders with %s variant', variant => {
       const { container } = render(
-        <IconButton variant="primary" aria-label="Create">
+        <IconButton variant={variant} aria-label="Action">
           <TestIcon />
         </IconButton>,
       );
-      expect(container.querySelector('button')).toHaveClass('primary');
+      expect(container.querySelector('button')).toHaveClass(variant);
     });
 
-    it('renders with lg size', () => {
+    it.each(SHAPES)('renders with %s shape', shape => {
       const { container } = render(
-        <IconButton size="lg" aria-label="Create">
+        <IconButton shape={shape} aria-label="Action">
           <TestIcon />
         </IconButton>,
       );
-      expect(container.querySelector('button')).toHaveClass('lg');
+      expect(container.querySelector('button')).toHaveClass(shape);
     });
+
+    it.each(SIZES)('renders with %s size', size => {
+      const { container } = render(
+        <IconButton size={size} aria-label="Action">
+          <TestIcon />
+        </IconButton>,
+      );
+      expect(container.querySelector('button')).toHaveClass(size);
+    });
+
+    it.each(VARIANTS.flatMap(variant => SHAPES.flatMap(shape => SIZES.map(size => [variant, shape, size] as const))))(
+      'applies combined classes for %s / %s / %s',
+      (variant, shape, size) => {
+        const { container } = render(
+          <IconButton variant={variant} shape={shape} size={size} aria-label="Action">
+            <TestIcon />
+          </IconButton>,
+        );
+        const button = container.querySelector('button');
+        expect(button).toHaveClass(variant);
+        expect(button).toHaveClass(shape);
+        expect(button).toHaveClass(size);
+      },
+    );
 
     it('applies custom className', () => {
       const { container } = render(
@@ -82,7 +111,7 @@ describe('IconButton', () => {
 
     it('renders as Link with href and without type attribute', () => {
       render(
-        <IconButton as={Link} to="/create" variant="primary" size="lg" aria-label="Create workout list">
+        <IconButton as={Link} to="/create" variant="primary" shape="circle" size="lg" aria-label="Create workout list">
           <TestIcon />
         </IconButton>,
       );
@@ -90,6 +119,9 @@ describe('IconButton', () => {
       const link = screen.getByRole('link', { name: 'Create workout list' });
       expect(link).toHaveAttribute('href', '/create');
       expect(link).not.toHaveAttribute('type');
+      expect(link).toHaveClass('primary');
+      expect(link).toHaveClass('circle');
+      expect(link).toHaveClass('lg');
     });
   });
 

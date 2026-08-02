@@ -70,9 +70,9 @@ Model only: `server/src/workout-sessions/workout-session-exercise.model.ts` (wir
 
 ### Location
 
-`client/src/entities/workout-session-exercise/` — `model/types.ts`
+`client/src/entities/workout-session-exercise/` — `model/types.ts`, `ui/workout-session-exercise-card/`
 
-No API layer or React Query hooks — type-only slice consumed by `workout-session`.
+No API layer or React Query hooks — type and training card consumed by `workout-session` / workout-mode.
 
 ### Types
 
@@ -88,6 +88,10 @@ interface WorkoutSessionExercise {
   completedSets: number;
 }
 ```
+
+### UI
+
+- `WorkoutSessionExerciseCard` (`ui/workout-session-exercise-card/`) — interactive training card with progress bar, completed sets, double-tap hint, checkmark transition. Keyboard-activatable (`role="button"`, Enter/Space). Logic layer owns activation handlers and progress/`isCompleted` derivation; presentation is props-only. Props: `exercise`, `justCompleted`, `isFinished`, `onTap`. Used on [workout-mode](../pages/workout-mode-page.spec.md) training phase.
 
 ---
 
@@ -122,6 +126,7 @@ No dedicated endpoints. Shape is nested under `WorkoutSessionResponse` — see [
 | Export | Type | Description |
 |--------|------|-------------|
 | `WorkoutSessionExercise` | type | Session exercise snapshot |
+| `WorkoutSessionExerciseCard` | component | Interactive training exercise card |
 
 Re-exported from `@entities` / `client/src/entities/workout-session-exercise`.
 
@@ -132,6 +137,13 @@ Re-exported from `@entities` / `client/src/entities/workout-session-exercise`.
 - Unit: `workout-sessions.service.spec.ts` (progress, resync, snapshot)
 - Model: `workout-sessions.model.spec.ts` — table name, columns, associations
 - E2E: `workout-lists-sessions.e2e-spec.ts`
+- UI: `ui/workout-session-exercise-card/specs/workout-session-exercise-card.spec.unit.tsx`, `ui/workout-session-exercise-card/specs/workout-session-exercise-card.spec.snap.tsx`
+
+---
+
+## Storybook
+
+- `ui/workout-session-exercise-card/workout-session-exercise-card.stories.tsx` — `Entities/WorkoutSessionExerciseCard`
 
 ---
 
