@@ -1,8 +1,9 @@
 import type { WorkoutExercise, WorkoutList, WorkoutSession, WorkoutSessionExercise } from '@entities';
-import { WorkoutExerciseCard, WorkoutSessionExerciseCard } from '@entities';
 import { Link } from '@tanstack/react-router';
-import { NotFoundMessage } from '@widgets';
 import { FC } from 'react';
+
+import { WorkoutExerciseCard, WorkoutSessionExerciseCard } from '@entities';
+import { NotFoundMessage } from '@widgets';
 
 
 import classes from 'src/pages/workout-mode/ui/workout-mode-page.module.scss';

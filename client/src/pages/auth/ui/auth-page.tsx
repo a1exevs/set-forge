@@ -1,10 +1,10 @@
-import { BrandWordmark, Button, PasswordField } from '@shared';
 import { Link } from '@tanstack/react-router';
-import { LegalFooter } from '@widgets';
 import { LogIn, UserPlus } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { FC, FormEvent } from 'react';
 
+import { BrandWordmark, Button, PasswordField } from '@shared';
+import { LegalFooter } from '@widgets';
 
 import classes from 'src/pages/auth/ui/auth-page.module.scss';
 
