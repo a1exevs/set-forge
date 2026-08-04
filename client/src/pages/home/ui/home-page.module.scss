@@ -71,6 +71,7 @@
 }
 
 .card {
+  position: relative;
   background-color: $bg-elevated;
   border: 1px solid $border-color;
   border-radius: $radius-lg;
@@ -82,16 +83,29 @@
     box-shadow: $shadow-md;
     border-color: $border-hover;
   }
+
+  &:has(.cardLink:focus-visible) {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+  }
 }
 
 .cardLink {
-  text-decoration: none;
-  color: inherit;
-  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
   cursor: pointer;
 
-  // Touch-friendly target
-  min-height: 44px;
+  &:focus {
+    outline: none;
+  }
+}
+
+.cardContent {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .cardHeader {
@@ -143,6 +157,7 @@
 
 .menuButton {
   flex-shrink: 0;
+  pointer-events: auto;
 
   // Touch-friendly target
   min-width: 44px;
