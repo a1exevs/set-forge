@@ -1,12 +1,12 @@
-import { UnprocessableEntityException, Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SignOptions, TokenExpiredError } from 'jsonwebtoken';
 
-import { User } from '@users/users.model';
 import { RefreshToken } from '@auth/refresh-tokens.model';
-import { UsersService } from '@users/users.service';
 import { RefreshTokensService } from '@auth/refresh-tokens.service';
 import { ErrorMessages } from '@common/constants';
+import { User } from '@users/users.model';
+import { UsersService } from '@users/users.service';
 
 // TODO Replace
 const BASE_OPTIONS: SignOptions = {

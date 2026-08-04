@@ -1,16 +1,15 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
-import { CreateUserRequest } from '@users/dto';
-import { UsersService } from '@users/users.service';
-import { User } from '@users/users.model';
-import { TokensService } from '@auth/tokens.service';
-import { RegisterRequest, LoginRequest, GetCurrentUserResponse } from '@auth/dto';
-import { IAuthenticationResult } from '@auth/interfaces';
-import { ErrorMessages } from '@common/constants/error-messages';
-import { DocumentVersions } from '@common/constants';
-
 import * as bcrypt from 'bcryptjs';
+
+import { GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto';
+import { IAuthenticationResult } from '@auth/interfaces';
+import { TokensService } from '@auth/tokens.service';
+import { DocumentVersions } from '@common/constants';
+import { ErrorMessages } from '@common/constants/error-messages';
+import { CreateUserRequest } from '@users/dto';
+import { User } from '@users/users.model';
+import { UsersService } from '@users/users.service';
 
 @Injectable()
 export class AuthService {

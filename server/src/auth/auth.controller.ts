@@ -24,16 +24,16 @@ import {
 import { CookieOptions, Request, Response } from 'express';
 
 import { AuthService } from '@auth/auth.service';
-import { LoginRequest, RegisterRequest, AuthenticationResponse, GetCurrentUserResponse } from '@auth/dto';
-import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
-import { SvgCaptchaGuard } from '@auth/guards';
+import { AuthenticationResponse, GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto';
 import { UnauthorizedExceptionFilter } from '@auth/exception-filters';
+import { SvgCaptchaGuard } from '@auth/guards';
 import { IAuthenticationResult } from '@auth/interfaces';
-import { ResponseInterceptor } from '@common/interceptors';
-import { Routes, Docs } from '@common/constants';
+import { Docs, Routes } from '@common/constants';
 import { ApiResult } from '@common/decorators';
-import { HttpExceptionFilter } from '@common/exception-filters';
 import { OperationResultResponse } from '@common/dto';
+import { HttpExceptionFilter } from '@common/exception-filters';
+import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
+import { ResponseInterceptor } from '@common/interceptors';
 
 @ApiTags(Docs.AUTHORIZATION_CONTROLLER)
 @Controller(Routes.ENDPOINT_AUTH)

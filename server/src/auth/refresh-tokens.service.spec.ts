@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/sequelize';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { RefreshToken } from '@auth/refresh-tokens.model';
 import { RefreshTokensService } from '@auth/refresh-tokens.service';

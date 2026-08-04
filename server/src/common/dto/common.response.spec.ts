@@ -1,5 +1,5 @@
-import { checkForApiProperties } from '@test/unit/helpers';
 import { CommonResponse } from '@common/dto';
+import { checkForApiProperties } from '@test/unit/helpers';
 
 describe('CommonResponse', () => {
   beforeEach(async () => {

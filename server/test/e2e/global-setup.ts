@@ -1,8 +1,7 @@
+import { MySqlContainer } from '@testcontainers/mysql';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-
-import { MySqlContainer } from '@testcontainers/mysql';
 
 const SERVER_ROOT = path.resolve(__dirname, '../..');
 const RUNTIME_ENV_PATH = path.join(__dirname, '.runtime-env.json');

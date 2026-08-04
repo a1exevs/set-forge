@@ -1,16 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { JwtService } from '@nestjs/jwt';
 import { UnprocessableEntityException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
+import * as bcrypt from 'bcryptjs';
 
 import { AuthService } from '@auth/auth.service';
-import { TokensService } from '@auth/tokens.service';
-import { UsersService } from '@users/users.service';
 import { LoginRequest, RegisterRequest } from '@auth/dto';
-import { sendPseudoError } from '@test/unit/helpers';
+import { TokensService } from '@auth/tokens.service';
 import { ErrorMessages } from '@common/constants';
+import { sendPseudoError } from '@test/unit/helpers';
 import { User } from '@users/users.model';
-
-import * as bcrypt from 'bcryptjs';
+import { UsersService } from '@users/users.service';
 
 describe('AuthService', () => {
   let authService: AuthService;

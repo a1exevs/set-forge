@@ -1,10 +1,10 @@
 import { HttpStatus } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { sendPseudoError, getMockJWTServiceData, getMockExecutionContextData } from '@test/unit/helpers';
-import { RolesGuard } from '@common/guards';
-import { ROLES_KEY } from '@common/decorators';
 import { ErrorMessages } from '@common/constants';
+import { ROLES_KEY } from '@common/decorators';
+import { RolesGuard } from '@common/guards';
+import { getMockExecutionContextData, getMockJWTServiceData, sendPseudoError } from '@test/unit/helpers';
 
 describe('RolesGuard', () => {
   beforeEach(() => {

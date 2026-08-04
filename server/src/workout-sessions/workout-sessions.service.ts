@@ -1,14 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel, InjectConnection } from '@nestjs/sequelize';
+import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
-import { WorkoutList } from '@workout-lists/workout-list.model';
 import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
-import { WorkoutSession } from '@workout-sessions/workout-session.model';
-import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exercise.model';
+import { WorkoutList } from '@workout-lists/workout-list.model';
 import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
 import { WorkoutHistoryResponse, WorkoutSessionResponse } from '@workout-sessions/dto';
+import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exercise.model';
+import { WorkoutSession } from '@workout-sessions/workout-session.model';
 
 export interface StartWorkoutSessionResult {
   session: WorkoutSessionResponse.Dto;

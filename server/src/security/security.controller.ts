@@ -1,11 +1,11 @@
 import { Controller, Get, Req, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { SecurityService } from '@security/security.service';
+import { Isession } from '@auth/interfaces';
+import { Docs, Routes } from '@common/constants';
 import { CommonResponse } from '@common/dto';
 import { ResponseInterceptor } from '@common/interceptors';
-import { Isession } from '@auth/interfaces';
-import { Routes, Docs } from '@common/constants';
+import { SecurityService } from '@security/security.service';
 
 @ApiTags(Docs.SECURITY_CONTROLLER)
 @Controller(Routes.ENDPOINT_SECURITY)

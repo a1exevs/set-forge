@@ -1,5 +1,4 @@
 import { validateDto } from '@test/unit/helpers';
-
 import { UpdateWorkoutListRequest } from '@workout-lists/dto/update-workout-list.request';
 
 describe('UpdateWorkoutListRequest.Dto', () => {

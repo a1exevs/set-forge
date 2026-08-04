@@ -2,19 +2,17 @@ import '@root/string.extensions';
 
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { getModelToken } from '@nestjs/sequelize';
-
-import { Routes, ResultCodes } from '@common/constants';
-import { User } from '@users/users.model';
-import { UserRole } from '@users/users-roles.model';
-import { RefreshToken } from '@auth/refresh-tokens.model';
-import { WorkoutList } from '@workout-lists/workout-list.model';
-import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
-import { WorkoutSession } from '@workout-sessions/workout-session.model';
-import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exercise.model';
-
 import * as request from 'supertest';
 
+import { RefreshToken } from '@auth/refresh-tokens.model';
+import { ResultCodes, Routes } from '@common/constants';
 import { createTestApp } from '@test/e2e/create-test-app';
+import { UserRole } from '@users/users-roles.model';
+import { User } from '@users/users.model';
+import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
+import { WorkoutList } from '@workout-lists/workout-list.model';
+import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exercise.model';
+import { WorkoutSession } from '@workout-sessions/workout-session.model';
 
 /**
  * Verifies that deleting the current account removes the user together with ALL user-owned

@@ -193,7 +193,6 @@ For local development against `mysql-dev`, the equivalent flow is `npm run db:up
 6. update RELEASE-NOTES.md with using generated notes in step 5, create PR from "common/release-notes-update-vX.X.X" to "develop" with message "[Common] RELEASE-NOTES.md update vX.X.X"
 
 **Full-stack production on [VDS Selectel](https://vds.selectel.ru/):** step-by-step deploy guide — [`DEPLOY-SELECTEL.md`](DEPLOY-SELECTEL.md) (Docker Compose + Caddy + MySQL on Ubuntu).
-// TODO add details after release
 
 ## Environment used for verification
 

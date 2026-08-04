@@ -1,5 +1,5 @@
-import { Equals, IsEmail, IsString, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Equals, IsEmail, IsString, Length } from 'class-validator';
 
 import { ErrorMessages } from '@common/constants';
 import { Docs } from '@common/constants/docs';

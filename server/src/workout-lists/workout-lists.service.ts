@@ -1,22 +1,22 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel, InjectConnection } from '@nestjs/sequelize';
+import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { Sequelize } from 'sequelize-typescript';
 
-import { WorkoutList } from '@workout-lists/workout-list.model';
-import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
-import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
 import {
   CreateWorkoutListRequest,
   ImportWorkoutListsRequest,
   ImportWorkoutListsResponse,
   UpdateWorkoutListRequest,
-  WorkoutListResponse,
-  WorkoutListsExportFileResponse,
   WORKOUT_LISTS_EXPORT_APP,
   WORKOUT_LISTS_EXPORT_FORMAT_VERSION,
+  WorkoutListResponse,
+  WorkoutListsExportFileResponse,
 } from '@workout-lists/dto';
+import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
+import { WorkoutList } from '@workout-lists/workout-list.model';
+import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
 
 @Injectable()
 export class WorkoutListsService {

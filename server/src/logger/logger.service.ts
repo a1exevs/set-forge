@@ -1,7 +1,6 @@
 import { ConsoleLogger, Injectable } from '@nestjs/common';
-
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class LoggerService extends ConsoleLogger {
@@ -16,7 +15,9 @@ export class LoggerService extends ConsoleLogger {
     const month = date.getMonth() + 1;
     const day = date.getDate();
     const logDir = `${path.resolve(__dirname, './../../', process.env.SERVER_LOGS)}/${year}/${month}/`;
-    if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
 
     const data = `[YYYY/MM/DD HH:MM:SS][${year}/${month}/${day} ${date.toLocaleTimeString()}]\n[${message}]\n[${stack}]\n[${context}]\n\n`;
     if (isLogAsync) {
@@ -25,6 +26,8 @@ export class LoggerService extends ConsoleLogger {
           this.logToFile(message, stack, context, false);
         }
       });
-    } else fs.appendFileSync(`${logDir}${day}.ts`, data, 'utf-8');
+    } else {
+      fs.appendFileSync(`${logDir}${day}.ts`, data, 'utf-8');
+    }
   }
 }

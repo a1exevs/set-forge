@@ -3,11 +3,11 @@ import { SequelizeModule } from '@nestjs/sequelize';
 
 import { AuthModule } from '@auth/auth.module';
 import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
-import { WorkoutSessionsModule } from '@workout-sessions/workout-sessions.module';
+import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
+import { WorkoutList } from '@workout-lists/workout-list.model';
 import { WorkoutListsController } from '@workout-lists/workout-lists.controller';
 import { WorkoutListsService } from '@workout-lists/workout-lists.service';
-import { WorkoutList } from '@workout-lists/workout-list.model';
-import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
+import { WorkoutSessionsModule } from '@workout-sessions/workout-sessions.module';
 
 @Module({
   controllers: [WorkoutListsController],

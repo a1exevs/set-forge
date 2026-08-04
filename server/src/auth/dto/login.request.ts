@@ -1,5 +1,5 @@
-import { IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
 import { ErrorMessages } from '@common/constants';
 
@@ -21,7 +21,9 @@ export namespace LoginRequest {
     constructor(email, password, captcha = null) {
       this.email = email;
       this.password = password;
-      if (captcha) this.captcha = captcha;
+      if (captcha) {
+        this.captcha = captcha;
+      }
     }
   }
 

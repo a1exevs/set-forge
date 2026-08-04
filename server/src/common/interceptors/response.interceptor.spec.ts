@@ -1,6 +1,6 @@
+import { ResultCodes } from '@common/constants';
 import { ResponseInterceptor } from '@common/interceptors';
 import { getMockCallHandler, getMockExecutionContextData } from '@test/unit/helpers';
-import { ResultCodes } from '@common/constants';
 
 describe('ResponseInterceptor', () => {
   beforeEach(() => {

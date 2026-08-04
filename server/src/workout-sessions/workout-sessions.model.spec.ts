@@ -1,13 +1,13 @@
 import { Sequelize } from 'sequelize-typescript';
 
-import { User } from '@users/users.model';
-import { UserRole } from '@users/users-roles.model';
 import { Role } from '@roles/roles.model';
-import { WorkoutList } from '@workout-lists/workout-list.model';
+import { UserRole } from '@users/users-roles.model';
+import { User } from '@users/users.model';
 import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
-import { WorkoutSession } from '@workout-sessions/workout-session.model';
-import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exercise.model';
+import { WorkoutList } from '@workout-lists/workout-list.model';
 import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
+import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exercise.model';
+import { WorkoutSession } from '@workout-sessions/workout-session.model';
 
 describe('Workout session models', () => {
   beforeAll(() => {
