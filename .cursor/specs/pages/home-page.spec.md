@@ -44,7 +44,7 @@ Entity: [workout-list](../entities/workout-list.entity.spec.md). Related pages: 
 ### Main content
 
 1. Empty: «No workout lists yet» with hint.
-2. Non-empty: card grid; each card `Link` to `/workout/$id` with name, exercise-count badge, description (if any), dates, [`MenuButton`](../shared/shared-components.spec.md#menubutton) (Edit, Delete).
+2. Non-empty: card grid; each card shows name, exercise-count badge, description (if any), and dates. A stretched overlay `Link` to `/workout/$id` covers the card; [`MenuButton`](../shared/shared-components.spec.md#menubutton) (Edit, Delete) sits outside that link (`pointer-events: auto`) so menu clicks do not navigate.
 3. Fixed **Create** FAB (`IconButton` primary circle `lg`) → `/create`.
 
 ### Bottom navigation

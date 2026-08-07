@@ -1,7 +1,7 @@
 import type { WorkoutList } from '@entities';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { Download, Plus, Upload } from 'lucide-react';
-import { ChangeEvent, FC, MouseEvent, RefObject } from 'react';
+import { ChangeEvent, FC, RefObject } from 'react';
 
 import { BrandWordmark, IconButton, MenuButton, useTabSwipeNavigation } from '@shared';
 import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets';
@@ -70,14 +70,17 @@ const HomePage: FC<Props> = ({
           <div className={classes.listGrid}>
             {workoutLists.map((list: WorkoutList) => (
               <div key={list.id} className={classes.card}>
-                <Link to="/workout/$id" params={{ id: list.id }} className={classes.cardLink}>
+                <Link
+                  to="/workout/$id"
+                  params={{ id: list.id }}
+                  className={classes.cardLink}
+                  aria-label={`Open ${list.name}`}
+                />
+                <div className={classes.cardContent}>
                   <div className={classes.cardHeader}>
                     <h2>{list.name}</h2>
                     <span className={classes.badge}>{list.exercises.length} ex.</span>
-                    <div
-                      className={classes.menuButton}
-                      onClick={(e: MouseEvent<HTMLDivElement>): void => e.stopPropagation()}
-                    >
+                    <div className={classes.menuButton}>
                       <MenuButton
                         ariaLabel="Workout list actions"
                         items={[
@@ -100,7 +103,7 @@ const HomePage: FC<Props> = ({
                       <span className={classes.lastUsed}>Last used: {formatDate(list.lastUsedAt)}</span>
                     )}
                   </div>
-                </Link>
+                </div>
               </div>
             ))}
           </div>
