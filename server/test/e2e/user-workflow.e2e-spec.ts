@@ -1,11 +1,9 @@
 import '@root/string.extensions';
 
 import { HttpStatus, INestApplication } from '@nestjs/common';
-
-import { Routes, ResultCodes, ErrorMessages } from '@common/constants';
-
 import * as request from 'supertest';
 
+import { ErrorMessages, ResultCodes, Routes } from '@common/constants';
 import { createTestApp } from '@test/e2e/create-test-app';
 
 describe('User workflow', () => {

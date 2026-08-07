@@ -1,13 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { getModelToken, getConnectionToken } from '@nestjs/sequelize';
 import { BadRequestException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { getConnectionToken, getModelToken } from '@nestjs/sequelize';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { WorkoutList } from '@workout-lists/workout-list.model';
-import { WorkoutSession } from '@workout-sessions/workout-session.model';
-import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exercise.model';
-import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
-import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
 import { sendPseudoError } from '@test/unit/helpers';
+import { WorkoutList } from '@workout-lists/workout-list.model';
+import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
+import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exercise.model';
+import { WorkoutSession } from '@workout-sessions/workout-session.model';
+import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
 
 type MockSessionExercise = {
   id: string;

@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+
 import { Routes } from '@common/constants';
 
 @Controller(Routes.HEALTH)

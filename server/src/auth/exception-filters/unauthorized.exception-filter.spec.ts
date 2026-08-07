@@ -1,8 +1,8 @@
 import { UnauthorizedException } from '@nestjs/common';
 
-import { getMockArgumentsHostData } from '@test/unit/helpers';
-import { ResultCodes, ErrorMessages } from '@common/constants';
 import { UnauthorizedExceptionFilter } from '@auth/exception-filters';
+import { ErrorMessages, ResultCodes } from '@common/constants';
+import { getMockArgumentsHostData } from '@test/unit/helpers';
 
 describe('UnauthorizedExceptionFilter', () => {
   beforeEach(() => {

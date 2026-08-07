@@ -1,15 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { getModelToken } from '@nestjs/sequelize';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { getModelToken } from '@nestjs/sequelize';
+import { Test, TestingModule } from '@nestjs/testing';
 import { FindOptions } from 'sequelize';
 
-import { UsersService } from '@users/users.service';
-import { User } from '@users/users.model';
-import { RolesService } from '@roles/roles.service';
-import { Role } from '@roles/roles.model';
-import { CreateUserRequest } from '@users/dto';
-import { mockUsers } from '@test/unit/helpers';
 import { ErrorMessages } from '@common/constants';
+import { Role } from '@roles/roles.model';
+import { RolesService } from '@roles/roles.service';
+import { mockUsers } from '@test/unit/helpers';
+import { CreateUserRequest } from '@users/dto';
+import { User } from '@users/users.model';
+import { UsersService } from '@users/users.service';
 
 jest.mock('./users.model');
 

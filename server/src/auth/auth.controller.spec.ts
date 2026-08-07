@@ -1,24 +1,24 @@
 import '@root/string.extensions';
 
-import { Test, TestingModule } from '@nestjs/testing';
-import { JwtService } from '@nestjs/jwt';
-import { createResponse, createRequest } from 'node-mocks-http';
 import { ArgumentMetadata, HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
+import { createRequest, createResponse } from 'node-mocks-http';
 
 import { AuthController } from '@auth/auth.controller';
 import { AuthService } from '@auth/auth.service';
-import { TokensService } from '@auth/tokens.service';
-import { IAuthenticationResult } from '@auth/interfaces';
-import { UsersService } from '@users/users.service';
-import { AuthenticationResponse, RegisterRequest, LoginRequest, GetCurrentUserResponse } from '@auth/dto';
-import { ValidationPipe } from '@common/pipes';
+import { AuthenticationResponse, GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto';
 import { UnauthorizedExceptionFilter } from '@auth/exception-filters';
 import { SvgCaptchaGuard } from '@auth/guards';
-import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
-import { HttpExceptionFilter } from '@common/exception-filters';
-import { ResponseInterceptor } from '@common/interceptors';
-import { sendPseudoError } from '@test/unit/helpers';
+import { IAuthenticationResult } from '@auth/interfaces';
+import { TokensService } from '@auth/tokens.service';
 import { ErrorMessages } from '@common/constants';
+import { HttpExceptionFilter } from '@common/exception-filters';
+import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
+import { ResponseInterceptor } from '@common/interceptors';
+import { ValidationPipe } from '@common/pipes';
+import { sendPseudoError } from '@test/unit/helpers';
+import { UsersService } from '@users/users.service';
 
 const getValidationPipeDataForUserRegistration = function (
   email,

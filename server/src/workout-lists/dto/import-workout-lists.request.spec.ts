@@ -1,10 +1,9 @@
 import { validateDto } from '@test/unit/helpers';
-
+import { ImportWorkoutListsRequest } from '@workout-lists/dto/import-workout-lists.request';
 import {
   WORKOUT_LISTS_EXPORT_APP,
   WORKOUT_LISTS_EXPORT_FORMAT_VERSION,
 } from '@workout-lists/dto/workout-lists-export-file.response';
-import { ImportWorkoutListsRequest } from '@workout-lists/dto/import-workout-lists.request';
 
 describe('ImportWorkoutListsRequest.Dto', () => {
   const validExercise = { name: 'Bench Press', muscleGroup: 'chest' as const, weight: 60, reps: 10, sets: 3 };

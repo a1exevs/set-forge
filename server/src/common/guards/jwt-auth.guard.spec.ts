@@ -1,9 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
 
+import { ErrorMessages } from '@common/constants';
 import { JwtAuthGuard } from '@common/guards';
 import { sendPseudoError } from '@test/unit/helpers';
-import { getMockJWTServiceData, getMockExecutionContextData } from '@test/unit/helpers';
-import { ErrorMessages } from '@common/constants';
+import { getMockExecutionContextData, getMockJWTServiceData } from '@test/unit/helpers';
 
 describe('JwtAuthGuard', () => {
   beforeEach(() => {

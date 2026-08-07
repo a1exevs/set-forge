@@ -1,9 +1,7 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
-
-import { Routes } from '@common/constants';
-
 import * as request from 'supertest';
 
+import { Routes } from '@common/constants';
 import { createTestApp } from '@test/e2e/create-test-app';
 
 describe('Authorized user methods', () => {

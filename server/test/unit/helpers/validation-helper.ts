@@ -1,4 +1,4 @@
-import { plainToInstance, ClassConstructor } from 'class-transformer';
+import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 
 export const validateDto = async <T extends object, V extends T>(

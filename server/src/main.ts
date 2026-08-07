@@ -1,12 +1,12 @@
 import '@root/string.extensions';
 
+import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { INestApplication } from '@nestjs/common';
 
+import { ensureAuthSecretsConfigured } from '@common/utils/ensure-auth-secrets';
 import { AppModule } from '@src/app.module';
 import { configureApp } from '@src/bootstrap/configure-app';
-import { ensureAuthSecretsConfigured } from '@common/utils/ensure-auth-secrets';
 
 async function start() {
   ensureAuthSecretsConfigured();

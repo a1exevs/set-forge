@@ -1,6 +1,6 @@
 import { ArgumentMetadata, HttpStatus } from '@nestjs/common';
-import { IsBoolean, isInstance, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsBoolean, isInstance, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import { ValidationPipe } from '@common/pipes';
 import { sendPseudoError } from '@test/unit/helpers';
@@ -108,7 +108,9 @@ describe('ValidationPipe', () => {
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
         expect(error.message.length).toBe(3);
         Object.keys(testObject).forEach(key => {
-          if (key !== 'objectProp') expect(error.message.some(message => message.includes(key))).toBeTruthy();
+          if (key !== 'objectProp') {
+            expect(error.message.some(message => message.includes(key))).toBeTruthy();
+          }
         });
       }
     });
@@ -125,7 +127,9 @@ describe('ValidationPipe', () => {
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
         expect(error.message.length).toBe(4);
         Object.keys(testObject).forEach(key => {
-          if (key !== 'objectProp') expect(error.message.some(message => message.includes(key))).toBeTruthy();
+          if (key !== 'objectProp') {
+            expect(error.message.some(message => message.includes(key))).toBeTruthy();
+          }
         });
         expect(isInstance(error.message[3], Array)).toBeTruthy();
         expect(error.message[3].length).toBe(1);

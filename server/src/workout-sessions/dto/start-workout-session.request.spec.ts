@@ -1,5 +1,4 @@
 import { validateDto } from '@test/unit/helpers';
-
 import { StartWorkoutSessionRequest } from '@workout-sessions/dto/start-workout-session.request';
 
 describe('StartWorkoutSessionRequest.Dto', () => {

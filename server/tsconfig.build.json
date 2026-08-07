@@ -8,6 +8,8 @@
     "coverage",
     "_stub",
     "assets",
-    "test-environment.ts"
+    "test-environment.ts",
+    "linter",
+    "eslint.config.ts"
   ]
 }

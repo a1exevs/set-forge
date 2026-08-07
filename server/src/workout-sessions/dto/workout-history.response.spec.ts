@@ -1,7 +1,7 @@
+import { checkForApiProperties } from '@test/unit/helpers';
+import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
 import { WorkoutHistoryResponse } from '@workout-sessions/dto/workout-history.response';
 import { WorkoutSessionResponse } from '@workout-sessions/dto/workout-session.response';
-import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
-import { checkForApiProperties } from '@test/unit/helpers';
 
 describe('WorkoutHistoryResponse', () => {
   it('should has ApiProperty decorator for all properties', () => {

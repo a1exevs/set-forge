@@ -1,8 +1,8 @@
 import { HttpStatus } from '@nestjs/common';
 
-import { getMockJWTServiceData, getMockExecutionContextData, sendPseudoError } from '@test/unit/helpers';
-import { RefreshTokenGuard } from '@common/guards';
 import { ErrorMessages } from '@common/constants';
+import { RefreshTokenGuard } from '@common/guards';
+import { getMockExecutionContextData, getMockJWTServiceData, sendPseudoError } from '@test/unit/helpers';
 
 describe('RefreshTokenGuard', () => {
   beforeEach(() => {

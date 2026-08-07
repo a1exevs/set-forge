@@ -1,7 +1,7 @@
 import { ArgumentMetadata, Injectable, ParseIntPipe, PipeTransform } from '@nestjs/common';
 
-import { ValidationException } from '@common/exceptions';
 import { ErrorMessages } from '@common/constants';
+import { ValidationException } from '@common/exceptions';
 
 @Injectable()
 export class ParsePositiveIntPipe implements PipeTransform<any> {

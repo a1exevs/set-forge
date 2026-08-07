@@ -2,17 +2,16 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ServeStaticModule } from '@nestjs/serve-static';
-
-import { UsersModule, User, UserRole } from '@src/users';
-import { RolesModule, Role } from '@src/roles';
-import { AuthModule, RefreshToken } from '@src/auth';
-import { LoggerModule } from '@src/logger';
-import { SecurityModule } from '@src/security';
-import { HealthModule } from '@src/health/health.module';
-import { WorkoutListsModule, WorkoutList, WorkoutExercise } from '@src/workout-lists';
-import { WorkoutSessionsModule, WorkoutSession, WorkoutSessionExercise } from '@src/workout-sessions';
-
 import * as path from 'path';
+
+import { AuthModule, RefreshToken } from '@src/auth';
+import { HealthModule } from '@src/health/health.module';
+import { LoggerModule } from '@src/logger';
+import { Role, RolesModule } from '@src/roles';
+import { SecurityModule } from '@src/security';
+import { User, UserRole, UsersModule } from '@src/users';
+import { WorkoutExercise, WorkoutList, WorkoutListsModule } from '@src/workout-lists';
+import { WorkoutSession, WorkoutSessionExercise, WorkoutSessionsModule } from '@src/workout-sessions';
 
 @Module({
   controllers: [],

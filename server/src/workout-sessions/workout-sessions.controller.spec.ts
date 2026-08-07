@@ -1,13 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { BadRequestException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { HttpStatus, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 
+import { sendPseudoError } from '@test/unit/helpers';
+import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
+import { WorkoutSessionResponse } from '@workout-sessions/dto';
 import { WorkoutSessionsController } from '@workout-sessions/workout-sessions.controller';
 import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
-import { WorkoutSessionResponse } from '@workout-sessions/dto';
-import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
-import { sendPseudoError } from '@test/unit/helpers';
 
 const buildSession = (overrides: Partial<WorkoutSessionResponse.Dto> = {}): WorkoutSessionResponse.Dto =>
   new WorkoutSessionResponse.Dto({

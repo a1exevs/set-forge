@@ -1,19 +1,18 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { getModelToken, getConnectionToken } from '@nestjs/sequelize';
 import { HttpStatus, NotFoundException } from '@nestjs/common';
+import { getConnectionToken, getModelToken } from '@nestjs/sequelize';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { WorkoutListsService } from '@workout-lists/workout-lists.service';
-import { WorkoutList } from '@workout-lists/workout-list.model';
-import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
-import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
-
+import { sendPseudoError } from '@test/unit/helpers';
 import {
   CreateWorkoutListRequest,
   UpdateWorkoutListRequest,
   WORKOUT_LISTS_EXPORT_APP,
   WORKOUT_LISTS_EXPORT_FORMAT_VERSION,
 } from '@workout-lists/dto';
-import { sendPseudoError } from '@test/unit/helpers';
+import { WorkoutExercise } from '@workout-lists/workout-exercise.model';
+import { WorkoutList } from '@workout-lists/workout-list.model';
+import { WorkoutListsService } from '@workout-lists/workout-lists.service';
+import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
 
 type MockExercise = {
   id: string;

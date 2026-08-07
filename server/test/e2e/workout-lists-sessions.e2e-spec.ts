@@ -1,15 +1,13 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { getModelToken } from '@nestjs/sequelize';
-
-import { Routes, ResultCodes } from '@common/constants';
-import { WorkoutList } from '@workout-lists/workout-list.model';
-import { WorkoutSession } from '@workout-sessions/workout-session.model';
-import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
-
 import * as request from 'supertest';
 
+import { ResultCodes, Routes } from '@common/constants';
 import { createTestApp } from '@test/e2e/create-test-app';
 import { E2eAuthContext, registerAndLogin, withAuth } from '@test/e2e/e2e-auth.helper';
+import { WorkoutList } from '@workout-lists/workout-list.model';
+import { SESSION_STATUS } from '@workout-sessions/constants/session-status';
+import { WorkoutSession } from '@workout-sessions/workout-session.model';
 
 describe('Workout lists and sessions business logic', () => {
   let app: INestApplication;

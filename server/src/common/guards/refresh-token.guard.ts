@@ -14,7 +14,7 @@ export class RefreshTokenGuard implements CanActivate {
       }
 
       return true;
-    } catch (e) {
+    } catch {
       throw new ForbiddenException(ErrorMessages.FORBIDDEN);
     }
   }

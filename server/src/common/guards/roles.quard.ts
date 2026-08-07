@@ -1,10 +1,10 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
+import { JwtService } from '@nestjs/jwt';
+import { Observable } from 'rxjs';
 
-import { ROLES_KEY } from '@common/decorators';
 import { ErrorMessages } from '@common/constants';
+import { ROLES_KEY } from '@common/decorators';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -40,7 +40,7 @@ export class RolesGuard implements CanActivate {
         }
       }
       return true;
-    } catch (e) {
+    } catch {
       throw new ForbiddenException(ErrorMessages.FORBIDDEN);
     }
   }

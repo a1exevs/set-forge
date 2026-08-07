@@ -1,6 +1,6 @@
-import { validateDto } from '@test/unit/helpers';
 import { LoginRequest } from '@auth/dto';
 import { ErrorMessages } from '@common/constants';
+import { validateDto } from '@test/unit/helpers';
 
 describe('LoginRequest', () => {
   beforeEach(async () => {

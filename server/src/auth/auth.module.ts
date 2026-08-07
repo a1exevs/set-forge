@@ -1,16 +1,16 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { SequelizeModule } from '@nestjs/sequelize';
 
 import { AuthController } from '@auth/auth.controller';
 import { AuthService } from '@auth/auth.service';
-import { UsersModule } from '@users/users.module';
+import { RefreshToken } from '@auth/refresh-tokens.model';
 import { RefreshTokensService } from '@auth/refresh-tokens.service';
 import { TokensService } from '@auth/tokens.service';
-import { RefreshToken } from '@auth/refresh-tokens.model';
-import { User } from '@users/users.model';
 import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
+import { User } from '@users/users.model';
+import { UsersModule } from '@users/users.module';
 
 @Module({
   controllers: [AuthController],
