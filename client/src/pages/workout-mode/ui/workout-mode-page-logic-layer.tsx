@@ -2,7 +2,7 @@ import type { WorkoutList, WorkoutSession } from '@entities';
 import confetti from 'canvas-confetti';
 import { FC, useEffect, useRef, useState } from 'react';
 
-import { useConfirm } from '@shared';
+import { toastError, useConfirm } from '@shared';
 
 import WorkoutModePage from 'src/pages/workout-mode/ui/workout-mode-page';
 
@@ -60,8 +60,8 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
 
     try {
       await startSession(workoutList.id);
-    } catch {
-      // TODO: Support common toaster
+    } catch (error: unknown) {
+      toastError(error, 'Failed to start workout session');
     }
   };
 
@@ -91,8 +91,8 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
         if (updated.status === 'completed') {
           celebrateOnce();
         }
-      } catch {
-        // TODO: Support common toaster
+      } catch (error: unknown) {
+        toastError(error, 'Failed to update session progress');
       }
     })();
   };
@@ -129,8 +129,8 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
       try {
         await finishSession(session.id);
         celebrateOnce();
-      } catch {
-        // TODO: Support common toaster
+      } catch (error: unknown) {
+        toastError(error, 'Failed to finish workout session');
       }
       return;
     }
@@ -138,8 +138,8 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     if (result === 'alternate') {
       try {
         await discardSession(session.id);
-      } catch {
-        // TODO: Support common toaster
+      } catch (error: unknown) {
+        toastError(error, 'Failed to discard workout session');
       }
     }
   };

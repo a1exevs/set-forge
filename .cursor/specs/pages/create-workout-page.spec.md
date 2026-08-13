@@ -25,6 +25,10 @@ Creates a new workout list via shared `workout-list-form` widget (`mode="create"
 - `ui/create-workout-page-data-layer.tsx`
 - `ui/create-workout-page-logic-layer.tsx` (thin — delegates to widget)
 - `ui/create-workout-page.stories.tsx`
+- `ui/specs/create-workout-page.spec.unit.tsx`
+- `ui/specs/create-workout-page-data-layer.spec.unit.tsx`
+- `ui/specs/create-workout-page-logic-layer.spec.unit.tsx`
+- `ui/specs/create-workout-page.spec.snap.tsx`
 - `ui/index.ts`, `index.ts`
 - Form UI: `widgets/workout-list-form/`
 
@@ -45,8 +49,8 @@ Creates a new workout list via shared `workout-list-form` widget (`mode="create"
 
 ### Initialization
 
-1. `CreateWorkoutPageDataLayer`: `useCreateWorkoutListMutation()`.
-2. `onSubmit` → `mutateAsync(dto)` → navigate `/` on success.
+1. `CreateWorkoutPageDataLayer`: `useCreateWorkoutListMutation()`; passes `onCreate(dto)` that awaits `mutateAsync(dto)`.
+2. Logic layer `onSubmit` → `await onCreate(dto)` → `toastSuccess('Workout list created')` → navigate `/` on success; on failure `toastError(error, 'Failed to create workout list')` and stay.
 
 ### Form (widget logic)
 
@@ -68,6 +72,14 @@ type ExerciseFormData = {
   weight: number | null;
   reps: number | null;
   sets: number | null;
+};
+```
+
+### Props CreateWorkoutPageLogicLayer
+
+```typescript
+type Props = {
+  onCreate: (dto: CreateWorkoutListDto) => Promise<void>;
 };
 ```
 
@@ -93,7 +105,7 @@ Full contract: [workout-list entity](../entities/workout-list.entity.spec.md#api
 
 ## Tech Stack
 
-TanStack Router, `@tanstack/react-query`, Headless UI `Listbox`, `useConfirm`, `widgets/workout-list-form`.
+TanStack Router, `@tanstack/react-query`, Headless UI `Listbox`, `useConfirm`, [`Toaster`](../shared/shared-components.spec.md#toaster) helpers, `widgets/workout-list-form`.
 
 ---
 
@@ -109,7 +121,8 @@ TanStack Router, `@tanstack/react-query`, Headless UI `Listbox`, `useConfirm`, `
 ## Tests
 
 - Widget tests in `widgets/workout-list-form/specs/`
-- No page-level unit specs
+- Unit: `create-workout-page.spec.unit.tsx`, `create-workout-page-data-layer.spec.unit.tsx`, `create-workout-page-logic-layer.spec.unit.tsx` — success toast + navigate; error toast + stay; cancel
+- Snapshot: `create-workout-page.spec.snap.tsx`
 
 ---
 
@@ -125,7 +138,8 @@ TanStack Router, `@tanstack/react-query`, Headless UI `Listbox`, `useConfirm`, `
 | Scenario | Handling |
 |----------|-----------|
 | Empty name / no exercises / invalid exercise | Confirm dialog; no submit |
-| API error on create | No navigation |
+| API error on create | `toastError`; no navigation |
+| Successful create | `toastSuccess`; navigate `/` |
 | Cancel | Navigate `/` without save |
 
 ---
@@ -137,3 +151,4 @@ TanStack Router, `@tanstack/react-query`, Headless UI `Listbox`, `useConfirm`, `
 - [user.entity.spec.md](../entities/user.entity.spec.md)
 - [home-page.spec.md](home-page.spec.md)
 - [edit-workout-page.spec.md](edit-workout-page.spec.md)
+- [shared-components.spec.md](../shared/shared-components.spec.md#toaster)

@@ -25,14 +25,8 @@ const EditWorkoutPageDataLayer: FC<Props> = ({ id }) => {
       id={id}
       workout={isLoading ? undefined : (workout ?? null)}
       activeSessionId={activeSession?.id ?? null}
-      updateWorkoutList={async (workoutId, dto): Promise<boolean> => {
-        try {
-          await updateWorkoutListMutation.mutateAsync({ id: workoutId, dto });
-          return true;
-        } catch {
-          // TODO: Support common toaster
-          return false;
-        }
+      updateWorkoutList={async (workoutId, dto): Promise<void> => {
+        await updateWorkoutListMutation.mutateAsync({ id: workoutId, dto });
       }}
       resyncSession={async (sessionId): Promise<void> => {
         await resyncWorkoutSessionMutation.mutateAsync({ sessionId, workoutListId: id });

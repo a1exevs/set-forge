@@ -73,12 +73,12 @@ Entity: [workout-list](../entities/workout-list.entity.spec.md). Related pages: 
 ### Menu actions
 
 6. **Edit** → `navigate({ to: '/edit/$id', params: { id } })`.
-7. **Delete** → confirm → `deleteWorkoutList(id)` then `clearWorkoutSessionCachesForDeletedList(id)` in logic layer. List mutation updates list cache only; session cache helper clears `active`, `forList`, and `detail` for the removed list. Server discards any active session for that list (not saved to history).
+7. **Delete** → confirm → `deleteWorkoutList(id)` then `clearWorkoutSessionCachesForDeletedList(id)` in logic layer → `toastSuccess('Workout list deleted')`. On API failure: `toastError(..., 'Failed to delete workout list')`. List mutation updates list cache only; session cache helper clears `active`, `forList`, and `detail` for the removed list. Server discards any active session for that list (not saved to history).
 
 ### Import / Export
 
-8. **Export** → `GET /workout-lists/export` → download `set-forge-workout-lists-YYYY-MM-DD.json`.
-9. **Import** → read file → confirm → `POST /workout-lists/import`; errors via confirm dialog.
+8. **Export** → `GET /workout-lists/export` → download `set-forge-workout-lists-YYYY-MM-DD.json` → `toastSuccess('Workout lists exported')`. On failure: `toastError(..., 'Failed to export workout lists')`.
+9. **Import** → read file → confirm → `POST /workout-lists/import` → `toastSuccess('Workout lists imported')`. Parse/empty-file/API errors via `toastError` (not confirm dialogs).
 
 ---
 
@@ -136,7 +136,8 @@ Full contract: [workout-list entity](../entities/workout-list.entity.spec.md#api
 | Server state | `@tanstack/react-query` |
 | UI | SCSS Modules, lucide-react, `BrandWordmark`, `IconButton`, `MenuButton`, `MainTabsBar` |
 | Swipe | `useTabSwipeNavigation`, `MAIN_TAB_ROUTES` |
-| Dialogs | `useConfirm` |
+| Dialogs | `useConfirm` (delete / import confirmation only) |
+| Feedback | [`Toaster`](../shared/shared-components.spec.md#toaster) — success/error for delete, export, import |
 
 Patterns: 3-layer Data → Logic → Presentation; FSD `pages/home`, `entities/workout-list`, `widgets`.
 
@@ -153,7 +154,7 @@ Patterns: 3-layer Data → Logic → Presentation; FSD `pages/home`, `entities/w
 ## Tests
 
 - Storybook: `Pages/HomePage` — `home-page.stories.tsx`
-- Unit: `pages/home/ui/specs/home-page-logic-layer.spec.unit.tsx` — delete confirms, list delete + session cache clear orchestration
+- Unit: `pages/home/ui/specs/home-page-logic-layer.spec.unit.tsx` — delete confirms, list delete + session cache clear, success/error toasts; export success/error toasts
 
 ---
 
@@ -172,7 +173,8 @@ Patterns: 3-layer Data → Logic → Presentation; FSD `pages/home`, `entities/w
 | No lists | Empty state; export disabled |
 | API error on lists | Empty state (`workoutLists` defaults to `[]`; query `isError` not surfaced) |
 | Import cancelled | No API call |
-| Import invalid JSON | Error confirm; input reset |
+| Import invalid JSON | `toastError`; input reset |
+| Export / import / delete API error | `toastError`; stay on home |
 | Swipe left on Home | Navigate to `/history` |
 | Unauthenticated | Root `beforeLoad` → `/login` |
 

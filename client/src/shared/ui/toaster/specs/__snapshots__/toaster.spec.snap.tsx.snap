@@ -1,0 +1,325 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Toaster matches snapshot for error toast 1`] = `
+<body>
+  <div>
+    <section
+      aria-atomic="false"
+      aria-label="Notifications alt+T"
+      aria-live="polite"
+      aria-relevant="additions text"
+      tabindex="-1"
+    >
+      <ol
+        class="toaster"
+        data-sonner-theme="dark"
+        data-sonner-toaster="true"
+        data-x-position="left"
+        data-y-position="bottom"
+        dir=""
+        style="--front-toast-height: 0px; --width: 356px; --gap: 14px; --offset-top: 24px; --offset-right: 24px; --offset-bottom: 24px; --offset-left: 24px; --mobile-offset-top: 16px; --mobile-offset-right: 16px; --mobile-offset-bottom: 16px; --mobile-offset-left: 16px;"
+        tabindex="-1"
+      >
+        <li
+          class="toast error"
+          data-dismissible="true"
+          data-expanded="false"
+          data-front="true"
+          data-index="0"
+          data-mounted="true"
+          data-promise="false"
+          data-removed="false"
+          data-sonner-toast=""
+          data-styled="true"
+          data-swipe-out="false"
+          data-swiped="false"
+          data-swiping="false"
+          data-type="error"
+          data-visible="true"
+          data-x-position="left"
+          data-y-position="bottom"
+          style="--index: 0; --toasts-before: 0; --z-index: 1; --offset: 0px; --initial-height: 0px;"
+          tabindex="0"
+        >
+          <button
+            aria-label="Close toast"
+            class=""
+            data-close-button="true"
+            data-disabled="false"
+          >
+            <svg
+              fill="none"
+              height="12"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="12"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <line
+                x1="18"
+                x2="6"
+                y1="6"
+                y2="18"
+              />
+              <line
+                x1="6"
+                x2="18"
+                y1="6"
+                y2="18"
+              />
+            </svg>
+          </button>
+          <div
+            class=""
+            data-icon=""
+          >
+            <svg
+              fill="currentColor"
+              height="20"
+              viewBox="0 0 20 20"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                clip-rule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div
+            class=""
+            data-content=""
+          >
+            <div
+              class="title"
+              data-title=""
+            >
+              Failed to update workout list
+            </div>
+          </div>
+        </li>
+      </ol>
+    </section>
+  </div>
+</body>
+`;
+
+exports[`Toaster matches snapshot for fallback error toast 1`] = `
+<body>
+  <div>
+    <section
+      aria-atomic="false"
+      aria-label="Notifications alt+T"
+      aria-live="polite"
+      aria-relevant="additions text"
+      tabindex="-1"
+    >
+      <ol
+        class="toaster"
+        data-sonner-theme="dark"
+        data-sonner-toaster="true"
+        data-x-position="left"
+        data-y-position="bottom"
+        dir=""
+        style="--front-toast-height: 0px; --width: 356px; --gap: 14px; --offset-top: 24px; --offset-right: 24px; --offset-bottom: 24px; --offset-left: 24px; --mobile-offset-top: 16px; --mobile-offset-right: 16px; --mobile-offset-bottom: 16px; --mobile-offset-left: 16px;"
+        tabindex="-1"
+      >
+        <li
+          class="toast error"
+          data-dismissible="true"
+          data-expanded="false"
+          data-front="true"
+          data-index="0"
+          data-mounted="true"
+          data-promise="false"
+          data-removed="false"
+          data-sonner-toast=""
+          data-styled="true"
+          data-swipe-out="false"
+          data-swiped="false"
+          data-swiping="false"
+          data-type="error"
+          data-visible="true"
+          data-x-position="left"
+          data-y-position="bottom"
+          style="--index: 0; --toasts-before: 0; --z-index: 1; --offset: 0px; --initial-height: 0px;"
+          tabindex="0"
+        >
+          <button
+            aria-label="Close toast"
+            class=""
+            data-close-button="true"
+            data-disabled="false"
+          >
+            <svg
+              fill="none"
+              height="12"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="12"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <line
+                x1="18"
+                x2="6"
+                y1="6"
+                y2="18"
+              />
+              <line
+                x1="6"
+                x2="18"
+                y1="6"
+                y2="18"
+              />
+            </svg>
+          </button>
+          <div
+            class=""
+            data-icon=""
+          >
+            <svg
+              fill="currentColor"
+              height="20"
+              viewBox="0 0 20 20"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                clip-rule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div
+            class=""
+            data-content=""
+          >
+            <div
+              class="title"
+              data-title=""
+            >
+              Failed to start workout session
+            </div>
+          </div>
+        </li>
+      </ol>
+    </section>
+  </div>
+</body>
+`;
+
+exports[`Toaster matches snapshot for success toast 1`] = `
+<body>
+  <div>
+    <section
+      aria-atomic="false"
+      aria-label="Notifications alt+T"
+      aria-live="polite"
+      aria-relevant="additions text"
+      tabindex="-1"
+    >
+      <ol
+        class="toaster"
+        data-sonner-theme="dark"
+        data-sonner-toaster="true"
+        data-x-position="left"
+        data-y-position="bottom"
+        dir=""
+        style="--front-toast-height: 0px; --width: 356px; --gap: 14px; --offset-top: 24px; --offset-right: 24px; --offset-bottom: 24px; --offset-left: 24px; --mobile-offset-top: 16px; --mobile-offset-right: 16px; --mobile-offset-bottom: 16px; --mobile-offset-left: 16px;"
+        tabindex="-1"
+      >
+        <li
+          class="toast success"
+          data-dismissible="true"
+          data-expanded="false"
+          data-front="true"
+          data-index="0"
+          data-mounted="true"
+          data-promise="false"
+          data-removed="false"
+          data-sonner-toast=""
+          data-styled="true"
+          data-swipe-out="false"
+          data-swiped="false"
+          data-swiping="false"
+          data-type="success"
+          data-visible="true"
+          data-x-position="left"
+          data-y-position="bottom"
+          style="--index: 0; --toasts-before: 0; --z-index: 1; --offset: 0px; --initial-height: 0px;"
+          tabindex="0"
+        >
+          <button
+            aria-label="Close toast"
+            class=""
+            data-close-button="true"
+            data-disabled="false"
+          >
+            <svg
+              fill="none"
+              height="12"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="12"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <line
+                x1="18"
+                x2="6"
+                y1="6"
+                y2="18"
+              />
+              <line
+                x1="6"
+                x2="18"
+                y1="6"
+                y2="18"
+              />
+            </svg>
+          </button>
+          <div
+            class=""
+            data-icon=""
+          >
+            <svg
+              fill="currentColor"
+              height="20"
+              viewBox="0 0 20 20"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                clip-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div
+            class=""
+            data-content=""
+          >
+            <div
+              class="title"
+              data-title=""
+            >
+              Workout list created
+            </div>
+          </div>
+        </li>
+      </ol>
+    </section>
+  </div>
+</body>
+`;

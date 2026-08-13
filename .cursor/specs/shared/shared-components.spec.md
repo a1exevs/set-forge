@@ -4,7 +4,7 @@
 
 Specification for shared UI components in `client/src/shared/ui/`. New components are added as sections in this file.
 
-**Components (12):**
+**Components (13):**
 
 | Component | Public export (`@shared`) | Storybook title |
 |-----------|---------------------------|-----------------|
@@ -19,6 +19,7 @@ Specification for shared UI components in `client/src/shared/ui/`. New component
 | PasswordField | `PasswordField` | `Shared/PasswordField` |
 | Dialog | `Dialog` | `Shared/Dialog` |
 | ConfirmDialog | `ConfirmDialogProvider`, `useConfirm` | `Shared/ConfirmDialog` |
+| Toaster | `Toaster`, `toast`, `toastSuccess`, `toastError` | `Shared/Toaster` |
 | LegalDocument | `LegalDocument`, `LegalContent`/`LegalLang`/`LegalLink`/`LegalSection`/`LegalText` types | `Shared/LegalDocument` |
 
 All components use Headless UI where applicable, **lucide-react** for icons, and SCSS Modules for styling. The `styles/` directory (themes, variables, global) is not a component and is out of scope here.
@@ -248,6 +249,7 @@ type Props = {
 
 - `aria-label` on the trigger (default: `"Open menu"`).
 - Keyboard navigation and focus management via Headless UI `Menu`.
+- Panel (`.items`) and items use `outline: none`; keyboard focus is indicated by `.item[data-focus]` background (`$bg-hover`), not a focus ring on the panel.
 
 ### Storybook
 
@@ -834,6 +836,80 @@ type ConfirmOptions = {
 - `pages/workout-mode/ui/workout-mode-page-logic-layer.tsx` — finish / discard / cancel (three-way).
 - `pages/edit-workout/ui/edit-workout-page-logic-layer.tsx` — save with optional session resync (three-way).
 - Tests/stories wrap consumers in `ConfirmDialogProvider` (see `app/model/specs/test-utils.tsx`).
+
+---
+
+## Toaster
+
+### Purpose
+
+App-wide toast notifications via **sonner**. Used for success/error feedback after mutations (create/edit/delete workout lists, import/export, workout session actions). Confirm dialogs remain for decisions that need explicit user choice (delete confirm, import confirm, session resync, finish/discard).
+
+### Location
+
+`shared/ui/toaster/`
+
+### Files
+
+- `toaster.tsx` — Sonner `Toaster` wrapper; default export; reads theme from `useThemeStore`.
+- `toast.ts` — `toastSuccess`, `toastError`, re-export of sonner `toast`.
+- `toaster.module.scss` — elevated surface, success/error/warning border accents, `$z-toaster`.
+- `toaster.stories.tsx` / `toaster.stories.module.scss` — Storybook.
+- `specs/toaster.spec.unit.tsx`, `specs/toaster.spec.snap.tsx`.
+
+### Public API
+
+```typescript
+const Toaster: FC; // mount once near app root
+
+toastSuccess(message: string): void;
+toastError(error: unknown, fallback: string): void;
+// toast — raw sonner API (escape hatch)
+```
+
+- `toastError` shows `error.message` when `error instanceof Error`, otherwise `fallback`.
+
+### Tech stack
+
+| Category | Technology |
+|----------|------------|
+| UI | sonner |
+| Theme | `useThemeStore` (`light` / `dark`) |
+| Styling | SCSS Modules + design tokens |
+
+### UI
+
+- Position: **bottom-left**.
+- Close button enabled.
+- Toast surface: `$bg-elevated`, border, `$shadow-lg`; success/error/warning tint the border.
+- `z-index`: `$z-toaster` (1200), above modal (`$z-modal` 1100).
+
+### Behavior
+
+1. App mounts `<Toaster />` next to the router inside `ConfirmDialogProvider` (`main.tsx`).
+2. Call sites use `toastSuccess` / `toastError` from `@shared` (logic layers).
+3. Toasts auto-dismiss (sonner defaults); user can dismiss via close button.
+
+### Accessibility
+
+- Sonner renders a polite live region for notifications.
+- Close control is a labeled button (`Close toast`).
+
+### Storybook
+
+- Title: `Shared/Toaster`
+- File: `toaster.stories.tsx`
+- Stories: Desktop/Tablet/Mobile (success), ErrorDesktop, Interactive variants.
+
+### Tests
+
+- Unit: `specs/toaster.spec.unit.tsx` — helper message resolution, position attrs, visible success/error text.
+- Snapshot: `specs/toaster.spec.snap.tsx` — success, error, fallback error.
+
+### Usage
+
+- `main.tsx` — global `<Toaster />`.
+- `pages/create-workout`, `pages/edit-workout`, `pages/home`, `pages/workout-mode` logic layers.
 
 ---
 
