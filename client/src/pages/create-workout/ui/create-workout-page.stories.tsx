@@ -15,7 +15,7 @@ const storyTitle = 'Pages/CreateWorkoutPage';
 const renderCreateWorkoutPage = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
     initialEntries: ['/create'],
-    component: (): JSX.Element => <CreateWorkoutPageLogicLayer onSubmit={async (): Promise<boolean> => true} />,
+    component: (): JSX.Element => <CreateWorkoutPageLogicLayer onCreate={async (): Promise<void> => undefined} />,
   });
 
 const meta = {

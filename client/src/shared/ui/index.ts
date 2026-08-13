@@ -16,5 +16,7 @@ export { default as MenuButton } from 'src/shared/ui/menu-button/menu-button';
 export { default as NumericField } from 'src/shared/ui/numeric-field/numeric-field-logic-layer';
 export { default as PasswordField } from 'src/shared/ui/password-field/password-field-logic-layer';
 export { default as TabsBar } from 'src/shared/ui/tabs-bar/tabs-bar';
+export { default as Toaster } from 'src/shared/ui/toaster/toaster';
+export { toast, toastError, toastSuccess } from 'src/shared/ui/toaster/toast';
 export { default as UserAvatar } from 'src/shared/ui/user-avatar/user-avatar';
 export { default as UserAvatarMenu } from 'src/shared/ui/user-avatar-menu/user-avatar-menu';

@@ -65,13 +65,17 @@ Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/
 
 ### Finishing
 
-8. Early finish: three-way confirm → **Finish** (`POST .../finish`, saved to history) | **Discard** (`DELETE .../:id`, return to preview) | **Cancel**.
+8. Early finish: three-way confirm → **Finish** (`POST .../finish`, saved to history) | **Discard** (`DELETE .../:id`, return to preview) | **Cancel**. Failures: `toastError` with finish/discard-specific fallbacks.
 9. Resync edge on entry: on first observation of a session, if `active` but all sets already complete → auto `finishSession` once + confetti. Not re-run when sets become complete mid-workout.
 
 ### Progress
 
 10. Preview: `totalExercises = workoutList.exercises.length`, `completedExercises = 0`, `overallProgress = 0`.
 11. Training: `completedExercises` where `completedSets === sets` (and `sets > 0`); `overallProgress` percentage.
+
+### Feedback
+
+12. Mutation errors use [`toastError`](../shared/shared-components.spec.md#toaster): start → «Failed to start workout session»; progress → «Failed to update session progress»; finish → «Failed to finish workout session»; discard → «Failed to discard workout session».
 
 ---
 
@@ -131,7 +135,7 @@ Full contract: [workout-session entity](../entities/workout-session.entity.spec.
 
 ## Tech Stack
 
-TanStack Router, React Query (optimistic mutations), Headless UI `Transition` (inside `WorkoutSessionExerciseCard`), `canvas-confetti`, `NotFoundMessage` widget, `WorkoutExerciseCard` / `WorkoutSessionExerciseCard` entity UI, extended `useConfirm` (alternate action).
+TanStack Router, React Query (optimistic mutations), Headless UI `Transition` (inside `WorkoutSessionExerciseCard`), `canvas-confetti`, `NotFoundMessage` widget, `WorkoutExerciseCard` / `WorkoutSessionExerciseCard` entity UI, extended `useConfirm` (alternate action), [`Toaster`](../shared/shared-components.spec.md#toaster) helpers.
 
 ---
 
@@ -146,7 +150,7 @@ TanStack Router, React Query (optimistic mutations), Headless UI `Transition` (i
 ## Tests
 
 - `ui/specs/workout-mode-page.spec.unit.tsx` — preview (Start + exercise cards below), training (session cards + Finish), not found
-- `ui/specs/workout-mode-page-logic-layer.spec.unit.tsx` — finish vs discard vs cancel confirm; start handler; resync-edge auto-finish on entry (complete vs incomplete)
+- `ui/specs/workout-mode-page-logic-layer.spec.unit.tsx` — finish vs discard vs cancel confirm; start handler; start/finish error toasts; resync-edge auto-finish on entry (complete vs incomplete)
 
 ---
 
@@ -163,9 +167,9 @@ N/A — no stories file.
 | Accidental click, back without Start | No session created |
 | Resume mid-workout | `GET /active` → training, skip preview |
 | Discard after partial progress | DELETE → preview; history unchanged |
-| Empty list | POST on Start → 400; error swallowed (TODO toaster); stays in preview |
+| Empty list | POST on Start → 400; `toastError`; stays in preview |
 | Completed session | Taps no-op; finish disabled |
-| Progress mutation error | Optimistic rollback to `previous`, unless cache is already `completed` or ahead of this mutation’s baseline (later taps) |
+| Progress mutation error | Optimistic rollback to `previous`, unless cache is already `completed` or ahead of this mutation’s baseline (later taps); `toastError` |
 | Re-enter after completion | Preview; Start creates new session |
 | Resync edge on entry | Auto-finish + confetti once |
 

@@ -1,0 +1,34 @@
+@use 'src/shared/ui/styles/variables';
+
+.toaster {
+  z-index: $z-toaster;
+}
+
+.toast {
+  background: $bg-elevated !important;
+  border: 1px solid $border-color !important;
+  color: $text-primary !important;
+  box-shadow: $shadow-lg !important;
+  font-family: $font-family;
+  font-size: $font-size-sm;
+}
+
+.title {
+  color: $text-primary !important;
+}
+
+.description {
+  color: $text-secondary !important;
+}
+
+.success {
+  border-color: $success-color !important;
+}
+
+.error {
+  border-color: $danger-color !important;
+}
+
+.warning {
+  border-color: $warning-color !important;
+}

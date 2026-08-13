@@ -4,7 +4,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { queryClient, router } from '@app';
-import { ConfirmDialogProvider } from '@shared';
+import { ConfirmDialogProvider, Toaster } from '@shared';
 
 import { clearAccessToken, setSessionExpiredHandler } from 'src/shared/api';
 
@@ -27,6 +27,7 @@ createRoot(rootElement).render(
     <QueryClientProvider client={queryClient}>
       <ConfirmDialogProvider>
         <RouterProvider router={router} context={{ queryClient }} />
+        <Toaster />
       </ConfirmDialogProvider>
     </QueryClientProvider>
   </StrictMode>,

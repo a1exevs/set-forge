@@ -1,0 +1,100 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`CreateWorkoutPage matches snapshot 1`] = `
+<div>
+  <div
+    class="container"
+  >
+    <header
+      class="header"
+    >
+      <h1>
+        New Workout List
+      </h1>
+    </header>
+    <main
+      class="main"
+    >
+      <form
+        class="form"
+      >
+        <div
+          class="section"
+        >
+          <div>
+            <label
+              class="label"
+              for="name"
+            >
+              List Name *
+            </label>
+            <input
+              class="input"
+              id="name"
+              placeholder="e.g., Push Day"
+              required=""
+              type="text"
+              value=""
+            />
+          </div>
+          <div>
+            <label
+              class="label"
+              for="description"
+            >
+              Description
+            </label>
+            <textarea
+              class="textarea"
+              id="description"
+              placeholder="Chest, shoulders, triceps"
+              rows="2"
+            />
+          </div>
+        </div>
+        <div
+          class="section section_withoutGap"
+        >
+          <div
+            class="sectionHeader"
+          >
+            <h2>
+              Exercises
+            </h2>
+            <button
+              class="button primary sm"
+              data-headlessui-state=""
+              type="button"
+            >
+              + Add Exercise
+            </button>
+          </div>
+          <p
+            class="emptyExercises"
+          >
+            Add exercises to your list
+          </p>
+        </div>
+        <div
+          class="actions"
+        >
+          <button
+            class="button secondary md"
+            data-headlessui-state=""
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="button primary md"
+            data-headlessui-state=""
+            type="submit"
+          >
+            Create List
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+`;

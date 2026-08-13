@@ -6,9 +6,11 @@ import confetti from 'canvas-confetti';
 import WorkoutModePageLogicLayer from 'src/pages/workout-mode/ui/workout-mode-page-logic-layer';
 
 const confirmDialogMock = jest.fn();
+const toastErrorMock = jest.fn();
 
 jest.mock('@shared', () => ({
   useConfirm: () => confirmDialogMock,
+  toastError: (...args: unknown[]): void => toastErrorMock(...args),
 }));
 
 jest.mock('canvas-confetti', () => jest.fn());
@@ -117,6 +119,31 @@ describe('WorkoutModePageLogicLayer', () => {
     await user.click(screen.getByRole('button', { name: 'Start workout' }));
 
     expect(startSession).toHaveBeenCalledWith('list-1');
+    expect(toastErrorMock).not.toHaveBeenCalled();
+  });
+
+  it('shows error toast when start session fails', async () => {
+    const user = userEvent.setup();
+    const error = new Error('Empty list');
+    const startSession = jest.fn().mockRejectedValue(error);
+
+    render(
+      <WorkoutModePageLogicLayer
+        workoutList={WORKOUT_LIST}
+        session={null}
+        isStarting={false}
+        startSession={startSession}
+        incrementProgress={jest.fn()}
+        finishSession={jest.fn()}
+        discardSession={jest.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Start workout' }));
+
+    await waitFor((): void => {
+      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to start workout session');
+    });
   });
 
   it('finishes the session when confirm returns confirm', async () => {
@@ -149,6 +176,31 @@ describe('WorkoutModePageLogicLayer', () => {
         }),
       );
       expect(finishSession).toHaveBeenCalledWith('sess-1');
+    });
+  });
+
+  it('shows error toast when finish session fails', async () => {
+    const user = userEvent.setup();
+    confirmDialogMock.mockResolvedValue('confirm');
+    const error = new Error('Finish failed');
+    const finishSession = jest.fn().mockRejectedValue(error);
+
+    render(
+      <WorkoutModePageLogicLayer
+        workoutList={WORKOUT_LIST}
+        session={SESSION}
+        isStarting={false}
+        startSession={jest.fn()}
+        incrementProgress={jest.fn()}
+        finishSession={finishSession}
+        discardSession={jest.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Finish workout' }));
+
+    await waitFor((): void => {
+      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to finish workout session');
     });
   });
 
