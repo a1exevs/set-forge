@@ -1,5 +1,5 @@
 # Install workspace deps from the repo root lockfile (client + root dev tooling only).
-FROM node:22.23.2-alpine AS deps
+FROM node:24.19.0-alpine AS deps
 WORKDIR /app
 ENV HUSKY=0
 COPY package.json package-lock.json ./
