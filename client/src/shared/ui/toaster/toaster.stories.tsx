@@ -5,7 +5,7 @@ import { buildDesktopStoryObj, buildMobileStoryObj, buildTabletStoryObj } from '
 
 import { toastError, toastSuccess } from '@shared/lib';
 
-import Toaster from './toaster';
+import Toaster from './toaster-data-layer';
 import classes from './toaster.stories.module.scss';
 import Button from '../button/button';
 

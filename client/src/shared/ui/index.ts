@@ -9,6 +9,6 @@ export { default as NumericField } from './numeric-field/numeric-field-logic-lay
 export { default as PasswordField } from './password-field/password-field-logic-layer';
 export { default as Select, type SelectOption } from './select/select';
 export { default as TabsBar, type TabsBarItem } from './tabs-bar/tabs-bar';
-export { default as Toaster } from './toaster/toaster';
+export { default as Toaster } from './toaster/toaster-data-layer';
 export { default as Transition } from './transition/transition';
 export { default as UserAvatar } from './user-avatar/user-avatar';

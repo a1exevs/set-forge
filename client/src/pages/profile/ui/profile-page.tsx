@@ -1,14 +1,13 @@
-import { useRouterState } from '@tanstack/react-router';
-import { FC } from 'react';
+import { FC, RefObject } from 'react';
 
-import { useTabSwipeNavigation } from '@shared/lib';
 import { BrandWordmark, Button, UserAvatar } from '@shared/ui';
 import { LegalFooter } from '@widgets/legal-footer';
-import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets/main-tabs-bar';
+import { MainTabsBar } from '@widgets/main-tabs-bar';
 
 import classes from './profile-page.module.scss';
 
 type Props = {
+  swipeRef: RefObject<HTMLDivElement>;
   email: string;
   avatarLetter: string;
   onLogout: () => void | Promise<void>;
@@ -18,6 +17,7 @@ type Props = {
 };
 
 const ProfilePage: FC<Props> = ({
+  swipeRef,
   email,
   avatarLetter,
   onLogout,
@@ -25,9 +25,6 @@ const ProfilePage: FC<Props> = ({
   onDeleteAccount,
   isDeletingAccount,
 }) => {
-  const pathname = useRouterState({ select: state => state.location.pathname });
-  const swipeRef = useTabSwipeNavigation({ tabs: MAIN_TAB_ROUTES, activePath: pathname });
-
   return (
     <div ref={swipeRef} className={classes.container}>
       <header className={classes.header}>

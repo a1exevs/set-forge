@@ -73,9 +73,9 @@ Entity: [workout-session](../entities/workout-session.entity.spec.md); nested ex
 3. `expandedIds` map; `formatSessionDate` / `formatSummary` from `lib/history-formatters.ts`.
 4. `IntersectionObserver` on sentinel → `fetchNextPage` when `hasMore && !isFetchingNextPage`.
 
-### Tab swipe (presentation)
+### Tab swipe (logic layer)
 
-5. `HistoryPage` mounts `useTabSwipeNavigation` — swipe right → Home; swipe left → Profile.
+5. The logic layer calls `useMainTabSwipe()` (`@widgets/main-tabs-bar`) and passes `swipeRef` to the view — swipe right → Home; swipe left → Profile.
 
 ### Data fetching
 

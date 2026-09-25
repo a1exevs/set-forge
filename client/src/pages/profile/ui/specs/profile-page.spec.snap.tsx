@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import type { ReactNode } from 'react';
+import { createRef, type ReactNode } from 'react';
 
 import ProfilePage from '../profile-page';
 
@@ -11,28 +11,17 @@ jest.mock('@tanstack/react-router', () => ({
 
 jest.mock('@widgets/main-tabs-bar', () => ({
   MainTabsBar: (): JSX.Element => <nav data-testid="main-tabs-bar" />,
-  MAIN_TAB_ROUTES: [
-    { id: 'home', to: '/' },
-    { id: 'profile', to: '/profile' },
-  ],
 }));
 
 jest.mock('@widgets/legal-footer', () => ({
   LegalFooter: (): JSX.Element => <footer data-testid="legal-footer" />,
 }));
 
-jest.mock('@shared/lib', () => {
-  const actual = jest.requireActual<typeof import('@shared/lib')>('@shared/lib');
-  return {
-    ...actual,
-    useTabSwipeNavigation: () => ({ current: null }),
-  };
-});
-
 describe('ProfilePage', () => {
   it('matches snapshot', () => {
     const { container } = render(
       <ProfilePage
+        swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
         onLogout={(): void => undefined}

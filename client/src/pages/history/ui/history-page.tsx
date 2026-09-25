@@ -1,17 +1,16 @@
-import { useRouterState } from '@tanstack/react-router';
 import { ChevronDown } from 'lucide-react';
 import { FC, RefObject } from 'react';
 
 import { muscleGroupLabels } from '@entities/workout-exercise';
 import type { WorkoutSession } from '@entities/workout-session';
 import { isExerciseComplete, type WorkoutSessionExercise } from '@entities/workout-session-exercise';
-import { useTabSwipeNavigation } from '@shared/lib';
 import { BrandWordmark } from '@shared/ui';
-import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets/main-tabs-bar';
+import { MainTabsBar } from '@widgets/main-tabs-bar';
 
 import classes from './history-page.module.scss';
 
 type Props = {
+  swipeRef: RefObject<HTMLDivElement>;
   sessions: WorkoutSession[];
   total: number;
   isLoading: boolean;
@@ -25,6 +24,7 @@ type Props = {
 };
 
 const HistoryPage: FC<Props> = ({
+  swipeRef,
   sessions,
   total,
   isLoading,
@@ -36,9 +36,6 @@ const HistoryPage: FC<Props> = ({
   formatSessionDate,
   formatSummary,
 }) => {
-  const pathname = useRouterState({ select: state => state.location.pathname });
-  const swipeRef = useTabSwipeNavigation({ tabs: MAIN_TAB_ROUTES, activePath: pathname });
-
   const renderBody = (): JSX.Element => {
     if (isLoading) {
       return (

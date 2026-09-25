@@ -62,9 +62,9 @@ Entity: [workout-list](../entities/workout-list.entity.spec.md). Related pages: 
 2. `useCurrentUserQuery(true)`, `useWorkoutListsQuery(Boolean(user))`, delete/export/import mutations.
 3. Logic layer builds delete/export/import handlers with `useConfirm`.
 
-### Tab swipe (presentation)
+### Tab swipe (logic layer)
 
-4. `HomePage` mounts `useTabSwipeNavigation({ tabs: MAIN_TAB_ROUTES, activePath })` on root container — swipe left → `/history`; swipe right → no-op.
+4. The logic layer calls `useMainTabSwipe()` (`@widgets/main-tabs-bar`); `HomePage` attaches the `swipeRef` prop to its root container — swipe left → `/history`; swipe right → no-op.
 
 ### Data loading
 
@@ -135,7 +135,7 @@ Full contract: [workout-list entity](../entities/workout-list.entity.spec.md#api
 | Routing | TanStack Router |
 | Server state | `@tanstack/react-query` |
 | UI | SCSS Modules, lucide-react, `BrandWordmark`, `IconButton`, `MenuButton`, `MainTabsBar` |
-| Swipe | `useTabSwipeNavigation`, `MAIN_TAB_ROUTES` |
+| Swipe | `useMainTabSwipe` (`@widgets/main-tabs-bar`) |
 | Dialogs | `useConfirm` (delete / import confirmation only) |
 | Feedback | [`Toaster`](../shared/shared-components.spec.md#toaster) — success/error for delete, export, import |
 

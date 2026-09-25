@@ -854,7 +854,8 @@ App-wide toast notifications via **sonner**. Used for success/error feedback aft
 
 ### Files
 
-- `toaster.tsx` — Sonner `Toaster` wrapper; default export; reads theme from `useThemeStore`.
+- `toaster-data-layer.tsx` — reads the theme from `useThemeStore`; exported as `Toaster`.
+- `toaster.tsx` — Sonner `Toaster` wrapper (presentation, `theme` prop).
 - `shared/lib/toast.ts` — `toastSuccess`, `toastError` (sonner), exported from `@shared/lib`.
 - `toaster.module.scss` — elevated surface, success/error/warning border accents, `$z-toaster`.
 - `toaster.stories.tsx` / `toaster.stories.module.scss` — Storybook.

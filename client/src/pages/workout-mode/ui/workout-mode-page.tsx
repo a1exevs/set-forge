@@ -5,6 +5,7 @@ import { type WorkoutExercise, WorkoutExerciseCard } from '@entities/workout-exe
 import type { WorkoutList } from '@entities/workout-list';
 import type { WorkoutSession } from '@entities/workout-session';
 import { type WorkoutSessionExercise, WorkoutSessionExerciseCard } from '@entities/workout-session-exercise';
+import { cssVars } from '@shared/lib';
 import { NotFoundMessage } from '@shared/ui';
 
 import classes from './workout-mode-page.module.scss';
@@ -67,7 +68,7 @@ const WorkoutModePage: FC<Props> = ({
             <span>{Math.round(overallProgress)}%</span>
           </div>
           <div className={classes.progressBarWrapper}>
-            <div className={classes.progressBarFill} style={{ width: `${overallProgress}%` }} />
+            <div className={classes.progressBarFill} style={cssVars({ '--progress': `${overallProgress}%` })} />
           </div>
         </div>
       </header>

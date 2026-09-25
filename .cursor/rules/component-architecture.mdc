@@ -15,7 +15,12 @@ globs: ["client/**"]
 
 **Data** (`*-data-layer.tsx`): TanStack Query hooks and/or Zustand stores. Pass data and callbacks to logic. No business logic. Optimization hooks (`useCallback`, `useMemo`) allowed for stable references.
 **Logic** (`*-logic-layer.tsx`): Hooks, handlers, state. No stores, no query hooks, no API imports.
-**Presentation** (`*.tsx`): Props only. No hooks.
+**Presentation** (`*.tsx`): Props only. No hooks — router, swipe and DOM hooks too: the logic layer calls them and
+passes the result (`swipeRef`, `activeItemId`). Context providers (`*-provider.tsx`) own state like a data layer.
+
+Enforced in `ui` segments by ESLint `no-restricted-syntax` (`client/linter/rules/ui-segment-rule.ts`): hooks are
+banned in presentation files, query/mutation hooks and stores (`use*Query`, `use*Mutation`, `use*Store`,
+`useStore.use.x()`) in logic layers.
 
 ```typescript
 // Data: useWorkoutListsQuery(); return <LogicLayer workoutLists={data ?? []} ... />;

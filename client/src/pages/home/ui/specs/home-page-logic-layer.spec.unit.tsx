@@ -25,7 +25,7 @@ jest.mock('@tanstack/react-router', () => ({
 }));
 
 jest.mock('@widgets/main-tabs-bar', () => ({
-  MAIN_TAB_ROUTES: [],
+  useMainTabSwipe: (): { current: null } => ({ current: null }),
   MainTabsBar: () => null,
 }));
 

@@ -1,6 +1,7 @@
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import type { WorkoutSession } from '@entities/workout-session';
+import { useMainTabSwipe } from '@widgets/main-tabs-bar';
 
 import HistoryPage from './history-page';
 import { formatSessionDate, formatSummary } from '../lib/history-formatters';
@@ -24,6 +25,7 @@ const HistoryPageLogicLayer: FC<Props> = ({
   hasMore,
   fetchNextPage,
 }) => {
+  const swipeRef = useMainTabSwipe();
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +51,7 @@ const HistoryPageLogicLayer: FC<Props> = ({
 
   return (
     <HistoryPage
+      swipeRef={swipeRef}
       sessions={sessions}
       total={total}
       isLoading={isLoading}

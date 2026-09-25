@@ -17,7 +17,7 @@ import {
   sliceModelTypeOnlyRule,
 } from './linter/rules/segment-direction-rule';
 import sortImportsRule from './linter/rules/sort-imports-rule';
-import { sharedUiRule, slicedUiRule } from './linter/rules/ui-segment-rule';
+import { uiLayerFiles, uiRule } from './linter/rules/ui-segment-rule';
 import unusedVarsRule from './linter/rules/unused-vars-rule';
 import settings from './linter/settings';
 
@@ -89,17 +89,25 @@ export default tsEslint.config(
   },
   // FSD import boundaries: layers, slices, public API, `@x`, UI kit / React Query placement.
   ...fsdImportsConfigs(),
-  {
-    // A `ui` segment holds components only: constants → config/, types and logic → model/, helpers → lib/.
-    files: ['src/{pages,widgets,features,entities}/*/ui/**/*.{ts,tsx}'],
-    ignores: ['src/**/specs/**', 'src/**/*.stories.tsx'],
-    rules: slicedUiRule,
-  },
-  {
-    files: ['src/shared/ui/**/*.{ts,tsx}'],
-    ignores: ['src/**/specs/**', 'src/**/*.stories.tsx', 'src/shared/ui/index.ts'],
-    rules: sharedUiRule,
-  },
+  // A `ui` segment holds components only (constants → config/, types and logic → model/, helpers → lib/);
+  // presentation files take props only, hooks live in the logic / data layers (component-architecture).
+  ...[false, true].flatMap(shared => {
+    const uiDir = shared ? 'src/shared/ui' : 'src/{pages,widgets,features,entities}/*/ui';
+    const ignores = ['src/**/specs/**', 'src/**/*.stories.tsx', 'src/shared/ui/index.ts'];
+    const layerFiles = [...uiLayerFiles.logic, ...uiLayerFiles.data];
+    return [
+      {
+        files: [`${uiDir}/**/*.{ts,tsx}`],
+        ignores: [...ignores, ...layerFiles],
+        rules: uiRule({ shared, kind: 'presentation' }),
+      },
+      ...(['logic', 'data'] as const).map(kind => ({
+        files: uiLayerFiles[kind].map(pattern => `${uiDir}/${pattern}`),
+        ignores,
+        rules: uiRule({ shared, kind }),
+      })),
+    ];
+  }),
   {
     // Tests config files
     files: ['tests/**/*.{ts,tsx}'],

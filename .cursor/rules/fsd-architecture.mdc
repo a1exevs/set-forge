@@ -55,6 +55,7 @@ Our examples:
 | privacy / terms texts | `pages/<slice>/config` | constants |
 | `WorkoutListForm`, `MainTabsBar`, `DocumentReconsentGate` | `widgets/*/ui` | big blocks over several entities |
 | `MAIN_TAB_ROUTES`, `muscleGroupOptions` | `widgets/*/config` | constants of a widget |
+| `useMainTabSwipe` (swipe between the main tabs) | `widgets/main-tabs-bar/model` | shared by the three tab pages; their logic layers call it |
 | `WorkoutList`, `useWorkoutListsQuery`, query keys | `entities/workout-list/model` | domain types and server state |
 | `fetchWorkoutLists` | `entities/workout-list/api` | requests — internal to the model, never exported |
 | `WorkoutExerciseCard` | `entities/workout-exercise/ui` | entity UI, reused by several pages |

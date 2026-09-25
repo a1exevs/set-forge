@@ -1,6 +1,8 @@
 import { DialogBackdrop, DialogPanel, Dialog as HeadlessDialog } from '@headlessui/react';
 import { FC, MutableRefObject, ReactNode, RefObject } from 'react';
 
+import { cssVars } from '@shared/lib';
+
 import classes from './dialog.module.scss';
 
 type Props = {
@@ -46,7 +48,7 @@ const DialogComponent: FC<Props> = ({
       <DialogBackdrop
         transition={!disableAnimation}
         className={classes.dialogBackdrop}
-        style={{ backgroundColor: backdropColor }}
+        style={cssVars({ '--dialog-backdrop': backdropColor })}
       />
       <div className={classes.dialogOverlay}>
         <DialogPanel transition={!disableAnimation} className={classes.dialogPanel}>

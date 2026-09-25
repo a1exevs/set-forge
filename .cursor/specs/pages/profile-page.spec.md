@@ -76,9 +76,9 @@ Shows authenticated user avatar letter, email, **Log out** button, and a **Delet
 
 4. Logic layer (`useConfirm`) shows a confirm dialog ("Delete account?"); on confirm → `onDeleteAccount()` → `DELETE /auth/account` → `useDeleteAccountMutation` clears the entire query cache; the data layer then goes to `/login` (also on failure).
 
-### Tab swipe (presentation)
+### Tab swipe (logic layer)
 
-5. `ProfilePage` mounts `useTabSwipeNavigation` — swipe right → `/history`; swipe left → no-op (rightmost tab).
+5. The logic layer calls `useMainTabSwipe()` (`@widgets/main-tabs-bar`) and passes `swipeRef` to the view — swipe right → `/history`; swipe left → no-op (rightmost tab).
 
 ---
 
@@ -120,7 +120,7 @@ Full contract: [user entity](../entities/user.entity.spec.md#api-contract).
 | Routing | TanStack Router |
 | Server state | `@tanstack/react-query` |
 | UI | `BrandWordmark`, `UserAvatar`, `Button`, `MainTabsBar` |
-| Swipe | `useTabSwipeNavigation`, `MAIN_TAB_ROUTES` |
+| Swipe | `useMainTabSwipe` (`@widgets/main-tabs-bar`) |
 
 ---
 

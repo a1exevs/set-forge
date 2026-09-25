@@ -2,6 +2,7 @@ import { ChangeEvent, FC, useRef } from 'react';
 
 import type { WorkoutList, WorkoutListsExportFile } from '@entities/workout-list';
 import { downloadJsonFile, toastError, toastSuccess, useConfirm } from '@shared/lib';
+import { useMainTabSwipe } from '@widgets/main-tabs-bar';
 
 import HomePage from './home-page';
 import { buildWorkoutListsExportFilename } from '../lib/workout-lists-export-filename';
@@ -25,6 +26,7 @@ const HomePageLogicLayer: FC<Props> = ({
   onEdit,
   formatDate,
 }) => {
+  const swipeRef = useMainTabSwipe();
   const confirmDialog = useConfirm();
   const importInputRef = useRef<HTMLInputElement>(null);
 
@@ -106,6 +108,7 @@ const HomePageLogicLayer: FC<Props> = ({
 
   return (
     <HomePage
+      swipeRef={swipeRef}
       workoutLists={workoutLists}
       onEdit={onEdit}
       onDelete={handleDelete}

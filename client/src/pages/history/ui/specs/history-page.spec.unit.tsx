@@ -13,20 +13,7 @@ jest.mock('@tanstack/react-router', () => ({
 
 jest.mock('@widgets/main-tabs-bar', () => ({
   MainTabsBar: (): JSX.Element => <nav data-testid="main-tabs-bar" />,
-  MAIN_TAB_ROUTES: [
-    { id: 'home', to: '/' },
-    { id: 'history', to: '/history' },
-    { id: 'profile', to: '/profile' },
-  ],
 }));
-
-jest.mock('@shared/lib', () => {
-  const actual = jest.requireActual<typeof import('@shared/lib')>('@shared/lib');
-  return {
-    ...actual,
-    useTabSwipeNavigation: () => ({ current: null }),
-  };
-});
 
 const SESSION: WorkoutSession = {
   id: 'sess-1',
@@ -50,6 +37,7 @@ const SESSION: WorkoutSession = {
 };
 
 const baseProps = {
+  swipeRef: createRef<HTMLDivElement>(),
   sessions: [SESSION],
   total: 1,
   isLoading: false,

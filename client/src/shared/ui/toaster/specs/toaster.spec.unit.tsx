@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 
 import { toastError, toastSuccess } from '@shared/lib';
 
-import Toaster from '../toaster';
+import Toaster from '../toaster-data-layer';
 
 describe('toast helpers', () => {
   afterEach((): void => {

@@ -1,15 +1,15 @@
-import { Link, useRouterState } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { Download, Plus, Upload } from 'lucide-react';
 import { ChangeEvent, FC, RefObject } from 'react';
 
 import type { WorkoutList } from '@entities/workout-list';
-import { useTabSwipeNavigation } from '@shared/lib';
 import { BrandWordmark, IconButton, MenuButton } from '@shared/ui';
-import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets/main-tabs-bar';
+import { MainTabsBar } from '@widgets/main-tabs-bar';
 
 import classes from './home-page.module.scss';
 
 type Props = {
+  swipeRef: RefObject<HTMLDivElement>;
   workoutLists: WorkoutList[];
   onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void | Promise<void>;
@@ -21,6 +21,7 @@ type Props = {
 };
 
 const HomePage: FC<Props> = ({
+  swipeRef,
   workoutLists,
   onEdit,
   onDelete,
@@ -30,9 +31,6 @@ const HomePage: FC<Props> = ({
   importInputRef,
   formatDate,
 }) => {
-  const pathname = useRouterState({ select: state => state.location.pathname });
-  const swipeRef = useTabSwipeNavigation({ tabs: MAIN_TAB_ROUTES, activePath: pathname });
-
   return (
     <div ref={swipeRef} className={classes.container}>
       <header className={classes.header}>
