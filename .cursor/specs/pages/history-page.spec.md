@@ -12,7 +12,7 @@ Entity: [workout-session](../entities/workout-session.entity.spec.md); nested ex
 
 - Path: `/history` (protected)
 - Router entry: `history-page-data-layer.tsx`
-- Route file: `client/src/app/model/routes/history.tsx`
+- Route file: `client/src/app/routes/history.tsx`
 
 ---
 
@@ -27,13 +27,13 @@ Entity: [workout-session](../entities/workout-session.entity.spec.md); nested ex
 - `ui/history-page-data-layer.tsx`
 - `ui/history-page-logic-layer.tsx`
 - `ui/history-page.tsx`
-- `ui/history-page-formatters.ts`
+- `lib/history-formatters.ts`
 - `ui/history-page.module.scss`
 - `ui/history-page.stories.tsx`
 - `ui/specs/history-page.spec.unit.tsx`
 - `ui/specs/history-page.spec.snap.tsx`
-- `ui/specs/history-page-formatters.spec.unit.ts`
-- `ui/index.ts`, `index.ts`
+- `lib/specs/history-formatters.spec.unit.ts`
+- `index.ts` (slice public API; no `index.ts` inside segments)
 
 ---
 
@@ -70,7 +70,7 @@ Entity: [workout-session](../entities/workout-session.entity.spec.md); nested ex
 
 ### Logic layer
 
-3. `expandedIds` map; `formatSessionDate` / `formatSummary` from `history-page-formatters.ts`.
+3. `expandedIds` map; `formatSessionDate` / `formatSummary` from `lib/history-formatters.ts`.
 4. `IntersectionObserver` on sentinel → `fetchNextPage` when `hasMore && !isFetchingNextPage`.
 
 ### Tab swipe (presentation)
@@ -128,16 +128,18 @@ Full contract: [workout-session entity](../entities/workout-session.entity.spec.
 
 ## Exposed API / Methods
 
+The slice `index.ts` exports only the page component; rows marked internal stay inside the slice.
+
 | API | Type | Description |
 |-----|-----|-------------|
 | `HistoryPage` | component | Default from `history-page-data-layer.tsx` |
-| `formatSessionDate`, `formatSummary`, etc. | functions | `history-page-formatters.ts` |
+| `formatSessionDate`, `formatSummary`, etc. | functions (internal) | `lib/history-formatters.ts` |
 
 ---
 
 ## Tests
 
-- Unit: `history-page.spec.unit.tsx`, `history-page-formatters.spec.unit.ts`
+- Unit: `history-page.spec.unit.tsx`, `history-formatters.spec.unit.ts`
 - Snapshot: `history-page.spec.snap.tsx`
 
 ---

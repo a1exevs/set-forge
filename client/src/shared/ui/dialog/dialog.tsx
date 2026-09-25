@@ -1,7 +1,7 @@
 import { DialogBackdrop, DialogPanel, Dialog as HeadlessDialog } from '@headlessui/react';
 import { FC, MutableRefObject, ReactNode, RefObject } from 'react';
 
-import classes from 'src/shared/ui/dialog/dialog.module.scss';
+import classes from './dialog.module.scss';
 
 type Props = {
   open: boolean;

@@ -1,22 +1,16 @@
-export { default as Button } from 'src/shared/ui/button/button';
-export { default as BrandWordmark } from 'src/shared/ui/brand-wordmark/brand-wordmark';
-export { default as Dialog } from 'src/shared/ui/dialog/dialog';
-export { default as IconButton } from 'src/shared/ui/icon-button/icon-button';
-export { default as LegalDocument } from 'src/shared/ui/legal-document/legal-document-logic-layer';
-export type {
-  LegalContent,
-  LegalLang,
-  LegalLink,
-  LegalSection,
-  LegalText,
-} from 'src/shared/ui/legal-document/legal-document';
-export { default as ConfirmDialogProvider } from 'src/shared/ui/confirm-dialog/confirm-dialog-provider';
-export { useConfirm } from 'src/shared/ui/confirm-dialog/hooks/use-confirm';
-export { default as MenuButton } from 'src/shared/ui/menu-button/menu-button';
-export { default as NumericField } from 'src/shared/ui/numeric-field/numeric-field-logic-layer';
-export { default as PasswordField } from 'src/shared/ui/password-field/password-field-logic-layer';
-export { default as TabsBar } from 'src/shared/ui/tabs-bar/tabs-bar';
-export { default as Toaster } from 'src/shared/ui/toaster/toaster';
-export { toast, toastError, toastSuccess } from 'src/shared/ui/toaster/toast';
-export { default as UserAvatar } from 'src/shared/ui/user-avatar/user-avatar';
-export { default as UserAvatarMenu } from 'src/shared/ui/user-avatar-menu/user-avatar-menu';
+export { default as BrandWordmark } from './brand-wordmark/brand-wordmark';
+export { default as Button } from './button/button';
+export { default as ConfirmDialogProvider } from './confirm-dialog/confirm-dialog-provider';
+export { default as Dialog } from './dialog/dialog';
+export { default as IconButton } from './icon-button/icon-button';
+export { default as LegalDocument } from './legal-document/legal-document-logic-layer';
+export type { LegalContent } from './legal-document/legal-document';
+export { default as MenuButton } from './menu-button/menu-button';
+export { default as NotFoundMessage } from './not-found-message/not-found-message';
+export { default as NumericField } from './numeric-field/numeric-field-logic-layer';
+export { default as PasswordField } from './password-field/password-field-logic-layer';
+export { default as Select, type SelectOption } from './select/select';
+export { default as TabsBar, type TabsBarItem } from './tabs-bar/tabs-bar';
+export { default as Toaster } from './toaster/toaster';
+export { default as Transition } from './transition/transition';
+export { default as UserAvatar } from './user-avatar/user-avatar';

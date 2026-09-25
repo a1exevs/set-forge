@@ -2,7 +2,9 @@ import { Link } from '@tanstack/react-router';
 import type { LucideIcon } from 'lucide-react';
 import { FC } from 'react';
 
-import classes from 'src/shared/ui/tabs-bar/tabs-bar.module.scss';
+import { formatBadgeCount } from '@shared/lib';
+
+import classes from './tabs-bar.module.scss';
 
 export type TabsBarItem = {
   id: string;
@@ -17,8 +19,6 @@ type Props = {
   activeItemId: string;
   className?: string;
 };
-
-const formatBadgeCount = (count: number): string => (count > 99 ? '99+' : String(count));
 
 const TabsBar: FC<Props> = ({ items, activeItemId, className }) => {
   const classNames = [classes.tabsBar, className].filter(Boolean).join(' ');

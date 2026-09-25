@@ -9,7 +9,7 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 
-import DocumentReconsentGate from 'src/widgets/document-reconsent/ui/document-reconsent-gate';
+import DocumentReconsentGate from './document-reconsent-gate';
 
 const storyTitle = 'Widgets/DocumentReconsentGate';
 

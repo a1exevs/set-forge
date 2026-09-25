@@ -1,8 +1,9 @@
 import { FC } from 'react';
 import { Toaster as SonnerToaster } from 'sonner';
 
-import { useThemeStore } from 'src/shared/model';
-import classes from 'src/shared/ui/toaster/toaster.module.scss';
+import { useThemeStore } from '@shared/lib';
+
+import classes from './toaster.module.scss';
 
 const Toaster: FC = () => {
   const theme = useThemeStore.use.theme();

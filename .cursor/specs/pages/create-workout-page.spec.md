@@ -10,7 +10,7 @@ Creates a new workout list via shared `workout-list-form` widget (`mode="create"
 
 - Path: `/create` (protected)
 - Router entry: `create-workout-page-data-layer.tsx`
-- Route file: `client/src/app/model/routes/create.tsx`
+- Route file: `client/src/app/routes/create.tsx`
 
 ---
 
@@ -25,11 +25,11 @@ Creates a new workout list via shared `workout-list-form` widget (`mode="create"
 - `ui/create-workout-page-data-layer.tsx`
 - `ui/create-workout-page-logic-layer.tsx` (thin — delegates to widget)
 - `ui/create-workout-page.stories.tsx`
-- `ui/specs/create-workout-page.spec.unit.tsx`
+- `app/router/specs/create-workout-page.spec.unit.tsx` (renders the whole app via the router)
 - `ui/specs/create-workout-page-data-layer.spec.unit.tsx`
 - `ui/specs/create-workout-page-logic-layer.spec.unit.tsx`
-- `ui/specs/create-workout-page.spec.snap.tsx`
-- `ui/index.ts`, `index.ts`
+- `app/router/specs/create-workout-page.spec.snap.tsx`
+- `index.ts` (slice public API; no `index.ts` inside segments)
 - Form UI: `widgets/workout-list-form/`
 
 ---
@@ -120,7 +120,7 @@ TanStack Router, `@tanstack/react-query`, Headless UI `Listbox`, `useConfirm`, [
 
 ## Tests
 
-- Widget tests in `widgets/workout-list-form/specs/`
+- Widget tests in `widgets/workout-list-form/ui/specs/`
 - Unit: `create-workout-page.spec.unit.tsx`, `create-workout-page-data-layer.spec.unit.tsx`, `create-workout-page-logic-layer.spec.unit.tsx` — success toast + navigate; error toast + stay; cancel
 - Snapshot: `create-workout-page.spec.snap.tsx`
 

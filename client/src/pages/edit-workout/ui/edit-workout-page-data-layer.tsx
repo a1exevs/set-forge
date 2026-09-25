@@ -1,13 +1,9 @@
 import { FC } from 'react';
 
-import {
-  useActiveWorkoutSessionQuery,
-  useResyncWorkoutSessionMutation,
-  useUpdateWorkoutListMutation,
-  useWorkoutQuery,
-} from '@entities';
+import { useUpdateWorkoutListMutation, useWorkoutQuery } from '@entities/workout-list';
+import { useActiveWorkoutSessionQuery, useResyncWorkoutSessionMutation } from '@entities/workout-session';
 
-import EditWorkoutPageLogicLayer from 'src/pages/edit-workout/ui/edit-workout-page-logic-layer';
+import EditWorkoutPageLogicLayer from './edit-workout-page-logic-layer';
 
 type Props = {
   id: string;

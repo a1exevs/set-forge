@@ -41,34 +41,35 @@ When importing routes, use simple, concise names without redundant suffixes:
 
 ```typescript
 // ✅ CORRECT - simple, concise names
-import { Route as rootRoute } from 'src/app/routes/__root';
-import { Route as indexRoute } from 'src/app/routes/index';
-import { Route as createRoute } from 'src/app/routes/create';
-import { Route as workoutRoute } from 'src/app/routes/workout/$id';
+import { Route as rootRoute } from '../routes/__root';
+import { Route as indexRoute } from '../routes/index';
+import { Route as createRoute } from '../routes/create';
+import { Route as workoutRoute } from '../routes/workout/$id';
 
 // ❌ WRONG - verbose, redundant suffixes
-import { Route as workoutIdRoute } from 'src/app/routes/workout/$id';
-import { Route as createWorkoutListRoute } from 'src/app/routes/create';
+import { Route as workoutIdRoute } from '../routes/workout/$id';
+import { Route as createWorkoutListRoute } from '../routes/create';
 ```
 
 **Principle:** Import variable names should be concise and match the essence of the file, not replicate the full path or dynamic parameters.
 
-## Import Conventions in Index Files
+## Client: names by purpose
 
-**Index files (index.ts/index.tsx) MUST use absolute paths from `src/` (not aliases, not relative).** Re-exports: same pattern as FSD public API.
+In `client/src` a file or folder is named after **what it is for**, not what kind of code it holds
+(FSD, see fsd-architecture §4). `client/scripts/check-structure.mjs` fails on:
 
-```typescript
-// ✅ CORRECT
-import { routeTree } from 'src/route-tree.gen';
-
-// ❌ WRONG - don't use aliases in index files
-import { routeTree } from '@app/route-tree.gen';
-
-// ❌ WRONG - don't use relative paths
-import { routeTree } from './route-tree.gen';
+```
+❌ types.ts, consts.ts, utils.ts, helpers.ts, menu-button.types.ts, access-token.store.ts
+❌ hooks/, types/, utils/, helpers/, consts/, contexts/, components/, store/, providers/
+✅ workout-list.ts, screen-widths.ts, format-date.ts, access-token-store.ts, swipe/, confirm/
 ```
 
-**Rationale:** Aliases can cause circular dependencies in index files. Absolute paths from `src/` are explicit and avoid ambiguity.
+Tests: `*.spec.unit.tsx` / `*.spec.snap.tsx` inside a `specs/` folder next to the tested code.
+
+## Import Conventions
+
+Imports and index files (public APIs) follow fsd-architecture §5–§7: relative inside a slice, `@layer/slice` /
+`@shared/segment` across slices, never `src/...` inside `client/src`.
 
 ## Rationale
 

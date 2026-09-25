@@ -1,7 +1,7 @@
 import { Description, Field, Input, Label } from '@headlessui/react';
 import { ChangeEvent, FC, FocusEvent } from 'react';
 
-import classes from 'src/shared/ui/numeric-field/numeric-field.module.scss';
+import classes from './numeric-field.module.scss';
 
 type Props = {
   label: string;

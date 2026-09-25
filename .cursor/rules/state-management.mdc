@@ -10,9 +10,10 @@ globs: ["client/**"]
 All **server/async state** (session, workout lists) lives in `@tanstack/react-query` hooks under `entities/*/model/use-*-queries.ts`.
 
 - Query keys in `entities/*/model/*-keys.ts` or `workout-query-keys.ts`.
-- Data layers import hooks from `@entities`; Logic/Presentation layers receive data via props — **never** import query hooks or API functions directly.
+- Data layers import hooks from the entity slice (`@entities/workout-list`); Logic/Presentation layers receive data via props — **never** import query hooks or API functions directly.
 - Mutations handle cache updates (`setQueryData`, `invalidateQueries`) and optimistic updates (`onMutate` / rollback in `onError`).
-- API functions in `entities/*/api/` are internal to query hooks and tests; not re-exported from `@entities`.
+- API functions in `entities/*/api/` are internal to query hooks; not re-exported from the slice `index.ts` (tests mock the api file and use `jest.requireMock`).
+- `@tanstack/react-query` is not imported in `ui` segments of slices (ESLint): need the query client in a component? Add a hook to the entity model (`useClearWorkoutSessionCachesForDeletedList`).
 
 ```typescript
 // entities/workout-list/model/use-workout-queries.ts
@@ -35,7 +36,7 @@ All stores: `devtools(immer(...))` + `createSelectors`. Middleware order: `devto
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { createSelectors } from '@shared';
+import { createSelectors } from '../create-selectors'; // shared/lib/theme/theme-store.ts; add it to the @shared/lib API when a slice needs it
 
 const useThemeStoreBase = create<ThemeState>()(
   devtools(
@@ -53,7 +54,7 @@ export const useThemeStore = createSelectors(useThemeStoreBase);
 
 - **Auto-selectors (Zustand):** `useStore.use.data()` — not `useStore(s => s.data)`
 - **Immer:** Mutate directly `state.x = y`, avoid spread `[...state.items, item]`
-- **Location:** `entities/X/model/store.ts` for client-only entity state; `shared/model/` for cross-cutting client state
+- **Location:** `entities/X/model/<purpose>-store.ts` for client-only entity state; `shared/lib/<purpose>/` for cross-cutting client state (`shared/lib/theme/theme-store.ts`)
 - **Usage:** Stores/query hooks only in Data Layer; Logic/Presentation never import stores or query hooks
 - **DevTools:** Always `{ name: 'StoreName' }` for Zustand stores
 - **Type safety:** See typescript-guidelines.

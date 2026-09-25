@@ -2,11 +2,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
-import { useAcceptDocumentsMutation, useCurrentUserQuery, useLogoutMutation } from '@entities';
+import { useAcceptDocumentsMutation, useCurrentUserQuery, useLogoutMutation } from '@entities/session';
 
-import DocumentReconsentGate from 'src/widgets/document-reconsent/ui/document-reconsent-gate-data-layer';
+import DocumentReconsentGate from '../document-reconsent-gate-data-layer';
 
-jest.mock('@entities', () => ({
+jest.mock('@entities/session', () => ({
   useCurrentUserQuery: jest.fn(),
   useAcceptDocumentsMutation: jest.fn(),
   useLogoutMutation: jest.fn(),

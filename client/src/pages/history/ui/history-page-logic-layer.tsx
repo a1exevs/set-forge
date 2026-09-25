@@ -1,8 +1,9 @@
-import type { WorkoutSession } from '@entities';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
-import HistoryPage from 'src/pages/history/ui/history-page';
-import { formatSessionDate, formatSummary } from 'src/pages/history/ui/history-page-formatters';
+import type { WorkoutSession } from '@entities/workout-session';
+
+import HistoryPage from './history-page';
+import { formatSessionDate, formatSummary } from '../lib/history-formatters';
 
 type Props = {
   sessions: WorkoutSession[];

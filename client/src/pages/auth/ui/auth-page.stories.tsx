@@ -4,7 +4,7 @@ import type { FormEvent } from 'react';
 
 import { renderWithAuthRouter } from 'storybook-dir/render-with-page-router';
 
-import AuthPage from 'src/pages/auth/ui/auth-page';
+import AuthPage from './auth-page';
 
 const meta = {
   title: 'Pages/AuthPage',

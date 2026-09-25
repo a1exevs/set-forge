@@ -1,1 +1,1 @@
-export { ProfilePage } from 'src/pages/profile/ui';
+export { default as ProfilePage } from './ui/profile-page-data-layer';

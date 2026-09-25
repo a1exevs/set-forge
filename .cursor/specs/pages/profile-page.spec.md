@@ -10,7 +10,7 @@ Shows authenticated user avatar letter, email, **Log out** button, and a **Delet
 
 - Path: `/profile` (protected)
 - Router entry: `profile-page-data-layer.tsx`
-- Route file: `client/src/app/model/routes/profile.tsx`
+- Route file: `client/src/app/routes/profile.tsx`
 
 ---
 
@@ -29,7 +29,7 @@ Shows authenticated user avatar letter, email, **Log out** button, and a **Delet
 - `ui/profile-page.stories.tsx`
 - `ui/specs/profile-page.spec.unit.tsx`
 - `ui/specs/profile-page.spec.snap.tsx`
-- `ui/index.ts`, `index.ts`
+- `index.ts` (slice public API; no `index.ts` inside segments)
 
 ---
 

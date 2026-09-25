@@ -1,6 +1,8 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 
+import type { WorkoutSession } from './workout-session';
+import { workoutSessionQueryKeys } from './workout-session-query-keys';
 import {
   discardWorkoutSession,
   fetchActiveWorkoutSession,
@@ -9,9 +11,7 @@ import {
   incrementSessionProgress,
   resyncWorkoutSession,
   startWorkoutSession,
-} from 'src/entities/workout-session/api';
-import type { WorkoutSession } from 'src/entities/workout-session/model/types';
-import { workoutSessionQueryKeys } from 'src/entities/workout-session/model/workout-session-query-keys';
+} from '../api/workout-session-api';
 
 const HISTORY_PAGE_SIZE = 20;
 

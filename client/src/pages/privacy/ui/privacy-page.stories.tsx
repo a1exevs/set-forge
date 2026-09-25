@@ -8,7 +8,7 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
-import PrivacyPage from 'src/pages/privacy/ui/privacy-page';
+import PrivacyPage from './privacy-page';
 
 const storyTitle = 'Pages/PrivacyPage';
 

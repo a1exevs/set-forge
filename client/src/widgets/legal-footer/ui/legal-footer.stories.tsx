@@ -9,7 +9,7 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 
-import LegalFooter from 'src/widgets/legal-footer/ui/legal-footer';
+import LegalFooter from './legal-footer';
 
 const storyTitle = 'Widgets/LegalFooter';
 

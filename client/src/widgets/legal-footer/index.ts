@@ -1,1 +1,1 @@
-export { LegalFooter } from 'src/widgets/legal-footer/ui';
+export { default as LegalFooter } from './ui/legal-footer';

@@ -1,2 +1,2 @@
-export type { WorkoutSessionExercise } from 'src/entities/workout-session-exercise/model';
-export { WorkoutSessionExerciseCard } from 'src/entities/workout-session-exercise/ui';
+export type { WorkoutSessionExercise } from './model/workout-session-exercise';
+export { default as WorkoutSessionExerciseCard } from './ui/workout-session-exercise-card/workout-session-exercise-card-logic-layer';

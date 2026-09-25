@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-router';
 import type { ReactElement } from 'react';
 
-import MainTabsBar from 'src/widgets/main-tabs-bar/ui/main-tabs-bar';
+import MainTabsBar from './main-tabs-bar';
 
 const renderWithRouter = (initialPath: '/' | '/history' | '/profile'): ReactElement => {
   const rootRoute = createRootRoute({

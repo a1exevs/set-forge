@@ -64,7 +64,7 @@ See [workout-exercise.entity.spec.md](workout-exercise.entity.spec.md) for colum
 
 ### Location
 
-`client/src/entities/workout-list/` — `api/workout-list-api.ts`, `model/use-workout-queries.ts`, `model/workout-query-keys.ts`, `model/types.ts`
+`client/src/entities/workout-list/` — `api/workout-list-api.ts`, `model/use-workout-queries.ts`, `model/workout-query-keys.ts`, `model/workout-list.ts`
 
 ### Types
 

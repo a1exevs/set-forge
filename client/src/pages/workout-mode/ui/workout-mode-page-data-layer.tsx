@@ -1,15 +1,15 @@
 import { FC } from 'react';
 
+import { useWorkoutQuery } from '@entities/workout-list';
 import {
   useActiveWorkoutSessionQuery,
   useDiscardWorkoutSessionMutation,
   useFinishWorkoutSessionMutation,
   useIncrementSessionProgressMutation,
   useStartWorkoutSessionMutation,
-  useWorkoutQuery,
-} from '@entities';
+} from '@entities/workout-session';
 
-import WorkoutModePageLogicLayer from 'src/pages/workout-mode/ui/workout-mode-page-logic-layer';
+import WorkoutModePageLogicLayer from './workout-mode-page-logic-layer';
 
 type Props = {
   id: string;

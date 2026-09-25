@@ -1,4 +1,4 @@
-jest.mock('src/entities/session/lib/bootstrap-session', () => ({
+jest.mock('src/entities/session/model/bootstrap-session', () => ({
   bootstrapSessionAndPrimeCache: jest.fn(
     async (qc: { setQueryData: (key: readonly unknown[], data: unknown) => void }) => {
       const user = { id: 1, email: 'test@example.com' };

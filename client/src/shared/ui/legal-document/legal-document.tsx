@@ -1,46 +1,49 @@
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft } from 'lucide-react';
-import { FC, Fragment, ReactNode } from 'react';
+import { FC, Fragment } from 'react';
 
-import BrandWordmark from 'src/shared/ui/brand-wordmark/brand-wordmark';
-import classes from 'src/shared/ui/legal-document/legal-document.module.scss';
+import { LEGAL_BACK_LABELS, LEGAL_LANG_LABELS, type LegalLang } from '@shared/config';
 
-// TODO Support language switcher across the site
-export type LegalLang = 'ru' | 'en';
+import classes from './legal-document.module.scss';
+import BrandWordmark from '../brand-wordmark/brand-wordmark';
 
 /** An inline link inside paragraph text: `to` for an in-app route, `href` for external (e.g. mailto:). */
-export type LegalLink = { text: string; to?: '/privacy' | '/terms'; href?: string };
+type LegalLink = { text: string; to?: '/privacy' | '/terms'; href?: string };
 
 /** Paragraph text: a plain string, or a sequence of strings and inline links. */
-export type LegalText = string | Array<string | LegalLink>;
+type LegalText = string | Array<string | LegalLink>;
 
-export type LegalSection = {
+type LegalSection = {
   heading: string;
   /** Paragraphs and/or bullet lists rendered in order. */
   blocks: Array<{ type: 'p'; text: LegalText } | { type: 'ul'; items: string[] }>;
 };
 
-const renderText = (text: LegalText): ReactNode => {
+const LegalRichText: FC<{ text: LegalText }> = ({ text }) => {
   if (typeof text === 'string') {
-    return text;
+    return <>{text}</>;
   }
-  return text.map((run, index) => {
-    if (typeof run === 'string') {
-      return <Fragment key={index}>{run}</Fragment>;
-    }
-    if (run.to) {
-      return (
-        <Link key={index} to={run.to} className={classes.link}>
-          {run.text}
-        </Link>
-      );
-    }
-    return (
-      <a key={index} href={run.href} className={classes.link}>
-        {run.text}
-      </a>
-    );
-  });
+  return (
+    <>
+      {text.map((run, index) => {
+        if (typeof run === 'string') {
+          return <Fragment key={index}>{run}</Fragment>;
+        }
+        if (run.to) {
+          return (
+            <Link key={index} to={run.to} className={classes.link}>
+              {run.text}
+            </Link>
+          );
+        }
+        return (
+          <a key={index} href={run.href} className={classes.link}>
+            {run.text}
+          </a>
+        );
+      })}
+    </>
+  );
 };
 
 export type LegalContent = {
@@ -58,9 +61,6 @@ type Props = {
   onBack: () => void;
 };
 
-const LANG_LABEL: Record<LegalLang, string> = { ru: 'RU', en: 'EN' };
-const BACK_LABEL: Record<LegalLang, string> = { ru: 'Назад', en: 'Back' };
-
 const LegalDocument: FC<Props> = ({ doc, lang, effectiveDate, onLangChange, onBack }) => {
   return (
     <div className={classes.page}>
@@ -69,10 +69,10 @@ const LegalDocument: FC<Props> = ({ doc, lang, effectiveDate, onLangChange, onBa
           <div className={classes.topBar}>
             <button type="button" className={classes.backLink} onClick={onBack}>
               <ArrowLeft size={18} strokeWidth={1.75} aria-hidden />
-              {BACK_LABEL[lang]}
+              {LEGAL_BACK_LABELS[lang]}
             </button>
             <div className={classes.langSwitch} role="group" aria-label="Language">
-              {(Object.keys(LANG_LABEL) as LegalLang[]).map(code => (
+              {(Object.keys(LEGAL_LANG_LABELS) as LegalLang[]).map(code => (
                 <button
                   key={code}
                   type="button"
@@ -80,7 +80,7 @@ const LegalDocument: FC<Props> = ({ doc, lang, effectiveDate, onLangChange, onBa
                   aria-pressed={code === lang}
                   onClick={(): void => onLangChange(code)}
                 >
-                  {LANG_LABEL[code]}
+                  {LEGAL_LANG_LABELS[code]}
                 </button>
               ))}
             </div>
@@ -100,7 +100,7 @@ const LegalDocument: FC<Props> = ({ doc, lang, effectiveDate, onLangChange, onBa
             {section.blocks.map((block, index) =>
               block.type === 'p' ? (
                 <p key={index} className={classes.paragraph}>
-                  {renderText(block.text)}
+                  <LegalRichText text={block.text} />
                 </p>
               ) : (
                 <ul key={index} className={classes.list}>

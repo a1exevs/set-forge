@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 
-import PasswordFieldView from 'src/shared/ui/password-field/password-field';
+import PasswordFieldView from './password-field';
 
 type Props = {
   id?: string;

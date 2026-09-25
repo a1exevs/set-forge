@@ -6,9 +6,9 @@ import {
   getApiBaseUrl,
   ResultCodes,
   setAccessToken,
-} from '@shared';
+} from '@shared/api';
 
-export function toAbsoluteFromApiOrigin(pathOrUrl: string): string {
+function toAbsoluteFromApiOrigin(pathOrUrl: string): string {
   if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://') || pathOrUrl.startsWith('data:')) {
     return pathOrUrl;
   }

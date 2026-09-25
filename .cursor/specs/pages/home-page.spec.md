@@ -12,7 +12,7 @@ Entity: [workout-list](../entities/workout-list.entity.spec.md). Related pages: 
 
 - Path: `/` (protected)
 - Router entry: `default` export from `home-page-data-layer.tsx`
-- Route file: `client/src/app/model/routes/index.tsx`
+- Route file: `client/src/app/routes/index.tsx`
 
 ---
 
@@ -29,7 +29,7 @@ Entity: [workout-list](../entities/workout-list.entity.spec.md). Related pages: 
 - `ui/home-page.tsx` — presentation
 - `ui/home-page.module.scss`
 - `ui/home-page.stories.tsx`
-- `ui/index.ts`, `index.ts`
+- `index.ts` (slice public API; no `index.ts` inside segments)
 
 ---
 

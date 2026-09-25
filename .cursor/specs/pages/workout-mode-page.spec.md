@@ -10,7 +10,7 @@ Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/
 
 - Path: `/workout/$id` (protected)
 - Router entry: `workout-mode-page-data-layer.tsx`
-- Route file: `client/src/app/model/routes/workout/$id.tsx`
+- Route file: `client/src/app/routes/workout/$id.tsx`
 
 ---
 
@@ -26,7 +26,9 @@ Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/
 - `ui/workout-mode-page-logic-layer.tsx`
 - `ui/workout-mode-page.tsx`
 - `ui/workout-mode-page.module.scss`
-- `ui/index.ts`, `index.ts`
+- `model/workout-phase.ts` — `WorkoutPhase`; `model/session-completion.ts` — `isSessionFullyComplete`
+- `lib/fire-workout-complete-confetti.ts`
+- `index.ts` (slice public API; no `index.ts` inside segments)
 - `ui/specs/workout-mode-page.spec.unit.tsx`
 - `ui/specs/workout-mode-page-logic-layer.spec.unit.tsx`
 
@@ -135,7 +137,7 @@ Full contract: [workout-session entity](../entities/workout-session.entity.spec.
 
 ## Tech Stack
 
-TanStack Router, React Query (optimistic mutations), Headless UI `Transition` (inside `WorkoutSessionExerciseCard`), `canvas-confetti`, `NotFoundMessage` widget, `WorkoutExerciseCard` / `WorkoutSessionExerciseCard` entity UI, extended `useConfirm` (alternate action), [`Toaster`](../shared/shared-components.spec.md#toaster) helpers.
+TanStack Router, React Query (optimistic mutations), shared `Transition` (Headless UI, inside `WorkoutSessionExerciseCard`), `canvas-confetti`, `NotFoundMessage` (shared/ui), `WorkoutExerciseCard` / `WorkoutSessionExerciseCard` entity UI, extended `useConfirm` (alternate action), [`Toaster`](../shared/shared-components.spec.md#toaster) helpers.
 
 ---
 

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import UserAvatarMenu from 'src/shared/ui/user-avatar-menu/user-avatar-menu';
+import UserAvatarMenu from './user-avatar-menu';
 
 const meta: Meta<typeof UserAvatarMenu> = {
   title: 'Shared/UserAvatarMenu',

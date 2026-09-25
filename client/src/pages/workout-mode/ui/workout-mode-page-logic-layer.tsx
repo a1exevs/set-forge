@@ -1,20 +1,12 @@
-import type { WorkoutList, WorkoutSession } from '@entities';
-import confetti from 'canvas-confetti';
 import { FC, useEffect, useRef, useState } from 'react';
 
-import { toastError, useConfirm } from '@shared';
+import type { WorkoutList } from '@entities/workout-list';
+import type { WorkoutSession } from '@entities/workout-session';
+import { toastError, useConfirm } from '@shared/lib';
 
-import WorkoutModePage from 'src/pages/workout-mode/ui/workout-mode-page';
-
-const fireWorkoutCompleteConfetti = (): void => {
-  void confetti({ particleCount: 110, spread: 72, origin: { y: 0.62 } });
-  void confetti({ particleCount: 70, angle: 55, spread: 58, origin: { x: 0, y: 0.62 } });
-  void confetti({ particleCount: 70, angle: 125, spread: 58, origin: { x: 1, y: 0.62 } });
-};
-
-const isSessionFullyComplete = (session: WorkoutSession): boolean =>
-  session.exercises.length > 0 &&
-  session.exercises.every(exercise => exercise.sets > 0 && exercise.completedSets === exercise.sets);
+import WorkoutModePage from './workout-mode-page';
+import { fireWorkoutCompleteConfetti } from '../lib/fire-workout-complete-confetti';
+import { isSessionFullyComplete } from '../model/session-completion';
 
 type Props = {
   workoutList: WorkoutList | null | undefined;

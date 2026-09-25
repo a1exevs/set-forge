@@ -1,1 +1,1 @@
-export { TermsPage } from 'src/pages/terms/ui';
+export { default as TermsPage } from './ui/terms-page';

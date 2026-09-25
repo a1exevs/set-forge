@@ -2,8 +2,9 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
-import ConfirmDialogProvider from 'src/shared/ui/confirm-dialog/confirm-dialog-provider';
-import WorkoutListForm from 'src/widgets/workout-list-form/ui/workout-list-form-logic-layer';
+import { ConfirmDialogProvider } from '@shared/ui';
+
+import WorkoutListForm from '../workout-list-form-logic-layer';
 
 jest.mock('@tanstack/react-router', () => ({
   Link: ({ to, children, className }: { to: string; children: ReactNode; className?: string }) => (

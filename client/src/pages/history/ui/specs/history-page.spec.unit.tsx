@@ -1,16 +1,17 @@
-import type { WorkoutSession } from '@entities';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 
-import HistoryPage from 'src/pages/history/ui/history-page';
+import type { WorkoutSession } from '@entities/workout-session';
+
+import HistoryPage from '../history-page';
 
 jest.mock('@tanstack/react-router', () => ({
   useRouterState: ({ select }: { select: (state: { location: { pathname: string } }) => string }) =>
     select({ location: { pathname: '/history' } }),
 }));
 
-jest.mock('@widgets', () => ({
+jest.mock('@widgets/main-tabs-bar', () => ({
   MainTabsBar: (): JSX.Element => <nav data-testid="main-tabs-bar" />,
   MAIN_TAB_ROUTES: [
     { id: 'home', to: '/' },
@@ -19,8 +20,8 @@ jest.mock('@widgets', () => ({
   ],
 }));
 
-jest.mock('@shared', () => {
-  const actual = jest.requireActual<typeof import('@shared')>('@shared');
+jest.mock('@shared/lib', () => {
+  const actual = jest.requireActual<typeof import('@shared/lib')>('@shared/lib');
   return {
     ...actual,
     useTabSwipeNavigation: () => ({ current: null }),

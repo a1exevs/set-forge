@@ -1,8 +1,8 @@
 import { FC } from 'react';
 
-import { CreateWorkoutListDto, useCreateWorkoutListMutation } from '@entities';
+import { type CreateWorkoutListDto, useCreateWorkoutListMutation } from '@entities/workout-list';
 
-import CreateWorkoutPageLogicLayer from 'src/pages/create-workout/ui/create-workout-page-logic-layer';
+import CreateWorkoutPageLogicLayer from './create-workout-page-logic-layer';
 
 const CreateWorkoutPageDataLayer: FC = () => {
   const createWorkoutListMutation = useCreateWorkoutListMutation();

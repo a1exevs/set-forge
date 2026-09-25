@@ -1,4 +1,4 @@
-import { apiRequest, ApiRequestError } from '@shared';
+import { apiRequest, ApiRequestError } from '@shared/api';
 
 import {
   discardWorkoutSession,
@@ -8,7 +8,7 @@ import {
   incrementSessionProgress,
   resyncWorkoutSession,
   startWorkoutSession,
-} from 'src/entities/workout-session/api/workout-session-api';
+} from '../workout-session-api';
 
 jest.mock('src/shared/api/http-client', () => {
   const actual = jest.requireActual('src/shared/api/http-client');

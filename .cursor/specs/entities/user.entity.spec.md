@@ -96,9 +96,9 @@ Model: `server/src/auth/refresh-tokens.model.ts`.
 
 ### Location
 
-`client/src/entities/session/` — `api/session-api.ts`, `model/use-session-queries.ts`, `model/session-keys.ts`, `model/avatar-letter.ts`, `model/auth-validation.ts`, `lib/bootstrap-session.ts`
+`client/src/entities/session/` — `api/session-api.ts`, `model/use-session-queries.ts`, `model/session-keys.ts`, `model/avatar-letter.ts`, `model/auth-validation.ts`, `model/bootstrap-session.ts`
 
-Access token storage: `client/src/shared/api/access-token.store.ts` (via `@shared`, not in this entity folder).
+Access token storage: `client/src/shared/api/access-token-store.ts` (via `@shared/api`, not in this entity folder).
 
 ### Types
 
@@ -159,8 +159,9 @@ When `authFailedCount >= 5`, failed login returns `resultCode === 10` (`NEED_CAP
 | `bootstrapSessionAndPrimeCache(queryClient)` | function | Root `beforeLoad` session bootstrap; on no user clears the whole query cache |
 | `sessionQueryKeys.me` | query key | Current user cache |
 | `emailToAvatarLetter(email)` | function | Avatar letter for profile |
-| `fetchCurrentUser`, `postLogin`, `postRegistration`, `deleteLogout`, `patchDocumentsAcceptance`, `deleteAccount` | functions | Raw API calls (`session-api.ts`) |
-| `getCaptchaUrl`, `isNeedCaptchaEnvelope`, `toAbsoluteFromApiOrigin` | functions | Captcha / envelope helpers |
+| `getCaptchaUrl`, `isNeedCaptchaEnvelope` | functions | Captcha / envelope helpers (still exported from `api/` — to be wrapped in a model hook) |
+
+Raw requests (`fetchCurrentUser`, `postLogin`, `postRegistration`, `deleteLogout`, `patchDocumentsAcceptance`, `deleteAccount`) stay internal to `api/session-api.ts` — callers use the hooks above.
 | `validateLoginEmail`, `validateLoginPassword`, `validateRegisterEmail`, `validateRegisterPassword` | functions | Client-side form validation |
 
 ---

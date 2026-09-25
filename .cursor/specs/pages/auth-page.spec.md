@@ -10,7 +10,7 @@ Login and registration on `/login` and `/register` (same component, tab follows 
 
 - Paths: `/login`, `/register` (guest-only — listed in root `GUEST_ONLY_PATHS`; signed-in users are redirected home)
 - Router entry: `auth-page-data-layer.tsx` (same component for both routes)
-- Route files: `client/src/app/model/routes/login.tsx`, `register.tsx`
+- Route files: `client/src/app/routes/login.tsx`, `register.tsx`
 - Always-public routes: `/privacy`, `/terms` (root `ALWAYS_PUBLIC_PATHS`; see [privacy-page](privacy-page.spec.md), [terms-page](terms-page.spec.md))
 - Protected routes (all others): `/`, `/history`, `/profile`, `/create`, `/edit/$id`, `/workout/$id`
 
@@ -34,7 +34,8 @@ Login and registration on `/login` and `/register` (same component, tab follows 
 - `ui/auth-page.tsx`
 - `ui/auth-page.module.scss`
 - `ui/auth-page.stories.tsx`
-- `ui/index.ts`, `index.ts`
+- `model/auth-tab.ts` — `AuthTab`
+- `index.ts` (slice public API; no `index.ts` inside segments)
 
 ---
 
@@ -107,10 +108,12 @@ Full contract: [user entity](../entities/user.entity.spec.md#api-contract).
 
 ## Exposed API / Methods
 
+The slice `index.ts` exports only the page component; rows marked internal stay inside the slice.
+
 | API | Type | Description |
 |-----|-----|-------------|
 | `AuthPage` | component | Via data layer from login/register routes |
-| `AuthTab` | type | `'login' \| 'register'` |
+| `AuthTab` | type (internal, `model/auth-tab.ts`) | `'login' \| 'register'` |
 
 ---
 

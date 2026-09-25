@@ -1,22 +1,13 @@
-export type { CurrentUser } from 'src/entities/session/api/session-api';
-export {
-  deleteLogout,
-  fetchCurrentUser,
-  getCaptchaUrl,
-  isNeedCaptchaEnvelope,
-  postLogin,
-  postRegistration,
-  toAbsoluteFromApiOrigin,
-} from 'src/entities/session/api/session-api';
-export { bootstrapSessionAndPrimeCache } from 'src/entities/session/lib/bootstrap-session';
-export { emailToAvatarLetter } from 'src/entities/session/model/avatar-letter';
+export { type CurrentUser, getCaptchaUrl, isNeedCaptchaEnvelope } from './api/session-api';
 export {
   validateLoginEmail,
   validateLoginPassword,
   validateRegisterEmail,
   validateRegisterPassword,
-} from 'src/entities/session/model/auth-validation';
-export { sessionQueryKeys } from 'src/entities/session/model/session-keys';
+} from './model/auth-validation';
+export { emailToAvatarLetter } from './model/avatar-letter';
+export { bootstrapSessionAndPrimeCache } from './model/bootstrap-session';
+export { sessionQueryKeys } from './model/session-keys';
 export {
   useAcceptDocumentsMutation,
   useCurrentUserQuery,
@@ -24,4 +15,4 @@ export {
   useLoginMutation,
   useLogoutMutation,
   useRegisterMutation,
-} from 'src/entities/session/model/use-session-queries';
+} from './model/use-session-queries';

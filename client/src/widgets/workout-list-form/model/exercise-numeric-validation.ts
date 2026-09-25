@@ -1,6 +1,6 @@
-import type { MuscleGroup } from '@entities';
+import type { MuscleGroup } from '@entities/workout-exercise';
 
-import type { ExerciseFormData } from 'src/widgets/workout-list-form/model/types';
+import type { ExerciseFormData } from './exercise-form-data';
 
 export type ExerciseSubmitPayload = {
   name: string;

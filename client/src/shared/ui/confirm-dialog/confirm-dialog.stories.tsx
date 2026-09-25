@@ -3,10 +3,11 @@ import { FC, useEffect, useState } from 'react';
 
 import { buildDesktopStoryObj, buildMobileStoryObj, buildTabletStoryObj } from 'storybook-dir/helpers';
 
-import Button from 'src/shared/ui/button/button';
-import ConfirmDialogProvider from 'src/shared/ui/confirm-dialog/confirm-dialog-provider';
-import classes from 'src/shared/ui/confirm-dialog/confirm-dialog.stories.module.scss';
-import { useConfirm } from 'src/shared/ui/confirm-dialog/hooks/use-confirm';
+import { useConfirm } from '@shared/lib';
+
+import ConfirmDialogProvider from './confirm-dialog-provider';
+import classes from './confirm-dialog.stories.module.scss';
+import Button from '../button/button';
 
 const storyTitle = 'Shared/ConfirmDialog';
 

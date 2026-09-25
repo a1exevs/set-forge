@@ -1,14 +1,16 @@
-import type { CreateWorkoutListDto } from '@entities';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import CreateWorkoutPageLogicLayer from 'src/pages/create-workout/ui/create-workout-page-logic-layer';
+import type { CreateWorkoutListDto } from '@entities/workout-list';
+
+import CreateWorkoutPageLogicLayer from '../create-workout-page-logic-layer';
 
 const navigateMock = jest.fn();
 const toastSuccessMock = jest.fn();
 const toastErrorMock = jest.fn();
 
-jest.mock('@shared', () => ({
+jest.mock('@shared/lib', () => ({
+  ...jest.requireActual('@shared/lib'),
   toastSuccess: (...args: unknown[]): void => toastSuccessMock(...args),
   toastError: (...args: unknown[]): void => toastErrorMock(...args),
 }));
@@ -17,7 +19,7 @@ jest.mock('@tanstack/react-router', () => ({
   useNavigate: () => navigateMock,
 }));
 
-jest.mock('@widgets', () => ({
+jest.mock('@widgets/workout-list-form', () => ({
   WorkoutListForm: ({
     onSubmit,
     onCancel,

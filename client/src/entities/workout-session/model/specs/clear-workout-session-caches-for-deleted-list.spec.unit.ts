@@ -1,8 +1,8 @@
 import { QueryClient } from '@tanstack/react-query';
 
-import { clearWorkoutSessionCachesForDeletedList } from 'src/entities/workout-session/model/clear-workout-session-caches-for-deleted-list';
-import type { WorkoutSession } from 'src/entities/workout-session/model/types';
-import { workoutSessionQueryKeys } from 'src/entities/workout-session/model/workout-session-query-keys';
+import { clearWorkoutSessionCachesForDeletedList } from '../clear-workout-session-caches-for-deleted-list';
+import type { WorkoutSession } from '../workout-session';
+import { workoutSessionQueryKeys } from '../workout-session-query-keys';
 
 const ACTIVE_SESSION: WorkoutSession = {
   id: 'sess-1',

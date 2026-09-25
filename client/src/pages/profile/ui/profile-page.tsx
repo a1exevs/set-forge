@@ -1,10 +1,12 @@
 import { useRouterState } from '@tanstack/react-router';
 import { FC } from 'react';
 
-import { BrandWordmark, Button, UserAvatar, useTabSwipeNavigation } from '@shared';
-import { LegalFooter, MAIN_TAB_ROUTES, MainTabsBar } from '@widgets';
+import { useTabSwipeNavigation } from '@shared/lib';
+import { BrandWordmark, Button, UserAvatar } from '@shared/ui';
+import { LegalFooter } from '@widgets/legal-footer';
+import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets/main-tabs-bar';
 
-import classes from 'src/pages/profile/ui/profile-page.module.scss';
+import classes from './profile-page.module.scss';
 
 type Props = {
   email: string;

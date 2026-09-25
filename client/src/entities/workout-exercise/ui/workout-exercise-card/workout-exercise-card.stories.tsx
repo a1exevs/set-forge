@@ -7,7 +7,7 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 
-import WorkoutExerciseCard from 'src/entities/workout-exercise/ui/workout-exercise-card/workout-exercise-card';
+import WorkoutExerciseCard from './workout-exercise-card';
 
 const storyTitle = 'Entities/WorkoutExerciseCard';
 

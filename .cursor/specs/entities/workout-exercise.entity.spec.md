@@ -33,7 +33,7 @@ Migrations: initial list schema; `20260630130000-drop-completed-sets-from-workou
 
 ### MuscleGroup
 
-Shared enum on server (`server/src/workout-lists/constants/muscle-groups.ts`) and client (`workout-exercise/model/types.ts`):
+Shared enum on server (`server/src/workout-lists/constants/muscle-groups.ts`) and client (`workout-exercise/model/workout-exercise.ts`):
 
 `'chest' | 'back' | 'legs' | 'shoulders' | 'arms' | 'core' | 'cardio'`.
 
@@ -69,7 +69,7 @@ Model only: `server/src/workout-lists/workout-exercise.model.ts` (wired via `Wor
 
 ### Location
 
-`client/src/entities/workout-exercise/` — `model/types.ts`, `model/muscle-group-labels.ts`, `ui/workout-exercise-card/`
+`client/src/entities/workout-exercise/` — `model/workout-exercise.ts`, `model/muscle-group-labels.ts`, `@x/`, `ui/workout-exercise-card/`
 
 No API layer or React Query hooks — types, UI helpers, and preview card only.
 
@@ -130,7 +130,7 @@ Create/update request exercise (no `id` on create; optional `id` on update).
 | `muscleGroups` | const | Select options |
 | `WorkoutExerciseCard` | component | Read-only preview exercise card |
 
-Re-exported from `@entities` / `client/src/entities/workout-exercise`.
+Public API: `@entities/workout-exercise` (`client/src/entities/workout-exercise/index.ts`); other entities use `@x` (`@x/workout-list`, `@x/workout-session-exercise`).
 
 ---
 

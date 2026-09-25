@@ -70,7 +70,7 @@ Model only: `server/src/workout-sessions/workout-session-exercise.model.ts` (wir
 
 ### Location
 
-`client/src/entities/workout-session-exercise/` — `model/types.ts`, `ui/workout-session-exercise-card/`
+`client/src/entities/workout-session-exercise/` — `model/workout-session-exercise.ts`, `@x/`, `ui/workout-session-exercise-card/`
 
 No API layer or React Query hooks — type and training card consumed by `workout-session` / workout-mode.
 
@@ -128,7 +128,7 @@ No dedicated endpoints. Shape is nested under `WorkoutSessionResponse` — see [
 | `WorkoutSessionExercise` | type | Session exercise snapshot |
 | `WorkoutSessionExerciseCard` | component | Interactive training exercise card |
 
-Re-exported from `@entities` / `client/src/entities/workout-session-exercise`.
+Public API: `@entities/workout-session-exercise` (`client/src/entities/workout-session-exercise/index.ts`); `workout-session` uses `@x/workout-session`.
 
 ---
 

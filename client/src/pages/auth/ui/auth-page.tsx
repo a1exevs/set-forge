@@ -3,12 +3,11 @@ import { LogIn, UserPlus } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { FC, FormEvent } from 'react';
 
-import { BrandWordmark, Button, PasswordField } from '@shared';
-import { LegalFooter } from '@widgets';
+import { BrandWordmark, Button, PasswordField } from '@shared/ui';
+import { LegalFooter } from '@widgets/legal-footer';
 
-import classes from 'src/pages/auth/ui/auth-page.module.scss';
-
-export type AuthTab = 'login' | 'register';
+import classes from './auth-page.module.scss';
+import type { AuthTab } from '../model/auth-tab';
 
 type Props = {
   activeTab: AuthTab;

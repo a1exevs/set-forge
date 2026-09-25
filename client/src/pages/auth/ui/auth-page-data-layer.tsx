@@ -1,8 +1,9 @@
 import { FC } from 'react';
 
-import { useLoginMutation, useRegisterMutation } from 'src/entities/session/model/use-session-queries';
-import type { AuthTab } from 'src/pages/auth/ui/auth-page';
-import AuthPageLogicLayer from 'src/pages/auth/ui/auth-page-logic-layer';
+import { useLoginMutation, useRegisterMutation } from '@entities/session';
+
+import AuthPageLogicLayer from './auth-page-logic-layer';
+import type { AuthTab } from '../model/auth-tab';
 
 type Props = {
   activeTab: AuthTab;

@@ -1,12 +1,10 @@
 import { useRouterState } from '@tanstack/react-router';
 import { FC } from 'react';
 
-import { useAcceptDocumentsMutation, useCurrentUserQuery, useLogoutMutation } from '@entities';
+import { useAcceptDocumentsMutation, useCurrentUserQuery, useLogoutMutation } from '@entities/session';
 
-import DocumentReconsentGateLogicLayer from 'src/widgets/document-reconsent/ui/document-reconsent-gate-logic-layer';
-
-/** Paths where the user must be able to read the documents without the blocking gate. */
-const LEGAL_DOCUMENT_PATHS = new Set(['/privacy', '/terms']);
+import DocumentReconsentGateLogicLayer from './document-reconsent-gate-logic-layer';
+import { LEGAL_DOCUMENT_PATHS } from '../config/legal-document-paths';
 
 /**
  * Blocking gate shown when the signed-in user must (re-)accept the current legal documents

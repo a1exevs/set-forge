@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import BrandWordmark from 'src/shared/ui/brand-wordmark/brand-wordmark';
+import BrandWordmark from './brand-wordmark';
 
 const meta = {
   title: 'Shared/BrandWordmark',

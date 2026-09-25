@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-router';
 import type { ReactElement } from 'react';
 
-import { ConfirmDialogProvider } from '@shared';
+import { ConfirmDialogProvider } from '@shared/ui';
 
 const PlaceholderPage = (): ReactElement => <div />;
 

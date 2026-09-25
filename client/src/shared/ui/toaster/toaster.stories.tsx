@@ -3,10 +3,11 @@ import { FC, useEffect } from 'react';
 
 import { buildDesktopStoryObj, buildMobileStoryObj, buildTabletStoryObj } from 'storybook-dir/helpers';
 
-import Button from 'src/shared/ui/button/button';
-import { toastError, toastSuccess } from 'src/shared/ui/toaster/toast';
-import Toaster from 'src/shared/ui/toaster/toaster';
-import classes from 'src/shared/ui/toaster/toaster.stories.module.scss';
+import { toastError, toastSuccess } from '@shared/lib';
+
+import Toaster from './toaster';
+import classes from './toaster.stories.module.scss';
+import Button from '../button/button';
 
 const storyTitle = 'Shared/Toaster';
 

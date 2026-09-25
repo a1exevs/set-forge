@@ -8,7 +8,7 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
-import TermsPage from 'src/pages/terms/ui/terms-page';
+import TermsPage from './terms-page';
 
 const storyTitle = 'Pages/TermsPage';
 

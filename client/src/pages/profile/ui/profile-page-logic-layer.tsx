@@ -1,8 +1,8 @@
 import { FC } from 'react';
 
-import { useConfirm } from '@shared';
+import { useConfirm } from '@shared/lib';
 
-import ProfilePage from 'src/pages/profile/ui/profile-page';
+import ProfilePage from './profile-page';
 
 type Props = {
   email: string;

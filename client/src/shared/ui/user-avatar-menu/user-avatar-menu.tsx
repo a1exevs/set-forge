@@ -1,12 +1,12 @@
 import { MenuButton as HeadlessMenuButton, Menu, MenuItem, MenuItems } from '@headlessui/react';
 import { FC } from 'react';
 
-import type { MenuItem as MenuItemType } from 'src/shared/ui/menu-button/menu-button.types';
-import classes from 'src/shared/ui/user-avatar-menu/user-avatar-menu.module.scss';
+import classes from './user-avatar-menu.module.scss';
+import type { MenuButtonItem } from '../menu-button/menu-button';
 
 type Props = {
   letter: string;
-  items: MenuItemType[];
+  items: MenuButtonItem[];
   ariaLabel?: string;
 };
 

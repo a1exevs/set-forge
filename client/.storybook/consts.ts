@@ -3,7 +3,7 @@ import {
   DESKTOP_SCREEN_WIDTH_PX,
   MOBILE_SCREEN_WIDTH_PX,
   TABLET_SCREEN_WIDTH_PX,
-} from 'src/shared';
+} from '@shared/config';
 
 export const STORY_BOOK_DESKTOP_4K_VIEWPORT_ID = 'sitDesktop4k';
 export const STORY_BOOK_DESKTOP_VIEWPORT_ID = 'sitDesktop';

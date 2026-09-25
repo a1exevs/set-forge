@@ -9,7 +9,7 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
-import EditWorkoutPageLogicLayer from 'src/pages/edit-workout/ui/edit-workout-page-logic-layer';
+import EditWorkoutPageLogicLayer from './edit-workout-page-logic-layer';
 
 const storyTitle = 'Pages/EditWorkoutPage';
 

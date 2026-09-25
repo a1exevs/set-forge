@@ -1,9 +1,10 @@
-import type { UpdateWorkoutListDto, WorkoutList } from '@entities';
 import { useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 
-import { toastError, toastSuccess, useConfirm } from '@shared';
-import { NotFoundMessage, WorkoutListForm } from '@widgets';
+import type { UpdateWorkoutListDto, WorkoutList } from '@entities/workout-list';
+import { toastError, toastSuccess, useConfirm } from '@shared/lib';
+import { NotFoundMessage } from '@shared/ui';
+import { WorkoutListForm } from '@widgets/workout-list-form';
 
 type Props = {
   id: string;

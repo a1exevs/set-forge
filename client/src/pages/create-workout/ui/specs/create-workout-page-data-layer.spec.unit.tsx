@@ -1,18 +1,19 @@
-import type { CreateWorkoutListDto } from '@entities';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import CreateWorkoutPageDataLayer from 'src/pages/create-workout/ui/create-workout-page-data-layer';
+import type { CreateWorkoutListDto } from '@entities/workout-list';
+
+import CreateWorkoutPageDataLayer from '../create-workout-page-data-layer';
 
 const mutateAsyncMock = jest.fn();
 
-jest.mock('@entities', () => ({
+jest.mock('@entities/workout-list', () => ({
   useCreateWorkoutListMutation: (): { mutateAsync: typeof mutateAsyncMock } => ({
     mutateAsync: mutateAsyncMock,
   }),
 }));
 
-jest.mock('src/pages/create-workout/ui/create-workout-page-logic-layer', () => ({
+jest.mock('../create-workout-page-logic-layer', () => ({
   __esModule: true,
   default: ({ onCreate }: { onCreate: (dto: CreateWorkoutListDto) => Promise<void> }) => (
     <button

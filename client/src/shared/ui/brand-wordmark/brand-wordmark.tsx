@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import classes from 'src/shared/ui/brand-wordmark/brand-wordmark.module.scss';
+import classes from './brand-wordmark.module.scss';
 
 type Props = {
   title?: string;

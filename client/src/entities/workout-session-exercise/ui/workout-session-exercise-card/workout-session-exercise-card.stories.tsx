@@ -7,8 +7,8 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 
-import type { WorkoutSessionExercise } from 'src/entities/workout-session-exercise/model/types';
-import WorkoutSessionExerciseCard from 'src/entities/workout-session-exercise/ui/workout-session-exercise-card/workout-session-exercise-card-logic-layer';
+import WorkoutSessionExerciseCard from './workout-session-exercise-card-logic-layer';
+import type { WorkoutSessionExercise } from '../../model/workout-session-exercise';
 
 const storyTitle = 'Entities/WorkoutSessionExerciseCard';
 

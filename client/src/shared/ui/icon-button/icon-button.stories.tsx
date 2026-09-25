@@ -11,7 +11,7 @@ import {
 import { Download, Plus } from 'lucide-react';
 import type { ReactElement } from 'react';
 
-import IconButton from 'src/shared/ui/icon-button/icon-button';
+import IconButton from './icon-button';
 
 type Variant = 'ghost' | 'primary';
 type Shape = 'square' | 'circle';

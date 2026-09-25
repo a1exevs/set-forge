@@ -3,7 +3,7 @@ import React, { FC, useRef, useState } from 'react';
 
 import { buildDesktopStoryObj, buildMobileStoryObj, buildTabletStoryObj } from 'storybook-dir/helpers';
 
-import Dialog from 'src/shared/ui/dialog/dialog';
+import Dialog from './dialog';
 
 const storyTitle = 'Shared/Dialog';
 

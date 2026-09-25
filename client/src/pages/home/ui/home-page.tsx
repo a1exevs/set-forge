@@ -1,12 +1,13 @@
-import type { WorkoutList } from '@entities';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { Download, Plus, Upload } from 'lucide-react';
 import { ChangeEvent, FC, RefObject } from 'react';
 
-import { BrandWordmark, IconButton, MenuButton, useTabSwipeNavigation } from '@shared';
-import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets';
+import type { WorkoutList } from '@entities/workout-list';
+import { useTabSwipeNavigation } from '@shared/lib';
+import { BrandWordmark, IconButton, MenuButton } from '@shared/ui';
+import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets/main-tabs-bar';
 
-import classes from 'src/pages/home/ui/home-page.module.scss';
+import classes from './home-page.module.scss';
 
 type Props = {
   workoutLists: WorkoutList[];

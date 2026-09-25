@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 
-import PasswordFieldView from 'src/shared/ui/password-field/password-field';
-import PasswordField from 'src/shared/ui/password-field/password-field-logic-layer';
+import PasswordFieldView from '../password-field';
+import PasswordField from '../password-field-logic-layer';
 
 describe('PasswordField', () => {
   it('matches snapshot for empty field', () => {

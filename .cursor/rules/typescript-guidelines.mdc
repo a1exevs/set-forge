@@ -33,8 +33,8 @@ const handleClick = (e: MouseEvent): void => {
 
 ## Type Definitions
 
-- `interface` — ONLY for business entities (Exercise, User, etc.)
-- `type` — for everything else: unions, intersections, props, utility types
+- `interface` — ONLY for domain entities (`WorkoutList`, `WorkoutSession`) and ONLY in `client/src/entities/*/model/**` (ESLint `consistent-type-definitions` is `type` everywhere else; declaration merging — module augmentation in `app/router/router.ts` and ambient `*.d.ts` like `vite-env.d.ts` — is the exception).
+- `type` — for everything else: DTOs and payloads, unions, intersections, props, view models, anything in `shared`. Doubt? It's a `type`.
 
 ## Component Props
 
@@ -42,10 +42,10 @@ See component-typing.
 
 ## Type Exports
 
-Use `export type { X }` in barrel files:
+Use `export type { X }` (or inline `type X`) in public API files; files are named by purpose, never `types.ts`:
 
 ```typescript
-export type { Exercise, MuscleGroup } from './types';
+export type { MuscleGroup, WorkoutExercise } from './model/workout-exercise';
 ```
 
 ## General Practices

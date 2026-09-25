@@ -1,11 +1,8 @@
 import { FC, PropsWithChildren, useCallback, useMemo, useRef, useState } from 'react';
 
-import ConfirmDialogLogicLayer from 'src/shared/ui/confirm-dialog/confirm-dialog-logic-layer';
-import {
-  ConfirmContext,
-  type ConfirmOptions,
-  type ConfirmResult,
-} from 'src/shared/ui/confirm-dialog/contexts/confirm-dialog-context';
+import { ConfirmContext, type ConfirmOptions, type ConfirmResult } from '@shared/lib';
+
+import ConfirmDialogLogicLayer from './confirm-dialog-logic-layer';
 
 const ConfirmDialogProvider: FC<PropsWithChildren> = ({ children }) => {
   const [open, setOpen] = useState<boolean>(false);

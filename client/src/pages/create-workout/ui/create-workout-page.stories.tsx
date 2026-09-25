@@ -8,7 +8,7 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
-import CreateWorkoutPageLogicLayer from 'src/pages/create-workout/ui/create-workout-page-logic-layer';
+import CreateWorkoutPageLogicLayer from './create-workout-page-logic-layer';
 
 const storyTitle = 'Pages/CreateWorkoutPage';
 

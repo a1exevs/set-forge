@@ -170,68 +170,6 @@
   gap: $spacing-sm;
 }
 
-// Listbox styles (Headless UI)
-.listboxWrapper {
-  position: relative;
-}
-
-.listboxButton {
-  width: 100%;
-  padding: $spacing-sm $spacing-md;
-  background-color: $bg-tertiary;
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  color: $text-primary;
-  font-size: 16px;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-
-  &:focus {
-    outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
-  }
-}
-
-.listboxOptions {
-  position: absolute;
-  z-index: 10;
-  width: 100%;
-  margin-top: $spacing-xs;
-  background-color: $bg-elevated;
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  box-shadow: $shadow-lg;
-  max-height: 200px;
-  overflow-y: auto;
-  padding: $spacing-xs;
-}
-
-.listboxOption {
-  cursor: pointer;
-  padding: $spacing-sm $spacing-md;
-  border-radius: $radius-sm;
-  transition: background-color 0.15s ease;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-}
-
-.optionText {
-  &.active {
-    background-color: $bg-hover;
-  }
-
-  &.selected {
-    color: $primary-color;
-    font-weight: 600;
-  }
-}
-
 .actions {
   display: flex;
   gap: $spacing-md;

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { FC, useState } from 'react';
 
-import NumericField from 'src/shared/ui/numeric-field/numeric-field-logic-layer';
+import NumericField from './numeric-field-logic-layer';
 
 const meta: Meta<typeof NumericField> = {
   title: 'Shared/NumericField',

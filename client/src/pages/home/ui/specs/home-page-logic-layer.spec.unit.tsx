@@ -1,15 +1,16 @@
-import type { WorkoutList } from '@entities';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import HomePageLogicLayer from 'src/pages/home/ui/home-page-logic-layer';
+import type { WorkoutList } from '@entities/workout-list';
+
+import HomePageLogicLayer from '../home-page-logic-layer';
 
 const confirmDialogMock = jest.fn();
 const toastSuccessMock = jest.fn();
 const toastErrorMock = jest.fn();
 
-jest.mock('@shared', () => ({
-  ...jest.requireActual('@shared'),
+jest.mock('@shared/lib', () => ({
+  ...jest.requireActual('@shared/lib'),
   useConfirm: () => confirmDialogMock,
   toastSuccess: (...args: unknown[]): void => toastSuccessMock(...args),
   toastError: (...args: unknown[]): void => toastErrorMock(...args),
@@ -23,7 +24,7 @@ jest.mock('@tanstack/react-router', () => ({
   useNavigate: () => jest.fn(),
 }));
 
-jest.mock('@widgets', () => ({
+jest.mock('@widgets/main-tabs-bar', () => ({
   MAIN_TAB_ROUTES: [],
   MainTabsBar: () => null,
 }));

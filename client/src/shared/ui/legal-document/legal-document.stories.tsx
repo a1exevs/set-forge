@@ -9,8 +9,10 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 
-import type { LegalContent, LegalLang } from 'src/shared/ui/legal-document/legal-document';
-import LegalDocument from 'src/shared/ui/legal-document/legal-document-logic-layer';
+import type { LegalLang } from '@shared/config';
+
+import type { LegalContent } from './legal-document';
+import LegalDocument from './legal-document-logic-layer';
 
 const storyTitle = 'Shared/LegalDocument';
 

@@ -36,8 +36,8 @@ If a change is purely internal and does not alter *what* PD is handled or *what*
 
 ## Where to change things (keep in sync)
 
-- **Privacy text (RU + EN):** `client/src/pages/privacy/model/privacy-policy-content.ts` — update both languages; bump `PRIVACY_EFFECTIVE_DATE`.
-- **Terms text (RU + EN):** `client/src/pages/terms/model/terms-content.ts` — update both languages; bump `TERMS_EFFECTIVE_DATE`.
+- **Privacy text (RU + EN):** `client/src/pages/privacy/config/privacy-policy-content.ts` — update both languages; bump `PRIVACY_EFFECTIVE_DATE`.
+- **Terms text (RU + EN):** `client/src/pages/terms/config/terms-content.ts` — update both languages; bump `TERMS_EFFECTIVE_DATE`.
 - **Required versions (server, runtime):** `TERMS_VERSION` / `PRIVACY_VERSION` env (read via `server/src/common/constants/document-versions.ts`); update `server/.production.env.example` and the deploy guide. Increment the number so users with a lower stored version are re-prompted.
 - **Effective date and env version must move together:** a text change without a version bump means users silently keep an outdated acceptance; a version bump without a text/date change forces a pointless re-consent.
 

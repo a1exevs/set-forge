@@ -1,16 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 
-import type { CurrentUser } from 'src/entities/session/api/session-api';
+import { sessionQueryKeys } from './session-keys';
 import {
+  type CurrentUser,
   deleteAccount,
   deleteLogout,
   fetchCurrentUser,
   patchDocumentsAcceptance,
   postLogin,
   postRegistration,
-} from 'src/entities/session/api/session-api';
-import { sessionQueryKeys } from 'src/entities/session/model/session-keys';
+} from '../api/session-api';
 
 export function useCurrentUserQuery(enabled: boolean) {
   return useQuery<CurrentUser | null>({

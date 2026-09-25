@@ -1,13 +1,15 @@
-import type { WorkoutSession, WorkoutSessionExercise } from '@entities';
 import { useRouterState } from '@tanstack/react-router';
 import { ChevronDown } from 'lucide-react';
 import { FC, RefObject } from 'react';
 
-import { muscleGroupLabels } from '@entities';
-import { BrandWordmark, useTabSwipeNavigation } from '@shared';
-import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets';
+import { muscleGroupLabels } from '@entities/workout-exercise';
+import type { WorkoutSession } from '@entities/workout-session';
+import type { WorkoutSessionExercise } from '@entities/workout-session-exercise';
+import { useTabSwipeNavigation } from '@shared/lib';
+import { BrandWordmark } from '@shared/ui';
+import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets/main-tabs-bar';
 
-import classes from 'src/pages/history/ui/history-page.module.scss';
+import classes from './history-page.module.scss';
 
 type Props = {
   sessions: WorkoutSession[];

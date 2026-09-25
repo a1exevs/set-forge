@@ -73,7 +73,7 @@ See [workout-session-exercise.entity.spec.md](workout-session-exercise.entity.sp
 
 ### Location
 
-`client/src/entities/workout-session/` — `api/workout-session-api.ts`, `model/use-workout-session-queries.ts`, `model/workout-session-query-keys.ts`, `model/types.ts`
+`client/src/entities/workout-session/` — `api/workout-session-api.ts`, `model/use-workout-session-queries.ts`, `model/workout-session-query-keys.ts`, `model/workout-session.ts`
 
 ### Types
 

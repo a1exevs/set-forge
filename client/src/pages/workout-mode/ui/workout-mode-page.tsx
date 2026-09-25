@@ -1,13 +1,14 @@
-import type { WorkoutExercise, WorkoutList, WorkoutSession, WorkoutSessionExercise } from '@entities';
 import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
 
-import { WorkoutExerciseCard, WorkoutSessionExerciseCard } from '@entities';
-import { NotFoundMessage } from '@widgets';
+import { type WorkoutExercise, WorkoutExerciseCard } from '@entities/workout-exercise';
+import type { WorkoutList } from '@entities/workout-list';
+import type { WorkoutSession } from '@entities/workout-session';
+import { type WorkoutSessionExercise, WorkoutSessionExerciseCard } from '@entities/workout-session-exercise';
+import { NotFoundMessage } from '@shared/ui';
 
-import classes from 'src/pages/workout-mode/ui/workout-mode-page.module.scss';
-
-export type WorkoutPhase = 'preview' | 'training';
+import classes from './workout-mode-page.module.scss';
+import type { WorkoutPhase } from '../model/workout-phase';
 
 type Props = {
   phase: WorkoutPhase;

@@ -10,6 +10,7 @@ const path = require('path');
 
 
 const ports = require('./ports.json');
+
 const E2E_CLIENT_PORT = ports.clientPort;
 const E2E_SERVER_PORT = ports.serverPort;
 const E2E_CLIENT_ORIGIN = `http://localhost:${E2E_CLIENT_PORT}`;

@@ -1,7 +1,6 @@
 import type { Meta } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import { formatDate } from '@shared';
 import { mockWorkoutLists } from 'storybook-dir/fixtures/workout-lists';
 import {
   buildDesktop4KStoryObj,
@@ -11,7 +10,9 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
-import HomePageLogicLayer from 'src/pages/home/ui/home-page-logic-layer';
+import { formatDate } from '@shared/lib';
+
+import HomePageLogicLayer from './home-page-logic-layer';
 
 const storyTitle = 'Pages/HomePage';
 

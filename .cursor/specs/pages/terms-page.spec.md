@@ -10,7 +10,7 @@ Public Terms of Use page on `/terms`. Presentation-only wrapper around the share
 
 - Path: `/terms` (always-public — listed in root `ALWAYS_PUBLIC_PATHS`; no auth required, no guest-only redirect)
 - Router entry: `terms-page.tsx` (presentation only, no data/logic layer)
-- Route file: `client/src/app/model/routes/terms.tsx`
+- Route file: `client/src/app/routes/terms.tsx`
 
 ---
 
@@ -24,8 +24,8 @@ Public Terms of Use page on `/terms`. Presentation-only wrapper around the share
 
 - `ui/terms-page.tsx` — renders `LegalDocument` with the terms content.
 - `ui/terms-page.stories.tsx`
-- `model/terms-content.ts` — RU/EN `LegalContent`, `TERMS_EFFECTIVE_DATE`.
-- `ui/index.ts`, `index.ts`
+- `config/terms-content.ts` — RU/EN `LegalContent`, `TERMS_EFFECTIVE_DATE`.
+- `index.ts` (slice public API; no `index.ts` inside segments)
 
 ---
 
@@ -79,11 +79,13 @@ None — static content only.
 
 ## Exposed API / Methods
 
+The slice `index.ts` exports only the page component; rows marked internal stay inside the slice.
+
 | API | Type | Description |
 |-----|-----|-------------|
 | `TermsPage` | component | From `pages/terms/ui` |
-| `termsContent` | const | RU/EN `LegalContent` |
-| `TERMS_EFFECTIVE_DATE` | const | Effective date string |
+| `termsContent` | const (internal, `config/`) | RU/EN `LegalContent` |
+| `TERMS_EFFECTIVE_DATE` | const (internal, `config/`) | Effective date string |
 
 ---
 

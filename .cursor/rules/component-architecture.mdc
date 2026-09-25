@@ -1,5 +1,5 @@
 ---
-description: Component architecture - 3-layer pattern, arrow functions, absolute paths
+description: Component architecture - 3-layer pattern, arrow functions
 globs: ["client/**"]
 ---
 
@@ -23,7 +23,7 @@ globs: ["client/**"]
 // Presentation: pure props, className={classes.form}
 ```
 
-Export: `export { default as X } from 'src/.../x-data-layer'`. No Data → export logic-layer. No Logic → export presentation.
+Export from the slice `index.ts`: `export { default as X } from './ui/x-data-layer'`. No Data → export logic-layer. No Logic → export presentation.
 
 **Skip layers:** No server/client async state → skip Data if logic can live in page. No state → skip Logic. Simple → Presentation only.
 

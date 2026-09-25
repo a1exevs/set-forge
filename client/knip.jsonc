@@ -1,0 +1,29 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  // Public APIs (slice / shared segment index.ts) must export only what other slices use.
+  "entry": [
+    "src/**/*.spec.{unit,snap}.{ts,tsx}",
+    "src/**/*.stories.tsx",
+    "tests/**/*.{ts,cjs}",
+    ".storybook/*.{ts,tsx}",
+    "scripts/*.mjs",
+    "steiger.config.ts",
+  ],
+  "project": ["src/**/*.{ts,tsx}", "linter/**/*.ts", ".storybook/**/*.{ts,tsx}", "tests/**/*.{ts,tsx,cjs}"],
+  "ignore": ["src/app/router/route-tree.gen.ts"],
+  // Jest resolves `tests/...` through moduleNameMapper.
+  "paths": { "tests/*": ["tests/*"] },
+  "typedoc": false,
+  "ignoreBinaries": ["chromatic"],
+  "ignoreDependencies": [
+    // Used indirectly: Jest config loader, @testcontainers/mysql peer, Babel preset warning, Storybook essentials.
+    "ts-node",
+    "testcontainers",
+    "@babel/plugin-proposal-private-property-in-object",
+    "@storybook/addon-viewport",
+    // TODO: not imported anywhere — remove in a separate dependency clean-up.
+    "recharts",
+    "@tanstack/router-devtools",
+    "dotenv",
+  ],
+}

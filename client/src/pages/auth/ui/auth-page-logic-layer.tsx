@@ -1,15 +1,17 @@
 import { FC, FormEvent, useCallback, useState } from 'react';
 
-import { getCaptchaUrl, isNeedCaptchaEnvelope } from 'src/entities/session/api/session-api';
 import {
+  getCaptchaUrl,
+  isNeedCaptchaEnvelope,
   validateLoginEmail,
   validateLoginPassword,
   validateRegisterEmail,
   validateRegisterPassword,
-} from 'src/entities/session/model/auth-validation';
-import type { AuthTab } from 'src/pages/auth/ui/auth-page';
-import AuthPage from 'src/pages/auth/ui/auth-page';
-import { ApiRequestError } from 'src/shared/api/http-client';
+} from '@entities/session';
+import { ApiRequestError } from '@shared/api';
+
+import AuthPage from './auth-page';
+import type { AuthTab } from '../model/auth-tab';
 
 type Props = {
   activeTab: AuthTab;

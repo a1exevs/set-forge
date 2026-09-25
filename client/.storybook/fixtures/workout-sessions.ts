@@ -1,6 +1,6 @@
-import type { WorkoutSession } from '@entities';
+import type { WorkoutSession } from '@entities/workout-session';
 
-export const mockWorkoutSession: WorkoutSession = {
+const mockWorkoutSession: WorkoutSession = {
   id: 'sess-1',
   workoutListId: 'list-1',
   workoutListName: 'Push Day',

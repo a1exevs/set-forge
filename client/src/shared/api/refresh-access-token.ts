@@ -1,7 +1,7 @@
-import { clearAccessToken, setAccessToken } from 'src/shared/api/access-token.store';
-import { getApiBaseUrl } from 'src/shared/api/api-base-url';
-import type { CommonResponseEnvelope } from 'src/shared/api/common-response.types';
-import { ResultCodes } from 'src/shared/api/result-codes';
+import { clearAccessToken, setAccessToken } from './access-token-store';
+import { getApiBaseUrl } from './api-base-url';
+import type { CommonResponseEnvelope } from './common-response';
+import { ResultCodes } from './result-codes';
 
 type AuthPayload = { userId: number; accessToken: string };
 

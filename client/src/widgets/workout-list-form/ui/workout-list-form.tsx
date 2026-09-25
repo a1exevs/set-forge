@@ -1,12 +1,11 @@
-import type { MuscleGroup } from '@entities';
-import { Listbox } from '@headlessui/react';
 import { ChangeEvent, FC, FormEvent } from 'react';
 
-import { muscleGroupLabels, muscleGroups } from '@entities';
-import { Button, NumericField } from '@shared';
+import { type MuscleGroup, muscleGroups } from '@entities/workout-exercise';
+import { Button, NumericField, Select } from '@shared/ui';
 
-import type { ExerciseFormData } from 'src/widgets/workout-list-form/model';
-import classes from 'src/widgets/workout-list-form/ui/workout-list-form.module.scss';
+import classes from './workout-list-form.module.scss';
+import { muscleGroupOptions } from '../config/muscle-group-options';
+import type { ExerciseFormData } from '../model/exercise-form-data';
 
 type Props = {
   title: string;
@@ -129,31 +128,16 @@ const WorkoutListForm: FC<Props> = ({
 
                     <div>
                       <label className={classes.label}>Muscle Group</label>
-                      <Listbox
+                      <Select
                         value={exercise.muscleGroup}
-                        onChange={(value: MuscleGroup): void => onUpdateExercise(exercise.tempId, 'muscleGroup', value)}
-                      >
-                        <div className={classes.listboxWrapper}>
-                          <Listbox.Button className={classes.listboxButton}>
-                            {muscleGroupLabels[exercise.muscleGroup]}
-                          </Listbox.Button>
-                          <Listbox.Options className={classes.listboxOptions}>
-                            {muscleGroups.map((group: MuscleGroup) => (
-                              <Listbox.Option key={group} value={group} className={classes.listboxOption}>
-                                {({ active, selected }) => (
-                                  <span
-                                    className={`${classes.optionText} ${
-                                      active ? classes.active : ''
-                                    } ${selected ? classes.selected : ''}`}
-                                  >
-                                    {muscleGroupLabels[group]}
-                                  </span>
-                                )}
-                              </Listbox.Option>
-                            ))}
-                          </Listbox.Options>
-                        </div>
-                      </Listbox>
+                        options={muscleGroupOptions}
+                        onChange={(value: string): void => {
+                          const muscleGroup = muscleGroups.find((group: MuscleGroup) => group === value);
+                          if (muscleGroup) {
+                            onUpdateExercise(exercise.tempId, 'muscleGroup', muscleGroup);
+                          }
+                        }}
+                      />
                     </div>
 
                     <div className={classes.fieldRow}>

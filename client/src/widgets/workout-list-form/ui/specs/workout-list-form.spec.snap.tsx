@@ -1,12 +1,12 @@
 import { render } from '@testing-library/react';
-import type { ExerciseFormData } from '@widgets/workout-list-form/model';
 import type { ReactNode } from 'react';
 
-import WorkoutListFormPresentation from '@widgets/workout-list-form/ui/workout-list-form';
+import { ConfirmDialogProvider } from '@shared/ui';
 
-import ConfirmDialogProvider from 'src/shared/ui/confirm-dialog/confirm-dialog-provider';
-import { getExerciseNumericFieldError } from 'src/widgets/workout-list-form/model';
-import WorkoutListForm from 'src/widgets/workout-list-form/ui/workout-list-form-logic-layer';
+import type { ExerciseFormData } from '../../model/exercise-form-data';
+import { getExerciseNumericFieldError } from '../../model/exercise-numeric-validation';
+import WorkoutListFormPresentation from '../workout-list-form';
+import WorkoutListForm from '../workout-list-form-logic-layer';
 
 jest.mock('@tanstack/react-router', () => ({
   Link: ({ to, children, className }: { to: string; children: ReactNode; className?: string }) => (

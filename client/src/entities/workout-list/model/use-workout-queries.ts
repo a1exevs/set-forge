@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import type { CreateWorkoutListDto, UpdateWorkoutListDto, WorkoutList, WorkoutListsExportFile } from './workout-list';
+import { workoutQueryKeys } from './workout-query-keys';
 import {
   createWorkoutList,
   deleteWorkoutList,
@@ -8,14 +10,7 @@ import {
   fetchWorkoutLists,
   importWorkoutLists,
   updateWorkoutList,
-} from 'src/entities/workout-list/api';
-import type {
-  CreateWorkoutListDto,
-  UpdateWorkoutListDto,
-  WorkoutList,
-  WorkoutListsExportFile,
-} from 'src/entities/workout-list/model/types';
-import { workoutQueryKeys } from 'src/entities/workout-list/model/workout-query-keys';
+} from '../api/workout-list-api';
 
 const patchWorkoutInLists = (lists: WorkoutList[], updated: WorkoutList): WorkoutList[] =>
   lists.map(list => (list.id === updated.id ? updated : list));

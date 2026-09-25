@@ -10,7 +10,7 @@ Public Privacy Policy page on `/privacy`. Presentation-only wrapper around the s
 
 - Path: `/privacy` (always-public — listed in root `ALWAYS_PUBLIC_PATHS`; no auth required, no guest-only redirect)
 - Router entry: `privacy-page.tsx` (presentation only, no data/logic layer)
-- Route file: `client/src/app/model/routes/privacy.tsx`
+- Route file: `client/src/app/routes/privacy.tsx`
 
 ---
 
@@ -24,8 +24,8 @@ Public Privacy Policy page on `/privacy`. Presentation-only wrapper around the s
 
 - `ui/privacy-page.tsx` — renders `LegalDocument` with the privacy content.
 - `ui/privacy-page.stories.tsx`
-- `model/privacy-policy-content.ts` — RU/EN `LegalContent`, `PRIVACY_EFFECTIVE_DATE`, `PRIVACY_OPERATOR`.
-- `ui/index.ts`, `index.ts`
+- `config/privacy-policy-content.ts` — RU/EN `LegalContent`, `PRIVACY_EFFECTIVE_DATE`, `PRIVACY_OPERATOR`.
+- `index.ts` (slice public API; no `index.ts` inside segments)
 
 ---
 
@@ -79,12 +79,14 @@ None — static content only.
 
 ## Exposed API / Methods
 
+The slice `index.ts` exports only the page component; rows marked internal stay inside the slice.
+
 | API | Type | Description |
 |-----|-----|-------------|
 | `PrivacyPage` | component | From `pages/privacy/ui` |
-| `privacyContent` | const | RU/EN `LegalContent` |
-| `PRIVACY_EFFECTIVE_DATE` | const | Effective date string |
-| `PRIVACY_OPERATOR` | const | `{ name: { ru, en }, contactEmail }` |
+| `privacyContent` | const (internal, `config/`) | RU/EN `LegalContent` |
+| `PRIVACY_EFFECTIVE_DATE` | const (internal, `config/`) | Effective date string |
+| `PRIVACY_OPERATOR` | const (internal, module-private) | `{ name: { ru, en }, contactEmail }` |
 
 ---
 

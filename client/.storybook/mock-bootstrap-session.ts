@@ -1,5 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
 
+// Files, not the slice index: the index re-exports the module this stub replaces.
 import type { CurrentUser } from 'src/entities/session/api/session-api';
 import { sessionQueryKeys } from 'src/entities/session/model/session-keys';
 

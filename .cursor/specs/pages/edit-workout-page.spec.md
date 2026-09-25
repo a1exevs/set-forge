@@ -12,7 +12,7 @@ Entities: [workout-list](../entities/workout-list.entity.spec.md), [workout-exer
 
 - Path: `/edit/$id` (protected); `$id` = workout list UUID
 - Router entry: `edit-workout-page-data-layer.tsx`
-- Route file: `client/src/app/model/routes/edit/$id.tsx`
+- Route file: `client/src/app/routes/edit/$id.tsx`
 
 ---
 
@@ -27,11 +27,11 @@ Entities: [workout-list](../entities/workout-list.entity.spec.md), [workout-exer
 - `ui/edit-workout-page-data-layer.tsx`
 - `ui/edit-workout-page-logic-layer.tsx`
 - `ui/edit-workout-page.stories.tsx`
-- `ui/specs/edit-workout-page.spec.unit.tsx`
+- `app/router/specs/edit-workout-page.spec.unit.tsx` (renders the whole app via the router)
 - `ui/specs/edit-workout-page-logic-layer.spec.unit.tsx`
-- `ui/specs/edit-workout-page.spec.snap.tsx`
-- `ui/index.ts`, `index.ts`
-- Widgets: `workout-list-form`, `not-found-message`
+- `app/router/specs/edit-workout-page.spec.snap.tsx`
+- `index.ts` (slice public API; no `index.ts` inside segments)
+- Widgets: `workout-list-form`; shared: `NotFoundMessage`
 
 ---
 

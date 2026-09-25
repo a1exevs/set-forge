@@ -4,25 +4,30 @@
 
 Specification for shared UI components in `client/src/shared/ui/`. New components are added as sections in this file.
 
-**Components (13):**
+**Components (16):**
 
-| Component | Public export (`@shared`) | Storybook title |
+Components are exported from `@shared/ui`; their hooks and helpers from `@shared/lib` (a `ui` segment holds components only — see fsd-architecture §4).
+
+| Component | Public export | Storybook title |
 |-----------|---------------------------|-----------------|
 | Button | `Button` | `Shared/Button` |
 | BrandWordmark | `BrandWordmark` | `Shared/BrandWordmark` |
 | IconButton | `IconButton` | `Shared/IconButton` |
-| MenuButton | `MenuButton`, `MenuItem` type | `Shared/MenuButton` |
+| MenuButton | `MenuButton` (`MenuButtonItem` type in the component file) | `Shared/MenuButton` |
 | TabsBar | `TabsBar`, `TabsBarItem` type | `Shared/TabsBar` |
 | UserAvatar | `UserAvatar` | `Shared/UserAvatar` |
-| UserAvatarMenu | `UserAvatarMenu` | `Shared/UserAvatarMenu` |
+| UserAvatarMenu | not exported (no consumer yet) | `Shared/UserAvatarMenu` |
 | NumericField | `NumericField` | `Shared/NumericField` |
 | PasswordField | `PasswordField` | `Shared/PasswordField` |
 | Dialog | `Dialog` | `Shared/Dialog` |
-| ConfirmDialog | `ConfirmDialogProvider`, `useConfirm` | `Shared/ConfirmDialog` |
-| Toaster | `Toaster`, `toast`, `toastSuccess`, `toastError` | `Shared/Toaster` |
-| LegalDocument | `LegalDocument`, `LegalContent`/`LegalLang`/`LegalLink`/`LegalSection`/`LegalText` types | `Shared/LegalDocument` |
+| ConfirmDialog | `ConfirmDialogProvider`; `useConfirm` from `@shared/lib` | `Shared/ConfirmDialog` |
+| Toaster | `Toaster`; `toastSuccess`, `toastError` from `@shared/lib` | `Shared/Toaster` |
+| LegalDocument | `LegalDocument`, `LegalContent` type; `LegalLang` from `@shared/config` | `Shared/LegalDocument` |
+| Select | `Select`, `SelectOption` type | — |
+| Transition | `Transition` | — |
+| NotFoundMessage | `NotFoundMessage` | `Shared/NotFoundMessage` |
 
-All components use Headless UI where applicable, **lucide-react** for icons, and SCSS Modules for styling. The `styles/` directory (themes, variables, global) is not a component and is out of scope here.
+All components use Headless UI where applicable, **lucide-react** for icons, and SCSS Modules for styling. Headless UI and sonner are imported only inside `src/shared` (ESLint) — slices use these wrappers. The `styles/` directory (themes, variables; global styles live in `app/styles`) is not a component and is out of scope here.
 
 ---
 
@@ -207,15 +212,14 @@ Reusable ⋮ context menu trigger. Used on the Home page for Edit/Delete workout
 ### Files
 
 - `menu-button.tsx` — Headless UI `Menu` + trigger + items; default export.
-- `menu-button.types.ts` — `MenuItem` type for `items` prop.
 - `menu-button.module.scss` — trigger, panel, item styles.
 
 ### Props
 
-`MenuItem` is defined in `menu-button.types.ts`:
+`MenuButtonItem` is exported from `menu-button.tsx`:
 
 ```typescript
-type MenuItem = {
+type MenuButtonItem = {
   id: string;
   label: string;
   onClick: () => void;
@@ -674,7 +678,7 @@ Referenced by: [auth-page.spec.md](../pages/auth-page.spec.md)
 
 ### Purpose
 
-Modal overlay shell: backdrop, centered panel, open/close lifecycle, optional animations. Building block for `ConfirmDialog`; also re-exported from `@shared` for widgets that need a raw blocking modal (e.g. the document re-consent gate).
+Modal overlay shell: backdrop, centered panel, open/close lifecycle, optional animations. Building block for `ConfirmDialog`; also exported from `@shared/ui` for widgets that need a raw blocking modal (e.g. the document re-consent gate).
 
 ### Location
 
@@ -757,9 +761,9 @@ App-wide imperative confirmation modal. Callers use `useConfirm()` to show a pro
 
 ### Files
 
-- `confirm-dialog-provider.tsx` — context provider + promise resolver; **default export, mounted in `main.tsx`**.
-- `hooks/use-confirm.ts` — `useConfirm()` hook; exported from `@shared`.
-- `contexts/confirm-dialog-context.tsx` — `ConfirmOptions`, `ConfirmContext`.
+- `confirm-dialog-provider.tsx` — context provider + promise resolver; **default export, mounted in `app/entrypoint/main.tsx`**.
+- `shared/lib/confirm/use-confirm.ts` — `useConfirm()` hook; exported from `@shared/lib`.
+- `shared/lib/confirm/confirm-context.ts` — `ConfirmOptions`, `ConfirmResult`, `ConfirmContext`.
 - `confirm-dialog-logic-layer.tsx` — maps options → presentational dialog, default button labels.
 - `confirm-dialog.tsx` — title, description, Cancel / optional alternate / Confirm buttons inside `Dialog`.
 - `confirm-dialog.module.scss` — dialog content layout (`singleButton`, `multiButton`).
@@ -807,7 +811,7 @@ type ConfirmOptions = {
 
 ### Behavior
 
-1. App wraps tree in `<ConfirmDialogProvider>` (`main.tsx`).
+1. App wraps tree in `<ConfirmDialogProvider>` (`app/entrypoint/main.tsx`).
 2. Feature code: `const confirmDialog = useConfirm();` then `await confirmDialog({ title: '...', ... })`.
 3. Provider renders one modal instance; logic layer supplies default labels and derives `ariaLabel` from string `title`.
 4. Three-way callers branch on `'confirm' | 'alternate' | 'cancel'` (e.g. workout mode finish/discard; edit workout save prompt).
@@ -831,11 +835,11 @@ type ConfirmOptions = {
 
 ### Usage
 
-- `main.tsx` — global `ConfirmDialogProvider`.
+- `app/entrypoint/main.tsx` — global `ConfirmDialogProvider`.
 - `pages/home/ui/home-page-logic-layer.tsx` — delete workout list confirmation (two-way).
 - `pages/workout-mode/ui/workout-mode-page-logic-layer.tsx` — finish / discard / cancel (three-way).
 - `pages/edit-workout/ui/edit-workout-page-logic-layer.tsx` — save with optional session resync (three-way).
-- Tests/stories wrap consumers in `ConfirmDialogProvider` (see `app/model/specs/test-utils.tsx`).
+- Tests/stories wrap consumers in `ConfirmDialogProvider` (see `app/router/specs/test-utils.tsx`).
 
 ---
 
@@ -852,7 +856,7 @@ App-wide toast notifications via **sonner**. Used for success/error feedback aft
 ### Files
 
 - `toaster.tsx` — Sonner `Toaster` wrapper; default export; reads theme from `useThemeStore`.
-- `toast.ts` — `toastSuccess`, `toastError`, re-export of sonner `toast`.
+- `shared/lib/toast.ts` — `toastSuccess`, `toastError` (sonner), exported from `@shared/lib`.
 - `toaster.module.scss` — elevated surface, success/error/warning border accents, `$z-toaster`.
 - `toaster.stories.tsx` / `toaster.stories.module.scss` — Storybook.
 - `specs/toaster.spec.unit.tsx`, `specs/toaster.spec.snap.tsx`.
@@ -886,8 +890,8 @@ toastError(error: unknown, fallback: string): void;
 
 ### Behavior
 
-1. App mounts `<Toaster />` next to the router inside `ConfirmDialogProvider` (`main.tsx`).
-2. Call sites use `toastSuccess` / `toastError` from `@shared` (logic layers).
+1. App mounts `<Toaster />` next to the router inside `ConfirmDialogProvider` (`app/entrypoint/main.tsx`).
+2. Call sites use `toastSuccess` / `toastError` from `@shared/lib` (logic layers).
 3. Toasts auto-dismiss (sonner defaults); user can dismiss via close button.
 
 ### Accessibility
@@ -908,7 +912,7 @@ toastError(error: unknown, fallback: string): void;
 
 ### Usage
 
-- `main.tsx` — global `<Toaster />`.
+- `app/entrypoint/main.tsx` — global `<Toaster />`.
 - `pages/create-workout`, `pages/edit-workout`, `pages/home`, `pages/workout-mode` logic layers.
 
 ---
@@ -984,3 +988,25 @@ type Props = {
 
 - `pages/privacy/ui/privacy-page.tsx` — Privacy Policy (`privacyContent`, `PRIVACY_EFFECTIVE_DATE`).
 - `pages/terms/ui/terms-page.tsx` — Terms of Use (`termsContent`, `TERMS_EFFECTIVE_DATE`).
+
+---
+
+## Select
+
+`shared/ui/select/` — single-value dropdown over Headless UI `Listbox`.
+
+- Props: `value: string`, `options: SelectOption[]` (`{ value, label }`), `onChange(value: string)`.
+- The trigger shows the label of the selected option; options highlight `active` / `selected`.
+- Used by `widgets/workout-list-form` (muscle group, options in `config/muscle-group-options.ts`).
+
+## Transition
+
+`shared/ui/transition/` — class-based enter/leave transition over Headless UI `Transition`.
+
+- Props: `show`, `enter`, `enterFrom`, `enterTo`, `leave`, `leaveFrom`, `leaveTo` (CSS module classes), `children`.
+- Used by `entities/workout-session-exercise` (completion checkmark).
+
+## NotFoundMessage
+
+`shared/ui/not-found-message/` — "not found" block: title and a link button back (`backToLink`, default `/`;
+`backToLabel`, default "Back to Home"). Domain-agnostic, so it lives in `shared` and is reused by pages and widgets.

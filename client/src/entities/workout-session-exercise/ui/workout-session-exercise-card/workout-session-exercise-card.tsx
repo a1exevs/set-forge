@@ -1,9 +1,10 @@
-import { Transition } from '@headlessui/react';
 import { FC, KeyboardEvent } from 'react';
 
-import { muscleGroupLabels } from 'src/entities/workout-exercise/model/muscle-group-labels';
-import type { WorkoutSessionExercise } from 'src/entities/workout-session-exercise/model/types';
-import classes from 'src/entities/workout-session-exercise/ui/workout-session-exercise-card/workout-session-exercise-card.module.scss';
+import { muscleGroupLabels } from '@entities/workout-exercise/@x/workout-session-exercise';
+import { Transition } from '@shared/ui';
+
+import classes from './workout-session-exercise-card.module.scss';
+import type { WorkoutSessionExercise } from '../../model/workout-session-exercise';
 
 type Props = {
   exercise: WorkoutSessionExercise;

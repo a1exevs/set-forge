@@ -1,9 +1,9 @@
-import type { CreateWorkoutListDto } from '@entities';
 import { useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 
-import { toastError, toastSuccess } from '@shared';
-import { WorkoutListForm } from '@widgets';
+import type { CreateWorkoutListDto } from '@entities/workout-list';
+import { toastError, toastSuccess } from '@shared/lib';
+import { WorkoutListForm } from '@widgets/workout-list-form';
 
 type Props = {
   onCreate: (dto: CreateWorkoutListDto) => Promise<void>;

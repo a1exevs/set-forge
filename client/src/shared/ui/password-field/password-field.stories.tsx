@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { userEvent, within } from '@storybook/test';
 import { FC, useState } from 'react';
 
-import PasswordField from 'src/shared/ui/password-field/password-field-logic-layer';
+import PasswordField from './password-field-logic-layer';
 
 const meta: Meta<typeof PasswordField> = {
   title: 'Shared/PasswordField',
