@@ -20,7 +20,9 @@ passes the result (`swipeRef`, `activeItemId`). Context providers (`*-provider.t
 
 Enforced in `ui` segments by ESLint `no-restricted-syntax` (`client/linter/rules/ui-segment-rule.ts`): hooks are
 banned in presentation files — calling them and importing them (`import { useX as x }` would hide the call), query/mutation hooks and stores (`use*Query`, `use*Mutation`, `use*Store`,
-`useStore.use.x()`) in logic layers.
+`useStore.use.x()`) and any hook of an entity or a feature (`@entities/*`, `@features/*`) are banned in logic
+layers — calls and imports. Logic layers use React, router and UI hooks (`useConfirm`, `useMainTabSwipe`).
+Not checked: that a logic layer renders only its presentation (`null`, fallbacks like `NotFoundMessage` are fine).
 
 ```typescript
 // Data: useWorkoutListsQuery(); return <LogicLayer workoutLists={data ?? []} ... />;

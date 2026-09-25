@@ -54,9 +54,17 @@ const noHooksInPresentation = {
 
 /** component-architecture: logic layers hold state and handlers; stores and query hooks belong to the data layer. */
 const noStoresOrQueriesInLogic = {
-  selector: String.raw`CallExpression[callee.name=/^use\w*(Query|Mutation|Store)$/], CallExpression[callee.object.property.name='use']`,
+  // Calls and imports: an aliased import would hide the call. Every hook of an entity (server state, its cache)
+  // or a feature (an action with a mutation) is data-layer business, whatever its name.
+  selector: [
+    String.raw`CallExpression[callee.name=/^use\w*(Query|Mutation|Store)$/]`,
+    "CallExpression[callee.object.property.name='use']",
+    String.raw`ImportSpecifier[imported.name=/^use\w*(Query|Mutation|Store)$/]`,
+    'ImportDeclaration[source.value=/^@(entities|features)\\//] > ImportSpecifier[imported.name=/^use[A-Z]/]',
+  ].join(', '),
   message:
-    'Logic layers get server state and stores through props — call query/mutation hooks and stores in the data layer.',
+    'Logic layers get server state, stores and feature actions through props — use query/mutation/store hooks ' +
+    'and entity/feature hooks in the data layer.',
 };
 
 export type UiFileKind = 'presentation' | 'logic' | 'data';
