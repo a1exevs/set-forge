@@ -65,16 +65,16 @@ Shows authenticated user avatar letter, email, **Log out** button, and a **Delet
 
 ### Initialization
 
-1. `ProfilePageDataLayer`: `useCurrentUserQuery(true)`, `useLogoutMutation()`, `useDeleteAccountMutation()`.
+1. `ProfilePageDataLayer`: `useCurrentUserQuery(true)`, `useLogout()` (`@features/logout`), `useDeleteAccountMutation()`.
 2. Passes `email`, `avatarLetter`, `onLogout`, `isLoggingOut`, `onDeleteAccount`, `isDeletingAccount` to logic layer.
 
 ### Logout
 
-3. Log out → `DELETE /auth/logout` → `useLogoutMutation` clears the entire query cache and redirects to `/login`.
+3. Log out → `useLogout` (`features/logout`) → `DELETE /auth/logout`; the mutation clears the entire query cache, the feature then goes to `/login` (also when the request fails).
 
 ### Delete account
 
-4. Logic layer (`useConfirm`) shows a confirm dialog ("Delete account?"); on confirm → `onDeleteAccount()` → `DELETE /auth/account` → `useDeleteAccountMutation` clears the entire query cache and redirects to `/login`.
+4. Logic layer (`useConfirm`) shows a confirm dialog ("Delete account?"); on confirm → `onDeleteAccount()` → `DELETE /auth/account` → `useDeleteAccountMutation` clears the entire query cache; the data layer then goes to `/login` (also on failure).
 
 ### Tab swipe (presentation)
 
@@ -106,7 +106,7 @@ The confirm dialog lives in the logic layer (`useConfirm`), which wraps `onDelet
 | Method | Path | Hook |
 |--------|------|------|
 | GET | `/auth/me` | `useCurrentUserQuery` |
-| DELETE | `/auth/logout` | `useLogoutMutation` |
+| DELETE | `/auth/logout` | `useLogoutMutation` via `useLogout` (`features/logout`) |
 | DELETE | `/auth/account` | `useDeleteAccountMutation` |
 
 Full contract: [user entity](../entities/user.entity.spec.md#api-contract).

@@ -2,14 +2,18 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
-import { useAcceptDocumentsMutation, useCurrentUserQuery, useLogoutMutation } from '@entities/session';
+import { useAcceptDocumentsMutation, useCurrentUserQuery } from '@entities/session';
+import { useLogout } from '@features/logout';
 
 import DocumentReconsentGate from '../document-reconsent-gate-data-layer';
 
 jest.mock('@entities/session', () => ({
   useCurrentUserQuery: jest.fn(),
   useAcceptDocumentsMutation: jest.fn(),
-  useLogoutMutation: jest.fn(),
+}));
+
+jest.mock('@features/logout', () => ({
+  useLogout: jest.fn(),
 }));
 
 jest.mock('@tanstack/react-router', () => ({
@@ -22,18 +26,18 @@ let mockPathname = '/';
 
 const mockedCurrentUser = useCurrentUserQuery as jest.Mock;
 const mockedAccept = useAcceptDocumentsMutation as jest.Mock;
-const mockedLogout = useLogoutMutation as jest.Mock;
+const mockedLogout = useLogout as jest.Mock;
 
 describe('DocumentReconsentGate', () => {
   const acceptMutation = { mutateAsync: jest.fn().mockResolvedValue(undefined), isPending: false, isError: false };
-  const logoutMutation = { mutate: jest.fn(), isPending: false };
+  const logout = { logout: jest.fn(), isPending: false };
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockPathname = '/';
     acceptMutation.mutateAsync.mockResolvedValue(undefined);
     mockedAccept.mockReturnValue(acceptMutation);
-    mockedLogout.mockReturnValue(logoutMutation);
+    mockedLogout.mockReturnValue(logout);
   });
 
   it('renders nothing when acceptance is up to date', () => {
@@ -79,6 +83,6 @@ describe('DocumentReconsentGate', () => {
     render(<DocumentReconsentGate />);
 
     await user.click(await screen.findByRole('button', { name: 'Log out' }));
-    expect(logoutMutation.mutate).toHaveBeenCalledTimes(1);
+    expect(logout.logout).toHaveBeenCalledTimes(1);
   });
 });

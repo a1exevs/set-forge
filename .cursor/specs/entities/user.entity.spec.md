@@ -154,12 +154,15 @@ When `authFailedCount >= 5`, failed login returns `resultCode === 10` (`NEED_CAP
 | `useLoginMutation()` | hook | `POST /auth/login` |
 | `useRegisterMutation()` | hook | `POST /auth/registration` (`{ email, password, consent, termsAccepted }`) |
 | `useAcceptDocumentsMutation()` | hook | `PATCH /auth/documents-acceptance`; updates `sessionQueryKeys.me` cache |
-| `useDeleteAccountMutation()` | hook | `DELETE /auth/account`; clears the whole query cache and redirects to `/login` |
-| `useLogoutMutation()` | hook | `DELETE /auth/logout`; clears the whole query cache and redirects to `/login` |
+| `useDeleteAccountMutation()` | hook | `DELETE /auth/account`; clears the whole query cache (the caller navigates) |
+| `useLogoutMutation()` | hook | `DELETE /auth/logout`; clears the whole query cache (navigation: `features/logout`) |
+| `useCaptchaUrlMutation()` | hook | `GET /security/get-captcha-url` → absolute image URL |
+| `getCachedCurrentUser(queryClient)` | function | The signed-in user from the cache, no request (root route guard) |
 | `bootstrapSessionAndPrimeCache(queryClient)` | function | Root `beforeLoad` session bootstrap; on no user clears the whole query cache |
-| `sessionQueryKeys.me` | query key | Current user cache |
 | `emailToAvatarLetter(email)` | function | Avatar letter for profile |
-| `getCaptchaUrl`, `isNeedCaptchaEnvelope` | functions | Captcha / envelope helpers (still exported from `api/` — to be wrapped in a model hook) |
+| `isNeedCaptchaEnvelope(envelope)` | function | The server requires a captcha (`model/captcha.ts`) |
+
+Session hooks never navigate: login/register redirects live in `pages/auth` (`useRedirectAfterAuth`), logout in `features/logout`, account deletion navigation in `pages/profile`. `CurrentUser` is `model/current-user.ts`; `sessionQueryKeys` stays internal.
 
 Raw requests (`fetchCurrentUser`, `postLogin`, `postRegistration`, `deleteLogout`, `patchDocumentsAcceptance`, `deleteAccount`) stay internal to `api/session-api.ts` — callers use the hooks above.
 | `validateLoginEmail`, `validateLoginPassword`, `validateRegisterEmail`, `validateRegisterPassword` | functions | Client-side form validation |

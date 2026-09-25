@@ -1,7 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext, Outlet, redirect } from '@tanstack/react-router';
 
-import { bootstrapSessionAndPrimeCache, type CurrentUser, sessionQueryKeys } from '@entities/session';
+import { bootstrapSessionAndPrimeCache, getCachedCurrentUser } from '@entities/session';
 import { DocumentReconsentGate } from '@widgets/document-reconsent';
 
 // Guest-only pages: a signed-in user has no reason to see the auth forms, so send them home.
@@ -40,15 +40,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     }
 
     if (GUEST_ONLY_PATHS.has(path)) {
-      const cachedUser = context.queryClient.getQueryData<CurrentUser | null>(sessionQueryKeys.me) ?? null;
-      if (cachedUser) {
+      if (getCachedCurrentUser(context.queryClient)) {
         throw redirect({ to: '/' });
       }
       return;
     }
 
-    await bootstrapSessionAndPrimeCache(context.queryClient);
-    const user = context.queryClient.getQueryData<CurrentUser | null>(sessionQueryKeys.me) ?? null;
+    const user = await bootstrapSessionAndPrimeCache(context.queryClient);
 
     if (!user) {
       throw redirect({

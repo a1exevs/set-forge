@@ -1,4 +1,3 @@
-export { type CurrentUser, getCaptchaUrl, isNeedCaptchaEnvelope } from './api/session-api';
 export {
   validateLoginEmail,
   validateLoginPassword,
@@ -6,10 +5,11 @@ export {
   validateRegisterPassword,
 } from './model/auth-validation';
 export { emailToAvatarLetter } from './model/avatar-letter';
-export { bootstrapSessionAndPrimeCache } from './model/bootstrap-session';
-export { sessionQueryKeys } from './model/session-keys';
+export { bootstrapSessionAndPrimeCache, getCachedCurrentUser } from './model/bootstrap-session';
+export { isNeedCaptchaEnvelope } from './model/captcha';
 export {
   useAcceptDocumentsMutation,
+  useCaptchaUrlMutation,
   useCurrentUserQuery,
   useDeleteAccountMutation,
   useLoginMutation,

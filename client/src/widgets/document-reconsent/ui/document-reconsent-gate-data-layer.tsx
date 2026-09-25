@@ -1,7 +1,8 @@
 import { useRouterState } from '@tanstack/react-router';
 import { FC } from 'react';
 
-import { useAcceptDocumentsMutation, useCurrentUserQuery, useLogoutMutation } from '@entities/session';
+import { useAcceptDocumentsMutation, useCurrentUserQuery } from '@entities/session';
+import { useLogout } from '@features/logout';
 
 import DocumentReconsentGateLogicLayer from './document-reconsent-gate-logic-layer';
 import { LEGAL_DOCUMENT_PATHS } from '../config/legal-document-paths';
@@ -16,11 +17,11 @@ const DocumentReconsentGateDataLayer: FC = () => {
   const pathname = useRouterState({ select: state => state.location.pathname });
   const { data: user } = useCurrentUserQuery(true);
   const acceptMutation = useAcceptDocumentsMutation();
-  const logoutMutation = useLogoutMutation();
+  const { logout, isPending: isLoggingOut } = useLogout();
 
   const onLegalDocumentPage = LEGAL_DOCUMENT_PATHS.has(pathname);
   const open = Boolean(user?.documentsPendingAcceptance) && !onLegalDocumentPage;
-  const busy = acceptMutation.isPending || logoutMutation.isPending;
+  const busy = acceptMutation.isPending || isLoggingOut;
 
   return (
     <DocumentReconsentGateLogicLayer
@@ -28,7 +29,7 @@ const DocumentReconsentGateDataLayer: FC = () => {
       busy={busy}
       isError={acceptMutation.isError}
       onAccept={(): void => void acceptMutation.mutateAsync().catch(() => undefined)}
-      onLogout={(): void => logoutMutation.mutate()}
+      onLogout={logout}
     />
   );
 };

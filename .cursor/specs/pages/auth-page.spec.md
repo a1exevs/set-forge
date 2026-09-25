@@ -34,7 +34,8 @@ Login and registration on `/login` and `/register` (same component, tab follows 
 - `ui/auth-page.tsx`
 - `ui/auth-page.module.scss`
 - `ui/auth-page.stories.tsx`
-- `model/auth-tab.ts` — `AuthTab`
+- `model/auth-tab.ts` — `AuthTab`; `model/auth-input.ts` — `LoginInput`, `RegisterInput`
+- `model/use-redirect-after-auth.ts` + `lib/resolve-redirect-target.ts` — after login/register: in-app `redirect` target (full page load) or home; `//host` rejected
 - `index.ts` (slice public API; no `index.ts` inside segments)
 
 ---
@@ -57,11 +58,11 @@ Login and registration on `/login` and `/register` (same component, tab follows 
 ### Initialization
 
 1. `AuthPageDataLayer` receives `activeTab`, `redirectSearch`.
-2. `useLoginMutation`, `useRegisterMutation` passed to logic layer.
+2. `useLoginMutation`, `useRegisterMutation`, `useCaptchaUrlMutation` wrapped into `onLogin` / `onRegister` / `loadCaptchaUrl` props of the logic layer.
 
 ### Submit
 
-3. Login/register → mutation → on success persist token, prefetch `me`, navigate to `/` or `redirect` search param.
+3. Login/register → mutation (persists the token, primes `me`) → data layer `useRedirectAfterAuth`: `/` via the router, an in-app `redirect` search param via a full page load.
 4. Tab change navigates between `/login` and `/register`.
 5. Register: client-side email/password validation (`validateRegisterEmail`, `validateRegisterPassword`) plus `consent` and `termsAccepted` must both be checked before submit; `useRegisterMutation` sends `{ email, password, consent, termsAccepted }`.
 6. Login: client-side email/password validation (`validateLoginEmail`, `validateLoginPassword`) before submit.
@@ -87,7 +88,7 @@ Controlled form fields: `activeTab`, `email`, `password`, `consent`, `termsAccep
 |--------|------|-------------|
 | POST | `/auth/login` | `useLoginMutation` |
 | POST | `/auth/registration` | `useRegisterMutation` |
-| GET | `/security/get-captcha-url` | logic layer on captcha required |
+| GET | `/security/get-captcha-url` | `useCaptchaUrlMutation` (data layer → `loadCaptchaUrl`) on captcha required |
 | POST | `/auth/refresh` | root bootstrap (not this page) |
 | GET | `/auth/me` | root bootstrap |
 
@@ -102,7 +103,7 @@ Full contract: [user entity](../entities/user.entity.spec.md#api-contract).
 | Routing | TanStack Router `beforeLoad`, `redirect` |
 | Server state | `@tanstack/react-query` |
 | UI | TanStack Router `Link`, shared `BrandWordmark` / `Button` / `PasswordField`, SCSS modules |
-| FSD | `pages/auth`, `entities/session` |
+| FSD | `pages/auth`, `entities/session` (the entity never navigates) |
 
 ---
 

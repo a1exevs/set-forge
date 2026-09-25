@@ -1,12 +1,6 @@
-import {
-  apiRequest,
-  clearAccessToken,
-  type CommonResponseEnvelope,
-  getAccessToken,
-  getApiBaseUrl,
-  ResultCodes,
-  setAccessToken,
-} from '@shared/api';
+import { apiRequest, clearAccessToken, getAccessToken, getApiBaseUrl, ResultCodes, setAccessToken } from '@shared/api';
+
+import type { CurrentUser } from '../model/current-user';
 
 function toAbsoluteFromApiOrigin(pathOrUrl: string): string {
   if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://') || pathOrUrl.startsWith('data:')) {
@@ -19,12 +13,6 @@ function toAbsoluteFromApiOrigin(pathOrUrl: string): string {
   const path = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`;
   return `${origin}${path}`;
 }
-
-export type CurrentUser = {
-  id: number;
-  email: string;
-  documentsPendingAcceptance: boolean;
-};
 
 export type AuthData = { userId: number; accessToken: string };
 
@@ -120,8 +108,4 @@ export async function deleteAccount(): Promise<void> {
   } finally {
     clearAccessToken();
   }
-}
-
-export function isNeedCaptchaEnvelope(envelope: CommonResponseEnvelope<unknown>): boolean {
-  return envelope.resultCode === ResultCodes.NEED_CAPTCHA_AUTHORIZATION;
 }

@@ -1,7 +1,6 @@
 import { FC, FormEvent, useCallback, useState } from 'react';
 
 import {
-  getCaptchaUrl,
   isNeedCaptchaEnvelope,
   validateLoginEmail,
   validateLoginPassword,
@@ -20,9 +19,17 @@ type Props = {
   isSubmitting: boolean;
   onLogin: (input: LoginInput) => Promise<void>;
   onRegister: (input: RegisterInput) => Promise<void>;
+  loadCaptchaUrl: () => Promise<string>;
 };
 
-const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting, onLogin, onRegister }) => {
+const AuthPageLogicLayer: FC<Props> = ({
+  activeTab,
+  redirectSearch,
+  isSubmitting,
+  onLogin,
+  onRegister,
+  loadCaptchaUrl,
+}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [consent, setConsent] = useState(false);
@@ -107,7 +114,7 @@ const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting
             setShowCaptcha(true);
             setCaptcha('');
             try {
-              const url = await getCaptchaUrl();
+              const url = await loadCaptchaUrl();
               setCaptchaImageUrl(url);
             } catch {
               setCaptchaImageUrl(null);
@@ -127,6 +134,7 @@ const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting
       consent,
       termsAccepted,
       email,
+      loadCaptchaUrl,
       onLogin,
       onRegister,
       password,

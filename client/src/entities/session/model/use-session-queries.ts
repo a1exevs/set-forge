@@ -5,19 +5,22 @@ import {
   useQueryClient,
   type UseQueryResult,
 } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
 
+import type { CurrentUser } from './current-user';
 import { sessionQueryKeys } from './session-keys';
 import {
   type AuthData,
-  type CurrentUser,
   deleteAccount,
   deleteLogout,
   fetchCurrentUser,
+  getCaptchaUrl,
   patchDocumentsAcceptance,
   postLogin,
   postRegistration,
 } from '../api/session-api';
+
+// Session mutations own the session cache only. Where the user goes next (home, redirect target, /login) is the
+// caller's flow — see pages/auth, pages/profile and features/logout.
 
 export function useCurrentUserQuery(enabled: boolean): UseQueryResult<CurrentUser | null> {
   return useQuery<CurrentUser | null>({
@@ -27,74 +30,50 @@ export function useCurrentUserQuery(enabled: boolean): UseQueryResult<CurrentUse
   });
 }
 
-type LoginVars = { email: string; password: string; captcha?: string; redirectTo?: string };
+type LoginVars = { email: string; password: string; captcha?: string };
 type RegisterVars = {
   email: string;
   password: string;
   consent: boolean;
   termsAccepted: boolean;
-  redirectTo?: string;
 };
 
 export function useLoginMutation(): UseMutationResult<AuthData, Error, LoginVars> {
-  const navigate = useNavigate();
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: LoginVars) => {
-      const { redirectTo: _r, ...rest } = vars;
-      return postLogin(rest.email, rest.password, rest.captcha);
-    },
-    onSuccess: async (_data, vars) => {
+    mutationFn: async ({ email, password, captcha }: LoginVars) => postLogin(email, password, captcha),
+    onSuccess: async () => {
       const user = await fetchCurrentUser();
       if (user) {
         qc.setQueryData(sessionQueryKeys.me, user);
-      }
-      const target =
-        vars.redirectTo && vars.redirectTo.startsWith('/') && !vars.redirectTo.startsWith('//') ? vars.redirectTo : '/';
-      if (target === '/') {
-        await navigate({ to: '/' });
-      } else {
-        window.location.assign(`${window.location.origin}${target}`);
       }
     },
   });
 }
 
 export function useRegisterMutation(): UseMutationResult<AuthData, Error, RegisterVars> {
-  const navigate = useNavigate();
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: RegisterVars) => {
-      const { redirectTo: _r, ...rest } = vars;
-      return postRegistration(rest.email, rest.password, rest.consent, rest.termsAccepted);
-    },
-    onSuccess: async (_data, vars) => {
+    mutationFn: async ({ email, password, consent, termsAccepted }: RegisterVars) =>
+      postRegistration(email, password, consent, termsAccepted),
+    onSuccess: async () => {
       const user = await fetchCurrentUser();
       if (user) {
         qc.setQueryData(sessionQueryKeys.me, user);
-      }
-      const target =
-        vars.redirectTo && vars.redirectTo.startsWith('/') && !vars.redirectTo.startsWith('//') ? vars.redirectTo : '/';
-      if (target === '/') {
-        await navigate({ to: '/' });
-      } else {
-        window.location.assign(`${window.location.origin}${target}`);
       }
     },
   });
 }
 
 export function useLogoutMutation(): UseMutationResult<void, Error, void> {
-  const navigate = useNavigate();
   const qc = useQueryClient();
 
   return useMutation({
     mutationFn: deleteLogout,
     onSettled: () => {
       qc.clear();
-      void navigate({ to: '/login' });
     },
   });
 }
@@ -111,7 +90,6 @@ export function useAcceptDocumentsMutation(): UseMutationResult<CurrentUser, Err
 }
 
 export function useDeleteAccountMutation(): UseMutationResult<void, Error, void> {
-  const navigate = useNavigate();
   const qc = useQueryClient();
 
   return useMutation({
@@ -119,7 +97,11 @@ export function useDeleteAccountMutation(): UseMutationResult<void, Error, void>
     onSettled: () => {
       // The account is gone: drop every cached query (profile, workout lists, sessions, history).
       qc.clear();
-      void navigate({ to: '/login' });
     },
   });
+}
+
+/** Loads a fresh captcha image URL (after the server answered a login with "captcha required"). */
+export function useCaptchaUrlMutation(): UseMutationResult<string, Error, void> {
+  return useMutation({ mutationFn: getCaptchaUrl });
 }

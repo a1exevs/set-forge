@@ -27,7 +27,7 @@ app → pages → widgets → features → entities → shared        (arrows = 
 | `shared/` | domain-agnostic code: UI kit, HTTP client, config, helpers | no | — (its own segments only) |
 
 - Only **downwards**. Never sideways between slices of one layer (§7), never upwards.
-- A layer is created when its first slice appears — no empty folders (there is no `features/` yet).
+- A layer is created when its first slice appears — no empty folders.
 - Nobody imports `app/`: it is the top. Its entry point `app/entrypoint/main.tsx` is referenced from `index.html`.
 
 ## 2. Where does new code go?
@@ -62,6 +62,8 @@ Our examples:
 | `Button`, `Select`, `NotFoundMessage`, `Toaster` | `shared/ui` | UI kit |
 | `useConfirm`, `toastError`, `formatDate`, `useThemeStore` | `shared/lib` | generic helpers and hooks |
 | `LegalLang`, screen widths | `shared/config` | constants |
+| `useLogout` (sign out + go to `/login`) | `features/logout/model` | one user action used by two slices (profile page, re-consent gate) |
+| redirect after sign-in (`resolveRedirectTarget`, `useRedirectAfterAuth`) | `pages/auth/lib`, `pages/auth/model` | a flow of one page; entities never navigate |
 
 `shared` never knows about the domain: no workouts or sessions there, and it never imports from other layers.
 
@@ -285,6 +287,7 @@ src/
 │   └── styles/         global.scss
 ├── pages/              auth, create-workout, edit-workout, history, home, privacy, profile, terms, workout-mode
 ├── widgets/            document-reconsent, legal-footer, main-tabs-bar, workout-list-form
+├── features/           logout
 ├── entities/
 │   ├── session/                 index.ts, api/, model/ (queries, keys, bootstrap-session, validation)
 │   ├── workout-exercise/        index.ts, @x/ (workout-list, workout-session-exercise), model/, ui/
