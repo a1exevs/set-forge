@@ -1,5 +1,4 @@
-import type { LegalLang } from '@shared/config';
-import type { LegalContent } from '@shared/ui';
+import type { LegalContent, LegalLang } from '@widgets/legal-document';
 
 /** Effective date of the current version. Bump when the terms text changes. */
 export const TERMS_EFFECTIVE_DATE = '2026-07-18';

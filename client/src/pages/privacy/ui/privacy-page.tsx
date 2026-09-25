@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { LegalDocument } from '@shared/ui';
+import { LegalDocument } from '@widgets/legal-document';
 
 import { PRIVACY_EFFECTIVE_DATE, privacyContent } from '../config/privacy-policy-content';
 

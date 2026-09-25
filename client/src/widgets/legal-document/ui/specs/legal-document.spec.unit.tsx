@@ -2,9 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
-import type { LegalLang } from '@shared/config';
-
-import type { LegalContent } from '../legal-document';
+import type { LegalContent, LegalLang } from '../../model/legal-content';
 import LegalDocument from '../legal-document-logic-layer';
 
 const mockBack = jest.fn();

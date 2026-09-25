@@ -2,7 +2,7 @@
 
 ## Overview
 
-Public Terms of Use page on `/terms`. Presentation-only wrapper around the shared [`LegalDocument`](../shared/shared-components.spec.md#legaldocument) component; the terms text lives in the page `model`. Related: [user entity](../entities/user.entity.spec.md), [privacy-page](privacy-page.spec.md).
+Public Terms of Use page on `/terms`. Presentation-only wrapper around the [`LegalDocument`](../widgets/legal-document.widget.spec.md) widget component; the terms text lives in the page `model`. Related: [user entity](../entities/user.entity.spec.md), [privacy-page](privacy-page.spec.md).
 
 ---
 
@@ -33,7 +33,7 @@ Public Terms of Use page on `/terms`. Presentation-only wrapper around the share
 
 ### Document
 
-1. Shared `LegalDocument` renders header (Back button, RU/EN switch, wordmark, title, effective date), intro, and sections (data-driven). Includes a health/liability disclaimer and cross-links to the Privacy Policy.
+1. The `LegalDocument` widget renders header (Back button, RU/EN switch, wordmark, title, effective date), intro, and sections (data-driven). Includes a health/liability disclaimer and cross-links to the Privacy Policy.
 
 ---
 
@@ -55,7 +55,7 @@ Public Terms of Use page on `/terms`. Presentation-only wrapper around the share
 
 ## Data Model
 
-- Content shape: `Record<LegalLang, LegalContent>` — see [`LegalDocument`](../shared/shared-components.spec.md#legaldocument).
+- Content shape: `Record<LegalLang, LegalContent>` — see [`LegalDocument`](../widgets/legal-document.widget.spec.md).
 - `TERMS_EFFECTIVE_DATE: string` — bumped when the terms text changes.
 
 ---
@@ -71,9 +71,9 @@ None — static content only.
 | Category | Technology |
 |----------|------------|
 | Routing | TanStack Router (public route) |
-| UI | shared `LegalDocument` |
+| UI | `LegalDocument` widget |
 | Build-time config | Vite `define` (contact email) |
-| FSD | `pages/terms`, `shared/ui/legal-document` |
+| FSD | `pages/terms`, `widgets/legal-document` |
 
 ---
 
@@ -91,7 +91,7 @@ The slice `index.ts` exports only the page component; rows marked internal stay 
 
 ## Tests
 
-- Covered by the shared `LegalDocument` unit tests and Storybook.
+- Covered by the `LegalDocument` widget unit tests and Storybook.
 
 ---
 
@@ -117,5 +117,5 @@ The slice `index.ts` exports only the page component; rows marked internal stay 
 
 - [user.entity.spec.md](../entities/user.entity.spec.md)
 - [privacy-page.spec.md](privacy-page.spec.md)
-- [shared-components.spec.md](../shared/shared-components.spec.md#legaldocument)
+- [legal-document.widget.spec.md](../widgets/legal-document.widget.spec.md)
 - [personal-data-compliance.mdc](../../rules/personal-data-compliance.mdc)

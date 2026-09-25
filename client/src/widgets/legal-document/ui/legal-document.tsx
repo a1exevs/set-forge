@@ -2,24 +2,11 @@ import { Link } from '@tanstack/react-router';
 import { ArrowLeft } from 'lucide-react';
 import { FC, Fragment } from 'react';
 
-import { LEGAL_BACK_LABELS, LEGAL_LANG_LABELS, type LegalLang } from '@shared/config';
+import { BrandWordmark } from '@shared/ui';
 
 import classes from './legal-document.module.scss';
-import BrandWordmark from '../brand-wordmark/brand-wordmark';
-
-/** An inline link inside paragraph text: `to` for an in-app route, `href` for external (e.g. mailto:). */
-type LegalLink = { text: string; to?: '/privacy' | '/terms'; href?: string };
-
-/** Paragraph text: a plain string, or a sequence of strings and inline links. */
-type LegalText = string | Array<string | LegalLink>;
-
-type LegalBlock = { type: 'p'; text: LegalText } | { type: 'ul'; items: string[] };
-
-type LegalSection = {
-  heading: string;
-  /** Paragraphs and/or bullet lists rendered in order. */
-  blocks: LegalBlock[];
-};
+import { LEGAL_BACK_LABELS, LEGAL_LANG_LABELS } from '../config/legal-labels';
+import type { LegalBlock, LegalContent, LegalLang, LegalLink, LegalSection, LegalText } from '../model/legal-content';
 
 type LegalRichTextProps = { text: LegalText };
 
@@ -48,13 +35,6 @@ const LegalRichText: FC<LegalRichTextProps> = ({ text }) => {
       })}
     </>
   );
-};
-
-export type LegalContent = {
-  title: string;
-  effectiveLabel: string;
-  intro: string;
-  sections: LegalSection[];
 };
 
 type Props = {

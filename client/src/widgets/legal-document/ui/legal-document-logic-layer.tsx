@@ -1,9 +1,8 @@
 import { useRouter } from '@tanstack/react-router';
 import { FC, useState } from 'react';
 
-import type { LegalLang } from '@shared/config';
-
-import LegalDocument, { type LegalContent } from './legal-document';
+import LegalDocument from './legal-document';
+import type { LegalContent, LegalLang } from '../model/legal-content';
 
 type Props = {
   content: Record<LegalLang, LegalContent>;

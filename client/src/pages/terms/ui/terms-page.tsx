@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { LegalDocument } from '@shared/ui';
+import { LegalDocument } from '@widgets/legal-document';
 
 import { TERMS_EFFECTIVE_DATE, termsContent } from '../config/terms-content';
 

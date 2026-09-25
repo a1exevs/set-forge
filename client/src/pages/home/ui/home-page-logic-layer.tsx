@@ -1,9 +1,10 @@
 import { ChangeEvent, FC, useRef } from 'react';
 
 import type { WorkoutList, WorkoutListsExportFile } from '@entities/workout-list';
-import { buildWorkoutListsExportFilename, downloadJsonFile, toastError, toastSuccess, useConfirm } from '@shared/lib';
+import { downloadJsonFile, toastError, toastSuccess, useConfirm } from '@shared/lib';
 
 import HomePage from './home-page';
+import { buildWorkoutListsExportFilename } from '../lib/workout-lists-export-filename';
 
 type Props = {
   workoutLists: WorkoutList[];

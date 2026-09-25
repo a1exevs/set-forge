@@ -61,7 +61,9 @@ Our examples:
 | `apiRequest`, access token | `shared/api` | transport, knows nothing about workouts |
 | `Button`, `Select`, `NotFoundMessage`, `Toaster` | `shared/ui` | UI kit |
 | `useConfirm`, `toastError`, `formatDate`, `useThemeStore` | `shared/lib` | generic helpers and hooks |
-| `LegalLang`, screen widths | `shared/config` | constants |
+| screen widths | `shared/config` | constants |
+| `LegalDocument` (knows `/privacy`, `/terms`, `/login`, the brand) | `widgets/legal-document` | used by two pages; not domain-agnostic, so not `shared` |
+| export file name `set-forge-workout-lists-<day>.json` | `pages/home/lib` | domain naming, one consumer |
 | `useLogout` (sign out + go to `/login`) | `features/logout/model` | one user action used by two slices (profile page, re-consent gate) |
 | redirect after sign-in (`resolveRedirectTarget`, `useRedirectAfterAuth`) | `pages/auth/lib`, `pages/auth/model` | a flow of one page; entities never navigate |
 
@@ -286,7 +288,7 @@ src/
 │   ├── routes/         TanStack file routes (__root, index, create, edit/$id, workout/$id, …)
 │   └── styles/         global.scss
 ├── pages/              auth, create-workout, edit-workout, history, home, privacy, profile, terms, workout-mode
-├── widgets/            document-reconsent, legal-footer, main-tabs-bar, workout-list-form
+├── widgets/            document-reconsent, legal-document, legal-footer, main-tabs-bar, workout-list-form
 ├── features/           logout
 ├── entities/
 │   ├── session/                 index.ts, api/, model/ (queries, keys, bootstrap-session, validation)
@@ -296,7 +298,7 @@ src/
 │   └── workout-session-exercise/ index.ts, @x/ (workout-session), model/, ui/
 └── shared/
     ├── api/            index.ts, http-client, access-token-store, refresh-access-token, …
-    ├── config/         index.ts, legal, screen-widths
+    ├── config/         index.ts, screen-widths
     ├── lib/            index.ts, confirm/, swipe/, theme/, toast, format-date, numeric-input, …
     └── ui/             index.ts, button/, select/, transition/, not-found-message/, styles/, …
 ```

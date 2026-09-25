@@ -1,5 +1,4 @@
-import type { LegalLang } from '@shared/config';
-import type { LegalContent } from '@shared/ui';
+import type { LegalContent, LegalLang } from '@widgets/legal-document';
 
 /**
  * Operator identity shown in the policy and used as the contact point for data-subject requests.

@@ -1,6 +1,6 @@
 export { ConfirmContext, type ConfirmOptions, type ConfirmResult } from './confirm/confirm-context';
 export { useConfirm } from './confirm/use-confirm';
-export { buildWorkoutListsExportFilename, downloadJsonFile } from './download-json-file';
+export { downloadJsonFile } from './download-json-file';
 export { formatBadgeCount } from './format-badge-count';
 export { formatDate } from './format-date';
 export {

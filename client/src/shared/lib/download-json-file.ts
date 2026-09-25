@@ -7,8 +7,3 @@ export function downloadJsonFile(data: unknown, filename: string): void {
   anchor.click();
   URL.revokeObjectURL(url);
 }
-
-export function buildWorkoutListsExportFilename(date = new Date()): string {
-  const day = date.toISOString().slice(0, 10);
-  return `set-forge-workout-lists-${day}.json`;
-}

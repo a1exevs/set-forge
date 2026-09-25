@@ -1,5 +1,4 @@
-// TODO Support language switcher across the site
-export type LegalLang = 'ru' | 'en';
+import type { LegalLang } from '../model/legal-content';
 
 export const LEGAL_LANG_LABELS: Record<LegalLang, string> = { ru: 'RU', en: 'EN' };
 
