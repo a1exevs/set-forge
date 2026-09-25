@@ -1,12 +1,12 @@
 import { FC, useEffect, useRef, useState } from 'react';
 
 import type { WorkoutList } from '@entities/workout-list';
-import type { WorkoutSession } from '@entities/workout-session';
+import { countCompletedExercises, isSessionFullyComplete, type WorkoutSession } from '@entities/workout-session';
+import { hasRemainingSets } from '@entities/workout-session-exercise';
 import { toastError, useConfirm } from '@shared/lib';
 
 import WorkoutModePage from './workout-mode-page';
 import { fireWorkoutCompleteConfetti } from '../lib/fire-workout-complete-confetti';
-import { isSessionFullyComplete } from '../model/session-completion';
 
 type Props = {
   workoutList: WorkoutList | null | undefined;
@@ -67,7 +67,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
       return;
     }
 
-    if (exercise.completedSets >= exercise.sets) {
+    if (!hasRemainingSets(exercise)) {
       return;
     }
 
@@ -147,7 +147,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     }
 
     const totalExercises = session.exercises.length;
-    const completedExercises = session.exercises.filter(ex => ex.sets > 0 && ex.completedSets === ex.sets).length;
+    const completedExercises = countCompletedExercises(session);
     const overallProgress = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0;
 
     return { totalExercises, completedExercises, overallProgress };

@@ -1,4 +1,4 @@
-import type { WorkoutSession } from '@entities/workout-session';
+import { countCompletedExercises, type WorkoutSession } from '@entities/workout-session';
 
 export const formatSessionDate = (iso: string | null): string => {
   if (!iso) {
@@ -10,9 +10,6 @@ export const formatSessionDate = (iso: string | null): string => {
     year: 'numeric',
   });
 };
-
-export const countCompletedExercises = (session: WorkoutSession): number =>
-  session.exercises.filter(exercise => exercise.sets > 0 && exercise.completedSets >= exercise.sets).length;
 
 export const formatDuration = (session: WorkoutSession): string | null => {
   if (!session.finishedAt) {

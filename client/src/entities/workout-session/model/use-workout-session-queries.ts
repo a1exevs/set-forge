@@ -1,6 +1,8 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 
+import { hasRemainingSets } from '@entities/workout-session-exercise/@x/workout-session';
+
 import type { WorkoutSession } from './workout-session';
 import { workoutSessionQueryKeys } from './workout-session-query-keys';
 import {
@@ -18,7 +20,7 @@ const HISTORY_PAGE_SIZE = 20;
 const applyProgressIncrement = (session: WorkoutSession, exerciseId: string): WorkoutSession => ({
   ...session,
   exercises: session.exercises.map(exercise => {
-    if (exercise.id !== exerciseId || exercise.completedSets >= exercise.sets) {
+    if (exercise.id !== exerciseId || !hasRemainingSets(exercise)) {
       return exercise;
     }
     return { ...exercise, completedSets: exercise.completedSets + 1 };

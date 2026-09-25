@@ -1,6 +1,6 @@
 import type { WorkoutSession } from '@entities/workout-session';
 
-import { countCompletedExercises, formatDuration, formatSessionDate, formatSummary } from '../history-formatters';
+import { formatDuration, formatSessionDate, formatSummary } from '../history-formatters';
 
 const buildSession = (overrides: Partial<WorkoutSession> = {}): WorkoutSession => ({
   id: 'sess-1',
@@ -42,31 +42,6 @@ describe('history-page-formatters', () => {
 
     it('formats an ISO date in en-US locale', () => {
       expect(formatSessionDate('2026-06-03T12:00:00.000Z')).toMatch(/Jun 3, 2026/);
-    });
-  });
-
-  describe('countCompletedExercises', () => {
-    it('counts exercises where completedSets meets or exceeds sets', () => {
-      expect(countCompletedExercises(buildSession())).toBe(1);
-    });
-
-    it('ignores exercises with zero sets', () => {
-      const session = buildSession({
-        exercises: [
-          {
-            id: 'ex-1',
-            sourceExerciseId: null,
-            name: 'Stretch',
-            muscleGroup: 'back',
-            weight: 0,
-            reps: 1,
-            sets: 0,
-            completedSets: 0,
-          },
-        ],
-      });
-
-      expect(countCompletedExercises(session)).toBe(0);
     });
   });
 

@@ -26,7 +26,7 @@ Runs a workout for a list at `/workout/$id` (`$id` = [workout list](../entities/
 - `ui/workout-mode-page-logic-layer.tsx`
 - `ui/workout-mode-page.tsx`
 - `ui/workout-mode-page.module.scss`
-- `model/workout-phase.ts` — `WorkoutPhase`; `model/session-completion.ts` — `isSessionFullyComplete`
+- `model/workout-phase.ts` — `WorkoutPhase` (completion rules come from the entities: `isSessionFullyComplete`, `countCompletedExercises`, `hasRemainingSets`)
 - `lib/fire-workout-complete-confetti.ts`
 - `index.ts` (slice public API; no `index.ts` inside segments)
 - `ui/specs/workout-mode-page.spec.unit.tsx`

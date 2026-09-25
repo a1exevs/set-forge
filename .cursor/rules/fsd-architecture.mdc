@@ -49,7 +49,8 @@ Our examples:
 | Code | Place | Why |
 |---|---|---|
 | `HomePage` (data / logic / view layers) | `pages/home/ui` | a screen |
-| `WorkoutPhase`, `AuthTab`, `isSessionFullyComplete` | `pages/<slice>/model` | page-local types and logic, out of components |
+| `WorkoutPhase`, `AuthTab` | `pages/<slice>/model` | page-local types, out of components |
+| `isExerciseComplete`, `isSessionFullyComplete`, `countCompletedExercises` | `entities/workout-session-exercise/model`, `entities/workout-session/model` | a business rule used by several pages and the entity card — one definition in the entity |
 | history date/duration formatters, confetti | `pages/history/lib`, `pages/workout-mode/lib` | helpers of one page |
 | privacy / terms texts | `pages/<slice>/config` | constants |
 | `WorkoutListForm`, `MainTabsBar`, `DocumentReconsentGate` | `widgets/*/ui` | big blocks over several entities |

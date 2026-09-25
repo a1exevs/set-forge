@@ -1,6 +1,7 @@
 import { FC, KeyboardEvent } from 'react';
 
 import WorkoutSessionExerciseCard from './workout-session-exercise-card';
+import { getExerciseProgress, isExerciseComplete } from '../../model/exercise-progress';
 import type { WorkoutSessionExercise } from '../../model/workout-session-exercise';
 
 type Props = {
@@ -11,8 +12,8 @@ type Props = {
 };
 
 const WorkoutSessionExerciseCardLogicLayer: FC<Props> = ({ exercise, justCompleted, isFinished, onTap }) => {
-  const progress = exercise.sets > 0 ? (exercise.completedSets / exercise.sets) * 100 : 0;
-  const isCompleted = exercise.sets > 0 && exercise.completedSets === exercise.sets;
+  const progress = getExerciseProgress(exercise);
+  const isCompleted = isExerciseComplete(exercise);
 
   const handleActivate = (): void => {
     onTap(exercise.id);

@@ -165,6 +165,8 @@ Nested `exercises` shape: [workout-session-exercise.entity.spec.md](workout-sess
 | `resyncWorkoutSession(sessionId)` | function | `POST .../resync` |
 | `discardWorkoutSession(sessionId)` | function | `DELETE /workout-sessions/:id` |
 | `clearWorkoutSessionCachesForDeletedList(qc, listId)` | function | Clears `active`, `forList`, and cached `detail` after list delete |
+| `countCompletedExercises(session)` | function | Exercises with every set done (`isExerciseComplete`) |
+| `isSessionFullyComplete(session)` | function | Has exercises and all of them are complete |
 | `useActiveWorkoutSessionQuery(listId)` | hook | Workout mode phase detection; edit-page resync prompt |
 | `useStartWorkoutSessionMutation()` | hook | Explicit start on workout mode preview |
 | `useWorkoutHistoryInfiniteQuery(enabled)` | hook | History page infinite query |

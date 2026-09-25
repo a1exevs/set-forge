@@ -127,6 +127,10 @@ No dedicated endpoints. Shape is nested under `WorkoutSessionResponse` — see [
 |--------|------|-------------|
 | `WorkoutSessionExercise` | type | Session exercise snapshot |
 | `WorkoutSessionExerciseCard` | component | Interactive training exercise card |
+| `isExerciseComplete(exercise)` | function | `sets > 0 && completedSets >= sets` — the one completion rule (same as the server; `>=` covers a plan reduced mid-session) |
+| `hasRemainingSets(exercise)` | function | `completedSets < sets` — whether another set can be logged |
+
+`model/exercise-progress.ts` also has `getExerciseProgress` (0–100, capped) for the card. `@x/workout-session` exposes `isExerciseComplete` and `hasRemainingSets` to the session entity.
 
 Public API: `@entities/workout-session-exercise` (`client/src/entities/workout-session-exercise/index.ts`); `workout-session` uses `@x/workout-session`.
 

@@ -4,7 +4,7 @@ import { FC, RefObject } from 'react';
 
 import { muscleGroupLabels } from '@entities/workout-exercise';
 import type { WorkoutSession } from '@entities/workout-session';
-import type { WorkoutSessionExercise } from '@entities/workout-session-exercise';
+import { isExerciseComplete, type WorkoutSessionExercise } from '@entities/workout-session-exercise';
 import { useTabSwipeNavigation } from '@shared/lib';
 import { BrandWordmark } from '@shared/ui';
 import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets/main-tabs-bar';
@@ -98,7 +98,7 @@ const HistoryPage: FC<Props> = ({
                 {isOpen && (
                   <div className={classes.details}>
                     {session.exercises.map((exercise: WorkoutSessionExercise) => {
-                      const done = exercise.sets > 0 && exercise.completedSets >= exercise.sets;
+                      const done = isExerciseComplete(exercise);
 
                       return (
                         <div key={exercise.id} className={classes.exerciseRow}>

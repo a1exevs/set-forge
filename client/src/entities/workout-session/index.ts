@@ -1,3 +1,4 @@
+export { countCompletedExercises, isSessionFullyComplete } from './model/session-progress';
 export { useClearWorkoutSessionCachesForDeletedList } from './model/clear-workout-session-caches-for-deleted-list';
 export {
   useActiveWorkoutSessionQuery,
