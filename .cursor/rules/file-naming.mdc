@@ -1,62 +1,37 @@
 ---
-description: File naming conventions - kebab-case for all files
-globs: ["client/**", "server/**"]
+description: File naming — kebab-case everywhere, names by purpose in the client, route import names
+globs: client/**, server/**
+alwaysApply: false
 ---
 
-# File Naming Conventions
+# File Naming
 
-All files in this project MUST use **kebab-case** (lowercase with hyphens).
+All files and folders use **kebab-case** (lowercase with hyphens): consistent, safe on case-insensitive file systems,
+the same convention as URLs and CSS classes.
 
-## Rules
-
-### Files
+## Files
 
 ```
-✅ CORRECT:
-- home-page.tsx
-- add-exercise-form.tsx
-- workout-list-store.ts
-- storage.service.ts
-- button.module.scss
-- create-selectors.ts
-
-❌ WRONG:
-- HomePage.tsx (PascalCase)
-- addExerciseForm.tsx (camelCase)
-- WorkoutListStore.ts (PascalCase)
-- storageService.ts (camelCase)
-- ButtonModule.scss (PascalCase)
+✅ home-page.tsx, add-exercise-form.tsx, workout-list-store.ts, storage.service.ts, button.module.scss
+❌ HomePage.tsx (PascalCase), addExerciseForm.tsx (camelCase), storageService.ts (camelCase)
 ```
 
-### TanStack Router Exception
+TanStack Router exception: file routes use `__root.tsx` and the `$` prefix for params (`routes/workout/$id.tsx`).
 
-Dynamic route parameters use `$` prefix:
-```
-✅ CORRECT: routes/workout/$id.tsx
-```
+## Route import names
 
-### Import Variable Naming
-
-When importing routes, use simple, concise names without redundant suffixes:
+Import variable names are concise and match the essence of the file, not the full path or the params:
 
 ```typescript
-// ✅ CORRECT - simple, concise names
-import { Route as rootRoute } from '../routes/__root';
-import { Route as indexRoute } from '../routes/index';
-import { Route as createRoute } from '../routes/create';
+// ✅
 import { Route as workoutRoute } from '../routes/workout/$id';
-
-// ❌ WRONG - verbose, redundant suffixes
+// ❌
 import { Route as workoutIdRoute } from '../routes/workout/$id';
-import { Route as createWorkoutListRoute } from '../routes/create';
 ```
-
-**Principle:** Import variable names should be concise and match the essence of the file, not replicate the full path or dynamic parameters.
 
 ## Client: names by purpose
 
-In `client/src` a file or folder is named after **what it is for**, not what kind of code it holds
-(FSD, see fsd-architecture §4). `client/scripts/check-structure.mjs` fails on:
+In `client/src` a file or folder is named after **what it is for**, not what kind of code it holds (fsd-architecture §4):
 
 ```
 ❌ types.ts, consts.ts, utils.ts, helpers.ts, menu-button.types.ts, access-token.store.ts
@@ -64,16 +39,15 @@ In `client/src` a file or folder is named after **what it is for**, not what kin
 ✅ workout-list.ts, screen-widths.ts, format-date.ts, access-token-store.ts, swipe/, confirm/
 ```
 
-Tests: `*.spec.unit.tsx` / `*.spec.snap.tsx` inside a `specs/` folder next to the tested code.
+- Tests: `*.spec.unit.tsx` / `*.spec.snap.tsx` inside a `specs/` folder next to the tested code.
+- Imports and public APIs: see fsd-architecture §5–§7.
 
-## Import Conventions
+## Enforcement
 
-Imports and index files (public APIs) follow fsd-architecture §5–§7: relative inside a slice, `@layer/slice` /
-`@shared/segment` across slices, never `src/...` inside `client/src`.
-
-## Rationale
-
-- **Consistency**: All files follow the same pattern
-- **Cross-platform**: Works on case-sensitive and case-insensitive filesystems
-- **Readability**: Hyphens clearly separate words
-- **Standard**: Common in web development (URLs, CSS classes)
+| Rule | Checked by |
+|---|---|
+| kebab-case in `client/src`, `client/tests`, `client/linter`, `client/scripts` (route files excepted) | `npm run client:lint` · `client/scripts/check-structure.mjs` |
+| Client names by purpose (folders and file suffixes) | `npm run client:lint` · `client/scripts/check-structure.mjs` · Steiger `fsd/segments-by-purpose` |
+| Client tests in `specs/` | `npm run client:lint` · `client/scripts/check-structure.mjs` |
+| kebab-case in `server/` | ❌ review |
+| Route import names | ❌ review (the route tree is generated) |

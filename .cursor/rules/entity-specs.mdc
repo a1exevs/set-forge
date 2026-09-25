@@ -1,6 +1,7 @@
 ---
 description: Entity spec format — DB, API contract, client entity (spec-anchored truth)
-globs: [".cursor/specs/entities/*.entity.spec.md", "server/src/**/*.model.ts", "client/src/entities/**"]
+globs: .cursor/specs/entities/*.entity.spec.md, server/src/**/*.model.ts, client/src/entities/**
+alwaysApply: false
 ---
 
 # Entity specs
@@ -28,3 +29,9 @@ One file per server module or client `entities/<name>/` slice. Child DB tables w
 - Describe **current code state** — no Stage N, no delivery roadmap, no removed features as active.
 - Update entity spec first when DB schema or API changes.
 - New entity → create file + add line to [.cursor/README.md](../README.md).
+
+## Enforcement
+
+| Rule | Checked by |
+|---|---|
+| Required sections, current state only, API contract only in entity specs | ❌ review |

@@ -1,6 +1,7 @@
 ---
 description: Page spec format — UI, logic, API usage links (no duplicated entity contracts)
-globs: [".cursor/specs/pages/*-page.spec.md", "client/src/pages/**"]
+globs: .cursor/specs/pages/*-page.spec.md, client/src/pages/**
+alwaysApply: false
 ---
 
 # Page specs
@@ -31,3 +32,9 @@ Path: `.cursor/specs/pages/<kebab-page>-page.spec.md`
 - Describe **current code state** — no Stage N, no «as of Stage 3».
 - New page → file in `specs/pages/` + `## Used by` in entity spec + line in [.cursor/README.md](../README.md).
 - Shared components: link `../shared/shared-components.spec.md#Anchor`, do not copy Props.
+
+## Enforcement
+
+| Rule | Checked by |
+|---|---|
+| Required sections, no duplicated entity contracts, current state only | ❌ review |

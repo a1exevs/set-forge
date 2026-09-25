@@ -4,7 +4,10 @@
 
 - Specs describe **current code state** (no Stage N, no delivery roadmap).
 - Entity specs own API contracts; page specs link via `## API usage`.
-- Rules in `.cursor/rules/` are immutable conventions.
+- Rules in `.cursor/rules/` are immutable conventions with one structure: frontmatter `description` / `globs` /
+  `alwaysApply`, `# Title`, topic sections, optional `## Related`, and `## Enforcement` last (what checks each rule,
+  or `❌ review`). `npm run client:lint` (`client/scripts/check-rules.mjs`) keeps that structure and every reference
+  in Enforcement valid.
 
 ## Specs layout
 

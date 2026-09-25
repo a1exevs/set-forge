@@ -1,12 +1,13 @@
 ---
 description: Feature-Sliced Design (React) — layers, slices, segments, where code goes, public API, @x, import rules
-globs: ["client/**"]
+globs: client/**
+alwaysApply: false
 ---
 
 # Feature-Sliced Design
 
 `client/src` follows standard [Feature-Sliced Design](https://feature-sliced.design/docs/get-started/overview).
-`npm run client:lint` enforces almost all of it — see [§10 Enforcement](#10-enforcement). What no tool can check is
+`npm run client:lint` enforces almost all of it — see [Enforcement](#enforcement). What no tool can check is
 marked there.
 
 Structure: **layer → slice → segment → file**. `app` and `shared` have no slices (layer → segment → file).
@@ -251,33 +252,6 @@ internals (`jest.mock('src/entities/session/model/bootstrap-session')`), and pre
 4. Imports: relative inside the slice, `@layer/slice` / `@shared/segment` across, `@x` between entities (§6, §7).
 5. `npm run client:lint` green.
 
-## 10. Enforcement
-
-`npm run client:lint` = `lint:structure` → `lint:eslint` → `lint:fsd` (Steiger) → `lint:unused` (knip).
-
-| Rule | Checked by |
-|---|---|
-| Only downwards between layers | ESLint `no-restricted-imports` (aliases, `linter/rules/fsd-imports-rule.ts`), Steiger `forbidden-imports` (relative paths) |
-| No imports between slices of one layer; `@x` only for its consumer entity | ESLint (aliases, per-slice config), Steiger `forbidden-imports` |
-| Through the public API only | ESLint (aliases), Steiger `no-public-api-sidestep` (relative paths) |
-| No `src/...` paths, no bare layer aliases in `src` | ESLint |
-| No import of your own slice/segment index | ESLint `no-restricted-imports` (`.` / `..`) |
-| No dependency cycles | ESLint `import/no-cycle`, `import/no-self-import` |
-| Segment direction `ui → model → api → lib, config`, in slices and in `shared` | ESLint `import/no-restricted-paths` (zones generated per slice and for `shared`, `linter/rules/segment-direction-rule.ts`); api / lib / config → own `model`: `import type` only — `@typescript-eslint/no-restricted-imports` with `allowTypeImports` (`sliceModelTypeOnlyRule`, `sharedModelTypeOnlyRule`) |
-| `ui/` holds components and props types only | ESLint `no-restricted-syntax` (`linter/rules/ui-segment-rule.ts`) |
-| `interface` only for domain entities in `entities/*/model` | ESLint `@typescript-eslint/consistent-type-definitions` |
-| Headless UI / sonner only in shared, React Query not in ui (slices and `shared/ui`) | ESLint `no-restricted-imports` |
-| `shared` imports no other layer; another `shared` segment only via `@shared/<segment>` | ESLint `no-restricted-imports` (aliases and relative paths), Steiger `forbidden-imports` |
-| `index.ts` placement (§5), `@x` file names, allowed segments, nothing but `index.ts` in a slice root | `scripts/check-structure.mjs`, Steiger `public-api`, `no-layer-public-api`, `no-segmentless-slices` |
-| No `export *` | `scripts/check-structure.mjs` |
-| No `eslint-disable` of FSD rules, no blanket `eslint-disable` | `scripts/check-structure.mjs` (Steiger has no inline disables at all) |
-| Names by purpose (no `hooks/`, `types.ts`, `*.store.ts`…) | `scripts/check-structure.mjs`, Steiger `segments-by-purpose` |
-| Tests in `specs/`, kebab-case names | `scripts/check-structure.mjs` |
-| No unused exports / files / dependencies | knip (`client/knip.jsonc`) |
-| Pages first | Steiger `insignificant-slice` — **warning only** |
-| `shared` knows nothing about the domain | ❌ not checkable (upward imports are caught, domain concepts are not) — review |
-| Which layer new code belongs to (§2) | ❌ a design decision — review |
-
 ## Current structure
 
 ```
@@ -303,3 +277,28 @@ src/
     ├── lib/            index.ts, confirm/, swipe/, theme/, toast, format-date, numeric-input, …
     └── ui/             index.ts, button/, select/, transition/, not-found-message/, styles/, …
 ```
+
+## Enforcement
+
+All client checks run in `npm run client:lint`: structure script → rules check → ESLint → Steiger → knip.
+
+| Rule | Checked by |
+|---|---|
+| Only downwards between layers | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` · Steiger `fsd/forbidden-imports` |
+| No imports between slices of one layer; `@x` only for its consumer entity | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` · Steiger `fsd/forbidden-imports` |
+| Through the public API only | `npm run client:lint` · ESLint `no-restricted-imports` · Steiger `fsd/no-public-api-sidestep` |
+| No `src/...` paths and no bare layer aliases inside `client/src` | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
+| No import of the own slice / segment index; no cycles | `npm run client:lint` · ESLint `no-restricted-imports` · ESLint `import/no-cycle` · ESLint `import/no-self-import` |
+| Segment direction `ui → model → api → lib, config` (slices and `shared`) | `npm run client:lint` · ESLint `import/no-restricted-paths` · `client/linter/rules/segment-direction-rule.ts` |
+| `api` / `lib` / `config` take only types from their `model` | `npm run client:lint` · ESLint `@typescript-eslint/no-restricted-imports` · `client/linter/rules/segment-direction-rule.ts` |
+| `ui` holds components and props types only | `npm run client:lint` · ESLint `no-restricted-syntax` · `client/linter/rules/ui-segment-rule.ts` |
+| `interface` only for domain entities in `entities/*/model` | `npm run client:lint` · ESLint `@typescript-eslint/consistent-type-definitions` · `client/eslint.config.ts` |
+| Headless UI / sonner only in `shared`; React Query not in `ui` | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
+| `shared` imports no other layer; other `shared` segments only via `@shared/<segment>` | `npm run client:lint` · ESLint `no-restricted-imports` · Steiger `fsd/forbidden-imports` |
+| `index.ts` placement, `@x` file names, allowed segments, nothing but `index.ts` in a slice root | `npm run client:lint` · `client/scripts/check-structure.mjs` · Steiger `fsd/public-api` · Steiger `fsd/no-layer-public-api` · Steiger `fsd/no-segmentless-slices` |
+| No `export *`; no `eslint-disable` of FSD rules | `npm run client:lint` · `client/scripts/check-structure.mjs` |
+| Names by purpose, tests in `specs/`, kebab-case | `npm run client:lint` · `client/scripts/check-structure.mjs` · Steiger `fsd/segments-by-purpose` |
+| No unused exports, files or dependencies | `npm run client:lint` · knip · `client/knip.jsonc` |
+| Pages first | `npm run client:lint` · Steiger `fsd/insignificant-slice` (warning only) |
+| `shared` knows nothing about the domain | ❌ review (upward imports are caught, domain concepts are not) |
+| Which layer new code belongs to (§2) | ❌ review — a design decision |

@@ -1,15 +1,7 @@
 ---
 description: Personal-data / privacy compliance — keep Privacy Policy & Terms in sync and versioned when user data or legal-relevant behaviour changes
-globs:
-  - "server/src/users/**"
-  - "server/src/auth/**"
-  - "server/src/security/**"
-  - "server/database/migrations/**"
-  - "server/src/common/constants/document-versions.ts"
-  - "client/src/entities/session/**"
-  - "client/src/pages/privacy/**"
-  - "client/src/pages/terms/**"
-  - "client/src/widgets/document-reconsent/**"
+globs: server/src/users/**, server/src/auth/**, server/src/security/**, server/database/migrations/**, server/src/common/constants/document-versions.ts, client/src/entities/session/**, client/src/pages/privacy/**, client/src/pages/terms/**, client/src/widgets/document-reconsent/**
+alwaysApply: false
 ---
 
 # Personal-Data & Privacy Compliance
@@ -62,3 +54,13 @@ If a change is purely internal and does not alter *what* PD is handled or *what*
 - Pages: [privacy-page.spec.md](../specs/pages/privacy-page.spec.md), [terms-page.spec.md](../specs/pages/terms-page.spec.md)
 - Server API conventions: [server-api.mdc](server-api.mdc)
 - Command: run `/privacy-audit` to audit a change against this rule.
+
+## Enforcement
+
+| Rule | Checked by |
+|---|---|
+| Separate, explicit consent and terms acceptance at registration | `npm run server:test:unit` · `server/src/auth/dto/register.request.spec.ts` |
+| Account deletion removes all user-owned data | `npm run server:test:e2e` · `server/test/e2e/account-deletion-cascade.e2e-spec.ts` |
+| Re-consent gate stays closed on the legal pages and blocks the other routes | `npm run client:test:unit` · `client/src/widgets/document-reconsent/ui/specs/document-reconsent-gate.spec.unit.tsx` |
+| Policy / terms text matches the data handling; versions and dates bumped together | ❌ review (run `/privacy-audit`) |
+| No real operator identity in the repo; no new PD without a policy update | ❌ review |

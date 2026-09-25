@@ -1,9 +1,12 @@
 ---
 description: NestJS API conventions — Swagger, DTO, thin controllers, service tests
-globs: ["server/**"]
+globs: server/**
+alwaysApply: false
 ---
 
 # Server API
+
+Conventions for the NestJS API: response envelope, Swagger, DTOs, thin controllers, tested services.
 
 ## Response envelope
 
@@ -96,3 +99,11 @@ When adding or changing an endpoint, update `server/_stub/postman/set-forge-serv
 5. Update entity spec `## API contract` in `.cursor/specs/entities/`
 6. Update Postman collection (`server/_stub/postman/set-forge-server.postman_collection.json`)
 7. E2E when needed
+
+## Enforcement
+
+| Rule | Checked by |
+|---|---|
+| DTO, controller and service specs pass | `npm run server:test:unit` |
+| Imports order, curly braces | `npm run server:lint` · ESLint `curly` · ESLint `import/order` |
+| Swagger decorators per endpoint, strings from `docs.ts`, spec for every DTO / controller / service, Postman collection updated | ❌ review |

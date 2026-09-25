@@ -1,71 +1,45 @@
 ---
-description: SCSS modules and styling guidelines
-globs: ["client/**"]
+description: Styling — SCSS modules next to components, camelCase classes, variables, no inline styles
+globs: client/**
+alwaysApply: false
 ---
 
 # Styling Guidelines
 
-## SCSS Modules
+Component styles are SCSS modules next to the component; global styles live in `client/src/app/styles/global.scss`.
 
-Component-scoped styling. File `component-name.module.scss` MUST be in the same directory as the component.
+## SCSS modules
 
-```
-component/
-├── component-name.tsx
-├── component-name.module.scss  ✓
-└── component-name-logic-layer.tsx
-```
+- `component-name.module.scss` sits in the same directory as the component; components in `shared/ui/` have their own.
+- Import as `classes` by relative path: `import classes from './component-name.module.scss';` (never `src/...`).
+- `variables.scss` is injected into every stylesheet by Vite (`css.preprocessorOptions.scss.additionalData`) — don't
+  `@use` it. `@use` between files of `shared/ui/styles/` is relative (`@use './themes';`).
 
-## Imports
+## Class naming
 
-**TS/TSX importing `.module.scss` — relative path next to the component (FSD: relative inside a slice), import as `classes`:**
-
-```typescript
-// ✅ CORRECT
-import classes from './component-name.module.scss';
-
-// ❌ WRONG
-import classes from 'src/features/feature-name/ui/component-name.module.scss';
-```
-
-**SCSS:** `variables.scss` is injected into every stylesheet by Vite (`css.preprocessorOptions.scss.additionalData`) —
-don't `@use` it. Internal `@use` between the style files of `shared/ui/styles/` is relative (`@use './themes';`).
-
-**Variables:** Auto-imported via Vite. Do NOT manually import `variables.scss`.
-
-## Class Naming
-
-Use **camelCase** in `.module.scss`:
-
-```scss
-// ✅ CORRECT
-.container { }
-.primaryButton { }
-.cardHeader { }
-
-// ❌ WRONG
-.primary-button { }
-```
+camelCase in `.module.scss`: `.container`, `.primaryButton`, `.cardHeader` — not `.primary-button`.
 
 ## Variables
 
-See `src/shared/ui/styles/variables.scss`: `$spacing-*`, `$primary-color`, `$radius-*`, `$shadow-*`, `$font-size-*`, etc.
+Use the variables of `client/src/shared/ui/styles/variables.scss` (`$spacing-*`, `$primary-color`, `$radius-*`,
+`$shadow-*`, `$font-size-*`, `$z-*`) instead of literal values.
 
 ## Patterns
 
-- **Nesting:** `&:hover`, `&.modifier`, `&Header` (BEM-like)
-- **Multiple classes:** use template literals with `classes.button`, `classes.primary`
-- **Conditional:** `isActive ? classes.active : ''` inside template literal
-- **Responsive:** `@media (min-width: 768px)` in SCSS
-- **Layout:** Flexbox (`display: flex`, `gap`) or Grid (`grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))`)
-- **Transitions:** `transition: all 0.2s ease-in-out`
-- **Z-index:** Define `$z-modal`, `$z-dropdown` in variables
+- Nesting: `&:hover`, `&.modifier`, `&Header`.
+- Several / conditional classes: template literals with `classes.x`, `isActive ? classes.active : ''`.
+- Responsive: `@media (min-width: 768px)`; layout with Flexbox / Grid; transitions `transition: all 0.2s ease-in-out`.
 
-No inline styles. Inline styles can only be used for Story Book Story wrappers in .stories.tsx-files. A runtime value
-(progress width, a caller-given colour) reaches the stylesheet as a CSS custom property through `cssVars` from
-`@shared/lib` — `style={cssVars({ '--progress': `${n}%` })}` + `width: var(--progress, 0%);` in the module; ESLint
-allows nothing else in `style` in `ui` segments. Global styles only in `src/app/styles/global.scss`.
+## No inline styles
 
-## Shared UI
+- No `style` attribute, except Storybook wrappers in `*.stories.tsx`.
+- A runtime value (a progress width, a caller-given colour) reaches the stylesheet as a CSS custom property through
+  `cssVars` from `@shared/lib`: `style={cssVars({ '--progress': `${n}%` })}` + `width: var(--progress, 0%);`.
 
-Components in `src/shared/ui/` must have their own `.module.scss` and be reusable.
+## Enforcement
+
+| Rule | Checked by |
+|---|---|
+| `style` only via `cssVars()` in `ui` segments | `npm run client:lint` · ESLint `no-restricted-syntax` · `client/linter/rules/ui-segment-rule.ts` |
+| SCSS modules imported by relative path, no `src/...` | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
+| camelCase classes, variables instead of literals, module next to the component | ❌ review |

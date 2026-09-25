@@ -1,68 +1,59 @@
 ---
-description: State management with TanStack Query and Zustand
-globs: ["client/**"]
+description: State management — server state in TanStack Query hooks of entities, client-only UI state in Zustand
+globs: client/**
+alwaysApply: false
 ---
 
 # State Management
 
+Server state lives in TanStack Query hooks of entity models; Zustand holds client-only UI state.
+
 ## Server state — TanStack Query
 
-All **server/async state** (session, workout lists) lives in `@tanstack/react-query` hooks under `entities/*/model/use-*-queries.ts`.
+All **server/async state** (session, workout lists, sessions) lives in `@tanstack/react-query` hooks under
+`entities/*/model/use-*-queries.ts`.
 
-- Query keys in `entities/*/model/*-keys.ts` or `workout-query-keys.ts`.
-- Data layers import hooks from the entity slice (`@entities/workout-list`); Logic/Presentation layers receive data via props — **never** import query hooks or API functions directly.
-- Mutations handle cache updates (`setQueryData`, `invalidateQueries`) and optimistic updates (`onMutate` / rollback in `onError`).
-- API functions in `entities/*/api/` are internal to query hooks; not re-exported from the slice `index.ts` (tests mock the api file and use `jest.requireMock`).
-- `@tanstack/react-query` is not imported in `ui` segments of slices (ESLint): need the query client in a component? Add a hook to the entity model (`useClearWorkoutSessionCachesForDeletedList`).
+- Query keys in `entities/*/model/*-keys.ts`; one key namespace per server resource.
+- Data layers import hooks from the entity slice (`@entities/workout-list`); logic and presentation layers receive
+  data via props (see component-architecture).
+- Mutations handle cache updates (`setQueryData`, `invalidateQueries`) and optimistic updates (`onMutate`, rollback
+  in `onError`). They never navigate — where the user goes next is the caller's flow.
+- Request functions in `entities/*/api/` are internal to the hooks and not exported from the slice `index.ts`; tests
+  mock the api file and read the mocks with `jest.requireMock`.
+- A component needs the query client? Add a hook to the entity model (`useClearWorkoutSessionCachesForDeletedList`).
 
 ```typescript
 // entities/workout-list/model/use-workout-queries.ts
-export function useWorkoutListsQuery(enabled = true) {
-  return useQuery({
-    queryKey: workoutQueryKeys.lists,
-    queryFn: fetchWorkoutLists,
-    enabled,
-  });
+export function useWorkoutListsQuery(enabled = true): UseQueryResult<WorkoutList[]> {
+  return useQuery<WorkoutList[]>({ queryKey: workoutQueryKeys.lists, queryFn: fetchWorkoutLists, enabled });
 }
 ```
 
 ## Client state — Zustand
 
-Use Zustand only for **client-only UI state** (e.g. theme preference with `persist`). Not for server data.
+Zustand only for **client-only UI state** (e.g. theme preference with `persist`), never for server data.
 
-All stores: `devtools(immer(...))` + `createSelectors`. Middleware order: `devtools` wraps `immer`.
+- Every store: `devtools(immer(...))` + `createSelectors`; `devtools` wraps `immer`; `{ name: 'StoreName' }` for DevTools.
+- Auto-selectors: `useStore.use.data()`, not `useStore(s => s.data)`.
+- Immer: mutate directly (`state.x = y`), no spread copies.
+- Location: `entities/<name>/model/<purpose>-store.ts` for client-only entity state, `shared/lib/<purpose>/` for
+  cross-cutting client state (`shared/lib/theme/theme-store.ts`).
 
 ```typescript
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
-import { createSelectors } from '../create-selectors'; // shared/lib/theme/theme-store.ts; add it to the @shared/lib API when a slice needs it
-
-const useThemeStoreBase = create<ThemeState>()(
-  devtools(
-    immer(
-      persist(/* ... */),
-    ),
-    { name: 'ThemeStore' },
-  ),
-);
-
+const useThemeStoreBase = create<ThemeState>()(devtools(immer(persist(/* ... */)), { name: 'ThemeStore' }));
 export const useThemeStore = createSelectors(useThemeStoreBase);
 ```
 
-## Rules
+## Single source of truth
 
-- **Auto-selectors (Zustand):** `useStore.use.data()` — not `useStore(s => s.data)`
-- **Immer:** Mutate directly `state.x = y`, avoid spread `[...state.items, item]`
-- **Location:** `entities/X/model/<purpose>-store.ts` for client-only entity state; `shared/lib/<purpose>/` for cross-cutting client state (`shared/lib/theme/theme-store.ts`)
-- **Usage:** Stores/query hooks only in Data Layer; Logic/Presentation never import stores or query hooks
-- **DevTools:** Always `{ name: 'StoreName' }` for Zustand stores
-- **Type safety:** See typescript-guidelines.
+- One Zustand store per client-only concern; no server state duplicated in Zustand.
+- Derive computed values, don't store them; keep stores and query modules focused.
 
-## Single Source of Truth
+## Enforcement
 
-- One query key namespace per server resource
-- One Zustand store per client-only concern
-- No duplicated server state in Zustand
-- Derive computed values, don't store them
-- Keep stores and query modules focused
+| Rule | Checked by |
+|---|---|
+| Query hooks and stores only in data layers | `npm run client:lint` · ESLint `no-restricted-syntax` · `client/linter/rules/ui-segment-rule.ts` |
+| React Query never imported in a `ui` segment | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
+| Request functions not exported from the entity public API | `npm run client:lint` · knip · `client/knip.jsonc` (unused exports fail) |
+| Mutations don't navigate; store middleware and selectors pattern | ❌ review |

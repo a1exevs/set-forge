@@ -1,81 +1,66 @@
 ---
-description: TypeScript strict mode and type safety
-globs: ["client/**", "server/**"]
+description: TypeScript — strict mode, no any, explicit return types, interface vs type, curly braces
+globs: client/**, server/**
+alwaysApply: false
 ---
 
 # TypeScript Guidelines
 
-## Strict Mode
+Strict TypeScript in the client and the server.
 
-TS strict mode enabled. All strict checks enforced.
+## Type safety
 
-## Type Safety Rules
+- Strict mode with all strict checks.
+- Never `any`: use `unknown` + narrowing.
+- Handle `null` / `undefined` explicitly (optional chaining, nullish coalescing, guards); array index access is
+  `T | undefined` — check before use.
+- Minimize `as` — prefer type guards (`value is T`) or proper typing; `as const` for literal types.
 
-- NEVER use `any`. Use `unknown` + type narrowing when type is unknown.
-- Always handle `null`/`undefined` explicitly (optional chaining, nullish coalescing, guards).
-- Array index access returns `T | undefined` — always check before use.
-- Minimize `as` assertions — prefer type guards or proper typing.
-- Use `as const` for literal types.
+## Explicit return types
 
-## Explicit Return Types
-
-Named functions, hooks, methods and arrow functions assigned to a variable MUST declare their return type,
-including `void` (hooks too: `UseQueryResult<WorkoutList[]>`, `UseMutationResult<WorkoutList, Error, CreateWorkoutListDto>`).
+Named functions, hooks, methods and arrow functions assigned to a variable declare their return type, including
+`void` — hooks too: `UseQueryResult<WorkoutList[]>`, `UseMutationResult<WorkoutList, Error, CreateWorkoutListDto>`.
 Callbacks passed inline to a typed parameter get their types from it; inline JSX callbacks follow component-typing.
-Client: enforced by ESLint `@typescript-eslint/explicit-function-return-type` (`client/linter/rules/return-type-rule.ts`).
 
 ```typescript
 function calculateTotal(items: Item[]): number {
   return items.reduce((sum, item) => sum + item.price, 0);
 }
-
-const handleClick = (e: MouseEvent): void => {
-  console.log('clicked');
-};
 ```
 
-## Type Definitions
+## `interface` vs `type`
 
-- `interface` — ONLY for domain entities (`WorkoutList`, `WorkoutSession`) and ONLY in `client/src/entities/*/model/**` (ESLint `consistent-type-definitions` is `type` everywhere else; declaration merging — module augmentation in `app/router/router.ts` and ambient `*.d.ts` like `vite-env.d.ts` — is the exception).
-- `type` — for everything else: DTOs and payloads, unions, intersections, props, view models, anything in `shared`. Doubt? It's a `type`.
+- `interface` — only for domain entities (`WorkoutList`, `WorkoutSession`), and in the client only in
+  `client/src/entities/*/model/**`. Declaration merging (module augmentation in `app/router/router.ts`, ambient
+  `*.d.ts` such as `vite-env.d.ts`) is the exception.
+- `type` — everything else: DTOs and payloads, unions, intersections, props, view models, anything in `shared`.
+  Doubt? It's a `type`.
+- Public API files re-export types with `export type { X }` or inline `type X`; files are named by purpose, never
+  `types.ts`.
 
-## Component Props
+## General practices
 
-See component-typing.
+- Generics for reusable type-safe code; built-in utility types (`Omit`, `Pick`, `Partial`, `Required`, `Readonly`).
+- Discriminated unions for complex state; explicit React event types (`FormEvent`, `ChangeEvent`, `MouseEvent`).
 
-## Type Exports
+## Control flow
 
-Use `export type { X }` (or inline `type X`) in public API files; files are named by purpose, never `types.ts`:
-
-```typescript
-export type { MuscleGroup, WorkoutExercise } from './model/workout-exercise';
-```
-
-## General Practices
-
-- Use generics for reusable type-safe code
-- Use built-in utility types (Omit, Pick, Partial, Required, Readonly)
-- Use discriminated unions for complex state
-- Create type guards (`value is T`) for runtime checks
-- Type React event handlers explicitly (FormEvent, ChangeEvent, MouseEvent)
-- Follow `@typescript-eslint` strict rules
-
-## Control flow (`if` / `else`)
-
-- **`if`, `else if`, and `else`** MUST use **curly braces** always, even for a single statement (`return`, one function call, etc.).
-- Put the **body on its own lines** inside the block — do not write one-line `if (x) foo();`.
+`if` / `else if` / `else` always use curly braces with the body on its own lines — never `if (x) foo();`.
 
 ```typescript
-// BAD
-if (!value) return;
-if (el) doThing(el);
-
-// GOOD
 if (!value) {
   return;
 }
-
-if (el) {
-  doThing(el);
-}
 ```
+
+## Enforcement
+
+| Rule | Checked by |
+|---|---|
+| Strict mode | `npm run client:build` · `client/tsconfig.json` |
+| No `any` (client) | `npm run client:lint` · ESLint `@typescript-eslint/no-explicit-any` |
+| Curly braces | `npm run client:lint` · `npm run server:lint` · ESLint `curly` |
+| Explicit return types (client) | `npm run client:lint` · ESLint `@typescript-eslint/explicit-function-return-type` · `client/linter/rules/return-type-rule.ts` |
+| `interface` only in `entities/*/model` (client) | `npm run client:lint` · ESLint `@typescript-eslint/consistent-type-definitions` · `client/eslint.config.ts` |
+| No `any`, explicit return types, `interface` vs `type` (server) | ❌ review (`no-explicit-any` is off in `server/eslint.config.ts` until the typing clean-up) |
+| Minimal `as`, DTOs as `type` inside entity models | ❌ review |
