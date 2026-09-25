@@ -20,7 +20,7 @@ const repoRoot = join(clientDir, '..');
 const rulesDir = join(repoRoot, '.cursor', 'rules');
 
 const FRONTMATTER_KEYS = ['description', 'globs', 'alwaysApply'];
-const PATH_PREFIXES = ['client/', 'server/', '.cursor/', 'scripts/'];
+const PATH_PREFIXES = ['client/', 'server/', '.cursor/', 'docs/', 'scripts/'];
 const REVIEW = '❌ review';
 
 const problems = [];

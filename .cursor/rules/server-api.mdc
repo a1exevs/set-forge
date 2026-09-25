@@ -96,7 +96,7 @@ When adding or changing an endpoint, update `server/_stub/postman/set-forge-serv
 2. Service method + spec
 3. Controller method + Swagger (success + all errors) + controller spec
 4. Strings in `docs.ts` and `routes.ts`
-5. Update entity spec `## API contract` in `.cursor/specs/entities/`
+5. Changed a business rule or flow? Update `docs/domains/<domain>.md` (invariant + its test) — the HTTP contract itself lives in the controller and Swagger
 6. Update Postman collection (`server/_stub/postman/set-forge-server.postman_collection.json`)
 7. E2E when needed
 

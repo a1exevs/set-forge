@@ -46,12 +46,11 @@ If a change is purely internal and does not alter *what* PD is handled or *what*
 1. Add the entity + cascading FK to `users`.
 2. Describe it in the Privacy Policy (both languages) with purpose + legal basis; bump `PRIVACY_VERSION` + date.
 3. Extend `account-deletion-cascade.e2e-spec.ts`.
-4. Update `.cursor/specs/entities/user.entity.spec.md` (and the new entity spec).
+4. Update the Map and invariants in `docs/domains/session.md` (and the doc of the new entity's domain).
 
 ## Related
 
-- Entity: [user.entity.spec.md](../specs/entities/user.entity.spec.md)
-- Pages: [privacy-page.spec.md](../specs/pages/privacy-page.spec.md), [terms-page.spec.md](../specs/pages/terms-page.spec.md)
+- Domain: `docs/domains/session.md` (consents, re-consent gate, account deletion)
 - Server API conventions: [server-api.mdc](server-api.mdc)
 - Command: run `/privacy-audit` to audit a change against this rule.
 

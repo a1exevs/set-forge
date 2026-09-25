@@ -12,7 +12,7 @@ Focus on:
 3. Security vulnerabilities (leaked secrets, injection points).
 4. Performance bottlenecks or unnecessary re-renders.
 5. Suggestions for better naming or simplified logic.
-6. Specs under `.cursor/specs/` — verify they still match the changed behavior; flag missing or stale spec updates.
+6. Domain docs under `docs/domains/` — invariants and flows still match the changed behavior; flag a changed rule without an updated invariant and test.
 
 Output your feedback as a concise list of actionable improvements. If everything looks solid, give me a "Ready to commit" signal.
 

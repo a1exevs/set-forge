@@ -280,7 +280,7 @@ src/
 
 ## Enforcement
 
-All client checks run in `npm run client:lint`: structure script → rules check → ESLint → Steiger → knip.
+All client checks run in `npm run client:lint`: structure script → rules check → domain docs check → ESLint → Steiger → knip.
 
 | Rule | Checked by |
 |---|---|

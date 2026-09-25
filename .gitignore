@@ -47,6 +47,8 @@ coverage
 
 test-results
 playwright-report
-docs
+# TypeDoc output — not the root docs/ folder (domain docs are tracked)
+client/docs
+server/docs
 storybook-static
 server/test/e2e/.runtime-env.json
