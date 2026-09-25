@@ -126,6 +126,7 @@ describe('AuthService', () => {
       );
       spyHashF.mockRestore();
     });
+    // @invariant session/email-unique
     it('Registration method: should throw Bad Request exception (user already exists)', async () => {
       const email = 'user@yandex.com';
       const password = '1234';
@@ -302,6 +303,7 @@ describe('AuthService', () => {
   });
 
   describe('AuthService - me', () => {
+    // @invariant session/pending-derived
     it('Me method: should be successful result (documents up to date)', async () => {
       const userId = 1;
       const userEmail = 'user@yandex.ru';
@@ -322,6 +324,7 @@ describe('AuthService', () => {
       expect(userService.getUserById).toBeCalledTimes(1);
       expect(userService.getUserById).toBeCalledWith(userId);
     });
+    // @invariant session/pending-derived
     it('Me method: documentsPendingAcceptance is true for a legacy user (null versions)', async () => {
       const userId = 1;
       const mockUser = { id: userId, email: 'user@yandex.ru', password: 'x', acceptedTermsVersion: null };

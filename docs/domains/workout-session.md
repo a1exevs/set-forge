@@ -14,18 +14,20 @@ its exercises that counts completed sets. Finished sessions form an immutable hi
 
 ## Invariants
 
-| Invariant | Checked by |
+Each id is proven by the tests tagged `// @invariant workout-session/<id>`; `npm run client:lint` finds them.
+
+| Id | Invariant |
 |---|---|
-| At most one active session per workout list; starting again returns the active one | `server/src/workout-sessions/workout-sessions.service.spec.ts` |
-| A session snapshots the list at start; later list edits don't change it until resync | `server/src/workout-sessions/workout-sessions.service.spec.ts` |
-| An exercise is complete when `completedSets >= sets` and it has sets — the same rule on server and client | `server/src/workout-sessions/workout-sessions.service.spec.ts` · `client/src/entities/workout-session-exercise/model/specs/exercise-progress.spec.unit.ts` |
-| Progress never exceeds the planned sets; the last set auto-finishes the session | `server/src/workout-sessions/workout-sessions.service.spec.ts` |
-| Resync keeps progress per source exercise (clamped to the new sets) and never finishes the session itself | `server/src/workout-sessions/workout-sessions.service.spec.ts` |
-| Discard hard-deletes an active session; it never reaches history | `server/src/workout-sessions/workout-sessions.service.spec.ts` |
-| History holds completed sessions only, newest first, with a stable tiebreaker | `server/src/workout-sessions/workout-sessions.service.spec.ts` |
-| Deleting a list discards its active session; completed sessions stay in history without the list | `server/src/workout-lists/workout-lists.service.spec.ts` · `client/src/entities/workout-session/model/specs/clear-workout-session-caches-for-deleted-list.spec.unit.ts` |
-| Entering an already complete active session (after resync) finishes it once | `client/src/pages/workout-mode/ui/specs/workout-mode-page-logic-layer.spec.unit.tsx` |
-| A slow progress response never rewinds optimistic progress | ❌ review (merge keeps the higher `completedSets`, no test) |
+| one-active-per-list | At most one active session per workout list; starting again returns the active one |
+| snapshot-at-start | A session snapshots the list at start; later list edits don't change it until resync |
+| exercise-complete | An exercise is complete when `completedSets >= sets` and it has sets — the same rule on server and client |
+| progress-capped | Progress never exceeds the planned sets; the last set auto-finishes the session |
+| resync-keeps-progress | Resync keeps progress per source exercise (clamped to the new sets) and never finishes the session itself |
+| discard-not-in-history | Discard hard-deletes an active session; it never reaches history |
+| history-completed-only | History holds completed sessions only, newest first, with a stable tiebreaker |
+| list-delete-discards-active | Deleting a list discards its active session; completed sessions stay in history without the list |
+| finish-on-entry-if-complete | Entering an already complete active session (after resync) finishes it once |
+| optimistic-no-rewind | A slow progress response never rewinds optimistic progress — ❌ review (the merge keeps the higher `completedSets`, no test) |
 
 ## Flows
 
@@ -50,6 +52,7 @@ resyncs, **Keep session** saves only, **Cancel** saves nothing.
 | Screens | `client/src/pages/workout-mode` · `client/src/pages/history` |
 | Server module (endpoints, rules) | `server/src/workout-sessions` |
 | Server rules | `server/src/workout-sessions/workout-sessions.service.ts` |
+| Models | `server/src/workout-sessions/workout-session.model.ts` · `server/src/workout-sessions/workout-session-exercise.model.ts` |
 | HTTP contract | `server/src/workout-sessions/workout-sessions.controller.ts` (Swagger) |
 
 ## Related

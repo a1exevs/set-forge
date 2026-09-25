@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 // Keeps the domain docs (docs/domains/*.md) thin and pointing at real code (see .cursor/rules/domain-docs.mdc):
 //   1. one `# Title`, then exactly Glossary, Invariants, Flows, Map (+ optional Related); at most MAX_LINES lines;
-//   2. Invariants is `| Invariant | Checked by |`: each row points to existing test files or says `❌ review`;
+//   2. Invariants is `| Id | Invariant |`; tests prove an invariant with `// @invariant <domain>/<id>`, and both sides
+//      agree: a tagged invariant is not `❌ review`, an untagged one is, every tag names a real invariant;
 //   3. Map is `| Part | Code |`: each row points to existing code;
 //   4. every backticked path and every relative link in a doc resolves — a rename breaks the lint, not the doc;
-//   5. every client entity / feature / page and every server domain module appears in some Map.
+//   5. every client entity / feature / page / widget, every server domain module and every server model appears in
+//      some Map.
 // Exit code 1 lists every violation.
 
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
@@ -19,7 +21,7 @@ const SECTIONS = ['Glossary', 'Invariants', 'Flows', 'Map'];
 const OPTIONAL_LAST = 'Related';
 const MAX_LINES = 150;
 const PATH_PREFIXES = ['client/', 'server/', 'docs/', '.cursor/'];
-const TEST_FILE = /(\.spec\.(unit|snap)\.tsx?|\.spec\.ts|\.e2e-spec\.ts)$/;
+const TEST_FILE = /(\.spec\.(unit|snap|e2e)\.tsx?|\.spec\.ts|\.e2e-spec\.ts)$/;
 const REVIEW = '❌ review';
 /** Server modules that are infrastructure, not a domain. */
 const INFRA_MODULES = new Set(['app', 'health', 'logger']);
@@ -74,6 +76,8 @@ function sections(body) {
 }
 
 const mapPaths = [];
+/** `<domain>/<id>` → where it is declared and whether it is marked `❌ review`. */
+const invariantsById = new Map();
 
 for (const name of existsSync(docsDir) ? readdirSync(docsDir).filter(entry => entry.endsWith('.md')) : []) {
   const path = join(docsDir, name);
@@ -99,15 +103,20 @@ for (const name of existsSync(docsDir) ? readdirSync(docsDir).filter(entry => en
   }
 
   const invariants = found.find(section => section.name === 'Invariants');
-  const invariantRows = invariants && tableRows(invariants.body, ['Invariant', 'Checked by']);
+  const invariantRows = invariants && tableRows(invariants.body, ['Id', 'Invariant']);
   if (invariants && !invariantRows) {
-    problems.push(`${file}: Invariants must be a \`| Invariant | Checked by |\` table`);
+    problems.push(`${file}: Invariants must be a \`| Id | Invariant |\` table`);
   }
-  for (const [rule, cell] of invariantRows ?? []) {
-    const tests = backtickedPaths(cell ?? '').filter(token => TEST_FILE.test(token));
-    if (!cell?.includes(REVIEW) && tests.length === 0) {
-      problems.push(`${file}: invariant "${rule}" — point to the test that proves it, or write \`${REVIEW}\``);
+  const domain = name.replace(/\.md$/, '');
+  for (const [id, text] of invariantRows ?? []) {
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id ?? '')) {
+      problems.push(`${file}: invariant id "${id}" must be kebab-case`);
     }
+    const key = `${domain}/${id}`;
+    if (invariantsById.has(key)) {
+      problems.push(`${file}: invariant id "${id}" is used twice`);
+    }
+    invariantsById.set(key, { file, review: (text ?? '').includes(REVIEW) });
   }
 
   const map = found.find(section => section.name === 'Map');
@@ -135,10 +144,76 @@ for (const name of existsSync(docsDir) ? readdirSync(docsDir).filter(entry => en
   }
 }
 
+// Invariants ↔ tests: a test proves an invariant by a `// @invariant <domain>/<id>` comment. Both directions must
+// agree — a tagged invariant can't stay `❌ review`, an untagged one must say so, a tag must name a real invariant.
+const TAG = /@invariant\s+([a-z0-9-]+\/[a-z0-9-]+)/g;
+const testsById = new Map();
+function scanTags(dir) {
+  for (const entry of existsSync(dir) ? readdirSync(dir, { withFileTypes: true }) : []) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (!['node_modules', 'dist', '__snapshots__', 'coverage'].includes(entry.name)) {
+        scanTags(path);
+      }
+      continue;
+    }
+    if (!/\.(tsx?|cjs|mjs)$/.test(entry.name) || path.includes(join('client', 'scripts'))) {
+      continue;
+    }
+    for (const [, key] of readFileSync(path, 'utf8').matchAll(TAG)) {
+      if (!TEST_FILE.test(entry.name)) {
+        problems.push(`${rel(path)}: \`@invariant ${key}\` outside a test file — tag the test that proves it`);
+      }
+      testsById.set(key, [...(testsById.get(key) ?? []), rel(path)]);
+    }
+  }
+}
+for (const dir of ['client/src', 'client/tests', 'server/src', 'server/test']) {
+  scanTags(join(repoRoot, dir));
+}
+for (const [key, { file, review }] of invariantsById) {
+  const tests = testsById.get(key) ?? [];
+  if (tests.length > 0 && review) {
+    problems.push(`${file}: invariant "${key}" is proven by ${tests.join(', ')} — drop \`${REVIEW}\``);
+  }
+  if (tests.length === 0 && !review) {
+    problems.push(
+      `${file}: no test tagged \`// @invariant ${key}\` — tag the test that proves it or mark \`${REVIEW}\``,
+    );
+  }
+}
+for (const [key, tests] of testsById) {
+  if (!invariantsById.has(key)) {
+    problems.push(
+      `${tests.join(', ')}: \`@invariant ${key}\` names no invariant in docs/domains — add it or fix the tag`,
+    );
+  }
+}
+
 // Coverage: every place that owns domain code is mapped by some doc.
+/** Widgets that are app chrome, not part of a domain. */
+const APP_CHROME = new Set(['client/src/widgets/main-tabs-bar']);
+const serverModels = [];
+(function findModels(dir) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      findModels(path);
+    } else if (entry.name.endsWith('.model.ts')) {
+      serverModels.push(rel(path));
+    }
+  }
+})(join(repoRoot, 'server', 'src'));
+for (const model of serverModels) {
+  if (!mapPaths.includes(model)) {
+    problems.push(`${model}: not in any docs/domains/*.md Map (Models row) — add the table to its domain doc`);
+  }
+}
 const required = [
-  ...['entities', 'features', 'pages'].flatMap(layer =>
-    dirs(join(clientDir, 'src', layer)).map(slice => `client/src/${layer}/${slice}`),
+  ...['entities', 'features', 'pages', 'widgets'].flatMap(layer =>
+    dirs(join(clientDir, 'src', layer))
+      .map(slice => `client/src/${layer}/${slice}`)
+      .filter(slice => !APP_CHROME.has(slice)),
   ),
   ...dirs(join(repoRoot, 'server', 'src'))
     .filter(module => !INFRA_MODULES.has(module))

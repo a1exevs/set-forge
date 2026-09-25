@@ -16,20 +16,22 @@ documents, logout and account deletion. Legal duties behind this domain: `.curso
 
 ## Invariants
 
-| Invariant | Checked by |
+Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run client:lint` finds them.
+
+| Id | Invariant |
 |---|---|
-| Email is unique | `server/src/auth/auth.service.spec.ts` |
-| Registration requires `consent` and `termsAccepted`, both explicitly true, validated separately | `server/src/auth/dto/register.request.spec.ts` |
-| Pending acceptance is derived from accepted vs required versions (up-to-date and legacy users tested) | `server/src/auth/auth.service.spec.ts` |
-| Acceptance stamps the current versions and the time | `server/src/users/users.service.spec.ts` |
-| The gate blocks app routes until accept or logout, and stays closed on `/privacy` and `/terms` | `client/src/widgets/document-reconsent/ui/specs/document-reconsent-gate.spec.unit.tsx` |
-| Account deletion removes every user-owned row (DB cascade) | `server/test/e2e/account-deletion-cascade.e2e-spec.ts` |
-| Concurrent token refreshes share one request | `client/src/shared/api/specs/refresh-access-token.spec.unit.ts` |
-| After sign-in only an in-app `redirect` target is followed (no open redirect) | `client/src/pages/auth/lib/specs/resolve-redirect-target.spec.unit.ts` |
-| Logout ends on `/login` also when the request fails | `client/src/features/logout/model/specs/use-logout.spec.unit.ts` |
-| All workout data is scoped to the signed-in user | `server/src/workout-lists/workout-lists.service.spec.ts` · `server/src/workout-sessions/workout-sessions.service.spec.ts` |
-| Guest-only (`/login`, `/register`), always-public (`/privacy`, `/terms`) and protected routes | ❌ review (route guard in `client/src/app/routes/__root.tsx`, no test) |
-| Session hooks never navigate — the calling flow does | ❌ review |
+| email-unique | Email is unique |
+| separate-consent | Registration requires `consent` and `termsAccepted`, both explicitly true, validated separately |
+| pending-derived | Pending acceptance is derived from accepted vs required versions (legacy users included) |
+| acceptance-stamps | Acceptance stamps the current versions and the time |
+| reconsent-gate | The gate blocks app routes until accept or logout, and stays closed on `/privacy` and `/terms` |
+| deletion-cascade | Account deletion removes every user-owned row (DB cascade) |
+| refresh-single-flight | Concurrent token refreshes share one request |
+| no-open-redirect | After sign-in only an in-app `redirect` target is followed (no open redirect) |
+| logout-ends-on-login | Logout ends on `/login` also when the request fails |
+| user-scoped | All workout data is scoped to the signed-in user |
+| route-guards | Guest-only (`/login`, `/register`), always-public (`/privacy`, `/terms`) and protected routes — ❌ review (guard in `client/src/app/routes/__root.tsx`, no test) |
+| hooks-dont-navigate | Session hooks never navigate — the calling flow does — ❌ review |
 
 ## Flows
 
@@ -65,6 +67,7 @@ confirmation first.
 | Screens | `client/src/pages/auth` · `client/src/pages/profile` · `client/src/pages/privacy` · `client/src/pages/terms` |
 | Legal UI and gate | `client/src/widgets/legal-document` · `client/src/widgets/legal-footer` · `client/src/widgets/document-reconsent` |
 | Server modules | `server/src/auth` · `server/src/users` · `server/src/roles` · `server/src/security` |
+| Models | `server/src/users/users.model.ts` · `server/src/users/users-roles.model.ts` · `server/src/roles/roles.model.ts` · `server/src/auth/refresh-tokens.model.ts` |
 | Document versions | `server/src/common/constants/document-versions.ts` |
 | HTTP contract | `server/src/auth/auth.controller.ts` (Swagger) |
 

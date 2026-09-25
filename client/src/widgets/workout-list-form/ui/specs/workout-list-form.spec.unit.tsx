@@ -90,6 +90,7 @@ describe('WorkoutListForm', () => {
   });
 
   describe('validation', () => {
+    // @invariant workout-list/form-validation
     it('shows confirm when submitting with empty name', async () => {
       const { container } = render(
         <ConfirmDialogProvider>
@@ -109,6 +110,7 @@ describe('WorkoutListForm', () => {
       expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
+    // @invariant workout-list/form-validation
     it('shows confirm when submitting with no exercises', async () => {
       const user = userEvent.setup();
       render(
@@ -127,6 +129,7 @@ describe('WorkoutListForm', () => {
       expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
+    // @invariant workout-list/form-validation
     it('shows confirm when submitting with invalid exercise data', async () => {
       const user = userEvent.setup();
       const { container } = render(

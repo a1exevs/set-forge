@@ -258,6 +258,7 @@ describe('WorkoutModePageLogicLayer', () => {
     });
   });
 
+  // @invariant workout-session/finish-on-entry-if-complete
   it('auto-finishes once on entry when an active session is already fully complete', async () => {
     const finishSession = jest.fn().mockResolvedValue(undefined);
 

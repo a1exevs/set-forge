@@ -24,6 +24,7 @@ describe('refreshAccessToken', () => {
     jest.resetAllMocks();
   });
 
+  // @invariant session/refresh-single-flight
   it('concurrent callers share a single fetch', async () => {
     let calls = 0;
     global.fetch = jest.fn(async () => {

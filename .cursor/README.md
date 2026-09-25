@@ -12,7 +12,8 @@
 
 ## Domain docs
 
-`docs/domains/*.md` — glossary, invariants (each backed by a test or marked `❌ review`), flows and a map to the code.
+`docs/domains/*.md` — glossary, invariants (proven by tests tagged `// @invariant <domain>/<id>`, or marked
+`❌ review`), flows and a map to the code.
 Format: [domain-docs](rules/domain-docs.mdc); `npm run client:lint` (`client/scripts/check-domain-docs.mjs`) fails on
 a broken path, a missing section or an unmapped slice / module.
 

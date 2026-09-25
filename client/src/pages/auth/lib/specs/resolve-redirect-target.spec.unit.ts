@@ -1,5 +1,6 @@
 import { resolveRedirectTarget } from '../resolve-redirect-target';
 
+// @invariant session/no-open-redirect
 describe('resolveRedirectTarget', () => {
   it('keeps an in-app path', () => {
     expect(resolveRedirectTarget('/history?tab=1')).toBe('/history?tab=1');

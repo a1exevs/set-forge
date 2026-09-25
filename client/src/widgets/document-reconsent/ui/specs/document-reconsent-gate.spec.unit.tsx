@@ -46,6 +46,7 @@ describe('DocumentReconsentGate', () => {
     expect(screen.queryByText(/updated our documents/i)).not.toBeInTheDocument();
   });
 
+  // @invariant session/reconsent-gate
   it('stays closed on /privacy and /terms so the documents remain readable', () => {
     mockedCurrentUser.mockReturnValue({ data: { id: 1, email: 'a@b.c', documentsPendingAcceptance: true } });
     mockPathname = '/privacy';
@@ -57,6 +58,7 @@ describe('DocumentReconsentGate', () => {
     expect(screen.queryByText(/updated our documents/i)).not.toBeInTheDocument();
   });
 
+  // @invariant session/reconsent-gate
   it('blocks with two checkboxes; Accept is enabled only when both are checked', async () => {
     mockedCurrentUser.mockReturnValue({ data: { id: 1, email: 'a@b.c', documentsPendingAcceptance: true } });
     const user = userEvent.setup();

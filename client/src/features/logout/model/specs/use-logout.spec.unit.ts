@@ -32,6 +32,7 @@ describe('useLogout', () => {
     await waitFor(() => expect(navigateMock).toHaveBeenCalledWith({ to: '/login' }));
   });
 
+  // @invariant session/logout-ends-on-login
   it('still goes to /login when the request fails', async () => {
     mockedLogoutMutation.mockReturnValue({
       mutateAsync: jest.fn().mockRejectedValue(new Error('offline')),

@@ -1,6 +1,7 @@
 import { getExerciseProgress, hasRemainingSets, isExerciseComplete } from '../exercise-progress';
 
 describe('exercise-progress', () => {
+  // @invariant workout-session/exercise-complete
   describe('isExerciseComplete', () => {
     it('is complete when every set is done', () => {
       expect(isExerciseComplete({ sets: 3, completedSets: 3 })).toBe(true);

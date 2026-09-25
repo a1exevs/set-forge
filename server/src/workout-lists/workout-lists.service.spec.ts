@@ -113,6 +113,8 @@ describe('WorkoutListsService', () => {
       expect(result.id).toBe('list-1');
     });
 
+    // @invariant workout-list/owner-only
+    // @invariant session/user-scoped
     it('throws NotFoundException when missing/not owned', async () => {
       listModel.findOne.mockResolvedValue(null);
 
@@ -156,6 +158,7 @@ describe('WorkoutListsService', () => {
   });
 
   describe('update', () => {
+    // @invariant workout-list/update-keeps-ids
     it('keeps existing exercises by id, adds new, drops removed', async () => {
       const existing = buildListModel([buildExercise({ id: 'ex-keep', sets: 3 }), buildExercise({ id: 'ex-remove' })]);
       // first findOne -> owned list for reconciliation, second findOne -> getOne result
@@ -189,6 +192,8 @@ describe('WorkoutListsService', () => {
   });
 
   describe('remove', () => {
+    // @invariant workout-list/delete-cascades
+    // @invariant workout-session/list-delete-discards-active
     it('discards active sessions and destroys an owned list in one transaction', async () => {
       const list = buildListModel([buildExercise()]);
       listModel.findOne.mockResolvedValue(list);
@@ -206,6 +211,7 @@ describe('WorkoutListsService', () => {
       expect(result).toEqual({ result: true });
     });
 
+    // @invariant workout-list/owner-only
     it('throws when not owned', async () => {
       listModel.findOne.mockResolvedValue(null);
 
@@ -222,6 +228,7 @@ describe('WorkoutListsService', () => {
   });
 
   describe('exportAll', () => {
+    // @invariant workout-list/export-import
     it('returns export file without ids and progress', async () => {
       const list = buildListModel([buildExercise()]);
       listModel.findAll.mockResolvedValue([list]);
@@ -242,6 +249,7 @@ describe('WorkoutListsService', () => {
   });
 
   describe('importAll', () => {
+    // @invariant workout-list/export-import
     it('creates all lists from export file in one transaction', async () => {
       const body = {
         formatVersion: WORKOUT_LISTS_EXPORT_FORMAT_VERSION,

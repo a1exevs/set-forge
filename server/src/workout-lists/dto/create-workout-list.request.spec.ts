@@ -13,6 +13,7 @@ describe('CreateWorkoutListRequest.Dto', () => {
     expect(errors).toHaveLength(0);
   });
 
+  // @invariant workout-list/at-least-one-exercise
   it('rejects an empty exercises array', async () => {
     const errors = await validateDto(CreateWorkoutListRequest.Dto, {
       name: 'Push Day',

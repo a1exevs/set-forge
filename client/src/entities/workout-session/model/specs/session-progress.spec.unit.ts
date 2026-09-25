@@ -34,6 +34,7 @@ const buildSession = (overrides: Partial<WorkoutSession> = {}): WorkoutSession =
 });
 
 describe('session-progress', () => {
+  // @invariant workout-session/exercise-complete
   describe('countCompletedExercises', () => {
     it('counts exercises where completedSets meets or exceeds sets', () => {
       expect(countCompletedExercises(buildSession())).toBe(1);
@@ -59,6 +60,7 @@ describe('session-progress', () => {
     });
   });
 
+  // @invariant workout-session/exercise-complete
   describe('isSessionFullyComplete', () => {
     it('is false while any exercise has sets left', () => {
       expect(isSessionFullyComplete(buildSession())).toBe(false);

@@ -14,6 +14,7 @@ const ACTIVE_SESSION: WorkoutSession = {
   exercises: [],
 };
 
+// @invariant workout-session/list-delete-discards-active
 describe('clearWorkoutSessionCachesForDeletedList', () => {
   let queryClient: QueryClient;
 
