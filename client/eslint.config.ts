@@ -9,6 +9,7 @@ import plugins from './linter/plugins';
 import curlyRule from './linter/rules/curly-rule';
 import { fsdImportsConfigs } from './linter/rules/fsd-imports-rule';
 import importOrderRule from './linter/rules/import-order-rule';
+import returnTypeRule, { jsxCallbackSelectors } from './linter/rules/return-type-rule';
 import {
   modelTypeReaders,
   segmentDirectionRule,
@@ -38,8 +39,15 @@ export default tsEslint.config(
       ...importOrderRule,
       ...sortImportsRule,
       ...curlyRule,
+      ...returnTypeRule,
       'no-console': 'error',
     },
+  },
+  {
+    // component-typing: typed inline JSX callbacks. The ui blocks below repeat these selectors (flat config replaces
+    // `no-restricted-syntax` options per block).
+    files: ['**/*.tsx'],
+    rules: { 'no-restricted-syntax': ['error', ...jsxCallbackSelectors] },
   },
   {
     // sources files
@@ -110,6 +118,8 @@ export default tsEslint.config(
     },
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
+      // Plain JS: no type annotations to write.
+      '@typescript-eslint/explicit-function-return-type': 'off',
     },
   },
   {

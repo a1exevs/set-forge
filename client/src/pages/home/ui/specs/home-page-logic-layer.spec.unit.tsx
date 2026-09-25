@@ -67,7 +67,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date): string => date ?? ''}
+        formatDate={(date: string | null): string => date ?? ''}
       />,
     );
 
@@ -95,7 +95,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date): string => date ?? ''}
+        formatDate={(date: string | null): string => date ?? ''}
       />,
     );
 
@@ -121,7 +121,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date): string => date ?? ''}
+        formatDate={(date: string | null): string => date ?? ''}
       />,
     );
 
@@ -149,7 +149,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={exportAllWorkoutLists}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date): string => date ?? ''}
+        formatDate={(date: string | null): string => date ?? ''}
       />,
     );
 
@@ -175,7 +175,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={exportAllWorkoutLists}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date): string => date ?? ''}
+        formatDate={(date: string | null): string => date ?? ''}
       />,
     );
 

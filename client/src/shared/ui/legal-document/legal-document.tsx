@@ -13,19 +13,23 @@ type LegalLink = { text: string; to?: '/privacy' | '/terms'; href?: string };
 /** Paragraph text: a plain string, or a sequence of strings and inline links. */
 type LegalText = string | Array<string | LegalLink>;
 
+type LegalBlock = { type: 'p'; text: LegalText } | { type: 'ul'; items: string[] };
+
 type LegalSection = {
   heading: string;
   /** Paragraphs and/or bullet lists rendered in order. */
-  blocks: Array<{ type: 'p'; text: LegalText } | { type: 'ul'; items: string[] }>;
+  blocks: LegalBlock[];
 };
 
-const LegalRichText: FC<{ text: LegalText }> = ({ text }) => {
+type LegalRichTextProps = { text: LegalText };
+
+const LegalRichText: FC<LegalRichTextProps> = ({ text }) => {
   if (typeof text === 'string') {
     return <>{text}</>;
   }
   return (
     <>
-      {text.map((run, index) => {
+      {text.map((run: string | LegalLink, index: number) => {
         if (typeof run === 'string') {
           return <Fragment key={index}>{run}</Fragment>;
         }
@@ -72,7 +76,7 @@ const LegalDocument: FC<Props> = ({ doc, lang, effectiveDate, onLangChange, onBa
               {LEGAL_BACK_LABELS[lang]}
             </button>
             <div className={classes.langSwitch} role="group" aria-label="Language">
-              {(Object.keys(LEGAL_LANG_LABELS) as LegalLang[]).map(code => (
+              {(Object.keys(LEGAL_LANG_LABELS) as LegalLang[]).map((code: LegalLang) => (
                 <button
                   key={code}
                   type="button"
@@ -94,17 +98,17 @@ const LegalDocument: FC<Props> = ({ doc, lang, effectiveDate, onLangChange, onBa
 
         <p className={classes.intro}>{doc.intro}</p>
 
-        {doc.sections.map(section => (
+        {doc.sections.map((section: LegalSection) => (
           <section key={section.heading} className={classes.section}>
             <h3 className={classes.sectionHeading}>{section.heading}</h3>
-            {section.blocks.map((block, index) =>
+            {section.blocks.map((block: LegalBlock, index: number) =>
               block.type === 'p' ? (
                 <p key={index} className={classes.paragraph}>
                   <LegalRichText text={block.text} />
                 </p>
               ) : (
                 <ul key={index} className={classes.list}>
-                  {block.items.map(item => (
+                  {block.items.map((item: string) => (
                     <li key={item} className={classes.listItem}>
                       {item}
                     </li>

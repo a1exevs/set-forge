@@ -55,7 +55,7 @@ const HomePage: FC<Props> = ({
               type="file"
               accept=".json,application/json"
               className={classes.hiddenFileInput}
-              onChange={(event): void => void onImportFile(event)}
+              onChange={(event: ChangeEvent<HTMLInputElement>): void => void onImportFile(event)}
             />
           </div>
         </div>

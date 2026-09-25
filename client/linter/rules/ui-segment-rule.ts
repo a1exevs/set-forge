@@ -1,5 +1,7 @@
 import { Linter } from 'eslint';
 
+import { jsxCallbackSelectors, namedPropsSelector } from './return-type-rule';
+
 /** A top-level `const` that is not a component (`const X: FC<Props> = ...`). */
 const nonComponentConst =
   'VariableDeclarator:not([id.typeAnnotation.typeAnnotation.typeName.name=/^(FC|FunctionComponent)$/])';
@@ -38,6 +40,8 @@ const noInterfacesOrEnums = {
 export const slicedUiRule: Linter.RulesRecord = {
   'no-restricted-syntax': [
     'error',
+    ...jsxCallbackSelectors,
+    namedPropsSelector,
     noConstants,
     noFunctions,
     noInterfacesOrEnums,
@@ -50,5 +54,12 @@ export const slicedUiRule: Linter.RulesRecord = {
 };
 
 export const sharedUiRule: Linter.RulesRecord = {
-  'no-restricted-syntax': ['error', noConstants, noFunctions, noInterfacesOrEnums],
+  'no-restricted-syntax': [
+    'error',
+    ...jsxCallbackSelectors,
+    namedPropsSelector,
+    noConstants,
+    noFunctions,
+    noInterfacesOrEnums,
+  ],
 };

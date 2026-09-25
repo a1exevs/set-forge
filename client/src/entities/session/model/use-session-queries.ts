@@ -1,8 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationResult,
+  useQuery,
+  useQueryClient,
+  type UseQueryResult,
+} from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 
 import { sessionQueryKeys } from './session-keys';
 import {
+  type AuthData,
   type CurrentUser,
   deleteAccount,
   deleteLogout,
@@ -12,7 +19,7 @@ import {
   postRegistration,
 } from '../api/session-api';
 
-export function useCurrentUserQuery(enabled: boolean) {
+export function useCurrentUserQuery(enabled: boolean): UseQueryResult<CurrentUser | null> {
   return useQuery<CurrentUser | null>({
     queryKey: sessionQueryKeys.me,
     queryFn: fetchCurrentUser,
@@ -29,7 +36,7 @@ type RegisterVars = {
   redirectTo?: string;
 };
 
-export function useLoginMutation() {
+export function useLoginMutation(): UseMutationResult<AuthData, Error, LoginVars> {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
@@ -54,7 +61,7 @@ export function useLoginMutation() {
   });
 }
 
-export function useRegisterMutation() {
+export function useRegisterMutation(): UseMutationResult<AuthData, Error, RegisterVars> {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
@@ -79,7 +86,7 @@ export function useRegisterMutation() {
   });
 }
 
-export function useLogoutMutation() {
+export function useLogoutMutation(): UseMutationResult<void, Error, void> {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
@@ -92,7 +99,7 @@ export function useLogoutMutation() {
   });
 }
 
-export function useAcceptDocumentsMutation() {
+export function useAcceptDocumentsMutation(): UseMutationResult<CurrentUser, Error, void> {
   const qc = useQueryClient();
 
   return useMutation({
@@ -103,7 +110,7 @@ export function useAcceptDocumentsMutation() {
   });
 }
 
-export function useDeleteAccountMutation() {
+export function useDeleteAccountMutation(): UseMutationResult<void, Error, void> {
   const navigate = useNavigate();
   const qc = useQueryClient();
 

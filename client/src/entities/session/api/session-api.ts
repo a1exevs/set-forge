@@ -26,7 +26,7 @@ export type CurrentUser = {
   documentsPendingAcceptance: boolean;
 };
 
-type AuthData = { userId: number; accessToken: string };
+export type AuthData = { userId: number; accessToken: string };
 
 export async function postRegistration(
   email: string,

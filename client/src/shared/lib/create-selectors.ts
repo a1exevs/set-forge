@@ -2,7 +2,7 @@ import { StoreApi, UseBoundStore } from 'zustand';
 
 type WithSelectors<S> = S extends { getState: () => infer T } ? S & { use: { [K in keyof T]: () => T[K] } } : never;
 
-export const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(store: S) => {
+export const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(store: S): WithSelectors<S> => {
   const storeWithSelectors = store as WithSelectors<typeof store>;
   storeWithSelectors.use = {} as Record<string, unknown>;
   for (const k of Object.keys(storeWithSelectors.getState())) {

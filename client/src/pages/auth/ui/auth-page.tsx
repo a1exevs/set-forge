@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { LogIn, UserPlus } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { FC, FormEvent } from 'react';
+import { ChangeEvent, FC, FormEvent } from 'react';
 
 import { BrandWordmark, Button, PasswordField } from '@shared/ui';
 import { LegalFooter } from '@widgets/legal-footer';
@@ -34,13 +34,15 @@ type Props = {
   redirectSearch: Record<string, string | undefined>;
 };
 
-const TabLink: FC<{
+type TabLinkProps = {
   to: '/login' | '/register';
   active: boolean;
   children: ReactNode;
   icon: ReactNode;
   search: Record<string, string | undefined>;
-}> = ({ to, active, children, icon, search }) => (
+};
+
+const TabLink: FC<TabLinkProps> = ({ to, active, children, icon, search }) => (
   <Link
     to={to}
     search={search}
@@ -115,7 +117,7 @@ const AuthPage: FC<Props> = ({
             type="email"
             autoComplete="email"
             value={email}
-            onChange={(e): void => onEmailChange(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>): void => onEmailChange(e.target.value)}
             disabled={isSubmitting}
           />
           {emailError && <p className={classes.fieldError}>{emailError}</p>}
@@ -148,7 +150,7 @@ const AuthPage: FC<Props> = ({
                 type="text"
                 autoComplete="off"
                 value={captcha}
-                onChange={(e): void => onCaptchaChange(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>): void => onCaptchaChange(e.target.value)}
                 disabled={isSubmitting}
               />
               {captchaError && <p className={classes.fieldError}>{captchaError}</p>}
@@ -163,7 +165,7 @@ const AuthPage: FC<Props> = ({
                   type="checkbox"
                   className={classes.consentCheckbox}
                   checked={consent}
-                  onChange={(e): void => onConsentChange(e.target.checked)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>): void => onConsentChange(e.target.checked)}
                   disabled={isSubmitting}
                 />
                 <span>
@@ -181,7 +183,7 @@ const AuthPage: FC<Props> = ({
                   type="checkbox"
                   className={classes.consentCheckbox}
                   checked={termsAccepted}
-                  onChange={(e): void => onTermsChange(e.target.checked)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>): void => onTermsChange(e.target.checked)}
                   disabled={isSubmitting}
                 />
                 <span>

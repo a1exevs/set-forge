@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { useLoginMutation, useRegisterMutation } from '@entities/session';
 
 import AuthPageLogicLayer from './auth-page-logic-layer';
+import type { LoginInput, RegisterInput } from '../model/auth-input';
 import type { AuthTab } from '../model/auth-tab';
 
 type Props = {
@@ -19,10 +20,10 @@ const AuthPageDataLayer: FC<Props> = ({ activeTab, redirectSearch }) => {
       activeTab={activeTab}
       redirectSearch={redirectSearch}
       isSubmitting={loginMutation.isPending || registerMutation.isPending}
-      onLogin={async input => {
+      onLogin={async (input: LoginInput): Promise<void> => {
         await loginMutation.mutateAsync(input);
       }}
-      onRegister={async input => {
+      onRegister={async (input: RegisterInput): Promise<void> => {
         await registerMutation.mutateAsync(input);
       }}
     />

@@ -19,7 +19,10 @@ TS strict mode enabled. All strict checks enforced.
 
 ## Explicit Return Types
 
-ALL functions MUST have explicit return types, including `void`:
+Named functions, hooks, methods and arrow functions assigned to a variable MUST declare their return type,
+including `void` (hooks too: `UseQueryResult<WorkoutList[]>`, `UseMutationResult<WorkoutList, Error, CreateWorkoutListDto>`).
+Callbacks passed inline to a typed parameter get their types from it; inline JSX callbacks follow component-typing.
+Client: enforced by ESLint `@typescript-eslint/explicit-function-return-type` (`client/linter/rules/return-type-rule.ts`).
 
 ```typescript
 function calculateTotal(items: Item[]): number {

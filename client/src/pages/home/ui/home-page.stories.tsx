@@ -10,6 +10,7 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
+import type { WorkoutListsExportFile } from '@entities/workout-list';
 import { formatDate } from '@shared/lib';
 
 import HomePageLogicLayer from './home-page-logic-layer';
@@ -24,7 +25,7 @@ const renderHomePage = (): ReturnType<typeof renderWithPageRouter> =>
         workoutLists={mockWorkoutLists}
         deleteWorkoutList={async (): Promise<void> => undefined}
         clearWorkoutSessionCachesForDeletedList={(): void => undefined}
-        exportAllWorkoutLists={async () => ({
+        exportAllWorkoutLists={async (): Promise<WorkoutListsExportFile> => ({
           formatVersion: 1,
           app: 'set-forge',
           exportedAt: new Date().toISOString(),

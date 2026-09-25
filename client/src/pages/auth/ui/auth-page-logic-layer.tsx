@@ -11,20 +11,15 @@ import {
 import { ApiRequestError } from '@shared/api';
 
 import AuthPage from './auth-page';
+import type { LoginInput, RegisterInput } from '../model/auth-input';
 import type { AuthTab } from '../model/auth-tab';
 
 type Props = {
   activeTab: AuthTab;
   redirectSearch: Record<string, string | undefined>;
   isSubmitting: boolean;
-  onLogin: (input: { email: string; password: string; captcha?: string; redirectTo?: string }) => Promise<void>;
-  onRegister: (input: {
-    email: string;
-    password: string;
-    consent: boolean;
-    termsAccepted: boolean;
-    redirectTo?: string;
-  }) => Promise<void>;
+  onLogin: (input: LoginInput) => Promise<void>;
+  onRegister: (input: RegisterInput) => Promise<void>;
 };
 
 const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting, onLogin, onRegister }) => {

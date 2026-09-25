@@ -19,7 +19,7 @@ const StatefulPasswordField: FC<{
       value={value}
       disabled={disabled}
       autoComplete={autoComplete}
-      onChange={(next): void => {
+      onChange={(next: string): void => {
         setValue(next);
         onChange?.(next);
       }}

@@ -1,6 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  type UseMutationResult,
+  useQuery,
+  useQueryClient,
+  type UseQueryResult,
+} from '@tanstack/react-query';
 
-import type { CreateWorkoutListDto, UpdateWorkoutListDto, WorkoutList, WorkoutListsExportFile } from './workout-list';
+import type {
+  CreateWorkoutListDto,
+  ImportWorkoutListsResult,
+  UpdateWorkoutListDto,
+  WorkoutList,
+  WorkoutListsExportFile,
+} from './workout-list';
 import { workoutQueryKeys } from './workout-query-keys';
 import {
   createWorkoutList,
@@ -15,7 +27,7 @@ import {
 const patchWorkoutInLists = (lists: WorkoutList[], updated: WorkoutList): WorkoutList[] =>
   lists.map(list => (list.id === updated.id ? updated : list));
 
-export function useWorkoutListsQuery(enabled = true) {
+export function useWorkoutListsQuery(enabled = true): UseQueryResult<WorkoutList[]> {
   return useQuery<WorkoutList[]>({
     queryKey: workoutQueryKeys.lists,
     queryFn: fetchWorkoutLists,
@@ -23,7 +35,7 @@ export function useWorkoutListsQuery(enabled = true) {
   });
 }
 
-export function useWorkoutQuery(id: string, enabled = true) {
+export function useWorkoutQuery(id: string, enabled = true): UseQueryResult<WorkoutList | null> {
   return useQuery<WorkoutList | null>({
     queryKey: workoutQueryKeys.detail(id),
     queryFn: () => fetchWorkoutList(id),
@@ -31,7 +43,7 @@ export function useWorkoutQuery(id: string, enabled = true) {
   });
 }
 
-export function useCreateWorkoutListMutation() {
+export function useCreateWorkoutListMutation(): UseMutationResult<WorkoutList, Error, CreateWorkoutListDto> {
   const qc = useQueryClient();
 
   return useMutation({
@@ -49,7 +61,7 @@ export function useCreateWorkoutListMutation() {
 
 type UpdateWorkoutListVars = { id: string; dto: UpdateWorkoutListDto };
 
-export function useUpdateWorkoutListMutation() {
+export function useUpdateWorkoutListMutation(): UseMutationResult<WorkoutList, Error, UpdateWorkoutListVars> {
   const qc = useQueryClient();
 
   return useMutation({
@@ -64,7 +76,7 @@ export function useUpdateWorkoutListMutation() {
   });
 }
 
-export function useDeleteWorkoutListMutation() {
+export function useDeleteWorkoutListMutation(): UseMutationResult<void, Error, string> {
   const qc = useQueryClient();
 
   return useMutation({
@@ -76,13 +88,17 @@ export function useDeleteWorkoutListMutation() {
   });
 }
 
-export function useExportAllWorkoutListsMutation() {
+export function useExportAllWorkoutListsMutation(): UseMutationResult<WorkoutListsExportFile, Error, void> {
   return useMutation({
     mutationFn: () => exportAllWorkoutLists(),
   });
 }
 
-export function useImportWorkoutListsMutation() {
+export function useImportWorkoutListsMutation(): UseMutationResult<
+  ImportWorkoutListsResult,
+  Error,
+  WorkoutListsExportFile
+> {
   const qc = useQueryClient();
 
   return useMutation({

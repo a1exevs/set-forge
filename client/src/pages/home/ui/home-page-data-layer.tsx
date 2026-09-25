@@ -7,6 +7,7 @@ import {
   useExportAllWorkoutListsMutation,
   useImportWorkoutListsMutation,
   useWorkoutListsQuery,
+  type WorkoutListsExportFile,
 } from '@entities/workout-list';
 import { useClearWorkoutSessionCachesForDeletedList } from '@entities/workout-session';
 import { formatDate } from '@shared/lib';
@@ -24,15 +25,15 @@ const HomePageDataLayer: FC = () => {
   return (
     <HomePageLogicLayer
       workoutLists={workoutLists}
-      deleteWorkoutList={async (id): Promise<void> => {
+      deleteWorkoutList={async (id: string): Promise<void> => {
         await deleteWorkoutListMutation.mutateAsync(id);
       }}
       clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
-      exportAllWorkoutLists={async () => exportAllWorkoutListsMutation.mutateAsync()}
-      importWorkoutLists={async (file): Promise<void> => {
+      exportAllWorkoutLists={async (): Promise<WorkoutListsExportFile> => exportAllWorkoutListsMutation.mutateAsync()}
+      importWorkoutLists={async (file: WorkoutListsExportFile): Promise<void> => {
         await importWorkoutListsMutation.mutateAsync(file);
       }}
-      onEdit={(id): void => {
+      onEdit={(id: string): void => {
         navigate({ to: '/edit/$id', params: { id } });
       }}
       formatDate={formatDate}

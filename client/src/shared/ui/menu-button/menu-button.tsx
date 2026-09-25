@@ -18,7 +18,7 @@ const MenuButton: FC<Props> = ({ items, ariaLabel }) => {
         <EllipsisVertical className={classes.icon} size={20} strokeWidth={2} aria-hidden />
       </HeadlessMenuButton>
       <MenuItems anchor="bottom start" className={classes.items}>
-        {items.map(item => (
+        {items.map((item: MenuButtonItem) => (
           <MenuItem key={item.id}>
             {({ close }): JSX.Element => (
               <button

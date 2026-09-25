@@ -25,7 +25,7 @@ const TabsBar: FC<Props> = ({ items, activeItemId, className }) => {
 
   return (
     <nav className={classNames} role="tablist" aria-label="Main navigation">
-      {items.map(item => {
+      {items.map((item: TabsBarItem) => {
         const isActive = item.id === activeItemId;
         const Icon = item.icon;
 

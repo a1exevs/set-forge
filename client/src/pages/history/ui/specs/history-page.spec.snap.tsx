@@ -60,7 +60,7 @@ describe('HistoryPage', () => {
         expandedIds={{ 'sess-1': true }}
         onToggle={(): void => undefined}
         sentinelRef={createRef<HTMLDivElement>()}
-        formatSessionDate={(iso): string => iso ?? ''}
+        formatSessionDate={(iso: string | null): string => iso ?? ''}
         formatSummary={(): string => '1/1 exercise · 60 min'}
       />,
     );

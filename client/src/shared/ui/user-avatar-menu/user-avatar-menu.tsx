@@ -19,7 +19,7 @@ const UserAvatarMenu: FC<Props> = ({ letter, items, ariaLabel }) => {
         </span>
       </HeadlessMenuButton>
       <MenuItems anchor="bottom start" className={classes.items}>
-        {items.map(item => (
+        {items.map((item: MenuButtonItem) => (
           <MenuItem key={item.id}>
             {({ close }): JSX.Element => (
               <button

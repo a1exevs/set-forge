@@ -98,7 +98,7 @@ const WorkoutListForm: FC<Props> = ({
               <p className={classes.emptyExercises}>Add exercises to your list</p>
             ) : (
               <div className={classes.exerciseList}>
-                {exercises.map((exercise, index) => (
+                {exercises.map((exercise: ExerciseFormData, index: number) => (
                   <div key={exercise.tempId} className={classes.exerciseCard}>
                     <div className={classes.exerciseHeader}>
                       <span className={classes.exerciseNumber}>{index + 1}</span>

@@ -25,7 +25,7 @@ const DialogWithButton: React.FC<{ backdropColor?: string }> = ({ backdropColor 
         close button inside.
       </p>
       <button
-        onClick={() => setOpen(true)}
+        onClick={(): void => setOpen(true)}
         style={{
           padding: '12px 24px',
           fontSize: '16px',
@@ -42,7 +42,7 @@ const DialogWithButton: React.FC<{ backdropColor?: string }> = ({ backdropColor 
 
       <Dialog
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={(): void => setOpen(false)}
         backdropColor={backdropColor}
         ariaLabel="Interactive dialog example"
       >
@@ -65,7 +65,7 @@ const DialogWithButton: React.FC<{ backdropColor?: string }> = ({ backdropColor 
             <li>Clicking the button below</li>
           </ul>
           <button
-            onClick={() => setOpen(false)}
+            onClick={(): void => setOpen(false)}
             style={{
               padding: '8px 16px',
               fontSize: '14px',
@@ -179,7 +179,7 @@ const DialogWithMultipleFocusableElements: FC = () => {
         through all elements and returns to the first one. Test Shift+Tab goes backwards.
       </p>
       <button
-        onClick={() => setOpen(true)}
+        onClick={(): void => setOpen(true)}
         style={{
           padding: '12px 24px',
           fontSize: '16px',
@@ -196,7 +196,7 @@ const DialogWithMultipleFocusableElements: FC = () => {
 
       <Dialog
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={(): void => setOpen(false)}
         backdropColor="#000000"
         ariaLabel="Form dialog for focus trap testing"
       >
@@ -306,7 +306,7 @@ const DialogWithMultipleFocusableElements: FC = () => {
               Submit
             </button>
             <button
-              onClick={() => setOpen(false)}
+              onClick={(): void => setOpen(false)}
               style={{
                 flex: 1,
                 padding: '8px 16px',
@@ -345,7 +345,7 @@ const DialogWithInitialFocus: React.FC = () => {
         instead of the first element (Cancel button).
       </p>
       <button
-        onClick={() => setOpen(true)}
+        onClick={(): void => setOpen(true)}
         style={{
           padding: '12px 24px',
           fontSize: '16px',
@@ -362,7 +362,7 @@ const DialogWithInitialFocus: React.FC = () => {
 
       <Dialog
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={(): void => setOpen(false)}
         backdropColor="#000000"
         initialFocus={deleteButtonRef}
         ariaLabel="Delete confirmation dialog"
@@ -387,7 +387,7 @@ const DialogWithInitialFocus: React.FC = () => {
 
           <div style={{ display: 'flex', gap: '8px', marginTop: '1.5rem' }}>
             <button
-              onClick={() => setOpen(false)}
+              onClick={(): void => setOpen(false)}
               style={{
                 flex: 1,
                 padding: '8px 16px',

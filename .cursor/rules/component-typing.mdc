@@ -8,7 +8,8 @@ globs: ["client/**"]
 ## Components
 
 - **ALL** components MUST use `FC<Props>` (or `FC<PropsWithChildren>` for children).
-- Props: `type Props = { ... }` (never `interface`).
+- Props: `type Props = { ... }` (never `interface`, never an inline object in `FC<{ ... }>` — a second component in
+  the file gets its own `type XProps`). Enforced in `ui` segments.
 - Import `FC` from react in every component file.
 
 ```typescript
@@ -23,7 +24,9 @@ Explicit return types: see typescript-guidelines (Explicit Return Types).
 
 ## Inline Callbacks in JSX
 
-- **ALL** inline callbacks MUST have explicit param and return types.
+- **ALL** inline callbacks in JSX attributes MUST have explicit param and return types.
+- List render callbacks in JSX (`.map`, `.flatMap`) type their parameters; the return type is inferred JSX.
+- Enforced by ESLint `no-restricted-syntax` selectors (`client/linter/rules/return-type-rule.ts`).
 
 ```typescript
 // ✅

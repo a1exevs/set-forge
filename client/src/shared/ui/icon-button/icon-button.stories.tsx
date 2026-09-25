@@ -73,7 +73,7 @@ export const AllCombinations: Story = {
         justifyItems: 'center',
       }}
     >
-      {VARIANTS.flatMap(variant =>
+      {VARIANTS.flatMap((variant: Variant) =>
         SHAPES.flatMap(shape =>
           SIZES.map(size => (
             <IconButton

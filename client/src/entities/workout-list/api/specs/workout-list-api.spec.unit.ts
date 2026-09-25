@@ -1,4 +1,4 @@
-import { apiRequest, ApiRequestError } from '@shared/api';
+import { apiRequest, ApiRequestError, type CommonResponseEnvelope } from '@shared/api';
 
 import {
   createWorkoutList,
@@ -15,7 +15,7 @@ jest.mock('src/shared/api/http-client', () => {
 
 const mockedApiRequest = apiRequest as jest.MockedFunction<typeof apiRequest>;
 
-const okEnvelope = <T>(data: T) => ({ data, messages: [], fieldsErrors: [], resultCode: 0 });
+const okEnvelope = <T>(data: T): CommonResponseEnvelope<T> => ({ data, messages: [], fieldsErrors: [], resultCode: 0 });
 
 const LIST = {
   id: 'list-1',

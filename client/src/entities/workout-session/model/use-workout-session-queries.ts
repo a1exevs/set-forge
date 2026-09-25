@@ -1,9 +1,18 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  type InfiniteData,
+  useInfiniteQuery,
+  type UseInfiniteQueryResult,
+  useMutation,
+  type UseMutationResult,
+  useQuery,
+  useQueryClient,
+  type UseQueryResult,
+} from '@tanstack/react-query';
 import { useRef } from 'react';
 
 import { hasRemainingSets } from '@entities/workout-session-exercise/@x/workout-session';
 
-import type { WorkoutSession } from './workout-session';
+import type { WorkoutHistoryPage, WorkoutSession } from './workout-session';
 import { workoutSessionQueryKeys } from './workout-session-query-keys';
 import {
   discardWorkoutSession,
@@ -58,7 +67,10 @@ const hasProgressBeyond = (current: WorkoutSession, baseline: WorkoutSession): b
     return base != null && exercise.completedSets > base.completedSets;
   });
 
-export function useActiveWorkoutSessionQuery(workoutListId: string, enabled = true) {
+export function useActiveWorkoutSessionQuery(
+  workoutListId: string,
+  enabled = true,
+): UseQueryResult<WorkoutSession | null> {
   return useQuery<WorkoutSession | null>({
     queryKey: workoutSessionQueryKeys.active(workoutListId),
     queryFn: () => fetchActiveWorkoutSession(workoutListId),
@@ -67,7 +79,9 @@ export function useActiveWorkoutSessionQuery(workoutListId: string, enabled = tr
 }
 
 /** Infinite (offset-based) history of completed sessions, newest first. */
-export function useWorkoutHistoryInfiniteQuery(enabled = true) {
+export function useWorkoutHistoryInfiniteQuery(
+  enabled = true,
+): UseInfiniteQueryResult<InfiniteData<WorkoutHistoryPage>> {
   return useInfiniteQuery({
     queryKey: workoutSessionQueryKeys.history(HISTORY_PAGE_SIZE),
     queryFn: ({ pageParam }) => fetchWorkoutHistory(HISTORY_PAGE_SIZE, pageParam),
@@ -80,6 +94,9 @@ export function useWorkoutHistoryInfiniteQuery(enabled = true) {
 
 type IncrementProgressVars = { sessionId: string; workoutListId: string; exerciseId: string };
 
+/** Snapshot taken in `onMutate` to roll the optimistic increment back on error. */
+type IncrementProgressContext = { previous: WorkoutSession | undefined };
+
 const syncSessionCaches = (
   qc: ReturnType<typeof useQueryClient>,
   workoutListId: string,
@@ -90,7 +107,12 @@ const syncSessionCaches = (
   qc.setQueryData(workoutSessionQueryKeys.detail(session.id), session);
 };
 
-export function useIncrementSessionProgressMutation() {
+export function useIncrementSessionProgressMutation(): UseMutationResult<
+  WorkoutSession,
+  Error,
+  IncrementProgressVars,
+  IncrementProgressContext
+> {
   const qc = useQueryClient();
   // Serialize PATCHes so the server does not lose increments under rapid taps / slow network.
   const queueRef = useRef(Promise.resolve(undefined));
@@ -151,7 +173,7 @@ export function useIncrementSessionProgressMutation() {
 
 type FinishSessionVars = { sessionId: string; workoutListId: string };
 
-export function useStartWorkoutSessionMutation() {
+export function useStartWorkoutSessionMutation(): UseMutationResult<WorkoutSession, Error, string> {
   const qc = useQueryClient();
 
   return useMutation({
@@ -162,7 +184,7 @@ export function useStartWorkoutSessionMutation() {
   });
 }
 
-export function useFinishWorkoutSessionMutation() {
+export function useFinishWorkoutSessionMutation(): UseMutationResult<WorkoutSession, Error, FinishSessionVars> {
   const qc = useQueryClient();
 
   return useMutation({
@@ -176,7 +198,7 @@ export function useFinishWorkoutSessionMutation() {
 
 type ResyncSessionVars = { sessionId: string; workoutListId: string };
 
-export function useDiscardWorkoutSessionMutation() {
+export function useDiscardWorkoutSessionMutation(): UseMutationResult<void, Error, FinishSessionVars> {
   const qc = useQueryClient();
 
   return useMutation({
@@ -188,7 +210,7 @@ export function useDiscardWorkoutSessionMutation() {
   });
 }
 
-export function useResyncWorkoutSessionMutation() {
+export function useResyncWorkoutSessionMutation(): UseMutationResult<WorkoutSession, Error, ResyncSessionVars> {
   const qc = useQueryClient();
 
   return useMutation({
