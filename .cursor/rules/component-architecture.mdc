@@ -19,7 +19,7 @@ globs: ["client/**"]
 passes the result (`swipeRef`, `activeItemId`). Context providers (`*-provider.tsx`) own state like a data layer.
 
 Enforced in `ui` segments by ESLint `no-restricted-syntax` (`client/linter/rules/ui-segment-rule.ts`): hooks are
-banned in presentation files, query/mutation hooks and stores (`use*Query`, `use*Mutation`, `use*Store`,
+banned in presentation files — calling them and importing them (`import { useX as x }` would hide the call), query/mutation hooks and stores (`use*Query`, `use*Mutation`, `use*Store`,
 `useStore.use.x()`) in logic layers.
 
 ```typescript

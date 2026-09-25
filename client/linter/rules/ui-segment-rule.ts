@@ -44,8 +44,9 @@ const noInlineStyles = {
  * in `*-logic-layer.tsx` / `*-data-layer.tsx` (and context providers, `*-provider.tsx`).
  */
 const noHooksInPresentation = {
+  // Imports too, not only calls: `import { useWorkoutListsQuery as lists }` + `lists()` would hide the call.
   selector:
-    "CallExpression[callee.name=/^use[A-Z]/], CallExpression[callee.property.name=/^use[A-Z]/], CallExpression[callee.object.property.name='use']",
+    "CallExpression[callee.name=/^use[A-Z]/], CallExpression[callee.property.name=/^use[A-Z]/], CallExpression[callee.object.property.name='use'], ImportSpecifier[imported.name=/^use[A-Z]/]",
   message:
     'Presentation components take props only — move hooks to the logic layer (`*-logic-layer.tsx`) or, for ' +
     'queries and stores, to the data layer (`*-data-layer.tsx`).',
