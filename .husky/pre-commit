@@ -1,5 +1,3 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 npx lint-staged
-# Repo-wide checks that lint-staged cannot express per file: FSD structure and a story next to every component.
-npm run --silent client:lint:structure && npm run --silent client:lint:stories

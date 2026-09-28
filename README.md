@@ -57,7 +57,7 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 | `npm run client:preview` | Preview production build (`client/dist`) |
 | `npm run client:format` / `npm run client:format:check` | Prettier |
 | `npm run client:lint` / `npm run client:lint:fix` | Structure, stories, rules, docs, ESLint, Steiger, knip (what CI runs) |
-| `npm run client:lint:structure` / `npm run client:lint:stories` | FSD structure and a story next to every component (also run by the pre-commit hook) |
+| `npm run client:lint:structure` / `npm run client:lint:stories` | FSD structure and a story next to every component |
 | `npm run client:test:unit` / `npm run client:test:unit-cov` | Jest unit tests |
 | `npm run client:test:snap` / `npm run client:test:snap-cov` / `npm run client:test:snap-update` | Snapshot tests |
 | `npm run client:test:e2e` | Playwright e2e (headless in CI; headed locally via config) |
