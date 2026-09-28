@@ -78,6 +78,7 @@
     "@feature-sliced/steiger-plugin": "0.7.0",
     "@playwright/test": "1.62.1",
     "@resvg/resvg-js": "2.6.2",
+    "@storybook/addon-a11y": "8.6.18",
     "@storybook/addon-essentials": "8.6.18",
     "@storybook/addon-interactions": "8.6.18",
     "@storybook/blocks": "8.6.18",

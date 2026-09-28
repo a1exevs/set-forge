@@ -52,6 +52,8 @@ export const Variant: Story = {
 - No inline `style`: the `showcase` wrappers, or a `<component>.stories.module.scss` for classes the story itself
   needs (transition classes, a demo box).
 - One viewport (the default) for `shared` components.
+- The Accessibility panel (`@storybook/addon-a11y`, axe) is green on every story: a violation is fixed in the
+  component, not hidden in the story.
 
 ## Pages, widgets, entities
 
@@ -80,4 +82,5 @@ export const Variant: Story = {
 | Stories compile and render | `npm run client:build-storybook` |
 | `Default` + one story per axis / state, matrices in `Row` / `Grid`, JSDoc on every story | ❌ review |
 | User-driven states reached through `play` | ❌ review |
+| The Accessibility panel is green on every story | ❌ review |
 | No inline `style`; wrappers from `client/.storybook/showcase.tsx` or a `*.stories.module.scss` | ❌ review |
