@@ -1,85 +1,39 @@
-import type { Meta } from '@storybook/react';
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRoute,
-  createRouter,
-  Outlet,
-  RouterProvider,
-} from '@tanstack/react-router';
+import type { Meta, StoryObj } from '@storybook/react';
 import type { ReactElement } from 'react';
 
-import {
-  buildDesktop4KStoryObj,
-  buildDesktopStoryObj,
-  buildMobileStoryObj,
-  buildTabletStoryObj,
-} from 'storybook-dir/helpers';
+import { renderWithRouter } from 'storybook-dir/render-with-router';
+import { withFrame } from 'storybook-dir/showcase';
 
 import NotFoundMessage from './not-found-message';
 
-const storyTitle = 'Shared/NotFoundMessage';
-
 const meta = {
-  title: storyTitle,
+  title: 'Shared/NotFoundMessage',
   component: NotFoundMessage,
-  argTypes: {
-    title: { control: 'text' },
-    backToLink: { control: 'text' },
-    backToLabel: { control: 'text' },
+  args: { title: 'Workout list not found' },
+  decorators: [withFrame],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'The empty state of a page whose entity is gone: a title and a button that links back. `backToLink` ' +
+          'defaults to home, `backToLabel` to "Back to Home".',
+      },
+    },
   },
+  render: (args): ReactElement =>
+    renderWithRouter({
+      paths: [args.backToLink ?? '/'],
+      component: (): ReactElement => <NotFoundMessage {...args} />,
+    }),
 } satisfies Meta<typeof NotFoundMessage>;
 
 export default meta;
+type Story = StoryObj<typeof meta>;
 
-const renderWithRouter = (title: string, backToLink?: string, backToLabel?: string): ReactElement => {
-  const rootRoute = createRootRoute({
-    component: (): JSX.Element => <Outlet />,
-  });
+/** The default way back is home. */
+export const Default: Story = {};
 
-  const indexRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/',
-    component: (): JSX.Element => <NotFoundMessage title={title} backToLink={backToLink} backToLabel={backToLabel} />,
-  });
-
-  const routeTree = rootRoute.addChildren([indexRoute]);
-  const router = createRouter({
-    routeTree,
-    history: createMemoryHistory({ initialEntries: ['/'] }),
-  });
-
-  return <RouterProvider router={router} />;
+/** A custom destination and label. */
+export const CustomBackTo: Story = {
+  args: { backToLink: '/history', backToLabel: 'Back to history' },
 };
-
-export const DefaultDesktop4k = buildDesktop4KStoryObj<typeof meta>({
-  render: () => renderWithRouter('Workout list not found'),
-});
-
-export const DefaultDesktop = buildDesktopStoryObj<typeof meta>({
-  render: () => renderWithRouter('Workout list not found'),
-});
-
-export const DefaultTablet = buildTabletStoryObj<typeof meta>({
-  render: () => renderWithRouter('Workout list not found'),
-});
-
-export const DefaultMobile = buildMobileStoryObj<typeof meta>({
-  render: () => renderWithRouter('Workout list not found'),
-});
-
-export const CustomBackToDesktop4k = buildDesktop4KStoryObj<typeof meta>({
-  render: () => renderWithRouter('Workout list not found', '/custom'),
-});
-
-export const CustomBackToDesktop = buildDesktopStoryObj<typeof meta>({
-  render: () => renderWithRouter('Workout list not found', '/custom'),
-});
-
-export const CustomBackToTablet = buildTabletStoryObj<typeof meta>({
-  render: () => renderWithRouter('Workout list not found', '/custom'),
-});
-
-export const CustomBackToMobile = buildMobileStoryObj<typeof meta>({
-  render: () => renderWithRouter('Workout list not found', '/custom'),
-});

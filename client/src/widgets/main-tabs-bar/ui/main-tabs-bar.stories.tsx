@@ -1,69 +1,37 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRoute,
-  createRouter,
-  Outlet,
-  RouterProvider,
-} from '@tanstack/react-router';
 import type { ReactElement } from 'react';
+
+import { renderWithRouter } from 'storybook-dir/render-with-router';
 
 import MainTabsBar from './main-tabs-bar-logic-layer';
 
-const renderWithRouter = (initialPath: '/' | '/history' | '/profile'): ReactElement => {
-  const rootRoute = createRootRoute({
-    component: (): JSX.Element => (
-      <>
-        <Outlet />
-        <MainTabsBar />
-      </>
-    ),
-  });
+const MAIN_TAB_PATHS = ['/', '/history', '/profile'];
 
-  const indexRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/',
-    component: (): null => null,
+const renderMainTabsBar = (initialEntry: string): ReactElement =>
+  renderWithRouter({
+    initialEntry,
+    paths: MAIN_TAB_PATHS,
+    component: (): ReactElement => <MainTabsBar />,
   });
-
-  const historyRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/history',
-    component: (): null => null,
-  });
-
-  const profileRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/profile',
-    component: (): null => null,
-  });
-
-  const routeTree = rootRoute.addChildren([indexRoute, historyRoute, profileRoute]);
-  const router = createRouter({
-    routeTree,
-    history: createMemoryHistory({ initialEntries: [initialPath] }),
-  });
-
-  return <RouterProvider router={router} />;
-};
 
 const meta = {
   title: 'Widgets/MainTabsBar',
   component: MainTabsBar,
+  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof MainTabsBar>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** The bar reads the active tab from the router: home. */
 export const HomeActive: Story = {
-  render: (): ReactElement => renderWithRouter('/'),
+  render: (): ReactElement => renderMainTabsBar('/'),
 };
 
 export const HistoryActive: Story = {
-  render: (): ReactElement => renderWithRouter('/history'),
+  render: (): ReactElement => renderMainTabsBar('/history'),
 };
 
 export const ProfileActive: Story = {
-  render: (): ReactElement => renderWithRouter('/profile'),
+  render: (): ReactElement => renderMainTabsBar('/profile'),
 };

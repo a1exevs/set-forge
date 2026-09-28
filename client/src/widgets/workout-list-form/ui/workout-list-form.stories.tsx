@@ -13,10 +13,8 @@ import { ConfirmDialogProvider } from '@shared/ui';
 
 import WorkoutListForm from './workout-list-form-logic-layer';
 
-const storyTitle = 'Widgets/WorkoutListForm';
-
 const meta = {
-  title: storyTitle,
+  title: 'Widgets/WorkoutListForm',
   component: WorkoutListForm,
 } satisfies Meta<typeof WorkoutListForm>;
 

@@ -54,3 +54,15 @@ export const mockWorkoutSessions: WorkoutSession[] = [
     ],
   },
 ];
+
+/** Workout mode mid-session: the first exercise done, the second half-way. */
+export const mockActiveWorkoutSession: WorkoutSession = {
+  ...mockWorkoutSession,
+  id: 'sess-active',
+  status: 'active',
+  finishedAt: null,
+  exercises: mockWorkoutSession.exercises.map((exercise, index) => ({
+    ...exercise,
+    completedSets: index === 0 ? exercise.sets : 1,
+  })),
+};

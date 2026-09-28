@@ -87,7 +87,7 @@ Five standard segments in slices. Names describe the **purpose**, never the esse
 
 | Segment | Put here | Examples |
 |---|---|---|
-| `ui/` | components (`.tsx` + `.module.scss`, stories, specs) | `home-page-logic-layer`, `workout-exercise-card` |
+| `ui/` | components (`.tsx` + `.module.scss`, one `*.stories.tsx` per component — see storybook, specs) | `home-page-logic-layer`, `workout-exercise-card` |
 | `model/` | domain types, query hooks and keys, stores, business logic | `workout-list`, `use-workout-queries` |
 | `api/` | requests to the backend, mapping responses | `workout-list-api` |
 | `lib/` | helpers used inside the slice, pure utilities | `history-formatters` |

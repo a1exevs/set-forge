@@ -10,8 +10,6 @@ import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
 import CreateWorkoutPageLogicLayer from './create-workout-page-logic-layer';
 
-const storyTitle = 'Pages/CreateWorkoutPage';
-
 const renderCreateWorkoutPage = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
     initialEntries: ['/create'],
@@ -19,7 +17,7 @@ const renderCreateWorkoutPage = (): ReturnType<typeof renderWithPageRouter> =>
   });
 
 const meta = {
-  title: storyTitle,
+  title: 'Pages/CreateWorkoutPage',
   component: CreateWorkoutPageLogicLayer,
 } satisfies Meta<typeof CreateWorkoutPageLogicLayer>;
 

@@ -12,10 +12,8 @@ import {
 import LegalDocument from './legal-document-logic-layer';
 import type { LegalContent, LegalLang } from '../model/legal-content';
 
-const storyTitle = 'Widgets/LegalDocument';
-
 const meta = {
-  title: storyTitle,
+  title: 'Widgets/LegalDocument',
   component: LegalDocument,
 } satisfies Meta<typeof LegalDocument>;
 

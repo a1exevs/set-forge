@@ -1,28 +1,36 @@
-import type { Meta } from '@storybook/react';
-import { FC, useEffect } from 'react';
+import type { Meta, StoryObj } from '@storybook/react';
+import { userEvent, within } from '@storybook/test';
+import { FC, ReactElement } from 'react';
 
-import { buildDesktopStoryObj, buildMobileStoryObj, buildTabletStoryObj } from 'storybook-dir/helpers';
+import { Caption, Row, Stack, withFrame } from 'storybook-dir/showcase';
 
 import { toastError, toastSuccess } from '@shared/lib';
 
 import Toaster from './toaster-data-layer';
-import classes from './toaster.stories.module.scss';
 import Button from '../button/button';
 
-const storyTitle = 'Shared/Toaster';
-
 const meta = {
-  title: storyTitle,
+  title: 'Shared/Toaster',
   component: Toaster,
+  decorators: [withFrame],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'The Sonner toaster mounted once in the app root; `toastSuccess` / `toastError` from `@shared/lib` fire the ' +
+          'toasts. Bottom-left, with a close button, themed by the theme store.',
+      },
+    },
+  },
 } satisfies Meta<typeof Toaster>;
 
 export default meta;
+type Story = StoryObj<typeof meta>;
 
 const ToasterDemo: FC = () => (
-  <div className={classes.storyWrapper}>
-    <h1 className={classes.storyTitle}>Toaster</h1>
-    <p className={classes.storyText}>Toasts appear at the bottom-left. Try success and error variants.</p>
-    <div className={classes.actions}>
+  <Stack>
+    <Caption>Toasts appear at the bottom-left of the viewport.</Caption>
+    <Row>
       <Button
         onClick={(): void => {
           toastSuccess('Workout list created');
@@ -33,10 +41,10 @@ const ToasterDemo: FC = () => (
       <Button
         variant="danger"
         onClick={(): void => {
-          toastError(new Error('Something went wrong'), 'Failed');
+          toastError(new Error('Failed to update workout list'), 'Failed');
         }}
       >
-        Error
+        Failure
       </Button>
       <Button
         variant="secondary"
@@ -44,76 +52,33 @@ const ToasterDemo: FC = () => (
           toastError(null, 'Failed to start workout session');
         }}
       >
-        Fallback error
+        Failure without error
       </Button>
-    </div>
+    </Row>
     <Toaster />
-  </div>
+  </Stack>
 );
 
-const ToasterRenderStory: FC<{ show: () => void }> = ({ show }) => {
-  useEffect((): void => {
-    show();
-  }, [show]);
+const clickToast =
+  (name: string): Story['play'] =>
+  async ({ canvasElement }): Promise<void> => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name }));
+  };
 
-  return (
-    <div className={classes.storyWrapper}>
-      <Toaster />
-    </div>
-  );
+/** A success toast: the message alone. */
+export const Success: Story = {
+  render: (): ReactElement => <ToasterDemo />,
+  play: clickToast('Success'),
 };
 
-export const Desktop = buildDesktopStoryObj({
-  render: () => (
-    <ToasterRenderStory
-      show={(): void => {
-        toastSuccess('Workout list created');
-      }}
-    />
-  ),
-});
-
-export const Tablet = buildTabletStoryObj({
-  render: () => (
-    <ToasterRenderStory
-      show={(): void => {
-        toastSuccess('Workout list created');
-      }}
-    />
-  ),
-});
-
-export const Mobile = buildMobileStoryObj({
-  render: () => (
-    <ToasterRenderStory
-      show={(): void => {
-        toastSuccess('Workout list created');
-      }}
-    />
-  ),
-});
-
-export const ErrorDesktop = buildDesktopStoryObj({
-  render: () => (
-    <ToasterRenderStory
-      show={(): void => {
-        toastError(new Error('Failed to update workout list'), 'Failed');
-      }}
-    />
-  ),
-});
-
-export const InteractiveDesktop = {
-  ...buildDesktopStoryObj({}),
-  render: () => <ToasterDemo />,
+/** An error toast: `toastError` shows the error's message. */
+export const Failure: Story = {
+  render: (): ReactElement => <ToasterDemo />,
+  play: clickToast('Failure'),
 };
 
-export const InteractiveTablet = {
-  ...buildTabletStoryObj({}),
-  render: () => <ToasterDemo />,
-};
-
-export const InteractiveMobile = {
-  ...buildMobileStoryObj({}),
-  render: () => <ToasterDemo />,
+/** `toastError(null, fallback)`: no error object, the fallback text is shown. */
+export const FailureWithoutError: Story = {
+  render: (): ReactElement => <ToasterDemo />,
+  play: clickToast('Failure without error'),
 };

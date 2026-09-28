@@ -39,7 +39,8 @@ From the **repository root**, use the `client:*` aliases (see [root README](../R
 | `npm run build` | `tsc && vite build` |
 | `npm run preview` | Preview production build (`client/dist`) |
 | `npm run format` / `npm run format:check` | Prettier |
-| `npm run lint` / `npm run lint:fix` | ESLint |
+| `npm run lint` / `npm run lint:fix` | Structure, stories, rules, docs, ESLint, Steiger, knip |
+| `npm run lint:stories` | A stories file next to every component, titles by FSD layer, pages in every viewport |
 | `npm run test:unit` / `npm run test:unit-cov` | Jest unit tests |
 | `npm run test:snap` / `npm run test:snap-cov` / `npm run test:snap-update` | Snapshot tests |
 | `npm run test:e2e` | Playwright e2e (headless in CI; headed locally via config) |
