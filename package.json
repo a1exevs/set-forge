@@ -18,6 +18,8 @@
     "client:format": "npm run format -w @set-forge/client",
     "client:format:check": "npm run format:check -w @set-forge/client",
     "client:lint": "npm run lint -w @set-forge/client",
+    "client:lint:structure": "npm run lint:structure -w @set-forge/client",
+    "client:lint:stories": "npm run lint:stories -w @set-forge/client",
     "client:lint:fix": "npm run lint:fix -w @set-forge/client",
     "client:test:unit": "npm run test:unit -w @set-forge/client",
     "client:test:unit-cov": "npm run test:unit-cov -w @set-forge/client",

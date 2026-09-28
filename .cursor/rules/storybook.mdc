@@ -1,6 +1,6 @@
 ---
 description: Storybook — one stories file next to every component, titles by FSD layer, showcase stories, viewports, Chromatic
-globs: client/src/**/*.stories.tsx, client/.storybook/**
+globs: client/src/**/ui/**, client/src/**/*.stories.tsx, client/.storybook/**
 alwaysApply: false
 ---
 
@@ -74,7 +74,7 @@ export const Variant: Story = {
 
 | Rule | Checked by |
 |---|---|
-| A `<component>.stories.tsx` next to every component of a `ui` segment (layers count as the component); no orphan story | `npm run client:lint` · `client/scripts/check-stories.mjs` |
+| A `<component>.stories.tsx` next to every component of a `ui` segment (layers count as the component); no orphan story | `npm run client:lint` · `client/scripts/check-stories.mjs` · pre-commit hook |
 | `title` is the literal `'<Layer>/<ComponentName>'` | `npm run client:lint` · `client/scripts/check-stories.mjs` |
 | Page stories cover `Desktop4k`, `Desktop`, `Tablet` and `Mobile` | `npm run client:lint` · `client/scripts/check-stories.mjs` |
 | Stories compile and render | `npm run client:build-storybook` |
