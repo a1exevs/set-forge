@@ -19,7 +19,24 @@ Shared release notes: [`RELEASE-NOTES.md`](RELEASE-NOTES.md) (repository root).
 
 ## Prerequisites
 
-- Node **22.23.2**, npm **10.9.8**
+- Node **22.23.2**, npm **10.9.8** (pinned in [`.nvmrc`](.nvmrc): `nvm install && nvm use`)
+- **Docker** for the local MySQL, both e2e suites and the prod stack
+- **GitHub CLI** (`gh`) for the PR and release workflows
+
+## Quick start
+
+In Claude Code run `/setup` ([`.claude/skills/setup/SKILL.md`](.claude/skills/setup/SKILL.md)): it checks and
+installs the prerequisites (macOS first, Windows / Linux fallbacks), walks you through `gh` authentication, installs dependencies,
+creates the env files and verifies that the client and the server build and run.
+
+Without Claude, the same steps by hand: install the prerequisites, then
+
+```bash
+npm install
+npm run setup:env          # .env, server/.development.env, server/.e2e.env from their examples
+npm run db:up              # wait until `docker compose --profile dev ps` shows mysql-dev healthy (~20 s on the first run)
+npm run server:db:migrate && npm run server:db:seed
+```
 
 ## Install
 
@@ -123,7 +140,7 @@ Persistent Docker volumes:
 
 #### Production environment files
 
-Create these files before running `npm run prod:up`:
+Create these files before running `npm run prod:up` (`npm run setup:env -- --prod` copies the root `.env` and `server/.production.env` from their examples):
 
 - Root `.env` (copy from [`.env.example`](.env.example)): compose-level values such as MySQL bootstrap credentials, `SITE_ADDRESS`, `VITE_PUBLIC_ORIGIN` (OG meta for the client Docker build), the legal/privacy build args `VITE_PRIVACY_OPERATOR_NAME_RU` / `VITE_PRIVACY_OPERATOR_NAME_EN` (per-language data-controller name shown in the Privacy Policy / Terms; `VITE_PRIVACY_OPERATOR_NAME` is an optional shared fallback) and `VITE_PRIVACY_CONTACT_EMAIL`, and optional host port overrides.
 - `client/.env` (copy from [`client/.env.example`](client/.env.example), **local dev only**): Vite dev overrides such as `VITE_DEV_API_PROXY`, `VITE_PUBLIC_ORIGIN`, and `VITE_PRIVACY_OPERATOR_NAME_RU` / `VITE_PRIVACY_OPERATOR_NAME_EN` / `VITE_PRIVACY_CONTACT_EMAIL` for manual `vite build`.
@@ -176,6 +193,8 @@ For local development against `mysql-dev`, the equivalent flow is `npm run db:up
 | Command | Description |
 |--------|-------------|
 | `npm run prepare` | Husky install (runs automatically after `npm install` unless `HUSKY=0`) |
+| `npm run setup:env` / `npm run setup:env -- --fix` | Create the missing dev env files (`.env`, `server/.development.env`, `server/.e2e.env`) from their examples and check (or sync) the MySQL credentials between the root `.env` and `server/.development.env` ([`scripts/setup-env.sh`](scripts/setup-env.sh)) |
+| `npm run setup:env -- --prod` / `-- --prod --fix` | Same for the prod stack: `.env` + `server/.production.env` (see [`DEPLOY-SELECTEL.md`](DEPLOY-SELECTEL.md#8-configure-environment-variables)). On Windows run from Git Bash so `bash` is Git's, not WSL's |
 | `npm run format:root` / `npm run format:root:check` | Prettier for `scripts/**/*.{ts,tsx}` |
 | `npm run version:patch` / `npm run version:minor` / `npm run version:major` | Bump version via `scripts/increase-version.ts` |
 | `npm run update-version:patch` / `npm run update-version:minor` / `npm run update-version:major` | Version branch workflow (`scripts/update-version.sh`) |
