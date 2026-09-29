@@ -1,3 +1,8 @@
+---
+name: code-review
+description: Rigorous senior-engineer review of the changes since the last commit (bugs, style, security, performance, domain docs). Use when the user asks to review the current changes or runs /code-review.
+---
+
 # code-review
 
 Act as a senior software engineer. Perform a rigorous code review of the changes since the last commit.
@@ -15,5 +20,3 @@ Focus on:
 6. Domain docs under `docs/domains/` — invariants and flows still match the changed behavior; flag a changed rule without an updated invariant and test.
 
 Output your feedback as a concise list of actionable improvements. If everything looks solid, give me a "Ready to commit" signal.
-
-This command will be available in chat with /code-review

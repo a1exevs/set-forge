@@ -42,7 +42,7 @@ From the **repository root**, use the `client:*` aliases (see [root README](../R
 | `npm run lint` / `npm run lint:fix` | Structure, stories, rules, docs, ESLint, Steiger, knip |
 | `npm run lint:structure` | FSD layers, slices, segments, public API, names by purpose, kebab-case |
 | `npm run lint:stories` | A stories file next to every component, titles by FSD layer, pages in every viewport |
-| `npm run lint:rules` | Agent rules in `.cursor/rules` have one shape and their Enforcement references resolve |
+| `npm run lint:rules` | Claude Code rules in `.claude/rules` have one shape and their Enforcement references resolve |
 | `npm run lint:docs` | Domain docs in `docs/domains` are thin and point at real code |
 | `npm run lint:eslint` | ESLint |
 | `npm run lint:fsd` | Steiger (FSD boundaries) |

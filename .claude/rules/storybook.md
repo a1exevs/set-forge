@@ -1,7 +1,9 @@
 ---
 description: Storybook — one stories file next to every component, titles by FSD layer, showcase stories, viewports, Chromatic
-globs: client/src/**/ui/**, client/src/**/*.stories.tsx, client/.storybook/**
-alwaysApply: false
+paths:
+  - "client/src/**/ui/**"
+  - "client/src/**/*.stories.tsx"
+  - "client/.storybook/**"
 ---
 
 # Storybook

@@ -1,7 +1,7 @@
 ---
 description: NestJS API conventions — Swagger, DTO, thin controllers, service tests
-globs: server/**
-alwaysApply: false
+paths:
+  - "server/**"
 ---
 
 # Server API

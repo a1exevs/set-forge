@@ -1,7 +1,12 @@
 ---
 description: Domain docs — what they hold (intent, invariants backed by tests, flows, a map to the code) and what they never duplicate
-globs: docs/**, client/src/entities/**, client/src/features/**, client/src/pages/**, client/src/widgets/**, server/src/**
-alwaysApply: false
+paths:
+  - "docs/**"
+  - "client/src/entities/**"
+  - "client/src/features/**"
+  - "client/src/pages/**"
+  - "client/src/widgets/**"
+  - "server/src/**"
 ---
 
 # Domain Docs

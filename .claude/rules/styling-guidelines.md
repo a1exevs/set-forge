@@ -1,7 +1,7 @@
 ---
 description: Styling — SCSS modules next to components, camelCase classes, variables, no inline styles
-globs: client/**
-alwaysApply: false
+paths:
+  - "client/**"
 ---
 
 # Styling Guidelines

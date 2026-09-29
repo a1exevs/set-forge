@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Keeps the domain docs (docs/domains/*.md) thin and pointing at real code (see .cursor/rules/domain-docs.mdc):
+// Keeps the domain docs (docs/domains/*.md) thin and pointing at real code (see .claude/rules/domain-docs.md):
 //   1. one `# Title`, then exactly Glossary, Invariants, Flows, Map (+ optional Related); at most MAX_LINES lines;
 //   2. Invariants is `| Id | Invariant |`; tests prove an invariant with `// @invariant <domain>/<id>`, and both sides
 //      agree: a tagged invariant is not `❌ review`, an untagged one is, every tag names a real invariant;
@@ -20,7 +20,7 @@ const docsDir = join(repoRoot, 'docs', 'domains');
 const SECTIONS = ['Glossary', 'Invariants', 'Flows', 'Map'];
 const OPTIONAL_LAST = 'Related';
 const MAX_LINES = 150;
-const PATH_PREFIXES = ['client/', 'server/', 'docs/', '.cursor/'];
+const PATH_PREFIXES = ['client/', 'server/', 'docs/', '.claude/'];
 const TEST_FILE = /(\.spec\.(unit|snap|e2e)\.tsx?|\.spec\.ts|\.e2e-spec\.ts)$/;
 const REVIEW = '❌ review';
 /** Server modules that are infrastructure, not a domain. */

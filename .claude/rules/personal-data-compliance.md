@@ -1,12 +1,20 @@
 ---
 description: Personal-data / privacy compliance — keep Privacy Policy & Terms in sync and versioned when user data or legal-relevant behaviour changes
-globs: server/src/users/**, server/src/auth/**, server/src/security/**, server/database/migrations/**, server/src/common/constants/document-versions.ts, client/src/entities/session/**, client/src/pages/privacy/**, client/src/pages/terms/**, client/src/widgets/document-reconsent/**
-alwaysApply: false
+paths:
+  - "server/src/users/**"
+  - "server/src/auth/**"
+  - "server/src/security/**"
+  - "server/database/migrations/**"
+  - "server/src/common/constants/document-versions.ts"
+  - "client/src/entities/session/**"
+  - "client/src/pages/privacy/**"
+  - "client/src/pages/terms/**"
+  - "client/src/widgets/document-reconsent/**"
 ---
 
 # Personal-Data & Privacy Compliance
 
-Set Forge is operated under Russian 152-ФЗ. The Privacy Policy and Terms of Use are **contracts with the user**, not just docs: they must always describe the code's *actual* data handling, and users must re-accept when they change materially. Treat any change under the globs above as potentially compliance-relevant.
+Set Forge is operated under Russian 152-ФЗ. The Privacy Policy and Terms of Use are **contracts with the user**, not just docs: they must always describe the code's *actual* data handling, and users must re-accept when they change materially. Treat any change under the paths above as potentially compliance-relevant.
 
 ## What counts as "personal data" (PD)
 
@@ -51,7 +59,7 @@ If a change is purely internal and does not alter *what* PD is handled or *what*
 ## Related
 
 - Domain: `docs/domains/session.md` (consents, re-consent gate, account deletion)
-- Server API conventions: [server-api.mdc](server-api.mdc)
+- Server API conventions: [server-api.md](server-api.md)
 - Command: run `/privacy-audit` to audit a change against this rule.
 
 ## Enforcement

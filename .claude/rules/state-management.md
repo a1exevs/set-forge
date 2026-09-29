@@ -1,7 +1,7 @@
 ---
 description: State management — server state in TanStack Query hooks of entities, client-only UI state in Zustand
-globs: client/**
-alwaysApply: false
+paths:
+  - "client/**"
 ---
 
 # State Management

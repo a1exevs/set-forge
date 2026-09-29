@@ -1,3 +1,8 @@
+---
+name: pr
+description: Create a GitHub Pull Request for the current branch with the repository's title, description and label conventions. Use when the user asks to open / create a PR or runs /pr.
+---
+
 # pr
 
 Act as a Git Automation Agent. Your goal is to create a GitHub Pull Request following these strict rules:
@@ -27,6 +32,4 @@ Labels: Add a label that matches the branch prefix (e.g., if branch is feature/l
 4. CONFIRMATION & EXECUTION
 Present the final Title, Description, and Labels to the user.
 Ask: "Ready to create the Pull Request with these details?"
-Upon approval, use gh pr create or the internal Cursor GitHub tool to submit it.
-
-This command will be available in chat with /pr
+Upon approval, use `gh pr create` to submit it.

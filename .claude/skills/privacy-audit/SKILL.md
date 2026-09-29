@@ -1,6 +1,11 @@
+---
+name: privacy-audit
+description: Audit the current changes for personal-data / privacy compliance (152-ФЗ): policy and terms text, document versions, consent invariants. Use when a change touches user data, consents or the legal pages, or when the user runs /privacy-audit.
+---
+
 # privacy-audit
 
-Act as a data-protection engineer. Audit the current changes for personal-data / privacy compliance, following [.cursor/rules/personal-data-compliance.mdc](../rules/personal-data-compliance.mdc) (Set Forge is operated under 152-ФЗ).
+Act as a data-protection engineer. Audit the current changes for personal-data / privacy compliance, following [.claude/rules/personal-data-compliance.md](../../rules/personal-data-compliance.md) (Set Forge is operated under 152-ФЗ).
 
 **First**, gather the diff:
 - Run `git add .` to stage new, modified, and deleted files.
@@ -20,5 +25,3 @@ Act as a data-protection engineer. Audit the current changes for personal-data /
 - **Domain doc updated?** `docs/domains/session.md` reflects the change (invariants, flows, Map).
 
 **Output** a concise, actionable checklist grouped as: `❌ Must fix before merge`, `⚠️ Should address`, `✅ OK`. For each `❌`, name the exact file(s) to change and the version(s)/date(s) to bump. If the change is not compliance-relevant, say so explicitly and note that no bump is required. If everything is in order, give a "Privacy: ready to merge" signal.
-
-This command will be available in chat with /privacy-audit
