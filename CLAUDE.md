@@ -42,6 +42,7 @@ fails on a broken path, a missing section or an unmapped slice / module.
 | [styling-guidelines](.claude/rules/styling-guidelines.md) | SCSS modules |
 | [typescript-guidelines](.claude/rules/typescript-guidelines.md) | TypeScript |
 | [component-typing](.claude/rules/component-typing.md) | FC / Props / JSX callbacks |
+| [storybook](.claude/rules/storybook.md) | Stories next to components, titles by FSD layer, showcase, Chromatic |
 | [personal-data-compliance](.claude/rules/personal-data-compliance.md) | User PD, privacy policy, terms, doc versioning |
 
 ## Adding new artifacts

@@ -7,9 +7,10 @@ description: Audit the current changes for personal-data / privacy compliance (1
 
 Act as a data-protection engineer. Audit the current changes for personal-data / privacy compliance, following [.claude/rules/personal-data-compliance.md](../../rules/personal-data-compliance.md) (Set Forge is operated under 152-ФЗ).
 
-**First**, gather the diff:
-- Run `git add .` to stage new, modified, and deleted files.
-- Run `git diff HEAD` to get all changes since the last commit. If the user names a base branch/commit, use `git diff <base>...HEAD` instead. Review only the changed lines.
+**First**, gather the diff without touching the index (no `git add`, no `git stash`, no edits):
+- Run `git diff HEAD` for the staged and unstaged changes since the last commit, plus
+  `git ls-files --others --exclude-standard` for the untracked files (read them whole — they are all new lines).
+  If the user names a base branch/commit, use `git diff <base>` instead (the base vs the working tree). Review only the changed lines.
 
 **Then**, decide whether the change is compliance-relevant. Flag it if it does any of the following:
 1. Collects, stores, logs, exposes, or transmits any new/changed **personal data** (new `users` column, new field on `CurrentUser` / `GetCurrentUserResponse`, new log of user data, new DTO field, new migration touching user-linked tables).
