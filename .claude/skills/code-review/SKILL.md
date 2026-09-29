@@ -1,7 +1,7 @@
 ---
 name: code-review
-description: Senior-engineer review of a change set with every finding verified (reproduced or tested), ranked as blocker / important / nit, printed as one table and logged per branch in .runtime/code-review/ so that later rounds mark what got fixed and /pr can attach the result. Use when the user asks to review the current changes or a commit, or runs /code-review [revision range].
-argument-hint: "[<commit> | <base>..<head> | <base>...<head>]"
+description: Senior-engineer review of a change set with every finding verified (reproduced or tested), ranked as blocker / important / nit, printed as one table and logged per branch in .runtime/code-review/ so that later rounds mark what got fixed and /pr can attach the result. Use when the user asks to review the current changes, the branch since its base, or a commit range, or runs /code-review [base | range].
+argument-hint: "[<base> | <base>..<head>]"
 ---
 
 # code-review
@@ -18,9 +18,19 @@ stash`, no edits during the review. The only file the review writes is its own l
 
 | `$1` | Review | Commands |
 |---|---|---|
-| empty | uncommitted work | `git diff HEAD` + untracked files from `git ls-files --others --exclude-standard` (read them whole — they are all new lines) |
-| `<commit>` (`HEAD`, a hash) | that one commit | `git show <commit>` |
-| `<base>..<head>` / `<base>...<head>` | a range / branch | `git diff <range>` |
+| empty | uncommitted work only | `git diff HEAD` + untracked files |
+| `<base>` — a single ref that is an ancestor of `HEAD` (`develop`, `common/cursor-to-claude`, `HEAD~2`) | **everything since the base: the branch's commits and the uncommitted work together.** The usual way to review a branch before committing or pushing | `git diff <base>` (base vs the working tree) + untracked files |
+| `<base>..<head>` / `<base>...<head>` | the committed range only — what is already pushed or what a PR contains; uncommitted work is ignored | `git diff <range>` |
+
+Untracked files come from `git ls-files --others --exclude-standard`; read them whole — they are all new lines.
+
+Resolving a single ref: `git merge-base --is-ancestor <ref> HEAD` succeeds and `<ref>` is not `HEAD` itself →
+it is a base. Otherwise (`HEAD`, a commit off this branch, a typo) → stop and say the ref is not an ancestor of
+`HEAD`; one commit is reviewed as `<hash>^..<hash>`. Never fall back to `git show <ref>` — for a branch name that
+would review the base's last commit, i.e. someone else's change.
+
+The working tree is **dirty** when `git status --porcelain` prints anything; record it in the scope (§5, §6) so a
+log entry made before the commit is not mistaken for one made after it.
 
 Review **only the changed lines**. Read surrounding code, tests, `.claude/rules/` and `docs/domains/` as much as
 needed to judge them — that is context, not scope.
@@ -81,7 +91,7 @@ Format (keep it exactly — `/pr` and later rounds parse it):
 ```markdown
 # Code review — common/setup-skill
 
-Rounds: 2 · last: 2026-09-29 14:05 · scope: commit 77b0a62
+Rounds: 2 · last: 2026-09-29 14:05 · scope: develop (77b0a62, 7 files)
 
 | # | Sev | Where | Problem | Proof | Fix | Status |
 |---|-----|-------|---------|-------|-----|--------|
@@ -91,9 +101,14 @@ Rounds: 2 · last: 2026-09-29 14:05 · scope: commit 77b0a62
 
 ## Rounds
 
-- r1 · 2026-09-29 13:40 · commit 7d707f0 · 🔴 1 🟠 1 🟡 1 · Not ready
-- r2 · 2026-09-29 14:05 · commit 77b0a62 · fixed 1 · new 0 · 🟠 1 🟡 1 open · Ready to commit with 1 important
+- r1 · 2026-09-29 13:40 · develop (7d707f0+dirty, 7 files) · 🔴 1 🟠 1 🟡 1 · Not ready
+- r2 · 2026-09-29 14:05 · develop (77b0a62, 7 files) · fixed 1 · new 0 · 🟠 1 🟡 1 open · Ready to commit with 1 important
 ```
+
+The scope string is `<what> (<HEAD short hash>[+dirty], <N> files)`: `<what>` is the argument as given (`develop`,
+`develop..HEAD`) or `working tree` for the empty argument; `+dirty` is present when the review included
+uncommitted changes (empty argument, or a `<base>` run with a dirty tree). Round 1 in the example was made
+before the commit, round 2 after it.
 
 Statuses — one per row:
 
@@ -118,7 +133,7 @@ something is open above 🟡, the re-run hint. Nothing else — no prose summary
 findings in text. Fixed and `wontfix` rows live in the log, not in the chat.
 
 ```
-Reviewed: commit 77b0a62 (7 files) · round 2 · log: .runtime/code-review/common--setup-skill.md
+Reviewed: develop (77b0a62, 7 files) · round 2 · log: .runtime/code-review/common--setup-skill.md
 Since round 1: 1 fixed (#1), 1 still open (#2), 1 wontfix (#3)
 
 | # | Sev | Where | Problem | Proof | Fix | Status |
