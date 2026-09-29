@@ -21,6 +21,8 @@ dist-ssr
 !.claude/settings.json
 !.claude/rules/
 !.claude/skills/
+# Per-branch agent artifacts (code-review log read by /pr) — local to the machine
+.runtime/
 .idea
 .DS_Store
 *.suo

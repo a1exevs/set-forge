@@ -24,12 +24,36 @@ Generate a Summarized Title and Structured Description.
 Title Format: [<Type>] <Summary> (Type must be derived from the branch prefix, e.g., [Feature]).
 Description: 2-3 sentences explaining the overall impact and a bullet-point list of key changes.
 
-3. METADATA & LABELS
+3. CODE REVIEW LOG
+`/code-review` keeps its findings per branch in `.runtime/code-review/<slug>.md` (gitignored), where `<slug>` is the
+branch name with `/` replaced by `--` (`feature/login` → `feature--login.md`); its format is defined in
+`.claude/skills/code-review/SKILL.md`. Read that file (never modify it) and end the PR description with a
+`## Code review` section:
+
+Case A (the file exists):
+```
+## Code review
+
+Rounds: <N> · last: <date> · scope: <scope> · last verdict: <verdict from the last `## Rounds` entry>
+Open: 🔴 <count> 🟠 <count> 🟡 <count> · fixed: <count> · wontfix: <count>
+
+<the findings table copied verbatim, every row and every column including Status>
+```
+Case B (no file): the PR must say so explicitly:
+```
+## Code review
+
+_No /code-review run was recorded for this branch._
+```
+Report the same fact to the user when presenting the description: open blockers in the log are worth mentioning
+before the PR is created, but the decision is theirs.
+
+4. METADATA & LABELS
 Prepare the PR with the following:
 Reviewer: Set me (the current authenticated user) as a reviewer/assignee.
 Labels: Add a label that matches the branch prefix (e.g., if branch is feature/login, add label feature).
 
-4. CONFIRMATION & EXECUTION
+5. CONFIRMATION & EXECUTION
 Present the final Title, Description, and Labels to the user.
 Ask: "Ready to create the Pull Request with these details?"
 Upon approval, use `gh pr create` to submit it.
