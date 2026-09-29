@@ -11,6 +11,7 @@
     "npm": "10.9.8"
   },
   "scripts": {
+    "setup:env": "bash scripts/setup-env.sh",
     "prepare": "node -e \"if (process.env.HUSKY === '0') process.exit(0); const fs=require('fs'); if (fs.existsSync('node_modules/husky')) require('child_process').execSync('husky install',{stdio:'inherit'});\"",
     "client:dev": "npm run dev -w @set-forge/client",
     "client:build": "npm run build -w @set-forge/client",
