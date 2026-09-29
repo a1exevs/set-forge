@@ -1,7 +1,8 @@
 ---
 description: File naming — kebab-case everywhere, names by purpose in the client, route import names
-globs: client/**, server/**
-alwaysApply: false
+paths:
+  - "client/**"
+  - "server/**"
 ---
 
 # File Naming

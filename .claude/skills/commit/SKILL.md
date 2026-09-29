@@ -1,14 +1,21 @@
+---
+name: commit
+description: Commit the current changes with the repository's [Type] message template. Use when the user asks to commit, "закоммить", or runs /commit <type>.
+argument-hint: "[feature|bugfix|common|improvement|storybook|tests|documentation|refactoring]"
+---
+
 # commit
 
-Act as a Git Assistant. You must accept one required parameter: [type].
+Act as a Git Assistant. You accept one optional parameter: `[type]` (`$1`).
 Available types: feature, bugfix, common, improvement, storybook, tests, documentation, refactoring.
 
-1. PARAMETER VALIDATION
-   If the user provided a type NOT in the list above, STOP and say:
+1. TYPE RESOLUTION
+   If `$1` is given but NOT in the list above, STOP and say:
    "❌ Invalid type. Please use one of: feature, bugfix, common, improvement, storybook, tests, documentation, refactoring."
-   If no type is provided, ask for it before proceeding.
+   If `$1` is empty, derive the type from the prefix of the current branch (`<type>/...`). If the branch has no such
+   prefix, ask the user for the type before proceeding.
 2. BRANCH CHECK
-   Let <type> be the parameter provided by the user.
+   Let <type> be the resolved type.
    Check the current git branch.
    The branch name MUST start with <type>/.
    If it doesn't (e.g., you are on main or dev), STOP and suggest:
@@ -26,5 +33,3 @@ Available types: feature, bugfix, common, improvement, storybook, tests, documen
    STOP and wait for explicit user approval. Do NOT proceed with the commit until the user confirms.
 5. FINAL ACTION
    Only after user approval: execute the commit with the approved message.
-
-This command will be available in chat with /commit <type>

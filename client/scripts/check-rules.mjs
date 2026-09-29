@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Keeps the agent rules (.cursor/rules/*.mdc) in one shape and their `## Enforcement` sections truthful:
-//   1. frontmatter: exactly `description`, `globs` (comma-separated string), `alwaysApply` (true / false);
-//      the static part of every glob exists;
+// Keeps the agent rules (.claude/rules/*.md) in one shape and their `## Enforcement` sections truthful:
+//   1. frontmatter: exactly `description` (one line) and `paths` (a YAML list of quoted globs, one per line —
+//      the shape Claude Code reads); the static part of every glob exists;
 //   2. one `# Title`; `## Enforcement` is the last section (`## Related`, when present, right before it);
 //   3. Enforcement is a `| Rule | Checked by |` table; every row names a check or says `❌ review`;
 //   4. every reference in "Checked by" resolves: `npm run <script>` exists in the root package.json, a path exists,
@@ -17,10 +17,10 @@ import { ESLint } from 'eslint';
 
 const clientDir = join(fileURLToPath(import.meta.url), '..', '..');
 const repoRoot = join(clientDir, '..');
-const rulesDir = join(repoRoot, '.cursor', 'rules');
+const rulesDir = join(repoRoot, '.claude', 'rules');
 
-const FRONTMATTER_KEYS = ['description', 'globs', 'alwaysApply'];
-const PATH_PREFIXES = ['client/', 'server/', '.cursor/', 'docs/', 'scripts/'];
+const FRONTMATTER_KEYS = ['description', 'paths'];
+const PATH_PREFIXES = ['client/', 'server/', '.claude/', 'docs/', 'scripts/'];
 const REVIEW = '❌ review';
 
 const problems = [];
@@ -73,24 +73,20 @@ function parseFrontmatter(file, text) {
     return null;
   }
   const lines = match[1].split('\n');
-  const keys = lines.map(line => /^([A-Za-z]+):/.exec(line)?.[1]);
+  const keys = lines.filter(line => !line.startsWith(' ')).map(line => /^([A-Za-z]+):/.exec(line)?.[1]);
   if (keys.some(key => key === undefined) || keys.join() !== FRONTMATTER_KEYS.join()) {
-    problems.push(`${file}: frontmatter must be exactly ${FRONTMATTER_KEYS.join(', ')} (one line each, in this order)`);
+    problems.push(`${file}: frontmatter must be exactly ${FRONTMATTER_KEYS.join(', ')} (in this order)`);
     return null;
   }
-  const fields = Object.fromEntries(lines.map(line => [line.split(':')[0], line.slice(line.indexOf(':') + 1).trim()]));
-  if (!fields.description) {
+  if (!lines[0].slice('description:'.length).trim()) {
     problems.push(`${file}: empty description`);
   }
-  if (!['true', 'false'].includes(fields.alwaysApply)) {
-    problems.push(`${file}: alwaysApply must be true or false`);
-  }
-  if (!fields.globs || /[[\]"']/.test(fields.globs)) {
-    problems.push(
-      `${file}: globs must be a comma-separated string (\`globs: client/**, server/**\`), no array or quotes`,
-    );
+  const items = lines.slice(lines.indexOf('paths:') + 1);
+  const globs = items.map(line => /^ {2}- "([^"\s]+)"$/.exec(line)?.[1]);
+  if (lines[1] !== 'paths:' || items.length === 0 || globs.some(glob => glob === undefined)) {
+    problems.push(`${file}: paths must be a YAML list of quoted globs, one \`  - "client/**"\` per line`);
   } else {
-    for (const glob of fields.globs.split(',').map(part => part.trim())) {
+    for (const glob of globs) {
       const staticPart = glob
         .split('/')
         .filter((_, index, parts) => !parts.slice(0, index + 1).some(p => /[*?{]/.test(p)));
@@ -180,7 +176,7 @@ function checkEnforcement(file, section) {
   }
 }
 
-for (const name of readdirSync(rulesDir).filter(entry => entry.endsWith('.mdc'))) {
+for (const name of readdirSync(rulesDir).filter(entry => entry.endsWith('.md'))) {
   const path = join(rulesDir, name);
   const file = rel(path);
   const text = readFileSync(path, 'utf8').replace(/\r\n/g, '\n');

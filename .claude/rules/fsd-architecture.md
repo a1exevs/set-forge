@@ -1,7 +1,7 @@
 ---
 description: Feature-Sliced Design (React) — layers, slices, segments, where code goes, public API, @x, import rules
-globs: client/**
-alwaysApply: false
+paths:
+  - "client/**"
 ---
 
 # Feature-Sliced Design

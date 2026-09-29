@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Every component has its Storybook story next to it (see .cursor/rules/storybook.mdc):
+// Every component has its Storybook story next to it (see .claude/rules/storybook.md):
 //   1. each component of a `ui` segment — the base name of its files without the `-data-layer` / `-logic-layer` /
 //      `-provider` layer suffix — has `<base>.stories.tsx` in the same folder; a stories file whose component is
 //      gone is an orphan;

@@ -1,7 +1,8 @@
 ---
 description: TypeScript — strict mode, no any, explicit return types, interface vs type, curly braces
-globs: client/**, server/**
-alwaysApply: false
+paths:
+  - "client/**"
+  - "server/**"
 ---
 
 # TypeScript Guidelines

@@ -1,7 +1,7 @@
 ---
 description: Component architecture — data / logic / presentation layers, arrow-function components, where hooks go
-globs: client/**
-alwaysApply: false
+paths:
+  - "client/**"
 ---
 
 # Component Architecture
