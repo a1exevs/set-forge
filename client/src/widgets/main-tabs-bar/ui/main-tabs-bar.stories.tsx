@@ -28,10 +28,12 @@ export const HomeActive: Story = {
   render: (): ReactElement => renderMainTabsBar('/'),
 };
 
+/** The router is on `/history`: the history tab is active. */
 export const HistoryActive: Story = {
   render: (): ReactElement => renderMainTabsBar('/history'),
 };
 
+/** The router is on `/profile`: the profile tab is active. */
 export const ProfileActive: Story = {
   render: (): ReactElement => renderMainTabsBar('/profile'),
 };

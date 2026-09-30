@@ -41,12 +41,20 @@ const meta = {
 
 export default meta;
 
+/** Preview, no session yet: the exercise list and the start button, at 4K. */
 export const PreviewDesktop4k = buildDesktop4KStoryObj<typeof meta>({ render: renderPreview });
+/** Preview on a desktop screen. */
 export const PreviewDesktop = buildDesktopStoryObj<typeof meta>({ render: renderPreview });
+/** Preview on a tablet. */
 export const PreviewTablet = buildTabletStoryObj<typeof meta>({ render: renderPreview });
+/** Preview on a phone: the everyday form of the page. */
 export const PreviewMobile = buildMobileStoryObj<typeof meta>({ render: renderPreview });
 
+/** Training, mid-session: the first exercise done, the second half-way, at 4K. */
 export const TrainingDesktop4k = buildDesktop4KStoryObj<typeof meta>({ render: renderTraining });
+/** Training on a desktop screen. */
 export const TrainingDesktop = buildDesktopStoryObj<typeof meta>({ render: renderTraining });
+/** Training on a tablet. */
 export const TrainingTablet = buildTabletStoryObj<typeof meta>({ render: renderTraining });
+/** Training on a phone: progress and the set counter under the thumb. */
 export const TrainingMobile = buildMobileStoryObj<typeof meta>({ render: renderTraining });

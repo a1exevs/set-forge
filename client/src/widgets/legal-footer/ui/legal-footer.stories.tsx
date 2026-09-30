@@ -22,7 +22,11 @@ export default meta;
 const renderLegalFooter = (): ReactElement =>
   renderWithRouter({ paths: ['/privacy', '/terms'], component: (): ReactElement => <LegalFooter /> });
 
+/** The privacy and terms links at 4K. */
 export const Desktop4k = buildDesktop4KStoryObj<typeof meta>({ render: renderLegalFooter });
+/** On a desktop screen. */
 export const Desktop = buildDesktopStoryObj<typeof meta>({ render: renderLegalFooter });
+/** On a tablet. */
 export const Tablet = buildTabletStoryObj<typeof meta>({ render: renderLegalFooter });
+/** On a phone, above the tabs bar. */
 export const Mobile = buildMobileStoryObj<typeof meta>({ render: renderLegalFooter });

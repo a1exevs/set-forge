@@ -19,6 +19,7 @@ const LAYERS = ['pages', 'widgets', 'features', 'entities', 'shared'];
 const LAYER_SUFFIX = /-(data-layer|logic-layer|provider)$/;
 const STORY_FILE = /\.stories\.tsx$/;
 const COMPONENT_FILE = /\.tsx$/;
+const META = /^const meta\b/m;
 const TITLE = /^\s*title:\s*(.+?),?\s*$/m;
 const STORY_EXPORT = /^export const (\w+)/gm;
 const PAGE_VIEWPORTS = ['Desktop4k', 'Desktop', 'Tablet', 'Mobile'];
@@ -93,7 +94,9 @@ function checkFolder(layer, dir) {
 function checkStory(layer, path, component) {
   const text = readFileSync(path, 'utf8');
   const expected = `${pascal(layer)}/${pascal(component)}`;
-  const title = TITLE.exec(text)?.[1];
+  // Only the meta's own `title`: a fixture or an options object above `const meta` may carry one too.
+  const metaStart = META.exec(text)?.index ?? 0;
+  const title = TITLE.exec(text.slice(metaStart))?.[1];
   if (title === undefined) {
     problems.push(`${rel(path)}: the meta has no \`title\` — expected \`title: '${expected}'\``);
   } else if (title !== `'${expected}'`) {

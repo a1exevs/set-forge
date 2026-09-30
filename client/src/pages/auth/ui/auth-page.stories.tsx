@@ -62,9 +62,13 @@ const captchaArgs: Story['args'] = {
   formError: 'Please complete the captcha',
 };
 
+/** The login tab, empty, at 4K. */
 export const LoginDesktop4k = buildDesktop4KStoryObj<typeof meta>();
+/** The login tab on a desktop screen. */
 export const LoginDesktop = buildDesktopStoryObj<typeof meta>();
+/** The login tab on a tablet. */
 export const LoginTablet = buildTabletStoryObj<typeof meta>();
+/** The login tab on a phone: the everyday form of the page. */
 export const LoginMobile = buildMobileStoryObj<typeof meta>();
 
 /** The register tab asks for consent and terms on top of the credentials. */
