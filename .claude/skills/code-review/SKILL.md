@@ -42,6 +42,8 @@ needed to judge them — that is context, not scope.
 3. Repository rules (`.claude/rules/*.md`) and architecture that the lint does not catch (the `❌ review` rows of
    each rule's Enforcement table).
 4. Domain docs (`docs/domains/*.md`): a changed business rule needs its invariant and test updated in the same change.
+   The invariants of a touched domain that end with `❌ review` have no test — check by hand that the change still
+   holds them.
 5. Tests: changed behavior without a changed test.
 6. Readability, naming, DRY, simplification, performance that is measurable in this app.
 
