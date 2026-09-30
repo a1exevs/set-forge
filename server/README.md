@@ -41,7 +41,7 @@ Run these **from the repository root** (they delegate to this workspace):
 | `npm run server:start:prod` | Run compiled `dist/src/main` |
 | `npm run server:build` | `tsc` compile |
 | `npm run server:format` / `npm run server:format:check` | Prettier |
-| `npm run server:lint` / `npm run server:lint:fix` | ESLint |
+| `npm run server:lint` / `npm run server:lint:fix` | Types of `eslint.config.ts` and `linter/`, then ESLint |
 | `npm run server:test:unit` / `npm run server:test:unit-watch` / `npm run server:test:unit-cov` / `npm run server:test:unit-debug` | Jest unit tests |
 | `npm run server:test:e2e` | Jest e2e (`jest-e2e.json`) — in-process Nest app + ephemeral MySQL via Testcontainers |
 | `npm run server:db:migrate` / `:undo` / `:undo:all` / `:status` | Sequelize migrations against the **local** DB (uses `server/.development.env`) |

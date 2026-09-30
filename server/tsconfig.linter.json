@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
+    // A composite project so that tsconfig.json can reference it (the IDE then type-checks eslint.config.ts and
+    // linter/ with these options). A referenced project may not disable emit, so declarations go to a cache.
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "outDir": "node_modules/.cache/tsconfig.linter",
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["ES2022"],
-    "noEmit": true,
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,

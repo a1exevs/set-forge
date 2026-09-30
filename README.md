@@ -73,7 +73,7 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 | `npm run client:build` | Production build (`tsc && vite build`) |
 | `npm run client:preview` | Preview production build (`client/dist`) |
 | `npm run client:format` / `npm run client:format:check` | Prettier |
-| `npm run client:lint` / `npm run client:lint:fix` | Structure, stories, rules, ESLint, Steiger, knip (what CI runs) |
+| `npm run client:lint` / `npm run client:lint:fix` | Structure, stories, rules, linter config types, ESLint, Steiger, knip (what CI runs) |
 | `npm run client:lint:structure` / `npm run client:lint:stories` | FSD structure and a story next to every component |
 | `npm run client:test:unit` / `npm run client:test:unit-cov` | Jest unit tests |
 | `npm run client:test:snap` / `npm run client:test:snap-cov` / `npm run client:test:snap-update` | Snapshot tests |
@@ -99,7 +99,7 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 | `npm run server:start:prod` | Run `dist/src/main` |
 | `npm run server:build` | TypeScript compile |
 | `npm run server:format` / `npm run server:format:check` | Prettier |
-| `npm run server:lint` / `npm run server:lint:fix` | ESLint |
+| `npm run server:lint` / `npm run server:lint:fix` | Types of `eslint.config.ts` and `linter/`, then ESLint |
 | `npm run server:test:unit` / `npm run server:test:unit-watch` / `npm run server:test:unit-cov` / `npm run server:test:unit-debug` | Jest unit tests |
 | `npm run server:test:e2e` | Jest e2e |
 | `npm run server:db:migrate` / `:undo` / `:undo:all` / `:status` | Sequelize migrations against the local DB |

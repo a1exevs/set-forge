@@ -71,7 +71,7 @@ function serverTsTasks(files) {
 }
 
 module.exports = {
-  "client/**/*.{ts,tsx}": clientTsTasks,
+  "client/**/*.{ts,tsx,mjs}": clientTsTasks,
   "client/{src,.storybook}/**/*.{css,scss}": ["prettier --ignore-path client/.prettierignore --write"],
   "scripts/**/*.{ts,tsx,mjs}": ["prettier --config client/.prettierrc.cjs --write"],
   "server/{src,test}/**/*.ts": serverTsTasks,

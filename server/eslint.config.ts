@@ -1,4 +1,5 @@
 import eslintJs from '@eslint/js';
+import { defineConfig } from 'eslint/config';
 import prettierConfig from 'eslint-config-prettier';
 import tsEslint from 'typescript-eslint';
 
@@ -11,7 +12,7 @@ import sortImportsRule from './linter/rules/sort-imports-rule';
 import unusedVarsRule from './linter/rules/unused-vars-rule';
 import settings from './linter/settings';
 
-export default tsEslint.config(
+export default defineConfig(
   {
     ignores: ['dist/**', 'coverage/**', 'database/**', '_stub/**'],
   },

@@ -12,14 +12,14 @@
 //   of both projects), so it belongs next to scripts/check-domain-docs.mjs and `npm run lint:root`. What keeps it
 //   here are its imports: `eslint` (the same 9.x in client and server, but declared by neither root nor a root
 //   script) and `@feature-sliced/steiger-plugin` (a client tool). Move it once the root declares `eslint` and the
-//   Steiger rule list is resolved from the client workspace (`createRequire(join(repoRoot, 'client', 'package.json'))`).
-
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
+//   Steiger rule list is resolved from the client workspace
+//   (`createRequire(join(repoRoot, 'client', 'package.json'))`).
 
 import fsd from '@feature-sliced/steiger-plugin';
 import { ESLint } from 'eslint';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const clientDir = join(fileURLToPath(import.meta.url), '..', '..');
 const repoRoot = join(clientDir, '..');

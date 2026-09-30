@@ -63,7 +63,9 @@ const modelTypeOnly = (regex: string): Linter.RulesRecord => ({
  * formatter) but never import its code — type imports are erased, so at runtime the direction stays one-way.
  * In a slice the own model is the relative `../model/...` (other slices go through their public API).
  */
-export const sliceModelTypeOnlyRule = modelTypeOnly(String.raw`^(\.\./)+model(/|$)`);
+export const sliceModelTypeOnlyRule: Linter.RulesRecord = modelTypeOnly(String.raw`^(\.\./)+model(/|$)`);
 
 /** In `shared` the own model is reached through its public API, `@shared/model`. */
-export const sharedModelTypeOnlyRule = modelTypeOnly(String.raw`^(@shared/model|(\.\./)+model)(/|$)`);
+export const sharedModelTypeOnlyRule: Linter.RulesRecord = modelTypeOnly(
+  String.raw`^(@shared/model|(\.\./)+model)(/|$)`,
+);
