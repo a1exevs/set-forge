@@ -20,7 +20,7 @@
 
 `docs/domains/*.md` — glossary, invariants (proven by tests tagged `// @invariant <domain>/<id>`, or marked
 `❌ review`), flows and a map to the code.
-Format: [domain-docs](.claude/rules/domain-docs.md); `npm run client:lint` (`client/scripts/check-domain-docs.mjs`)
+Format: [domain-docs](.claude/rules/domain-docs.md); `npm run lint:root` (`scripts/check-domain-docs.mjs`)
 fails on a broken path, a missing section or an unmapped slice / module.
 
 | Domain | Doc |

@@ -7,6 +7,12 @@
 //   4. every reference in "Checked by" resolves: `npm run <script>` exists in the root package.json, a path exists,
 //      ESLint `<rule>` is enabled in the linted project(s), Steiger `<rule>` exists in the FSD plugin.
 // Exit code 1 lists every violation.
+//
+// TODO: this is a repo-wide check (it reads the root package.json, resolves paths from the repo root and asks ESLint
+//   of both projects), so it belongs next to scripts/check-domain-docs.mjs and `npm run lint:root`. What keeps it
+//   here are its imports: `eslint` (the same 9.x in client and server, but declared by neither root nor a root
+//   script) and `@feature-sliced/steiger-plugin` (a client tool). Move it once the root declares `eslint` and the
+//   Steiger rule list is resolved from the client workspace (`createRequire(join(repoRoot, 'client', 'package.json'))`).
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';

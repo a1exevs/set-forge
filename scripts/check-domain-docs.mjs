@@ -13,8 +13,8 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const clientDir = join(fileURLToPath(import.meta.url), '..', '..');
-const repoRoot = join(clientDir, '..');
+const repoRoot = join(fileURLToPath(import.meta.url), '..', '..');
+const clientDir = join(repoRoot, 'client');
 const docsDir = join(repoRoot, 'docs', 'domains');
 
 const SECTIONS = ['Glossary', 'Invariants', 'Flows', 'Map'];

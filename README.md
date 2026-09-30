@@ -73,7 +73,7 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 | `npm run client:build` | Production build (`tsc && vite build`) |
 | `npm run client:preview` | Preview production build (`client/dist`) |
 | `npm run client:format` / `npm run client:format:check` | Prettier |
-| `npm run client:lint` / `npm run client:lint:fix` | Structure, stories, rules, docs, ESLint, Steiger, knip (what CI runs) |
+| `npm run client:lint` / `npm run client:lint:fix` | Structure, stories, rules, ESLint, Steiger, knip (what CI runs) |
 | `npm run client:lint:structure` / `npm run client:lint:stories` | FSD structure and a story next to every component |
 | `npm run client:test:unit` / `npm run client:test:unit-cov` | Jest unit tests |
 | `npm run client:test:snap` / `npm run client:test:snap-cov` / `npm run client:test:snap-update` | Snapshot tests |
@@ -195,7 +195,8 @@ For local development against `mysql-dev`, the equivalent flow is `npm run db:up
 | `npm run prepare` | Husky install (runs automatically after `npm install` unless `HUSKY=0`) |
 | `npm run setup:env` / `npm run setup:env -- --fix` | Create the missing dev env files (`.env`, `server/.development.env`, `server/.e2e.env`) from their examples and check (or sync) the MySQL credentials between the root `.env` and `server/.development.env` ([`scripts/setup-env.sh`](scripts/setup-env.sh)) |
 | `npm run setup:env -- --prod` / `-- --prod --fix` | Same for the prod stack: `.env` + `server/.production.env` (see [`DEPLOY-SELECTEL.md`](DEPLOY-SELECTEL.md#8-configure-environment-variables)). On Windows run from Git Bash so `bash` is Git's, not WSL's |
-| `npm run format:root` / `npm run format:root:check` | Prettier for `scripts/**/*.{ts,tsx}` |
+| `npm run format:root` / `npm run format:root:check` | Prettier for `scripts/**/*.{ts,tsx,mjs}` |
+| `npm run lint:root` / `npm run lint:docs` | Repo-wide checks (what CI runs): domain docs in `docs/domains` are thin and point at real code |
 | `npm run version:patch` / `npm run version:minor` / `npm run version:major` | Bump version via `scripts/increase-version.ts` |
 | `npm run update-version:patch` / `npm run update-version:minor` / `npm run update-version:major` | Version branch workflow (`scripts/update-version.sh`) |
 
