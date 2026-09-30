@@ -81,7 +81,7 @@ export const uiLayerFiles: Record<Exclude<UiFileKind, 'presentation'>, string[]>
  * constants → `config/`, types and logic (hooks included) → `model/`, helpers → `lib/`.
  * React specifics: a component's own `type Props` stays next to it.
  * In sliced layers that is the only type allowed; `shared/ui` may also export the types of its public contract
- * (`MenuItem`, `LegalContent`) — shared has no model to put them in.
+ * (`MenuItem`, `LegalContent`): `shared/model` is for domain-agnostic state, not for one component's contract.
  */
 const onlyPropsTypes = {
   selector: declarations('TSTypeAliasDeclaration[id.name!=/Props$/]'),

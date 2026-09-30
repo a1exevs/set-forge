@@ -109,8 +109,9 @@ same slice — `config/`, `model/` or `lib/`, named by purpose (`config/muscle-g
 
 - components: `const X: FC<Props> = ...`;
 - props types: `type Props`, `type EditProps` (`*Props`);
-- in `shared/ui` only: exported types of the component's contract (`MenuButtonItem`, `SelectOption`, `LegalContent`) —
-  shared has no model to put them in.
+- in `shared/ui` only: exported types of the component's contract (`MenuButtonItem`, `SelectOption`, `LegalContent`).
+  `shared/model` is for domain-agnostic state and types shared by several consumers, not for the shape of one
+  component's props — that contract stays next to the component.
 
 Hooks are logic → `model/` (slices) or `shared/lib` (a hook of a shared component, e.g. `useConfirm`).
 

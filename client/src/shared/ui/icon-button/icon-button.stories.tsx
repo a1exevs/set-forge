@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Link } from '@tanstack/react-router';
 import { Download, Plus } from 'lucide-react';
-import type { ReactElement } from 'react';
+import type { ComponentProps, ReactElement } from 'react';
 
 import { renderWithRouter } from 'storybook-dir/render-with-router';
 import { Grid, Row, withFrame } from 'storybook-dir/showcase';
 
 import IconButton from './icon-button';
 
-type Variant = 'ghost' | 'primary';
-type Shape = 'square' | 'circle';
-type Size = 'sm' | 'md' | 'lg';
+type Variant = NonNullable<ComponentProps<typeof IconButton>['variant']>;
+type Shape = NonNullable<ComponentProps<typeof IconButton>['shape']>;
+type Size = NonNullable<ComponentProps<typeof IconButton>['size']>;
 
 const VARIANTS: Variant[] = ['ghost', 'primary'];
 const SHAPES: Shape[] = ['square', 'circle'];

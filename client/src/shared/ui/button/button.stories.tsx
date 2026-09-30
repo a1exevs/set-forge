@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import type { ReactElement } from 'react';
+import type { ComponentProps, ReactElement } from 'react';
 
 import { Row, withFrame } from 'storybook-dir/showcase';
 
 import Button from './button';
 
-type Variant = 'primary' | 'secondary' | 'danger';
-type Size = 'sm' | 'md' | 'lg';
+type Variant = NonNullable<ComponentProps<typeof Button>['variant']>;
+type Size = NonNullable<ComponentProps<typeof Button>['size']>;
 
 const VARIANTS: Variant[] = ['primary', 'secondary', 'danger'];
 const SIZES: Size[] = ['sm', 'md', 'lg'];

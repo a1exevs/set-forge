@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { FC, ReactElement, useState } from 'react';
+import { ComponentProps, FC, ReactElement, useState } from 'react';
 
 import { Stack, withFrame } from 'storybook-dir/showcase';
 
+import type { NumericVariant } from '@shared/lib';
+
 import NumericField from './numeric-field-logic-layer';
 
-type Variant = 'integer' | 'decimal';
-type Size = 'md' | 'sm';
+type Size = NonNullable<ComponentProps<typeof NumericField>['size']>;
 
 const meta: Meta<typeof NumericField> = {
   title: 'Shared/NumericField',
@@ -27,7 +28,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 type StatefulProps = {
-  variant: Variant;
+  variant: NumericVariant;
   label: string;
   initialValue: number | null;
   error?: string;
