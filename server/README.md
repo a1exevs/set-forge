@@ -31,25 +31,26 @@ For the production compose stack, copy `.production.env.example` to `.production
 
 ## Available scripts
 
-Run these **from the repository root** (they delegate to this workspace):
+From the **repository root**, use the `server:*` aliases (see [root README](../README.md#server-set-forgeserver)). From **`server/`**, use the names below.
 
 | Command | Description |
 |--------|-------------|
-| `npm run server:start` | `nest start` (production mode env) |
-| `npm run server:start:dev` | `nest start --watch` (development) |
-| `npm run server:start:debug` | `nest start --debug --watch` |
-| `npm run server:start:prod` | Run compiled `dist/src/main` |
-| `npm run server:build` | `tsc` compile |
-| `npm run server:format` / `npm run server:format:check` | Prettier |
-| `npm run server:lint` / `npm run server:lint:fix` | Types of `eslint.config.ts` and `linter/`, then ESLint |
-| `npm run server:test:unit` / `npm run server:test:unit-watch` / `npm run server:test:unit-cov` / `npm run server:test:unit-debug` | Jest unit tests |
-| `npm run server:test:e2e` | Jest e2e (`jest-e2e.json`) — in-process Nest app + ephemeral MySQL via Testcontainers |
-| `npm run server:db:migrate` / `:undo` / `:undo:all` / `:status` | Sequelize migrations against the **local** DB (uses `server/.development.env`) |
-| `npm run server:db:seed` / `:undo` | Sequelize seeders against the **local** DB |
-| `npm run prod:db:migrate` / `:undo` / `:status` / `prod:db:seed` / `:undo` | Same, but executed inside the running **prod** container (`docker compose exec server-prod ...`) |
-| `npm run server:check-deps` / `npm run server:upgrade-deps` | Dependency maintenance |
+| `npm run start` | `nest start` (production mode env) |
+| `npm run start:dev` | `nest start --watch` (development) |
+| `npm run start:debug` | `nest start --debug --watch` |
+| `npm run start:prod` | Run compiled `dist/src/main` |
+| `npm run build` | `nest build` (`tsc` compile) |
+| `npm run format` / `npm run format:check` | Prettier |
+| `npm run lint` | Linter config types, then ESLint |
+| `npm run lint:config` | Types of `eslint.config.ts` and `linter/` (`tsconfig.linter.json`) |
+| `npm run lint:eslint` / `npm run lint:eslint:fix` | ESLint (`:fix` applies its autofixes) |
+| `npm run test:unit` / `npm run test:unit-watch` / `npm run test:unit-cov` / `npm run test:unit-debug` | Jest unit tests |
+| `npm run test:e2e` | Jest e2e (`jest-e2e.json`) — in-process Nest app + ephemeral MySQL via Testcontainers |
+| `npm run db:migrate` / `npm run db:migrate:undo` / `npm run db:migrate:undo:all` / `npm run db:migrate:status` | Sequelize migrations against the **local** DB (uses `server/.development.env`) |
+| `npm run db:seed` / `npm run db:seed:undo` | Sequelize seeders against the **local** DB |
+| `npm run check-deps` / `npm run upgrade-deps` | Dependency maintenance |
 
-You can also run the same script names **from `server/`** after install (for example `npm run start:dev` inside this package).
+The same against the running **prod** container (`docker compose exec server-prod ...`) is root-only: `npm run prod:db:migrate` / `:undo` / `:status`, `npm run prod:db:seed` / `:undo` (see root README).
 
 ## E2E tests
 

@@ -31,7 +31,7 @@
     "lint": "npm run lint:config && npm run lint:eslint",
     "lint:config": "tsc -p tsconfig.linter.json",
     "lint:eslint": "eslint --config eslint.config.ts src test linter eslint.config.ts",
-    "lint:fix": "eslint --config eslint.config.ts src test linter eslint.config.ts --fix",
+    "lint:eslint:fix": "eslint --config eslint.config.ts src test linter eslint.config.ts --fix",
     "test:unit": "tsc --noEmit -p tsconfig.test.json && jest",
     "test:unit-watch": "jest --watch",
     "test:unit-cov": "tsc --noEmit -p tsconfig.test.json && jest --coverage",

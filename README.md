@@ -65,6 +65,18 @@ Server e2e tests need **Docker** locally (Testcontainers starts ephemeral MySQL)
 
 Run from the **repository root**. Names mirror `package.json` workspaces and shared tooling.
 
+### Root tooling
+
+| Command | Description |
+|--------|-------------|
+| `npm run setup:env` / `npm run setup:env -- --fix` | Create the missing dev env files (`.env`, `server/.development.env`, `server/.e2e.env`) from their examples and check (or sync) the MySQL credentials between the root `.env` and `server/.development.env` ([`scripts/setup-env.sh`](scripts/setup-env.sh)) |
+| `npm run setup:env -- --prod` / `-- --prod --fix` | Same for the prod stack: `.env` + `server/.production.env` (see [`DEPLOY-SELECTEL.md`](DEPLOY-SELECTEL.md#8-configure-environment-variables)). On Windows run from Git Bash so `bash` is Git's, not WSL's |
+| `npm run prepare` | Husky install (runs automatically after `npm install` unless `HUSKY=0`) |
+| `npm run format:root` / `npm run format:root:check` | Prettier for `scripts/**/*.{ts,tsx,mjs}` |
+| `npm run lint:root` / `npm run lint:docs` | Repo-wide checks (what CI runs): domain docs in `docs/domains` are thin and point at real code |
+| `npm run version:patch` / `npm run version:minor` / `npm run version:major` | Bump version via `scripts/increase-version.ts` |
+| `npm run update-version:patch` / `npm run update-version:minor` / `npm run update-version:major` | Version branch workflow (`scripts/update-version.sh`) |
+
 ### Client (`@set-forge/client`)
 
 | Command | Description |
@@ -73,8 +85,14 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 | `npm run client:build` | Production build (`tsc && vite build`) |
 | `npm run client:preview` | Preview production build (`client/dist`) |
 | `npm run client:format` / `npm run client:format:check` | Prettier |
-| `npm run client:lint` / `npm run client:lint:fix` | Structure, stories, rules, linter config types, ESLint, Steiger, knip (what CI runs) |
-| `npm run client:lint:structure` / `npm run client:lint:stories` | FSD structure and a story next to every component |
+| `npm run client:lint` | Structure, stories, rules, linter config types, ESLint, Steiger, knip (what CI runs) |
+| `npm run client:lint:structure` | FSD layers, slices, segments, public API, names by purpose, kebab-case |
+| `npm run client:lint:stories` | A stories file next to every component, titles by FSD layer, pages in every viewport |
+| `npm run client:lint:rules` | Claude Code rules in `.claude/rules` have one shape and their Enforcement references resolve |
+| `npm run client:lint:config` | Types of `eslint.config.ts` and `linter/` (`tsconfig.linter.json`) |
+| `npm run client:lint:eslint` / `npm run client:lint:eslint:fix` | ESLint (`:fix` applies its autofixes) |
+| `npm run client:lint:fsd` | Steiger (FSD boundaries) |
+| `npm run client:lint:unused` | knip (unused files, exports, dependencies) |
 | `npm run client:test:unit` / `npm run client:test:unit-cov` | Jest unit tests |
 | `npm run client:test:snap` / `npm run client:test:snap-cov` / `npm run client:test:snap-update` | Snapshot tests |
 | `npm run client:test:e2e` | Playwright e2e (headless in CI; headed locally via config) |
@@ -99,20 +117,27 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 | `npm run server:start:prod` | Run `dist/src/main` |
 | `npm run server:build` | TypeScript compile |
 | `npm run server:format` / `npm run server:format:check` | Prettier |
-| `npm run server:lint` / `npm run server:lint:fix` | Types of `eslint.config.ts` and `linter/`, then ESLint |
+| `npm run server:lint` | Linter config types, then ESLint |
+| `npm run server:lint:config` | Types of `eslint.config.ts` and `linter/` (`tsconfig.linter.json`) |
+| `npm run server:lint:eslint` / `npm run server:lint:eslint:fix` | ESLint (`:fix` applies its autofixes) |
 | `npm run server:test:unit` / `npm run server:test:unit-watch` / `npm run server:test:unit-cov` / `npm run server:test:unit-debug` | Jest unit tests |
 | `npm run server:test:e2e` | Jest e2e |
 | `npm run server:db:migrate` / `:undo` / `:undo:all` / `:status` | Sequelize migrations against the local DB |
 | `npm run server:db:seed` / `:undo` | Sequelize seeders against the local DB |
 | `npm run server:check-deps` / `npm run server:upgrade-deps` | Dependency maintenance |
 
-### Docker & database
+### Database (dev)
 
 | Command | Description |
 |--------|-------------|
 | `npm run db:up` | `docker compose --profile dev up -d mysql-dev` |
 | `npm run db:down` | `docker compose --profile dev down` |
 | `npm run db:logs` | MySQL logs (`-f`) |
+
+### Production (Docker)
+
+| Command | Description |
+|--------|-------------|
 | `npm run prod:up` | Production compose up (`--build -d`): Caddy + client (nginx) + server + MySQL |
 | `npm run prod:down` | Production compose down |
 | `npm run prod:logs` | Caddy + server + client + MySQL logs (`-f`) |
@@ -187,18 +212,6 @@ npm run prod:db:seed            # inserts default `user` / `admin` roles (idempo
 ```
 
 For local development against `mysql-dev`, the equivalent flow is `npm run db:up` → `npm run server:db:migrate` → `npm run server:db:seed`. See [`server/README.md`](server/README.md#database-schema-sequelize-migrations) for full details and how to add new migrations.
-
-### Root tooling
-
-| Command | Description |
-|--------|-------------|
-| `npm run prepare` | Husky install (runs automatically after `npm install` unless `HUSKY=0`) |
-| `npm run setup:env` / `npm run setup:env -- --fix` | Create the missing dev env files (`.env`, `server/.development.env`, `server/.e2e.env`) from their examples and check (or sync) the MySQL credentials between the root `.env` and `server/.development.env` ([`scripts/setup-env.sh`](scripts/setup-env.sh)) |
-| `npm run setup:env -- --prod` / `-- --prod --fix` | Same for the prod stack: `.env` + `server/.production.env` (see [`DEPLOY-SELECTEL.md`](DEPLOY-SELECTEL.md#8-configure-environment-variables)). On Windows run from Git Bash so `bash` is Git's, not WSL's |
-| `npm run format:root` / `npm run format:root:check` | Prettier for `scripts/**/*.{ts,tsx,mjs}` |
-| `npm run lint:root` / `npm run lint:docs` | Repo-wide checks (what CI runs): domain docs in `docs/domains` are thin and point at real code |
-| `npm run version:patch` / `npm run version:minor` / `npm run version:major` | Bump version via `scripts/increase-version.ts` |
-| `npm run update-version:patch` / `npm run update-version:minor` / `npm run update-version:major` | Version branch workflow (`scripts/update-version.sh`) |
 
 ## Release steps
 1. run npm update-version:patch (or :minor, :major)
