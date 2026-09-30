@@ -9,8 +9,7 @@ paths:
 # Storybook
 
 Every component has one `*.stories.tsx` next to it; the story is the component's visual contract and the input of
-Chromatic. Stories follow the `@dsr-w/ui-kit` shape: few stories, each showing one axis or one state, not one story
-per prop combination.
+Chromatic. Few stories per component, each showing one axis or one state, not one story per prop combination.
 
 ## One file per component
 
