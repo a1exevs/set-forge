@@ -20,7 +20,7 @@ Act as a data-protection engineer. Audit the current changes for personal-data /
 5. Touches consent at registration, the re-consent gate, or `documentsPendingAcceptance` logic.
 
 **For each relevant change**, verify and report:
-- **Docs updated?** Is the Privacy Policy (`client/src/pages/privacy/model/privacy-policy-content.ts`) and/or Terms (`client/src/pages/terms/model/terms-content.ts`) updated in **both** RU and EN to match the new behaviour (data described, purpose, legal basis)?
+- **Docs updated?** Is the Privacy Policy (`client/src/pages/privacy/config/privacy-policy-content.ts`) and/or Terms (`client/src/pages/terms/config/terms-content.ts`) updated in **both** RU and EN to match the new behaviour (data described, purpose, legal basis)?
 - **Version bumped?** Is `PRIVACY_VERSION` / `TERMS_VERSION` incremented (`server/.production.env.example` + deploy guide) **and** the matching `*_EFFECTIVE_DATE` updated, together? A text change without a version bump (or vice versa) is a finding.
 - **Invariants intact?** Separate `consent` + `termsAccepted` (non-defaulted `@Equals(true)`); `documentsPendingAcceptance` stays derived, not persisted; account-deletion cascade still removes all user-owned data (new user-owned table → cascading FK + `account-deletion-cascade.e2e-spec.ts` coverage); operator identity stays in build-time env, not hardcoded; no newly-collected data that the policy claims is not collected.
 - **Domain doc updated?** `docs/domains/session.md` reflects the change (invariants, flows, Map).

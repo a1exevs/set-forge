@@ -9,7 +9,7 @@
 //      some Map.
 // Exit code 1 lists every violation.
 
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -222,12 +222,7 @@ const required = [
 ];
 const mapped = new Set(mapPaths.map(path => path.replace(/\/$/, '')));
 for (const owner of required) {
-  const covered = [...mapped].some(
-    path =>
-      path === owner ||
-      path.startsWith(`${owner}/`) ||
-      (statSync(join(repoRoot, owner)).isDirectory() && owner.startsWith(`${path}/`)),
-  );
+  const covered = [...mapped].some(path => path === owner || path.startsWith(`${owner}/`));
   if (!covered) {
     problems.push(`${owner}: not in any docs/domains/*.md Map — add it to the doc of its domain`);
   }

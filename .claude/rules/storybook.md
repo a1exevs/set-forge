@@ -15,7 +15,9 @@ Chromatic. Few stories per component, each showing one axis or one state, not on
 
 - `<component>.stories.tsx` sits in the component's folder, next to `<component>.tsx`. The data / logic / provider
   layers (`*-data-layer`, `*-logic-layer`, `*-provider`) belong to the same component and get no file of their own;
-  the story renders the layer the slice exports (usually the logic layer with mocked props).
+  the story renders the layer that shows the states with mocked props — the logic layer or the presentation. A data
+  layer or provider is rendered only when it holds client-only state (`toaster-data-layer` reads the theme store,
+  `confirm-dialog-provider` owns the dialog state), never one with server queries.
 - `title` is the literal `'<Layer>/<ComponentName>'`: the FSD layer in PascalCase (`Pages`, `Widgets`, `Features`,
   `Entities`, `Shared`) and the component name in PascalCase — `'Shared/IconButton'`, `'Pages/HomePage'`. No
   variable, no slice or folder in the path (the sidebar is sorted by layer, see `.storybook/preview.tsx`).
@@ -63,8 +65,9 @@ export const Variant: Story = {
   `PreviewMobile`). A page with several states shows the main one in all four viewports and the others where they
   matter.
 - Widgets pick their viewports by what the widget is: a bottom bar is mobile-first, a footer is shown in all four.
-- Pages and widgets render the logic layer through `renderWithPageRouter` with fixtures from `.storybook/fixtures/`
-  and `fn()` callbacks; the data layer (queries, stores) is never rendered in a story.
+- Pages render through `.storybook/render-with-page-router.tsx` (`renderWithPageRouter`, `renderWithAuthRouter` for
+  the auth forms) with fixtures from `.storybook/fixtures/` and `fn()` callbacks. Pages and widgets never render a
+  data layer: theirs hold the queries.
 
 ## Chromatic
 

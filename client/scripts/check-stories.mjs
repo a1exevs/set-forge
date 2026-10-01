@@ -19,8 +19,9 @@ const LAYERS = ['pages', 'widgets', 'features', 'entities', 'shared'];
 const LAYER_SUFFIX = /-(data-layer|logic-layer|provider)$/;
 const STORY_FILE = /\.stories\.tsx$/;
 const COMPONENT_FILE = /\.tsx$/;
-const META = /^const meta\b/m;
-const TITLE = /^\s*title:\s*(.+?),?\s*$/m;
+const META = /^(export )?const meta\b/m;
+const EXPORT = /^export\b/m;
+const TITLE = /\btitle:\s*('[^']*'|[^,\s}]+)/;
 const STORY_EXPORT = /^export const (\w+)/gm;
 const PAGE_VIEWPORTS = ['Desktop4k', 'Desktop', 'Tablet', 'Mobile'];
 const SKIP_DIRS = new Set(['specs', '__snapshots__', '__mocks__']);
@@ -95,8 +96,10 @@ function checkStory(layer, path, component) {
   const text = readFileSync(path, 'utf8');
   const expected = `${pascal(layer)}/${pascal(component)}`;
   // Only the meta's own `title`: a fixture or an options object above `const meta` may carry one too.
-  const metaStart = META.exec(text)?.index ?? 0;
-  const title = TITLE.exec(text.slice(metaStart))?.[1];
+  const metaText = text.slice(META.exec(text)?.index ?? 0);
+  // … and only up to the next top-level `export`: a story's `args` may carry a `title` too.
+  const metaEnd = EXPORT.exec(metaText.slice(1));
+  const title = TITLE.exec(metaText.slice(0, metaEnd ? metaEnd.index + 1 : undefined))?.[1];
   if (title === undefined) {
     problems.push(`${rel(path)}: the meta has no \`title\` — expected \`title: '${expected}'\``);
   } else if (title !== `'${expected}'`) {

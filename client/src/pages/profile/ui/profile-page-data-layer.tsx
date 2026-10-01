@@ -1,16 +1,15 @@
-import { useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 
-import { emailToAvatarLetter, useCurrentUserQuery, useDeleteAccountMutation } from '@entities/session';
+import { emailToAvatarLetter, useCurrentUserQuery } from '@entities/session';
 import { useLogout } from '@features/logout';
 
 import ProfilePageLogicLayer from './profile-page-logic-layer';
+import { useDeleteAccount } from '../model/use-delete-account';
 
 const ProfilePageDataLayer: FC = () => {
   const { data: user } = useCurrentUserQuery(true);
-  const navigate = useNavigate();
   const { logout, isPending: isLoggingOut } = useLogout();
-  const deleteAccountMutation = useDeleteAccountMutation();
+  const { deleteAccount, isPending: isDeletingAccount } = useDeleteAccount();
 
   return (
     <ProfilePageLogicLayer
@@ -18,13 +17,8 @@ const ProfilePageDataLayer: FC = () => {
       avatarLetter={user ? emailToAvatarLetter(user.email) : '?'}
       onLogout={logout}
       isLoggingOut={isLoggingOut}
-      onDeleteAccount={(): Promise<void> =>
-        deleteAccountMutation
-          .mutateAsync()
-          .catch(() => undefined)
-          .finally(() => navigate({ to: '/login' }))
-      }
-      isDeletingAccount={deleteAccountMutation.isPending}
+      onDeleteAccount={deleteAccount}
+      isDeletingAccount={isDeletingAccount}
     />
   );
 };

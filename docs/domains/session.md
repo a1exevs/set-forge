@@ -16,7 +16,7 @@ documents, logout and account deletion. Legal duties behind this domain: `.claud
 
 ## Invariants
 
-Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run client:lint` finds them.
+Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lint:root` checks them.
 
 | Id | Invariant |
 |---|---|
@@ -28,7 +28,7 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run cli
 | deletion-cascade | Account deletion removes every user-owned row (DB cascade) |
 | refresh-single-flight | Concurrent token refreshes share one request |
 | no-open-redirect | After sign-in only an in-app `redirect` target is followed (no open redirect) |
-| logout-ends-on-login | Logout ends on `/login` also when the request fails |
+| logout-ends-on-login | Logout and account deletion end on `/login` also when the request fails |
 | user-scoped | All workout data is scoped to the signed-in user |
 | route-guards | Guest-only (`/login`, `/register`), always-public (`/privacy`, `/terms`) and protected routes — ❌ review (guard in `client/src/app/routes/__root.tsx`, no test) |
 | hooks-dont-navigate | Session hooks never navigate — the calling flow does — ❌ review |

@@ -12,7 +12,7 @@ holds no progress — that belongs to a workout session. Lists can be exported t
 
 ## Invariants
 
-Each id is proven by the tests tagged `// @invariant workout-list/<id>`; `npm run client:lint` finds them.
+Each id is proven by the tests tagged `// @invariant workout-list/<id>`; `npm run lint:root` checks them.
 
 | Id | Invariant |
 |---|---|

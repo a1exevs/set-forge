@@ -19,7 +19,7 @@ stash`, no edits during the review. The only file the review writes is its own l
 | `$1` | Review | Commands |
 |---|---|---|
 | empty | uncommitted work only | `git diff HEAD` + untracked files |
-| `<base>` — a single ref that is an ancestor of `HEAD` (`develop`, `common/cursor-to-claude`, `HEAD~2`) | **everything since the base: the branch's commits and the uncommitted work together.** The usual way to review a branch before committing or pushing | `git diff <base>` (base vs the working tree) + untracked files |
+| `<base>` — a single ref that is an ancestor of `HEAD` (`develop`, `origin/develop`, `HEAD~2`) | **everything since the base: the branch's commits and the uncommitted work together.** The usual way to review a branch before committing or pushing | `git diff <base>` (base vs the working tree) + untracked files |
 | `<base>..<head>` / `<base>...<head>` | the committed range only — what is already pushed or what a PR contains; uncommitted work is ignored | `git diff <range>` |
 
 Untracked files come from `git ls-files --others --exclude-standard`; read them whole — they are all new lines.

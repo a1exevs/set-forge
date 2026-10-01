@@ -14,7 +14,7 @@ its exercises that counts completed sets. Finished sessions form an immutable hi
 
 ## Invariants
 
-Each id is proven by the tests tagged `// @invariant workout-session/<id>`; `npm run client:lint` finds them.
+Each id is proven by the tests tagged `// @invariant workout-session/<id>`; `npm run lint:root` checks them.
 
 | Id | Invariant |
 |---|---|

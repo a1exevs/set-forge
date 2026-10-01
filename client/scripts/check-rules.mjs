@@ -131,9 +131,13 @@ function checkReferences(file, rule, cell) {
       problems.push(`${file}: "${rule}" — \`npm run ${script}\` is not a script of the root package.json`);
     }
   }
-  const projects = ['client', 'server'].filter(project => scripts.includes(`${project}:lint`));
+  // The project comes from the scripts the row names (`client:lint`, `server:lint:eslint`, …); a row that names
+  // none must hold in both.
+  const projects = [...new Set(scripts.map(script => script.split(':')[0]))].filter(
+    project => project === 'client' || project === 'server',
+  );
   for (const id of eslintIds) {
-    for (const project of projects.length > 0 ? projects : ['client']) {
+    for (const project of projects.length > 0 ? projects : ['client', 'server']) {
       if (!eslintRules[project].has(id)) {
         problems.push(`${file}: "${rule}" — ESLint \`${id}\` is not enabled in ${project}`);
       }

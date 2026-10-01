@@ -45,8 +45,8 @@ ensure() {
 KEY_LINE='^[[:space:]]*(export[[:space:]]+)?'
 
 # read_var <file> <key>: value of the last KEY=... line (dotenv keeps the last one). A quoted value
-# runs up to its closing quote (whatever follows — an inline comment — is dropped); an unquoted
-# value loses a trailing "# comment". Empty when absent.
+# runs up to its closing quote — the last one on the line, so an escaped \" inside survives; an inline
+# comment after it, like the trailing "# comment" of an unquoted value, is dropped. Empty when absent.
 read_var() {
   local file="$1" key="$2" line value
   line="$(grep -E "${KEY_LINE}${key}=" "$file" | tail -n 1 || true)"
@@ -55,8 +55,17 @@ read_var() {
   fi
   value="$(printf '%s' "${line#*=}" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
   case "$value" in
-    \"*) value="${value#\"}"; value="${value%%\"*}" ;;
-    \'*) value="${value#\'}"; value="${value%%\'*}" ;;
+    \"* | \'*)
+      local quote="${value:0:1}" uncommented
+      value="${value#"$quote"}"
+      # The closing quote is the last one followed by " # comment", or else the last character.
+      uncommented="${value%"$quote"[[:space:]]*#*}"
+      if [[ "$uncommented" != "$value" ]]; then
+        value="$uncommented"
+      else
+        value="${value%"$quote"}"
+      fi
+      ;;
     *) value="$(printf '%s' "$value" | sed -E 's/[[:space:]]+#.*$//; s/[[:space:]]+$//')" ;;
   esac
   printf '%s' "$value"

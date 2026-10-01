@@ -293,7 +293,7 @@ npm run prod:up   # rebuilds images (client-prod picks up the new build args)
 
 **Document versions (server, runtime).** `TERMS_VERSION` and `PRIVACY_VERSION` (`server/.production.env`, default `1`) record which version a user accepted. When you change a document materially:
 
-1. Update the document text (`client/src/pages/privacy/model/privacy-policy-content.ts` or `.../terms/model/terms-content.ts`) and bump its `*_EFFECTIVE_DATE`.
+1. Update the document text (`client/src/pages/privacy/config/privacy-policy-content.ts` or `.../terms/config/terms-content.ts`) and bump its `*_EFFECTIVE_DATE`.
 2. Increment the matching `TERMS_VERSION` / `PRIVACY_VERSION` in `server/.production.env`.
 3. Restart `server-prod` (`npm run prod:up`). Users who accepted an older version are shown a blocking re-consent gate on their next visit and must re-accept or log out.
 

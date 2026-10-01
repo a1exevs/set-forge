@@ -4,6 +4,7 @@
 //   2. slice root holds only `index.ts`, segment folders and (entities) the `@x` folder;
 //   3. `index.ts`: required for every slice and every `shared` segment (their public API); forbidden in layers,
 //      in `app` and anywhere inside the segments of a slice — outsiders use the slice index, insiders import files;
+//      `index.tsx` likewise, except the TanStack route `app/routes/index.tsx` (the `/` route);
 //   4. segments: the five standard ones in slices; `app` / `shared` segments from an explicit list (named by purpose);
 //   5. `@x/<consumer>.ts` names an existing entity other than its owner;
 //   6. names by purpose: no `components/`, `hooks/`, `types/`, `utils/`, `helpers/`, `consts/`, `contexts/` folders,
@@ -93,8 +94,12 @@ function checkSegments(owner, dir, { allowed, index }) {
     }
     if (index === 'forbidden') {
       walkFiles(path, (file, fileEntry, isDir) => {
-        if (!isDir && fileEntry.name === 'index.ts') {
-          problems.push(`${rel(file)}: no index.ts inside segments — re-export from files in the slice index`);
+        // `routes/index.tsx` is the TanStack file route of `/`, not a segment index.
+        const isIndexRoute = fileEntry.name === 'index.tsx' && rel(file).startsWith('src/app/routes/');
+        if (!isDir && /^index\.tsx?$/.test(fileEntry.name) && !isIndexRoute) {
+          problems.push(
+            `${rel(file)}: no index.ts / index.tsx inside segments — re-export from files in the slice index`,
+          );
         }
       });
     }

@@ -57,15 +57,6 @@ export async function exportAllWorkoutLists(): Promise<WorkoutListsExportFile> {
   return unwrap(res, 'Failed to export workout lists');
 }
 
-/**
- * Reserved for GET /workout-lists/:id/export.
- * @public
- */
-export async function exportWorkoutList(id: string): Promise<WorkoutListsExportFile> {
-  const res = await apiRequest<WorkoutListsExportFile>(`${BASE}/${id}/export`, { method: 'GET', auth: true });
-  return unwrap(res, 'Failed to export workout list');
-}
-
 export async function importWorkoutLists(file: WorkoutListsExportFile): Promise<ImportWorkoutListsResult> {
   const res = await apiRequest<ImportWorkoutListsResult>(`${BASE}/import`, {
     method: 'POST',

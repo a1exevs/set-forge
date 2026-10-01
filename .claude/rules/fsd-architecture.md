@@ -93,7 +93,7 @@ Five standard segments in slices. Names describe the **purpose**, never the esse
 | `lib/` | helpers used inside the slice, pure utilities | `history-formatters` |
 | `config/` | constants, configuration | `main-tab-routes` |
 
-`app` and `shared` use their own segments, named by purpose, from a fixed list (`scripts/check-structure.mjs`):
+`app` and `shared` use their own segments, named by purpose, from a fixed list (`client/scripts/check-structure.mjs`):
 
 - `app/`: `entrypoint/` (`main.tsx`, referenced from `index.html`), `routes/` (TanStack file routes), `router/`
   (router + generated route tree), `api/` (query client), `styles/` (global styles). The FSD docs name `store/` for
@@ -281,7 +281,8 @@ src/
 
 ## Enforcement
 
-All client checks run in `npm run client:lint`: structure script → rules check → domain docs check → ESLint → Steiger → knip.
+All client checks run in `npm run client:lint`: structure script → stories check → rules check → linter config types →
+ESLint → Steiger → knip. The domain docs check is `npm run lint:root` (`scripts/check-domain-docs.mjs`).
 
 | Rule | Checked by |
 |---|---|

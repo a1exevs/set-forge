@@ -10,3 +10,8 @@ export async function bootstrapSessionAndPrimeCache(queryClient: QueryClient): P
   queryClient.setQueryData(sessionQueryKeys.me, user);
   return user;
 }
+
+/** Same contract as the real module: the user the stub primed, read back from the cache. */
+export function getCachedCurrentUser(queryClient: QueryClient): CurrentUser | null {
+  return queryClient.getQueryData<CurrentUser | null>(sessionQueryKeys.me) ?? null;
+}
