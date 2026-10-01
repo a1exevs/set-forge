@@ -10,9 +10,7 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
-import HistoryPageLogicLayer from 'src/pages/history/ui/history-page-logic-layer';
-
-const storyTitle = 'Pages/HistoryPage';
+import HistoryPageLogicLayer from './history-page-logic-layer';
 
 const renderHistoryPage = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
@@ -31,7 +29,7 @@ const renderHistoryPage = (): ReturnType<typeof renderWithPageRouter> =>
   });
 
 const meta = {
-  title: storyTitle,
+  title: 'Pages/HistoryPage',
   component: HistoryPageLogicLayer,
 } satisfies Meta<typeof HistoryPageLogicLayer>;
 

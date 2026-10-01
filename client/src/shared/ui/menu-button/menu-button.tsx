@@ -2,11 +2,12 @@ import { MenuButton as HeadlessMenuButton, Menu, MenuItem, MenuItems } from '@he
 import { EllipsisVertical } from 'lucide-react';
 import { FC } from 'react';
 
-import classes from 'src/shared/ui/menu-button/menu-button.module.scss';
-import type { MenuItem as MenuItemType } from 'src/shared/ui/menu-button/menu-button.types';
+import classes from './menu-button.module.scss';
+
+export type MenuButtonItem = { id: string; label: string; onClick: () => void };
 
 type Props = {
-  items: MenuItemType[];
+  items: MenuButtonItem[];
   ariaLabel?: string;
 };
 
@@ -17,7 +18,7 @@ const MenuButton: FC<Props> = ({ items, ariaLabel }) => {
         <EllipsisVertical className={classes.icon} size={20} strokeWidth={2} aria-hidden />
       </HeadlessMenuButton>
       <MenuItems anchor="bottom start" className={classes.items}>
-        {items.map(item => (
+        {items.map((item: MenuButtonItem) => (
           <MenuItem key={item.id}>
             {({ close }): JSX.Element => (
               <button

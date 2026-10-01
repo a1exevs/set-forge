@@ -71,6 +71,7 @@ describe('RegisterRequest', () => {
         ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(8, 50),
       );
     });
+    // @invariant session/separate-consent
     it('should has error (consent is false)', async () => {
       const dto = new RegisterRequest.Dto('email@mail.com', '12345678', false, true);
       const errors = await validateDto(RegisterRequest.Dto, dto);
@@ -85,6 +86,7 @@ describe('RegisterRequest', () => {
       expect(errors[0].property).toBe('consent');
       expect(errors[0].constraints.equals).toBe(ErrorMessages.CONSENT_TO_PERSONAL_DATA_PROCESSING_IS_REQUIRED);
     });
+    // @invariant session/separate-consent
     it('should has error (terms not accepted)', async () => {
       const dto = new RegisterRequest.Dto('email@mail.com', '12345678', true, false);
       const errors = await validateDto(RegisterRequest.Dto, dto);
@@ -99,6 +101,7 @@ describe('RegisterRequest', () => {
       expect(errors[0].property).toBe('termsAccepted');
       expect(errors[0].constraints.equals).toBe(ErrorMessages.TERMS_ACCEPTANCE_IS_REQUIRED);
     });
+    // @invariant session/separate-consent
     it('should has errors (both consent and terms missing)', async () => {
       const dto = new RegisterRequest.Dto('email@mail.com', '12345678');
       const errors = await validateDto(RegisterRequest.Dto, dto);

@@ -1,14 +1,17 @@
-import type { WorkoutList, WorkoutSession } from '@entities';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import confetti from 'canvas-confetti';
 
-import WorkoutModePageLogicLayer from 'src/pages/workout-mode/ui/workout-mode-page-logic-layer';
+import type { WorkoutList } from '@entities/workout-list';
+import type { WorkoutSession } from '@entities/workout-session';
+
+import WorkoutModePageLogicLayer from '../workout-mode-page-logic-layer';
 
 const confirmDialogMock = jest.fn();
 const toastErrorMock = jest.fn();
 
-jest.mock('@shared', () => ({
+jest.mock('@shared/lib', () => ({
+  ...jest.requireActual('@shared/lib'),
   useConfirm: () => confirmDialogMock,
   toastError: (...args: unknown[]): void => toastErrorMock(...args),
 }));
@@ -19,7 +22,8 @@ jest.mock('@tanstack/react-router', () => ({
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
 }));
 
-jest.mock('@widgets', () => ({
+jest.mock('@shared/ui', () => ({
+  ...jest.requireActual('@shared/ui'),
   NotFoundMessage: ({ title }: { title: string }) => <div>{title}</div>,
 }));
 
@@ -254,6 +258,7 @@ describe('WorkoutModePageLogicLayer', () => {
     });
   });
 
+  // @invariant workout-session/finish-on-entry-if-complete
   it('auto-finishes once on entry when an active session is already fully complete', async () => {
     const finishSession = jest.fn().mockResolvedValue(undefined);
 

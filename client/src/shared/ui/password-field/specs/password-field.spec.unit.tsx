@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FC, useState } from 'react';
 
-import PasswordField from 'src/shared/ui/password-field/password-field-logic-layer';
+import PasswordField from '../password-field-logic-layer';
 
 const StatefulPasswordField: FC<{
   initialValue?: string;
@@ -19,7 +19,7 @@ const StatefulPasswordField: FC<{
       value={value}
       disabled={disabled}
       autoComplete={autoComplete}
-      onChange={(next): void => {
+      onChange={(next: string): void => {
         setValue(next);
         onChange?.(next);
       }}

@@ -135,6 +135,7 @@ describe('WorkoutSessionsService', () => {
       expect(result.exercises.map(e => e.id)).toEqual(['a', 'b']);
     });
 
+    // @invariant session/user-scoped
     it('throws NotFoundException when missing/not owned', async () => {
       sessionModel.findOne.mockResolvedValue(null);
 
@@ -195,6 +196,7 @@ describe('WorkoutSessionsService', () => {
       expect(sessionModel.create).not.toBeCalled();
     });
 
+    // @invariant workout-session/one-active-per-list
     it('returns the existing active session without creating a new one', async () => {
       const existingSession = buildSessionModel([buildSessionExercise()]);
       listModel.findOne.mockResolvedValue(buildListModel([buildTemplateExercise()]));
@@ -216,6 +218,7 @@ describe('WorkoutSessionsService', () => {
       expect(result.session.id).toBe('sess-1');
     });
 
+    // @invariant workout-session/snapshot-at-start
     it('snapshots a new session from the list when none is active', async () => {
       const list = buildListModel([
         buildTemplateExercise({ id: 'tpl-2', name: 'Fly', position: 1 }),
@@ -267,6 +270,7 @@ describe('WorkoutSessionsService', () => {
       expect(session.update).not.toBeCalled();
     });
 
+    // @invariant workout-session/progress-capped
     it('does not increment when already at sets', async () => {
       const done = buildSessionExercise({ completedSets: 3, sets: 3 });
       const other = buildSessionExercise({ id: 'sess-ex-2', completedSets: 0, sets: 3 });
@@ -280,6 +284,8 @@ describe('WorkoutSessionsService', () => {
       expect(connection.transaction).toBeCalledTimes(1);
     });
 
+    // @invariant workout-session/progress-capped
+    // @invariant workout-session/exercise-complete
     it('auto-finishes the session when the last set completes', async () => {
       const exercise = buildSessionExercise({ completedSets: 2, sets: 3 });
       const session = buildSessionModel([exercise]);
@@ -342,6 +348,7 @@ describe('WorkoutSessionsService', () => {
   });
 
   describe('discard', () => {
+    // @invariant workout-session/discard-not-in-history
     it('hard-deletes an active session', async () => {
       const session = buildSessionModel([buildSessionExercise()]);
       sessionModel.findOne.mockResolvedValue(session);
@@ -422,6 +429,7 @@ describe('WorkoutSessionsService', () => {
       }
     });
 
+    // @invariant workout-session/resync-keeps-progress
     it('re-snapshots from the list preserving completedSets by sourceExerciseId (clamped)', async () => {
       const session = buildSessionModel([
         buildSessionExercise({ id: 'old-1', sourceExerciseId: 'tpl-keep', completedSets: 5, sets: 5 }),
@@ -450,6 +458,7 @@ describe('WorkoutSessionsService', () => {
       expect(rows[1]).toEqual(expect.objectContaining({ sourceExerciseId: 'tpl-new', completedSets: 0, position: 1 }));
     });
 
+    // @invariant workout-session/resync-keeps-progress
     it('stays active even when clamped progress completes every exercise after resync', async () => {
       const session = buildSessionModel([
         buildSessionExercise({ id: 'old-1', sourceExerciseId: 'tpl-1', completedSets: 3, sets: 4 }),
@@ -473,6 +482,7 @@ describe('WorkoutSessionsService', () => {
   });
 
   describe('getHistory', () => {
+    // @invariant workout-session/history-completed-only
     it('queries completed sessions for the user, newest first, with default paging', async () => {
       const session = buildSessionModel([buildSessionExercise({ completedSets: 3, sets: 3 })], {
         status: SESSION_STATUS.COMPLETED,

@@ -1,26 +1,43 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn, userEvent, within } from '@storybook/test';
 
-import MenuButton from 'src/shared/ui/menu-button/menu-button';
-import type { MenuItem } from 'src/shared/ui/menu-button/menu-button.types';
+import { withFrame } from 'storybook-dir/showcase';
 
-const defaultItems: MenuItem[] = [
-  { id: 'edit', label: 'Edit', onClick: (): void => undefined },
-  { id: 'delete', label: 'Delete', onClick: (): void => undefined },
-];
+import MenuButton from './menu-button';
+
+const ARIA_LABEL = 'Workout list actions';
 
 const meta = {
   title: 'Shared/MenuButton',
   component: MenuButton,
-  args: { items: defaultItems },
+  args: {
+    ariaLabel: ARIA_LABEL,
+    items: [
+      { id: 'edit', label: 'Edit', onClick: fn() },
+      { id: 'delete', label: 'Delete', onClick: fn() },
+    ],
+  },
+  decorators: [withFrame],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'The kebab menu of a card (Headless UI `Menu`): a vertical-ellipsis trigger and a list of actions. ' +
+          '`ariaLabel` names the trigger; each item closes the menu after its `onClick`.',
+      },
+    },
+  },
 } satisfies Meta<typeof MenuButton>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** Closed: the ellipsis is the trigger. */
 export const Default: Story = {};
-export const CustomAriaLabel: Story = { args: { ariaLabel: 'Workout list actions' } };
-export const SingleItem: Story = {
-  args: {
-    items: [{ id: 'edit', label: 'Edit', onClick: (): void => undefined }],
+
+/** Opened: the actions anchor below the trigger. */
+export const Open: Story = {
+  play: async ({ canvasElement }): Promise<void> => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: ARIA_LABEL }));
   },
 };

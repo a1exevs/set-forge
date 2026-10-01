@@ -1,1 +1,1 @@
-export { PrivacyPage } from 'src/pages/privacy/ui';
+export { default as PrivacyPage } from './ui/privacy-page';

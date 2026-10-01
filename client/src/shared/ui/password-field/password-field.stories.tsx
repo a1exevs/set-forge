@@ -1,64 +1,74 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { userEvent, within } from '@storybook/test';
-import { FC, useState } from 'react';
+import { FC, ReactElement, useState } from 'react';
 
-import PasswordField from 'src/shared/ui/password-field/password-field-logic-layer';
+import { Caption, Stack, withFrame } from 'storybook-dir/showcase';
+
+import PasswordField from './password-field-logic-layer';
 
 const meta: Meta<typeof PasswordField> = {
   title: 'Shared/PasswordField',
   component: PasswordField,
+  decorators: [withFrame],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'A password input with a show / hide toggle (`aria-pressed` carries the state). Controlled through ' +
+          '`value` and `onChange`; the label is the caller’s.',
+      },
+    },
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 type StatefulProps = {
+  id: string;
   initialValue?: string;
-  autoComplete?: string;
-  name?: string;
   disabled?: boolean;
 };
 
-const StatefulPasswordField: FC<StatefulProps> = ({ initialValue = '', autoComplete, name, disabled }) => {
+const StatefulPasswordField: FC<StatefulProps> = ({ id, initialValue = '', disabled }) => {
   const [value, setValue] = useState(initialValue);
 
   return (
-    <div style={{ padding: '1.5rem', maxWidth: 360 }}>
-      <label htmlFor="story-password" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
-        Password
-      </label>
+    <Stack>
+      <label htmlFor={id}>Password</label>
       <PasswordField
-        id="story-password"
-        name={name}
+        id={id}
+        name="password"
+        autoComplete="current-password"
         value={value}
         onChange={setValue}
-        autoComplete={autoComplete}
         disabled={disabled}
       />
-    </div>
+    </Stack>
   );
 };
 
-export const Empty: Story = {
-  render: (): JSX.Element => <StatefulPasswordField name="password" />,
+/** Filled and hidden: the sign-in form. */
+export const Default: Story = {
+  render: (): ReactElement => <StatefulPasswordField id="password" initialValue="secret" />,
 };
 
-export const WithValue: Story = {
-  render: (): JSX.Element => (
-    <StatefulPasswordField initialValue="secret" name="password" autoComplete="current-password" />
-  ),
-};
-
+/** The toggle pressed: the value is readable. */
 export const Visible: Story = {
-  render: (): JSX.Element => (
-    <StatefulPasswordField initialValue="secret" name="password" autoComplete="current-password" />
-  ),
+  render: (): ReactElement => <StatefulPasswordField id="password" initialValue="secret" />,
   play: async ({ canvasElement }): Promise<void> => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button', { name: 'Show password' }));
+    await userEvent.click(within(canvasElement).getByRole('button', { name: 'Show password' }));
   },
 };
 
-export const Disabled: Story = {
-  render: (): JSX.Element => <StatefulPasswordField initialValue="secret" name="password" disabled />,
+/** Empty and disabled. */
+export const States: Story = {
+  render: (): ReactElement => (
+    <Stack>
+      <Caption>Empty</Caption>
+      <StatefulPasswordField id="password-empty" />
+      <Caption>Disabled</Caption>
+      <StatefulPasswordField id="password-disabled" initialValue="secret" disabled />
+    </Stack>
+  ),
 };

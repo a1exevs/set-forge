@@ -1,11 +1,9 @@
 import type { FC } from 'react';
 import { useCallback } from 'react';
 
-import ConfirmDialog from 'src/shared/ui/confirm-dialog/confirm-dialog';
-import type { ConfirmOptions, ConfirmResult } from 'src/shared/ui/confirm-dialog/contexts/confirm-dialog-context';
+import type { ConfirmOptions, ConfirmResult } from '@shared/lib';
 
-const DEFAULT_CONFIRMATION_TEXT = 'Confirm';
-const DEFAULT_CANCELLATION_TEXT = 'Cancel';
+import ConfirmDialog from './confirm-dialog';
 
 type Props = {
   open: boolean;
@@ -30,8 +28,8 @@ const ConfirmDialogLogicLayer: FC<Props> = ({ open, options, onClose }) => {
     return null;
   }
 
-  const confirmationText = options.confirmationText ?? DEFAULT_CONFIRMATION_TEXT;
-  const cancellationText = options.cancellationText ?? DEFAULT_CANCELLATION_TEXT;
+  const confirmationText = options.confirmationText ?? 'Confirm';
+  const cancellationText = options.cancellationText ?? 'Cancel';
   const hideCancelButton = options.hideCancelButton ?? false;
   const ariaLabel = typeof options.title === 'string' ? options.title : 'Confirmation dialog';
 

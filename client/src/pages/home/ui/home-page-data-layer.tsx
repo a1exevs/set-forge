@@ -1,22 +1,22 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 
+import { useCurrentUserQuery } from '@entities/session';
 import {
-  clearWorkoutSessionCachesForDeletedList,
-  useCurrentUserQuery,
   useDeleteWorkoutListMutation,
   useExportAllWorkoutListsMutation,
   useImportWorkoutListsMutation,
   useWorkoutListsQuery,
-} from '@entities';
-import { formatDate } from '@shared';
+  type WorkoutListsExportFile,
+} from '@entities/workout-list';
+import { useClearWorkoutSessionCachesForDeletedList } from '@entities/workout-session';
+import { formatDate } from '@shared/lib';
 
-import HomePageLogicLayer from 'src/pages/home/ui/home-page-logic-layer';
+import HomePageLogicLayer from './home-page-logic-layer';
 
 const HomePageDataLayer: FC = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const clearWorkoutSessionCachesForDeletedList = useClearWorkoutSessionCachesForDeletedList();
   const { data: user } = useCurrentUserQuery(true);
   const { data: workoutLists = [] } = useWorkoutListsQuery(Boolean(user));
   const deleteWorkoutListMutation = useDeleteWorkoutListMutation();
@@ -25,17 +25,15 @@ const HomePageDataLayer: FC = () => {
   return (
     <HomePageLogicLayer
       workoutLists={workoutLists}
-      deleteWorkoutList={async (id): Promise<void> => {
+      deleteWorkoutList={async (id: string): Promise<void> => {
         await deleteWorkoutListMutation.mutateAsync(id);
       }}
-      clearWorkoutSessionCachesForDeletedList={(workoutListId): void => {
-        clearWorkoutSessionCachesForDeletedList(queryClient, workoutListId);
-      }}
-      exportAllWorkoutLists={async () => exportAllWorkoutListsMutation.mutateAsync()}
-      importWorkoutLists={async (file): Promise<void> => {
+      clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
+      exportAllWorkoutLists={async (): Promise<WorkoutListsExportFile> => exportAllWorkoutListsMutation.mutateAsync()}
+      importWorkoutLists={async (file: WorkoutListsExportFile): Promise<void> => {
         await importWorkoutListsMutation.mutateAsync(file);
       }}
-      onEdit={(id): void => {
+      onEdit={(id: string): void => {
         navigate({ to: '/edit/$id', params: { id } });
       }}
       formatDate={formatDate}

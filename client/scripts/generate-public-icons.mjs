@@ -1,8 +1,7 @@
+import { Resvg } from '@resvg/resvg-js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-import { Resvg } from '@resvg/resvg-js';
 import toIco from 'to-ico';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -50,7 +49,6 @@ const BRAND_BLUE = '#3b82f6';
 const TEXT_DARK = '#374151';
 const TAGLINE_FONT_SIZE = 42;
 const BADGE_FONT_SIZE = 34;
-const BADGE_PAD_X = 36;
 const BADGE_PAD_Y = 22;
 const BADGE_WIDTH = 280;
 const BADGE_HEIGHT = BADGE_FONT_SIZE + BADGE_PAD_Y * 2;
@@ -117,8 +115,8 @@ for (const target of pngTargets) {
 }
 
 const icoSizes = ['favicon-16x16.png', 'favicon-32x32.png', 'favicon-48x48.png'];
-const icoBuffers = icoSizes.map((name) => fs.readFileSync(path.join(publicDir, name)));
+const icoBuffers = icoSizes.map(name => fs.readFileSync(path.join(publicDir, name)));
 const ico = await toIco(icoBuffers);
 fs.writeFileSync(path.join(publicDir, 'favicon.ico'), ico);
 
-console.log(`Generated ${pngTargets.length + 2} public icon files in ${publicDir}`);
+process.stdout.write(`Generated ${pngTargets.length + 2} public icon files in ${publicDir}\n`);

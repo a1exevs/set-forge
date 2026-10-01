@@ -1,31 +1,35 @@
 import { FC, FormEvent, useCallback, useState } from 'react';
 
-import { getCaptchaUrl, isNeedCaptchaEnvelope } from 'src/entities/session/api/session-api';
 import {
+  isNeedCaptchaEnvelope,
   validateLoginEmail,
   validateLoginPassword,
   validateRegisterEmail,
   validateRegisterPassword,
-} from 'src/entities/session/model/auth-validation';
-import type { AuthTab } from 'src/pages/auth/ui/auth-page';
-import AuthPage from 'src/pages/auth/ui/auth-page';
-import { ApiRequestError } from 'src/shared/api/http-client';
+} from '@entities/session';
+import { ApiRequestError } from '@shared/api';
+
+import AuthPage from './auth-page';
+import type { LoginInput, RegisterInput } from '../model/auth-input';
+import type { AuthTab } from '../model/auth-tab';
 
 type Props = {
   activeTab: AuthTab;
   redirectSearch: Record<string, string | undefined>;
   isSubmitting: boolean;
-  onLogin: (input: { email: string; password: string; captcha?: string; redirectTo?: string }) => Promise<void>;
-  onRegister: (input: {
-    email: string;
-    password: string;
-    consent: boolean;
-    termsAccepted: boolean;
-    redirectTo?: string;
-  }) => Promise<void>;
+  onLogin: (input: LoginInput) => Promise<void>;
+  onRegister: (input: RegisterInput) => Promise<void>;
+  loadCaptchaUrl: () => Promise<string>;
 };
 
-const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting, onLogin, onRegister }) => {
+const AuthPageLogicLayer: FC<Props> = ({
+  activeTab,
+  redirectSearch,
+  isSubmitting,
+  onLogin,
+  onRegister,
+  loadCaptchaUrl,
+}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [consent, setConsent] = useState(false);
@@ -110,7 +114,7 @@ const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting
             setShowCaptcha(true);
             setCaptcha('');
             try {
-              const url = await getCaptchaUrl();
+              const url = await loadCaptchaUrl();
               setCaptchaImageUrl(url);
             } catch {
               setCaptchaImageUrl(null);
@@ -130,6 +134,7 @@ const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting
       consent,
       termsAccepted,
       email,
+      loadCaptchaUrl,
       onLogin,
       onRegister,
       password,

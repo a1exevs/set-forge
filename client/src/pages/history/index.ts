@@ -1,1 +1,1 @@
-export { HistoryPage } from 'src/pages/history/ui';
+export { default as HistoryPage } from './ui/history-page-data-layer';

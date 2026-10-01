@@ -1,8 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { toast } from 'sonner';
 
-import { toastError, toastSuccess } from 'src/shared/ui/toaster/toast';
-import Toaster from 'src/shared/ui/toaster/toaster';
+import { toastError, toastSuccess } from '@shared/lib';
+
+import Toaster from '../toaster-data-layer';
 
 const showAndSnapshot = async (show: () => void): Promise<{ baseElement: HTMLElement }> => {
   const result = render(<Toaster />);

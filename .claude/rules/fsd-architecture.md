@@ -1,0 +1,306 @@
+---
+description: Feature-Sliced Design (React) — layers, slices, segments, where code goes, public API, @x, import rules
+paths:
+  - "client/**"
+---
+
+# Feature-Sliced Design
+
+`client/src` follows standard [Feature-Sliced Design](https://feature-sliced.design/docs/get-started/overview).
+`npm run client:lint` enforces almost all of it — see [Enforcement](#enforcement). What no tool can check is
+marked there.
+
+Structure: **layer → slice → segment → file**. `app` and `shared` have no slices (layer → segment → file).
+
+## 1. Layers
+
+```
+app → pages → widgets → features → entities → shared        (arrows = "may import")
+```
+
+| Layer | What lives here | Has slices | May import |
+|---|---|---|---|
+| `app/` | bootstrap: entry point, file routes, router, query client, global styles | no | pages, widgets, features, entities, shared |
+| `pages/` | one slice per route/screen; composes widgets | yes | widgets, features, entities, shared |
+| `widgets/` | big self-contained UI blocks that combine entities/features | yes | features, entities, shared |
+| `features/` | one user action that brings value | yes | entities, shared |
+| `entities/` | domain objects: types, server state (query hooks), their own small UI | yes | shared |
+| `shared/` | domain-agnostic code: UI kit, HTTP client, config, helpers | no | — (its own segments only) |
+
+- Only **downwards**. Never sideways between slices of one layer (§7), never upwards.
+- A layer is created when its first slice appears — no empty folders.
+- Nobody imports `app/`: it is the top. Its entry point `app/entrypoint/main.tsx` is referenced from `index.html`.
+
+## 2. Where does new code go?
+
+Walk from the top and stop at the first "yes":
+
+1. App-wide wiring (route, router, query client, global styles)? → `app/`
+2. A whole screen? → `pages/<screen>/`
+3. One user action (a button + the logic it triggers)? → `features/<verb-noun>/`
+4. A big UI block assembled from several entities/features? → `widgets/<block>/`
+5. A domain concept of this app (session, workout list, workout session)? → `entities/<noun>/`
+6. Would it make sense in any other project (no knowledge of workouts)? → `shared/<segment>/`
+
+**Pages first:** put code in the page/widget that uses it; extract a widget, feature or entity only when a second
+consumer appears. Steiger's `fsd/insignificant-slice` warning points at slices with a single consumer.
+
+Our examples:
+
+| Code | Place | Why |
+|---|---|---|
+| `HomePage` (data / logic / view layers) | `pages/home/ui` | a screen |
+| `WorkoutPhase`, `AuthTab` | `pages/<slice>/model` | page-local types, out of components |
+| `isExerciseComplete`, `isSessionFullyComplete`, `countCompletedExercises` | `entities/workout-session-exercise/model`, `entities/workout-session/model` | a business rule used by several pages and the entity card — one definition in the entity |
+| history date/duration formatters, confetti | `pages/history/lib`, `pages/workout-mode/lib` | helpers of one page |
+| privacy / terms texts | `pages/<slice>/config` | constants |
+| `WorkoutListForm`, `MainTabsBar`, `DocumentReconsentGate` | `widgets/*/ui` | big blocks over several entities |
+| `MAIN_TAB_ROUTES`, `muscleGroupOptions` | `widgets/*/config` | constants of a widget |
+| `useMainTabSwipe` (swipe between the main tabs) | `widgets/main-tabs-bar/model` | shared by the three tab pages; their logic layers call it |
+| `WorkoutList`, `useWorkoutListsQuery`, query keys | `entities/workout-list/model` | domain types and server state |
+| `fetchWorkoutLists` | `entities/workout-list/api` | requests — internal to the model, never exported |
+| `WorkoutExerciseCard` | `entities/workout-exercise/ui` | entity UI, reused by several pages |
+| `apiRequest`, access token | `shared/api` | transport, knows nothing about workouts |
+| `Button`, `Select`, `NotFoundMessage`, `Toaster` | `shared/ui` | UI kit |
+| `useConfirm`, `toastError`, `formatDate`, `useThemeStore` | `shared/lib` | generic helpers and hooks |
+| screen widths | `shared/config` | constants |
+| `LegalDocument` (knows `/privacy`, `/terms`, `/login`, the brand) | `widgets/legal-document` | used by two pages; not domain-agnostic, so not `shared` |
+| export file name `set-forge-workout-lists-<day>.json` | `pages/home/lib` | domain naming, one consumer |
+| `useLogout` (sign out + go to `/login`) | `features/logout/model` | one user action used by two slices (profile page, re-consent gate) |
+| redirect after sign-in (`resolveRedirectTarget`, `useRedirectAfterAuth`) | `pages/auth/lib`, `pages/auth/model` | a flow of one page; entities never navigate |
+
+`shared` never knows about the domain: no workouts or sessions there, and it never imports from other layers.
+
+## 3. Slices
+
+- A slice = one business thing, named in kebab-case: noun for entities (`workout-list`), verb-noun for features,
+  block name for widgets/pages (`main-tabs-bar`, `workout-mode`).
+- Slices are **isolated**: a slice doesn't import another slice of the same layer (§7, entities: §6).
+- A slice consists of segments (§4) and has a public API `index.ts` (§5). No files directly in the slice root
+  other than `index.ts` (and `@x/` in entities).
+
+## 4. Segments
+
+Five standard segments in slices. Names describe the **purpose**, never the essence: no `components/`, `hooks/`,
+`types/`, `utils/`, `helpers/`, `consts/`, `contexts/`, `store/`, `providers/` — folders or files (`types.ts`,
+`*.types.ts`, `*.store.ts`).
+
+| Segment | Put here | Examples |
+|---|---|---|
+| `ui/` | components (`.tsx` + `.module.scss`, one `*.stories.tsx` per component — see storybook, specs) | `home-page-logic-layer`, `workout-exercise-card` |
+| `model/` | domain types, query hooks and keys, stores, business logic | `workout-list`, `use-workout-queries` |
+| `api/` | requests to the backend, mapping responses | `workout-list-api` |
+| `lib/` | helpers used inside the slice, pure utilities | `history-formatters` |
+| `config/` | constants, configuration | `main-tab-routes` |
+
+`app` and `shared` use their own segments, named by purpose, from a fixed list (`client/scripts/check-structure.mjs`):
+
+- `app/`: `entrypoint/` (`main.tsx`, referenced from `index.html`), `routes/` (TanStack file routes), `router/`
+  (router + generated route tree), `api/` (query client), `styles/` (global styles). The FSD docs name `store/` for
+  the query client and put the router into `routes/`, but Steiger bans `store`, and TanStack Router treats every file
+  in `routes/` as a route — hence `api/` and a separate `router/`.
+- `shared/`: `ui/`, `model/`, `api/`, `lib/`, `config/` (FSD allows a `model` in shared for domain-agnostic state;
+  there is none yet). Grouping inside a segment is fine (`shared/lib/swipe/`,
+  `shared/ui/button/`).
+
+**`ui/` holds components only.** A constant, type or function found next to a component moves to its FSD home in the
+same slice — `config/`, `model/` or `lib/`, named by purpose (`config/muscle-group-options.ts`,
+`model/workout-phase.ts`). Allowed at the top level of a ui file:
+
+- components: `const X: FC<Props> = ...`;
+- props types: `type Props`, `type EditProps` (`*Props`);
+- in `shared/ui` only: exported types of the component's contract (`MenuButtonItem`, `SelectOption`, `LegalContent`).
+  `shared/model` is for domain-agnostic state and types shared by several consumers, not for the shape of one
+  component's props — that contract stays next to the component.
+
+Hooks are logic → `model/` (slices) or `shared/lib` (a hook of a shared component, e.g. `useConfirm`).
+
+**Between segments of one slice** imports are relative, to the **file**, and keep the direction:
+
+```
+ui ──→ model ──→ api
+ │       │        │
+ └───────┴────────┴──→ lib, config
+```
+
+| Segment | may import (code) | may also `import type` from |
+|---|---|---|
+| `ui` | `model`, `api`, `lib`, `config` | — |
+| `model` | `api`, `lib`, `config` | — |
+| `api` | `lib`, `config` | `model` |
+| `lib` | — | `model` |
+| `config` | — | `model` |
+
+- **Types flow down, code doesn't:** `api`, `lib` and `config` may `import type` domain types from their slice's
+  `model` (a request returning `WorkoutList`, a typed formatter or config) — type imports are erased, so at runtime
+  `model` still depends on them, never the other way round.
+- **`ui` stays on top:** no segment imports `ui`, not even its types.
+- **`shared` follows the same direction** (`shared/ui` may use `@shared/lib`, `shared/lib` may `import type` from
+  `@shared/model` but not its code). Stricter than the FSD docs, which let shared segments import each other freely —
+  the roles of the segments are the same, so is the direction. Across segments of `shared` — through the segment's
+  public API (§7).
+- `app` is exempt: its segments are wiring (routes, router, query client, styles), not layers of logic.
+
+**Tests** (`*.spec.unit.tsx`, `*.spec.snap.tsx`) live in a `specs/` folder next to the code they test (Jest picks
+them up there); `specs/` holds only tests, `__snapshots__` and `test-utils`. Tests that render the whole app through
+the router live in `app/router/specs/`.
+
+## 5. Public API (`index.ts`)
+
+| Where | `index.ts`? | Why |
+|---|---|---|
+| slice (`entities/session/index.ts`) | **required** | the slice's public API; re-exports straight from files |
+| segment of `shared` (`shared/ui/index.ts`) | **required** | `shared` has no slices — its segments are the public API |
+| segment inside a slice (`entities/session/model/index.ts`) | **forbidden** | outsiders use the slice index, insiders import files — it would be a dead barrel |
+| layer (`src/entities/index.ts`) | **forbidden** | layer barrels hide dependencies and create cycles |
+| `app/` | **forbidden** | nobody imports `app`; inside it files import each other directly |
+
+- Explicit named re-exports only (`export { X }`, `export { default as X }`, `export type { Y }`), never `export *`.
+- Export **only what other slices use** — knip fails on unused exports. Nothing is exported "for tests": a test
+  mocks the module file and takes its mocks with `jest.requireMock` (see `app/router/specs/edit-workout-page.spec.unit.tsx`).
+- Requests (`api/`) are internal to the entity model: pages and widgets use query hooks, not `fetch*` functions.
+- Index files re-export with relative paths.
+
+```typescript
+// src/entities/workout-list/index.ts
+export { useWorkoutListsQuery, useWorkoutQuery } from './model/use-workout-queries';
+export type { WorkoutList, UpdateWorkoutListDto } from './model/workout-list';
+
+// src/shared/ui/index.ts
+export { default as Button } from './button/button';
+export { default as Select, type SelectOption } from './select/select';
+```
+
+## 6. Cross-imports between entities (`@x`)
+
+Entities may reference each other only through the [`@x` notation](https://feature-sliced.design/docs/reference/public-api#public-api-for-cross-imports):
+a narrow public API that slice A publishes **for** slice B, read "A crossed with B".
+
+```
+entities/workout-exercise/@x/workout-list.ts              ← what workout-list may use from workout-exercise
+entities/workout-exercise/@x/workout-session-exercise.ts
+entities/workout-session-exercise/@x/workout-session.ts
+```
+
+```typescript
+// src/entities/workout-exercise/@x/workout-list.ts
+export type { UpdateExerciseDto, WorkoutExercise } from '../model/workout-exercise';
+
+// src/entities/workout-list/model/workout-list.ts
+import type { WorkoutExercise } from '@entities/workout-exercise/@x/workout-list';
+```
+
+- Only in `entities`; a file is named after its consumer, which must be another existing entity.
+- A slice may import only the `@x` file addressed to it; features/widgets/pages use the regular public API.
+- Keep it small (types, a label map) — if it grows, the two entities probably want merging or a widget on top.
+
+## 7. Imports
+
+As the [FSD docs](https://feature-sliced.design/docs/reference/public-api) put it: **relative inside a slice,
+alias across slices.**
+
+| From → to | Allowed? | How | Example |
+|---|---|---|---|
+| file → file of the same segment | ✅ | relative | `import HomePage from './home-page';` |
+| segment → segment of the same slice | ✅ (direction §4) | relative, to the **file** | `import { formatSummary } from '../lib/history-formatters';` |
+| file → file of the same `shared` segment | ✅ | relative | `import Button from '../button/button';` |
+| `shared` segment → another `shared` segment | ✅ | alias to the segment | `import { useConfirm } from '@shared/lib';` (in `shared/ui`) |
+| slice → slice of a **lower** layer | ✅ | alias to its `index.ts` | `import { useCurrentUserQuery } from '@entities/session';` |
+| slice → `shared` segment | ✅ | alias to the segment | `import { Button } from '@shared/ui';` |
+| entity → entity | ✅ | the `@x` file for it (§6) | `import { muscleGroupLabels } from '@entities/workout-exercise/@x/workout-session-exercise';` |
+| segment → segment of `app` | ✅ | relative, to the file | `import { router } from '../router/router';` (in `app/entrypoint`) |
+| slice → another slice of the **same** layer | ❌ | — compose them one layer up | |
+| anything → **upper** layer | ❌ | — | |
+| anything → inside another slice / segment | ❌ | — use its public API | |
+| a file → its own slice's `index.ts` (`.`, `..`) | ❌ | — cycle | |
+| a layer (`@entities`, `@shared`) or `src/...` path | ❌ | — | |
+
+Forbidden — and who catches it:
+
+```typescript
+import { Button } from 'src/shared/ui';                                 // ❌ `src/` path — ESLint
+import { Button, useConfirm } from '@shared';                           // ❌ layer has no public API — ESLint
+import { WorkoutList } from '@entities/workout-list/model/workout-list'; // ❌ public-API sidestep — ESLint
+import Button from '@shared/ui/button/button';                          // ❌ shared segment sidestep — ESLint
+import { WorkoutList } from '@entities/workout-list';                   // ❌ in entities/workout-session: use @x — ESLint
+import { NotFoundMessage } from '@widgets/not-found-message';           // ❌ in a widget: cross-slice — ESLint
+import { MainTabsBar } from '../../main-tabs-bar';                      // ❌ relative path into another slice — Steiger
+import { HomePage } from '@pages/home';                                 // ❌ in a widget: upper layer — ESLint
+import { Listbox } from '@headlessui/react';                            // ❌ outside shared — ESLint
+import { useQueryClient } from '@tanstack/react-query';                 // ❌ in a ui segment — ESLint
+```
+
+**When two slices of one layer need each other:** the thing that uses both belongs one layer up; if it is
+domain-agnostic, it belongs in `shared` (`NotFoundMessage` moved from widgets to `shared/ui` for that reason).
+
+Files outside `src` (`tests/`, `.storybook/`) are not part of the FSD graph: they may use `src/...` paths to reach
+internals (`jest.mock('src/entities/session/model/bootstrap-session')`), and prefer the public API otherwise.
+
+## 8. Library boundaries
+
+- `@headlessui/react` and `sonner` are imported **only** inside `src/shared/**`: every primitive is wrapped in
+  `shared/ui/<name>/` (`Button`, `Select`, `Transition`, `Toaster`) or `shared/lib` (`toastError`). A wrapper is
+  missing? Add it to `shared/ui` first.
+- `@tanstack/react-query` is not imported in `ui` segments of slices: server state comes through entity hooks
+  (`useWorkoutListsQuery`, `useClearWorkoutSessionCachesForDeletedList`). Data layers call those hooks.
+
+## 9. Checklist for new code
+
+1. Pick the place with §2 (pages first).
+2. Create the slice folder (kebab-case) and only the segments you need (§4); constants, types and logic outside `ui/`.
+3. Add the slice `index.ts` (re-export straight from files; no `index.ts` in its segments); export only what other
+   slices use (§5).
+4. Imports: relative inside the slice, `@layer/slice` / `@shared/segment` across, `@x` between entities (§6, §7).
+5. `npm run client:lint` green.
+
+## Current structure
+
+```
+src/
+├── app/
+│   ├── entrypoint/     main.tsx (referenced from index.html)
+│   ├── api/            query-client
+│   ├── router/         router, route-tree.gen (generated), specs/ (whole-app tests, test-utils)
+│   ├── routes/         TanStack file routes (__root, index, create, edit/$id, workout/$id, …)
+│   └── styles/         global.scss
+├── pages/              auth, create-workout, edit-workout, history, home, privacy, profile, terms, workout-mode
+├── widgets/            document-reconsent, legal-document, legal-footer, main-tabs-bar, workout-list-form
+├── features/           logout
+├── entities/
+│   ├── session/                 index.ts, api/, model/ (queries, keys, bootstrap-session, validation)
+│   ├── workout-exercise/        index.ts, @x/ (workout-list, workout-session-exercise), model/, ui/
+│   ├── workout-list/            index.ts, api/, model/
+│   ├── workout-session/         index.ts, api/, model/
+│   └── workout-session-exercise/ index.ts, @x/ (workout-session), model/, ui/
+└── shared/
+    ├── api/            index.ts, http-client, access-token-store, refresh-access-token, …
+    ├── config/         index.ts, screen-widths
+    ├── lib/            index.ts, confirm/, swipe/, theme/, toast, format-date, numeric-input, …
+    └── ui/             index.ts, button/, select/, transition/, not-found-message/, styles/, …
+```
+
+## Enforcement
+
+All client checks run in `npm run client:lint`: structure script → stories check → rules check → linter config types →
+ESLint → Steiger → knip. The domain docs check is `npm run lint:root` (`scripts/check-domain-docs.mjs`).
+
+| Rule | Checked by |
+|---|---|
+| Only downwards between layers | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` · Steiger `fsd/forbidden-imports` |
+| No imports between slices of one layer; `@x` only for its consumer entity | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` · Steiger `fsd/forbidden-imports` |
+| Through the public API only | `npm run client:lint` · ESLint `no-restricted-imports` · Steiger `fsd/no-public-api-sidestep` |
+| No `src/...` paths and no bare layer aliases inside `client/src` | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
+| No import of the own slice / segment index; no cycles | `npm run client:lint` · ESLint `no-restricted-imports` · ESLint `import/no-cycle` · ESLint `import/no-self-import` |
+| Segment direction `ui → model → api → lib, config` (slices and `shared`) | `npm run client:lint` · ESLint `import/no-restricted-paths` · `client/linter/rules/segment-direction-rule.ts` |
+| `api` / `lib` / `config` take only types from their `model` | `npm run client:lint` · ESLint `@typescript-eslint/no-restricted-imports` · `client/linter/rules/segment-direction-rule.ts` |
+| `ui` holds components and props types only | `npm run client:lint` · ESLint `no-restricted-syntax` · `client/linter/rules/ui-segment-rule.ts` |
+| `interface` only for domain entities in `entities/*/model` | `npm run client:lint` · ESLint `@typescript-eslint/consistent-type-definitions` · `client/eslint.config.ts` |
+| Headless UI / sonner only in `shared`; React Query not in `ui` | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
+| `shared` imports no other layer; other `shared` segments only via `@shared/<segment>` | `npm run client:lint` · ESLint `no-restricted-imports` · Steiger `fsd/forbidden-imports` |
+| `index.ts` placement, `@x` file names, allowed segments, nothing but `index.ts` in a slice root | `npm run client:lint` · `client/scripts/check-structure.mjs` · Steiger `fsd/public-api` · Steiger `fsd/no-layer-public-api` · Steiger `fsd/no-segmentless-slices` |
+| No `export *`; no `eslint-disable` of FSD rules | `npm run client:lint` · `client/scripts/check-structure.mjs` |
+| Names by purpose, tests in `specs/`, kebab-case | `npm run client:lint` · `client/scripts/check-structure.mjs` · Steiger `fsd/segments-by-purpose` |
+| No unused exports, files or dependencies | `npm run client:lint` · knip · `client/knip.jsonc` |
+| Pages first | `npm run client:lint` · Steiger `fsd/insignificant-slice` (warning only) |
+| `shared` knows nothing about the domain | ❌ review (upward imports are caught, domain concepts are not) |
+| Which layer new code belongs to (§2) | ❌ review — a design decision |

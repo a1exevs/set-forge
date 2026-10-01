@@ -9,9 +9,7 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
-import EditWorkoutPageLogicLayer from 'src/pages/edit-workout/ui/edit-workout-page-logic-layer';
-
-const storyTitle = 'Pages/EditWorkoutPage';
+import EditWorkoutPageLogicLayer from './edit-workout-page-logic-layer';
 
 const editWithDataProps = {
   id: mockWorkoutList.id,
@@ -42,7 +40,7 @@ const renderEditNotFound = (): ReturnType<typeof renderWithPageRouter> =>
   });
 
 const meta = {
-  title: storyTitle,
+  title: 'Pages/EditWorkoutPage',
   component: EditWorkoutPageLogicLayer,
 } satisfies Meta<typeof EditWorkoutPageLogicLayer>;
 

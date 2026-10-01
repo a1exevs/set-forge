@@ -1,10 +1,10 @@
-import { getAccessToken } from 'src/shared/api/access-token.store';
-import { getApiBaseUrl } from 'src/shared/api/api-base-url';
-import type { CommonResponseEnvelope } from 'src/shared/api/common-response.types';
-import { refreshAccessToken } from 'src/shared/api/refresh-access-token';
-import { notifySessionExpired } from 'src/shared/api/session-expired';
+import { getAccessToken } from './access-token-store';
+import { getApiBaseUrl } from './api-base-url';
+import type { CommonResponseEnvelope } from './common-response';
+import { refreshAccessToken } from './refresh-access-token';
+import { notifySessionExpired } from './session-expired';
 
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export type ApiRequestOptions = {
   method?: HttpMethod;

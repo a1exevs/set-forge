@@ -1,20 +1,12 @@
-import type { WorkoutList, WorkoutSession } from '@entities';
-import confetti from 'canvas-confetti';
 import { FC, useEffect, useRef, useState } from 'react';
 
-import { toastError, useConfirm } from '@shared';
+import type { WorkoutList } from '@entities/workout-list';
+import { countCompletedExercises, isSessionFullyComplete, type WorkoutSession } from '@entities/workout-session';
+import { hasRemainingSets } from '@entities/workout-session-exercise';
+import { toastError, useConfirm } from '@shared/lib';
 
-import WorkoutModePage from 'src/pages/workout-mode/ui/workout-mode-page';
-
-const fireWorkoutCompleteConfetti = (): void => {
-  void confetti({ particleCount: 110, spread: 72, origin: { y: 0.62 } });
-  void confetti({ particleCount: 70, angle: 55, spread: 58, origin: { x: 0, y: 0.62 } });
-  void confetti({ particleCount: 70, angle: 125, spread: 58, origin: { x: 1, y: 0.62 } });
-};
-
-const isSessionFullyComplete = (session: WorkoutSession): boolean =>
-  session.exercises.length > 0 &&
-  session.exercises.every(exercise => exercise.sets > 0 && exercise.completedSets === exercise.sets);
+import WorkoutModePage from './workout-mode-page';
+import { fireWorkoutCompleteConfetti } from '../lib/fire-workout-complete-confetti';
 
 type Props = {
   workoutList: WorkoutList | null | undefined;
@@ -75,7 +67,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
       return;
     }
 
-    if (exercise.completedSets >= exercise.sets) {
+    if (!hasRemainingSets(exercise)) {
       return;
     }
 
@@ -155,7 +147,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     }
 
     const totalExercises = session.exercises.length;
-    const completedExercises = session.exercises.filter(ex => ex.sets > 0 && ex.completedSets === ex.sets).length;
+    const completedExercises = countCompletedExercises(session);
     const overallProgress = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0;
 
     return { totalExercises, completedExercises, overallProgress };

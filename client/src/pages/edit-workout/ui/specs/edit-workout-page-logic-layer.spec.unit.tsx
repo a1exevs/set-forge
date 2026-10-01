@@ -1,15 +1,17 @@
-import type { WorkoutList } from '@entities';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import EditWorkoutPageLogicLayer from 'src/pages/edit-workout/ui/edit-workout-page-logic-layer';
+import type { WorkoutList } from '@entities/workout-list';
+
+import EditWorkoutPageLogicLayer from '../edit-workout-page-logic-layer';
 
 const confirmDialogMock = jest.fn();
 const navigateMock = jest.fn();
 const toastSuccessMock = jest.fn();
 const toastErrorMock = jest.fn();
 
-jest.mock('@shared', () => ({
+jest.mock('@shared/lib', () => ({
+  ...jest.requireActual('@shared/lib'),
   useConfirm: () => confirmDialogMock,
   toastError: (...args: unknown[]): void => toastErrorMock(...args),
   toastSuccess: (...args: unknown[]): void => toastSuccessMock(...args),
@@ -19,8 +21,12 @@ jest.mock('@tanstack/react-router', () => ({
   useNavigate: () => navigateMock,
 }));
 
-jest.mock('@widgets', () => ({
+jest.mock('@shared/ui', () => ({
+  ...jest.requireActual('@shared/ui'),
   NotFoundMessage: ({ title }: { title: string }) => <div>{title}</div>,
+}));
+
+jest.mock('@widgets/workout-list-form', () => ({
   WorkoutListForm: ({
     onSubmit,
     onCancel,

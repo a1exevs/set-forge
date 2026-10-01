@@ -1,8 +1,3 @@
-export {
-  muscleGroupLabels,
-  muscleGroups,
-  type MuscleGroup,
-  type UpdateExerciseDto,
-  type WorkoutExercise,
-} from 'src/entities/workout-exercise/model';
-export { WorkoutExerciseCard } from 'src/entities/workout-exercise/ui';
+export { muscleGroupLabels, muscleGroups } from './model/muscle-group-labels';
+export type { MuscleGroup, WorkoutExercise } from './model/workout-exercise';
+export { default as WorkoutExerciseCard } from './ui/workout-exercise-card/workout-exercise-card';

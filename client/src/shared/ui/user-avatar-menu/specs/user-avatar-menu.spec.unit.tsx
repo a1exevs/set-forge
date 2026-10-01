@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import UserAvatarMenu from 'src/shared/ui/user-avatar-menu/user-avatar-menu';
+import UserAvatarMenu from '../user-avatar-menu';
 
 describe('UserAvatarMenu', () => {
   it('renders letter and opens menu', async () => {

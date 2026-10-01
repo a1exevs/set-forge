@@ -1,18 +1,28 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
-
-import type { CurrentUser } from 'src/entities/session/api/session-api';
 import {
+  useMutation,
+  type UseMutationResult,
+  useQuery,
+  useQueryClient,
+  type UseQueryResult,
+} from '@tanstack/react-query';
+
+import type { CurrentUser } from './current-user';
+import { sessionQueryKeys } from './session-keys';
+import {
+  type AuthData,
   deleteAccount,
   deleteLogout,
   fetchCurrentUser,
+  getCaptchaUrl,
   patchDocumentsAcceptance,
   postLogin,
   postRegistration,
-} from 'src/entities/session/api/session-api';
-import { sessionQueryKeys } from 'src/entities/session/model/session-keys';
+} from '../api/session-api';
 
-export function useCurrentUserQuery(enabled: boolean) {
+// Session mutations own the session cache only. Where the user goes next (home, redirect target, /login) is the
+// caller's flow — see pages/auth, pages/profile and features/logout.
+
+export function useCurrentUserQuery(enabled: boolean): UseQueryResult<CurrentUser | null> {
   return useQuery<CurrentUser | null>({
     queryKey: sessionQueryKeys.me,
     queryFn: fetchCurrentUser,
@@ -20,79 +30,55 @@ export function useCurrentUserQuery(enabled: boolean) {
   });
 }
 
-type LoginVars = { email: string; password: string; captcha?: string; redirectTo?: string };
+type LoginVars = { email: string; password: string; captcha?: string };
 type RegisterVars = {
   email: string;
   password: string;
   consent: boolean;
   termsAccepted: boolean;
-  redirectTo?: string;
 };
 
-export function useLoginMutation() {
-  const navigate = useNavigate();
+export function useLoginMutation(): UseMutationResult<AuthData, Error, LoginVars> {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: LoginVars) => {
-      const { redirectTo: _r, ...rest } = vars;
-      return postLogin(rest.email, rest.password, rest.captcha);
-    },
-    onSuccess: async (_data, vars) => {
+    mutationFn: async ({ email, password, captcha }: LoginVars) => postLogin(email, password, captcha),
+    onSuccess: async () => {
       const user = await fetchCurrentUser();
       if (user) {
         qc.setQueryData(sessionQueryKeys.me, user);
-      }
-      const target =
-        vars.redirectTo && vars.redirectTo.startsWith('/') && !vars.redirectTo.startsWith('//') ? vars.redirectTo : '/';
-      if (target === '/') {
-        await navigate({ to: '/' });
-      } else {
-        window.location.assign(`${window.location.origin}${target}`);
       }
     },
   });
 }
 
-export function useRegisterMutation() {
-  const navigate = useNavigate();
+export function useRegisterMutation(): UseMutationResult<AuthData, Error, RegisterVars> {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: RegisterVars) => {
-      const { redirectTo: _r, ...rest } = vars;
-      return postRegistration(rest.email, rest.password, rest.consent, rest.termsAccepted);
-    },
-    onSuccess: async (_data, vars) => {
+    mutationFn: async ({ email, password, consent, termsAccepted }: RegisterVars) =>
+      postRegistration(email, password, consent, termsAccepted),
+    onSuccess: async () => {
       const user = await fetchCurrentUser();
       if (user) {
         qc.setQueryData(sessionQueryKeys.me, user);
-      }
-      const target =
-        vars.redirectTo && vars.redirectTo.startsWith('/') && !vars.redirectTo.startsWith('//') ? vars.redirectTo : '/';
-      if (target === '/') {
-        await navigate({ to: '/' });
-      } else {
-        window.location.assign(`${window.location.origin}${target}`);
       }
     },
   });
 }
 
-export function useLogoutMutation() {
-  const navigate = useNavigate();
+export function useLogoutMutation(): UseMutationResult<void, Error, void> {
   const qc = useQueryClient();
 
   return useMutation({
     mutationFn: deleteLogout,
     onSettled: () => {
       qc.clear();
-      void navigate({ to: '/login' });
     },
   });
 }
 
-export function useAcceptDocumentsMutation() {
+export function useAcceptDocumentsMutation(): UseMutationResult<CurrentUser, Error, void> {
   const qc = useQueryClient();
 
   return useMutation({
@@ -103,8 +89,7 @@ export function useAcceptDocumentsMutation() {
   });
 }
 
-export function useDeleteAccountMutation() {
-  const navigate = useNavigate();
+export function useDeleteAccountMutation(): UseMutationResult<void, Error, void> {
   const qc = useQueryClient();
 
   return useMutation({
@@ -112,7 +97,11 @@ export function useDeleteAccountMutation() {
     onSettled: () => {
       // The account is gone: drop every cached query (profile, workout lists, sessions, history).
       qc.clear();
-      void navigate({ to: '/login' });
     },
   });
+}
+
+/** Loads a fresh captcha image URL (after the server answered a login with "captcha required"). */
+export function useCaptchaUrlMutation(): UseMutationResult<string, Error, void> {
+  return useMutation({ mutationFn: getCaptchaUrl });
 }

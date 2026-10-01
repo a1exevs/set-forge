@@ -1,2 +1,2 @@
-export { default as MainTabsBar } from 'src/widgets/main-tabs-bar/ui/main-tabs-bar';
-export { MAIN_TAB_ROUTES } from 'src/widgets/main-tabs-bar/model/main-tab-routes';
+export { useMainTabSwipe } from './model/use-main-tab-swipe';
+export { default as MainTabsBar } from './ui/main-tabs-bar-logic-layer';

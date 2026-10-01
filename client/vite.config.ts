@@ -41,15 +41,13 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       TanStackRouterVite({
-        routesDirectory: './src/app/model/routes',
-        generatedRouteTree: './src/route-tree.gen.ts',
+        routesDirectory: './src/app/routes',
+        generatedRouteTree: './src/app/router/route-tree.gen.ts',
       }),
       react(),
     ],
     resolve: {
       alias: {
-        src: path.resolve(__dirname, './src'),
-        '@app': path.resolve(__dirname, './src/app'),
         '@pages': path.resolve(__dirname, './src/pages'),
         '@widgets': path.resolve(__dirname, './src/widgets'),
         '@features': path.resolve(__dirname, './src/features'),

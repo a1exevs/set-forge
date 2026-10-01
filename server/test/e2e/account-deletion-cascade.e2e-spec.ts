@@ -22,6 +22,7 @@ import { WorkoutSession } from '@workout-sessions/workout-session.model';
  *   users → refreshTokens
  *   users → users_roles
  */
+// @invariant session/deletion-cascade
 describe('Account deletion cascade', () => {
   let app: INestApplication;
 

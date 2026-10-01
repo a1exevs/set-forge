@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 
-import NumericField from 'src/shared/ui/numeric-field/numeric-field-logic-layer';
+import NumericField from '../numeric-field-logic-layer';
 
 describe('NumericField', () => {
   it('matches snapshot for decimal with value', () => {

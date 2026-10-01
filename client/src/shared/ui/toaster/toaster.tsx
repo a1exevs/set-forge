@@ -1,12 +1,15 @@
 import { FC } from 'react';
 import { Toaster as SonnerToaster } from 'sonner';
 
-import { useThemeStore } from 'src/shared/model';
-import classes from 'src/shared/ui/toaster/toaster.module.scss';
+import type { Theme } from '@shared/lib';
 
-const Toaster: FC = () => {
-  const theme = useThemeStore.use.theme();
+import classes from './toaster.module.scss';
 
+type Props = {
+  theme: Theme;
+};
+
+const Toaster: FC<Props> = ({ theme }) => {
   return (
     <SonnerToaster
       theme={theme}

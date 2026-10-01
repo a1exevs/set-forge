@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
-import IconButton from 'src/shared/ui/icon-button/icon-button';
+import IconButton from '../icon-button';
 
 jest.mock('@tanstack/react-router', () => ({
   Link: ({

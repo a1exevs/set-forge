@@ -1,6 +1,6 @@
-import type { WorkoutSession } from '@entities';
+import type { WorkoutSession } from '@entities/workout-session';
 
-export const mockWorkoutSession: WorkoutSession = {
+const mockWorkoutSession: WorkoutSession = {
   id: 'sess-1',
   workoutListId: 'list-1',
   workoutListName: 'Push Day',
@@ -54,3 +54,15 @@ export const mockWorkoutSessions: WorkoutSession[] = [
     ],
   },
 ];
+
+/** Workout mode mid-session: the first exercise done, the second half-way. */
+export const mockActiveWorkoutSession: WorkoutSession = {
+  ...mockWorkoutSession,
+  id: 'sess-active',
+  status: 'active',
+  finishedAt: null,
+  exercises: mockWorkoutSession.exercises.map((exercise, index) => ({
+    ...exercise,
+    completedSets: index === 0 ? exercise.sets : 1,
+  })),
+};

@@ -2,8 +2,6 @@ import type { Meta } from '@storybook/react';
 import { createMemoryHistory, createRootRoute, createRouter, RouterProvider } from '@tanstack/react-router';
 import type { ReactElement } from 'react';
 
-import { ConfirmDialogProvider } from '@shared';
-import { WorkoutListForm } from '@widgets';
 import {
   buildDesktop4KStoryObj,
   buildDesktopStoryObj,
@@ -11,10 +9,12 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 
-const storyTitle = 'Widgets/WorkoutListForm';
+import { ConfirmDialogProvider } from '@shared/ui';
+
+import WorkoutListForm from './workout-list-form-logic-layer';
 
 const meta = {
-  title: storyTitle,
+  title: 'Widgets/WorkoutListForm',
   component: WorkoutListForm,
 } satisfies Meta<typeof WorkoutListForm>;
 

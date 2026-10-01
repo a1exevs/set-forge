@@ -1,1 +1,1 @@
-export { HomePage } from 'src/pages/home/ui';
+export { default as HomePage } from './ui/home-page-data-layer';

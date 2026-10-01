@@ -192,13 +192,18 @@ git checkout v1.0.0   # replace with the tag you need
 
 ## 8. Configure environment variables
 
-You need **two** files for production (plus optional `client/.env` for local Vite dev only). Copy the templates and edit the values.
+You need **two** files for production (plus optional `client/.env` for local Vite dev only). Create both from the templates in one go, then edit the values:
+
+```bash
+cd ~/set-forge
+npm run setup:env -- --prod     # .env + server/.production.env from their examples; never overwrites
+```
+
+The script ([`scripts/setup-env.sh`](scripts/setup-env.sh)) only needs `npm` and `bash` — no `npm install`. Run it again after editing: it checks that `MYSQL_USER` / `MYSQL_PASSWORD` / `MYSQL_DATABASE` in the root `.env` match `MYSQL_USER` / `MYSQL_PASSWORD` / `MYSQL_DB` in `server/.production.env` and that `MYSQL_HOST` is `mysql`, printing key names only. `npm run setup:env -- --prod --fix` copies the root MySQL values into the server file.
 
 ### 8.1. Root `.env`
 
 ```bash
-cd ~/set-forge
-cp .env.example .env
 nano .env
 ```
 
@@ -241,7 +246,6 @@ VITE_PRIVACY_CONTACT_EMAIL=privacy@set-forge.example.com
 ### 8.2. `server/.production.env`
 
 ```bash
-cp server/.production.env.example server/.production.env
 nano server/.production.env
 ```
 
@@ -275,7 +279,7 @@ Generate secrets:
 openssl rand -hex 32
 ```
 
-`MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` must match the root `.env`.
+`MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DB` must match the root `.env` — verify with `npm run setup:env -- --prod` (see the start of this section).
 
 ### 8.3. Legal documents & privacy
 
@@ -289,11 +293,11 @@ npm run prod:up   # rebuilds images (client-prod picks up the new build args)
 
 **Document versions (server, runtime).** `TERMS_VERSION` and `PRIVACY_VERSION` (`server/.production.env`, default `1`) record which version a user accepted. When you change a document materially:
 
-1. Update the document text (`client/src/pages/privacy/model/privacy-policy-content.ts` or `.../terms/model/terms-content.ts`) and bump its `*_EFFECTIVE_DATE`.
+1. Update the document text (`client/src/pages/privacy/config/privacy-policy-content.ts` or `.../terms/config/terms-content.ts`) and bump its `*_EFFECTIVE_DATE`.
 2. Increment the matching `TERMS_VERSION` / `PRIVACY_VERSION` in `server/.production.env`.
 3. Restart `server-prod` (`npm run prod:up`). Users who accepted an older version are shown a blocking re-consent gate on their next visit and must re-accept or log out.
 
-See the [personal-data-compliance rule](.cursor/rules/personal-data-compliance.mdc) for the full checklist.
+See the [personal-data-compliance rule](.claude/rules/personal-data-compliance.md) for the full checklist.
 
 ---
 

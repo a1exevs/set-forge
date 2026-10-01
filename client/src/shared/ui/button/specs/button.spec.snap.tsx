@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 
-import Button from 'src/shared/ui/button/button';
+import Button from '../button';
 
 describe('Button', () => {
   it('matches snapshot for default', () => {

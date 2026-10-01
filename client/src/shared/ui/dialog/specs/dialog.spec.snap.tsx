@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 
-import Dialog from 'src/shared/ui/dialog/dialog';
+import Dialog from '../dialog';
 
 describe('Dialog', () => {
   it('matches snapshot when open', () => {

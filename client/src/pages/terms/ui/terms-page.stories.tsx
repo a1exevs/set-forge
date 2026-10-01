@@ -8,9 +8,7 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
-import TermsPage from 'src/pages/terms/ui/terms-page';
-
-const storyTitle = 'Pages/TermsPage';
+import TermsPage from './terms-page';
 
 const renderTermsPage = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
@@ -19,7 +17,7 @@ const renderTermsPage = (): ReturnType<typeof renderWithPageRouter> =>
   });
 
 const meta = {
-  title: storyTitle,
+  title: 'Pages/TermsPage',
   component: TermsPage,
 } satisfies Meta<typeof TermsPage>;
 

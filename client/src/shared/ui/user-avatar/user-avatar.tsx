@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import classes from 'src/shared/ui/user-avatar/user-avatar.module.scss';
+import classes from './user-avatar.module.scss';
 
 type Props = {
   letter: string;

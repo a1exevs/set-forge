@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import Dialog from 'src/shared/ui/dialog/dialog';
+import Dialog from '../dialog';
 
 describe('Dialog', () => {
   describe('rendering', () => {

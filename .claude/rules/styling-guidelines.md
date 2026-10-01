@@ -1,0 +1,46 @@
+---
+description: Styling — SCSS modules next to components, camelCase classes, variables, no inline styles
+paths:
+  - "client/**"
+---
+
+# Styling Guidelines
+
+Component styles are SCSS modules next to the component; global styles live in `client/src/app/styles/global.scss`.
+
+## SCSS modules
+
+- `component-name.module.scss` sits in the same directory as the component; components in `shared/ui/` have their own.
+- Import as `classes` by relative path: `import classes from './component-name.module.scss';` (never `src/...`).
+- `variables.scss` is injected into every stylesheet by Vite (`css.preprocessorOptions.scss.additionalData`) — don't
+  `@use` it. `@use` between files of `shared/ui/styles/` is relative (`@use './themes';`).
+
+## Class naming
+
+camelCase in `.module.scss`: `.container`, `.primaryButton`, `.cardHeader` — not `.primary-button`.
+
+## Variables
+
+Use the variables of `client/src/shared/ui/styles/variables.scss` (`$spacing-*`, `$primary-color`, `$radius-*`,
+`$shadow-*`, `$font-size-*`, `$z-*`) instead of literal values.
+
+## Patterns
+
+- Nesting: `&:hover`, `&.modifier`, `&Header`.
+- Several / conditional classes: template literals with `classes.x`, `isActive ? classes.active : ''`.
+- Responsive: `@media (min-width: 768px)`; layout with Flexbox / Grid; transitions `transition: all 0.2s ease-in-out`.
+
+## No inline styles
+
+- No `style` attribute. Stories use the wrappers of `client/.storybook/showcase.tsx` or a `*.stories.module.scss`
+  (see storybook).
+- A runtime value (a progress width, a caller-given colour) reaches the stylesheet as a CSS custom property through
+  `cssVars` from `@shared/lib`: `style={cssVars({ '--progress': `${n}%` })}` + `width: var(--progress, 0%);`.
+
+## Enforcement
+
+| Rule | Checked by |
+|---|---|
+| `style` only via `cssVars()` in `ui` segments | `npm run client:lint` · ESLint `no-restricted-syntax` · `client/linter/rules/ui-segment-rule.ts` |
+| SCSS modules imported by relative path, no `src/...` | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
+| camelCase classes, variables instead of literals, module next to the component | ❌ review |

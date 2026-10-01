@@ -192,6 +192,7 @@ describe('UsersService', () => {
   });
 
   describe('UsersService - updateDocumentAcceptance', () => {
+    // @invariant session/acceptance-stamps
     it('should stamp the current document versions and acceptance time', async () => {
       const userId = 1;
       jest.spyOn(model, 'update').mockImplementation(() => Promise.resolve([1]));

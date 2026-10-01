@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { ReactNode } from 'react';
+import { createRef, type ReactNode } from 'react';
 
-import ProfilePage from 'src/pages/profile/ui/profile-page';
+import ProfilePage from '../profile-page';
 
 jest.mock('@tanstack/react-router', () => ({
   useRouterState: ({ select }: { select: (state: { location: { pathname: string } }) => string }) =>
@@ -10,22 +10,13 @@ jest.mock('@tanstack/react-router', () => ({
   Link: ({ to, children }: { to: string; children: ReactNode }) => <a href={to}>{children}</a>,
 }));
 
-jest.mock('@widgets', () => ({
+jest.mock('@widgets/main-tabs-bar', () => ({
   MainTabsBar: (): JSX.Element => <nav data-testid="main-tabs-bar" />,
-  MAIN_TAB_ROUTES: [
-    { id: 'home', to: '/' },
-    { id: 'profile', to: '/profile' },
-  ],
-  LegalFooter: (): JSX.Element => <footer data-testid="legal-footer" />,
 }));
 
-jest.mock('@shared', () => {
-  const actual = jest.requireActual<typeof import('@shared')>('@shared');
-  return {
-    ...actual,
-    useTabSwipeNavigation: () => ({ current: null }),
-  };
-});
+jest.mock('@widgets/legal-footer', () => ({
+  LegalFooter: (): JSX.Element => <footer data-testid="legal-footer" />,
+}));
 
 const noop = (): void => undefined;
 const asyncNoop = (): Promise<void> => Promise.resolve();
@@ -34,6 +25,7 @@ describe('ProfilePage', () => {
   it('renders account info, logout and delete-account buttons', () => {
     render(
       <ProfilePage
+        swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
         onLogout={noop}
@@ -57,6 +49,7 @@ describe('ProfilePage', () => {
 
     render(
       <ProfilePage
+        swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
         onLogout={onLogout}
@@ -77,6 +70,7 @@ describe('ProfilePage', () => {
 
     render(
       <ProfilePage
+        swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
         onLogout={noop}
@@ -94,6 +88,7 @@ describe('ProfilePage', () => {
   it('disables logout button while logging out', () => {
     render(
       <ProfilePage
+        swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
         onLogout={noop}
@@ -109,6 +104,7 @@ describe('ProfilePage', () => {
   it('disables delete-account button while deleting', () => {
     render(
       <ProfilePage
+        swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
         onLogout={noop}

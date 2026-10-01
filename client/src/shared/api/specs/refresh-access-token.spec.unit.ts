@@ -1,5 +1,5 @@
-import { clearAccessToken, getAccessToken } from 'src/shared/api/access-token.store';
-import { refreshAccessToken } from 'src/shared/api/refresh-access-token';
+import { clearAccessToken, getAccessToken } from '../access-token-store';
+import { refreshAccessToken } from '../refresh-access-token';
 
 const jsonOk = {
   data: { userId: 1, accessToken: 'new-token' },
@@ -24,6 +24,7 @@ describe('refreshAccessToken', () => {
     jest.resetAllMocks();
   });
 
+  // @invariant session/refresh-single-flight
   it('concurrent callers share a single fetch', async () => {
     let calls = 0;
     global.fetch = jest.fn(async () => {

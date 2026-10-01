@@ -1,13 +1,9 @@
 import { FC } from 'react';
 
-import {
-  useActiveWorkoutSessionQuery,
-  useResyncWorkoutSessionMutation,
-  useUpdateWorkoutListMutation,
-  useWorkoutQuery,
-} from '@entities';
+import { type UpdateWorkoutListDto, useUpdateWorkoutListMutation, useWorkoutQuery } from '@entities/workout-list';
+import { useActiveWorkoutSessionQuery, useResyncWorkoutSessionMutation } from '@entities/workout-session';
 
-import EditWorkoutPageLogicLayer from 'src/pages/edit-workout/ui/edit-workout-page-logic-layer';
+import EditWorkoutPageLogicLayer from './edit-workout-page-logic-layer';
 
 type Props = {
   id: string;
@@ -25,10 +21,10 @@ const EditWorkoutPageDataLayer: FC<Props> = ({ id }) => {
       id={id}
       workout={isLoading ? undefined : (workout ?? null)}
       activeSessionId={activeSession?.id ?? null}
-      updateWorkoutList={async (workoutId, dto): Promise<void> => {
+      updateWorkoutList={async (workoutId: string, dto: UpdateWorkoutListDto): Promise<void> => {
         await updateWorkoutListMutation.mutateAsync({ id: workoutId, dto });
       }}
-      resyncSession={async (sessionId): Promise<void> => {
+      resyncSession={async (sessionId: string): Promise<void> => {
         await resyncWorkoutSessionMutation.mutateAsync({ sessionId, workoutListId: id });
       }}
     />

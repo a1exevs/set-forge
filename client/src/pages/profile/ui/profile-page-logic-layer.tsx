@@ -1,8 +1,9 @@
 import { FC } from 'react';
 
-import { useConfirm } from '@shared';
+import { useConfirm } from '@shared/lib';
+import { useMainTabSwipe } from '@widgets/main-tabs-bar';
 
-import ProfilePage from 'src/pages/profile/ui/profile-page';
+import ProfilePage from './profile-page';
 
 type Props = {
   email: string;
@@ -14,6 +15,7 @@ type Props = {
 };
 
 const ProfilePageLogicLayer: FC<Props> = ({ onDeleteAccount, isDeletingAccount, ...props }) => {
+  const swipeRef = useMainTabSwipe();
   const confirmDialog = useConfirm();
 
   const handleDeleteAccount = async (): Promise<void> => {
@@ -29,7 +31,14 @@ const ProfilePageLogicLayer: FC<Props> = ({ onDeleteAccount, isDeletingAccount, 
     }
   };
 
-  return <ProfilePage {...props} onDeleteAccount={handleDeleteAccount} isDeletingAccount={isDeletingAccount} />;
+  return (
+    <ProfilePage
+      {...props}
+      swipeRef={swipeRef}
+      onDeleteAccount={handleDeleteAccount}
+      isDeletingAccount={isDeletingAccount}
+    />
+  );
 };
 
 export default ProfilePageLogicLayer;

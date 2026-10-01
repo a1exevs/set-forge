@@ -37,7 +37,7 @@ exports[`ConfirmDialog matches snapshot with custom button texts 1`] = `
             class="dialogBackdrop"
             data-headlessui-state="open"
             data-open=""
-            style="background-color: rgb(0, 0, 0);"
+            style="--dialog-backdrop: #000000;"
           />
           <div
             class="dialogOverlay"
@@ -134,7 +134,7 @@ exports[`ConfirmDialog matches snapshot with default options 1`] = `
             class="dialogBackdrop"
             data-headlessui-state="open"
             data-open=""
-            style="background-color: rgb(0, 0, 0);"
+            style="--dialog-backdrop: #000000;"
           />
           <div
             class="dialogOverlay"
@@ -224,7 +224,7 @@ exports[`ConfirmDialog matches snapshot with description 1`] = `
             class="dialogBackdrop"
             data-headlessui-state="open"
             data-open=""
-            style="background-color: rgb(0, 0, 0);"
+            style="--dialog-backdrop: #000000;"
           />
           <div
             class="dialogOverlay"
@@ -319,7 +319,7 @@ exports[`ConfirmDialog matches snapshot with hideCancelButton 1`] = `
             class="dialogBackdrop"
             data-headlessui-state="open"
             data-open=""
-            style="background-color: rgb(0, 0, 0);"
+            style="--dialog-backdrop: #000000;"
           />
           <div
             class="dialogOverlay"

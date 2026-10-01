@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 
-import type { WorkoutSessionExercise } from 'src/entities/workout-session-exercise/model/types';
-import WorkoutSessionExerciseCard from 'src/entities/workout-session-exercise/ui/workout-session-exercise-card/workout-session-exercise-card-logic-layer';
+import type { WorkoutSessionExercise } from '../../../model/workout-session-exercise';
+import WorkoutSessionExerciseCard from '../workout-session-exercise-card-logic-layer';
 
 const EXERCISE: WorkoutSessionExercise = {
   id: 'sx-1',

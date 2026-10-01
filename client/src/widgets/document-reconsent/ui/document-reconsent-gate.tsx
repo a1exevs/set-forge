@@ -1,9 +1,9 @@
 import { Link } from '@tanstack/react-router';
 import { ChangeEvent, FC } from 'react';
 
-import { Button, Dialog } from '@shared';
+import { Button, Dialog } from '@shared/ui';
 
-import classes from 'src/widgets/document-reconsent/ui/document-reconsent-gate.module.scss';
+import classes from './document-reconsent-gate.module.scss';
 
 type Props = {
   open: boolean;

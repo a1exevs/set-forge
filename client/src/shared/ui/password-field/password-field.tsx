@@ -2,8 +2,8 @@ import { Input } from '@headlessui/react';
 import { Eye, EyeOff } from 'lucide-react';
 import { ChangeEvent, FC } from 'react';
 
-import IconButton from 'src/shared/ui/icon-button/icon-button';
-import classes from 'src/shared/ui/password-field/password-field.module.scss';
+import classes from './password-field.module.scss';
+import IconButton from '../icon-button/icon-button';
 
 type Props = {
   id?: string;
