@@ -11,8 +11,6 @@ import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
 import ProfilePageLogicLayer from './profile-page-logic-layer';
 
-const storyTitle = 'Pages/ProfilePage';
-
 const renderProfilePage = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
     initialEntries: ['/profile'],
@@ -29,7 +27,7 @@ const renderProfilePage = (): ReturnType<typeof renderWithPageRouter> =>
   });
 
 const meta = {
-  title: storyTitle,
+  title: 'Pages/ProfilePage',
   component: ProfilePageLogicLayer,
 } satisfies Meta<typeof ProfilePageLogicLayer>;
 

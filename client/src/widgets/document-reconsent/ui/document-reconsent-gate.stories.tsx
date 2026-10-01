@@ -11,10 +11,8 @@ import {
 
 import DocumentReconsentGate from './document-reconsent-gate';
 
-const storyTitle = 'Widgets/DocumentReconsentGate';
-
 const meta = {
-  title: storyTitle,
+  title: 'Widgets/DocumentReconsentGate',
   component: DocumentReconsentGate,
 } satisfies Meta<typeof DocumentReconsentGate>;
 

@@ -1,119 +1,91 @@
-import type { Meta } from '@storybook/react';
-import { FC, useEffect, useState } from 'react';
+import type { Meta, StoryObj } from '@storybook/react';
+import { userEvent, within } from '@storybook/test';
+import { FC, ReactElement, useState } from 'react';
 
-import { buildDesktopStoryObj, buildMobileStoryObj, buildTabletStoryObj } from 'storybook-dir/helpers';
+import { Caption, Row, Stack, withFrame } from 'storybook-dir/showcase';
 
-import { useConfirm } from '@shared/lib';
+import { type ConfirmOptions, useConfirm } from '@shared/lib';
 
 import ConfirmDialogProvider from './confirm-dialog-provider';
-import classes from './confirm-dialog.stories.module.scss';
 import Button from '../button/button';
 
-const storyTitle = 'Shared/ConfirmDialog';
+const OPEN_LABEL = 'Open confirm dialog';
 
-const meta = {
-  title: storyTitle,
+const meta: Meta<typeof ConfirmDialogProvider> = {
+  title: 'Shared/ConfirmDialog',
   component: ConfirmDialogProvider,
-} satisfies Meta<typeof ConfirmDialogProvider>;
+  decorators: [withFrame],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Confirmation as a promise: `useConfirm()` from `@shared/lib` opens the dialog the provider renders and ' +
+          'resolves with the answer. Two buttons by default, one with `hideCancelButton`, three with `alternateText`.',
+      },
+    },
+  },
+};
 
 export default meta;
+type Story = StoryObj<typeof meta>;
 
-const ConfirmDialogOpener: FC<{ options: Parameters<ReturnType<typeof useConfirm>>[0] }> = ({ options }) => {
-  const confirmDialog = useConfirm();
-  const [result, setResult] = useState<string | null>(null);
+type OpenerProps = { options: ConfirmOptions };
 
-  const handleOpen = async (): Promise<void> => {
-    const ok = await confirmDialog(options);
-    setResult(ok ? 'Confirmed' : 'Cancelled');
-  };
+const ConfirmOpener: FC<OpenerProps> = ({ options }) => {
+  const confirm = useConfirm();
+  const [answer, setAnswer] = useState<string>('—');
 
   return (
-    <div className={classes.storyWrapper}>
-      <h1 className={classes.storyTitle}>Confirm Dialog</h1>
-      <p className={classes.storyText}>Click the button to open the confirmation dialog. Result: {result ?? '—'}</p>
-      <Button onClick={handleOpen}>Open Confirm Dialog</Button>
-    </div>
+    <Stack>
+      <Caption>Answer: {answer}</Caption>
+      <Row>
+        <Button
+          onClick={async (): Promise<void> => {
+            setAnswer(String(await confirm(options)));
+          }}
+        >
+          {OPEN_LABEL}
+        </Button>
+      </Row>
+    </Stack>
   );
 };
 
-const ConfirmDialogRenderStory: FC<{ options: Parameters<ReturnType<typeof useConfirm>>[0] }> = ({ options }) => {
-  const confirmDialog = useConfirm();
+const renderOpener = (options: ConfirmOptions) => (): ReactElement => (
+  <ConfirmDialogProvider>
+    <ConfirmOpener options={options} />
+  </ConfirmDialogProvider>
+);
 
-  useEffect((): void => {
-    confirmDialog(options);
-  }, [confirmDialog, options]);
-
-  return <div className={classes.storyWrapper} />;
+const openDialog: Story['play'] = async ({ canvasElement }): Promise<void> => {
+  await userEvent.click(within(canvasElement).getByRole('button', { name: OPEN_LABEL }));
 };
 
-const defaultOptions = {
-  title: 'Delete workout list?',
-  description: 'This action cannot be undone.',
-  confirmationText: 'Delete',
-  cancellationText: 'Cancel',
+/** Confirm or cancel: the promise resolves `true` / `false`. */
+export const Default: Story = {
+  render: renderOpener({
+    title: 'Delete workout list?',
+    description: 'This action cannot be undone.',
+    confirmationText: 'Delete',
+    cancellationText: 'Cancel',
+  }),
+  play: openDialog,
 };
 
-export const Desktop = buildDesktopStoryObj({
-  render: () => (
-    <ConfirmDialogProvider>
-      <ConfirmDialogRenderStory options={defaultOptions} />
-    </ConfirmDialogProvider>
-  ),
-});
-
-export const Tablet = buildTabletStoryObj({
-  render: () => (
-    <ConfirmDialogProvider>
-      <ConfirmDialogRenderStory options={defaultOptions} />
-    </ConfirmDialogProvider>
-  ),
-});
-
-export const Mobile = buildMobileStoryObj({
-  render: () => (
-    <ConfirmDialogProvider>
-      <ConfirmDialogRenderStory options={defaultOptions} />
-    </ConfirmDialogProvider>
-  ),
-});
-
-export const AlertStyle = buildDesktopStoryObj({
-  render: () => (
-    <ConfirmDialogProvider>
-      <ConfirmDialogRenderStory
-        options={{
-          title: 'Please enter a list name',
-          hideCancelButton: true,
-          confirmationText: 'Ok',
-        }}
-      />
-    </ConfirmDialogProvider>
-  ),
-});
-
-export const InteractiveDesktop = {
-  ...buildDesktopStoryObj({}),
-  render: () => (
-    <ConfirmDialogProvider>
-      <ConfirmDialogOpener options={defaultOptions} />
-    </ConfirmDialogProvider>
-  ),
+/** `hideCancelButton`: an alert with one way out. */
+export const Alert: Story = {
+  render: renderOpener({ title: 'Please enter a list name', confirmationText: 'Ok', hideCancelButton: true }),
+  play: openDialog,
 };
 
-export const InteractiveTablet = {
-  ...buildTabletStoryObj({}),
-  render: () => (
-    <ConfirmDialogProvider>
-      <ConfirmDialogOpener options={defaultOptions} />
-    </ConfirmDialogProvider>
-  ),
-};
-
-export const InteractiveMobile = {
-  ...buildMobileStoryObj({}),
-  render: () => (
-    <ConfirmDialogProvider>
-      <ConfirmDialogOpener options={defaultOptions} />
-    </ConfirmDialogProvider>
-  ),
+/** `alternateText` adds a third answer; the promise resolves `'confirm' | 'alternate' | 'cancel'`. */
+export const ThreeAnswers: Story = {
+  render: renderOpener({
+    title: 'Finish workout?',
+    description: 'Two exercises still have sets left.',
+    confirmationText: 'Finish',
+    alternateText: 'Discard',
+    cancellationText: 'Keep going',
+  }),
+  play: openDialog,
 };

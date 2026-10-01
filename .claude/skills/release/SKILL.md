@@ -1,10 +1,16 @@
+---
+name: release
+description: Orchestrate the full release pipeline in phases (version bump, develop → testing → main, GitHub Release, RELEASE-NOTES.md). Use when the user asks to make a release or runs /release <patch|minor|major>.
+argument-hint: "[patch|minor|major]"
+---
+
 # release
 
 Act as a Release Automation Agent for this repository. Orchestrate the full release pipeline from README "Release steps" in **phases**. Never skip ahead. After every phase that requires a manual merge (or human review), STOP and wait for the user to say continue before starting the next phase.
 
 ## Parameter
 
-Accept one required parameter: `[bump]`.
+Accept one required parameter: `[bump]` (`$1`).
 Available values: `patch`, `minor`, `major`.
 
 If missing or invalid, STOP and ask for a valid bump type. Do not guess.
@@ -20,7 +26,7 @@ Usage: `/release patch` (or `minor` / `major`).
 5. Do **not** include Selectel/deploy steps — out of scope.
 6. Before any mutating git/`gh` action in a phase, briefly state what you will do and get approval for that phase (except when the user already said "continue" into a clearly defined next phase — then execute that phase, still confirming before publish/force-push style actions).
 7. Track and reuse `vX.X.X` (without inventing a version). Prefer reading it from `client/package.json` after the bump, or from the version-increase PR/commit if resuming mid-flow.
-8. Prefer `gh` for GitHub operations. Use `required_permissions: ["all"]` when push/network/`gh` need it.
+8. Prefer `gh` for GitHub operations.
 9. When creating a release PR, always attach the matching GitHub label via `gh pr create --label …` (or `gh pr edit --add-label …` if the PR already exists without it):
    - Phase A / Phase E (`common/*` → `develop`): `common`
    - Phase B (`develop` → `testing`): `testing`
@@ -42,7 +48,7 @@ Goal: bump version and open the version-increase PR.
 
 1. Ensure working tree is clean. If not, STOP and ask the user to commit/stash.
 2. Confirm bump type with the user if not already explicit in the command args.
-3. Run: `npm update-version:<bump>`
+3. Run: `npm run update-version:<bump>`
    - This script checks out `common/version-increase`, resets to `origin/develop`, bumps, commits, and force-pushes with lease.
 4. Read the new version from `client/package.json` → `vX.X.X`.
 5. Create PR (if one is not already open):
@@ -136,5 +142,3 @@ When the user says `continue`, `merged`, `done`, or similar:
 - If `update-version` fails (dirty tree, push rejected, etc.), show the error and STOP; do not invent a workaround that skips the script.
 - If a promote PR already exists, link it instead of opening a duplicate.
 - If tag `vX.X.X` already exists on a different commit, STOP and ask the user how to proceed.
-
-This command will be available in chat with /release <patch|minor|major>

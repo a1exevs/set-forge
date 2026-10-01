@@ -1,7 +1,7 @@
 ---
 description: React component typing — FC<Props>, named props types, typed inline JSX callbacks
-globs: client/**
-alwaysApply: false
+paths:
+  - "client/**"
 ---
 
 # Component Typing

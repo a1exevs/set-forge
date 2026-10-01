@@ -10,8 +10,6 @@ import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
 import PrivacyPage from './privacy-page';
 
-const storyTitle = 'Pages/PrivacyPage';
-
 const renderPrivacyPage = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
     initialEntries: ['/privacy'],
@@ -19,7 +17,7 @@ const renderPrivacyPage = (): ReturnType<typeof renderWithPageRouter> =>
   });
 
 const meta = {
-  title: storyTitle,
+  title: 'Pages/PrivacyPage',
   component: PrivacyPage,
 } satisfies Meta<typeof PrivacyPage>;
 

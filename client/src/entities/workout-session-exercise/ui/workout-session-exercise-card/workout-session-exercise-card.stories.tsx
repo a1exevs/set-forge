@@ -10,8 +10,6 @@ import {
 import WorkoutSessionExerciseCard from './workout-session-exercise-card-logic-layer';
 import type { WorkoutSessionExercise } from '../../model/workout-session-exercise';
 
-const storyTitle = 'Entities/WorkoutSessionExerciseCard';
-
 const IN_PROGRESS_EXERCISE: WorkoutSessionExercise = {
   id: 'sx-1',
   sourceExerciseId: 'ex-1',
@@ -29,7 +27,7 @@ const COMPLETED_EXERCISE: WorkoutSessionExercise = {
 };
 
 const meta = {
-  title: storyTitle,
+  title: 'Entities/WorkoutSessionExerciseCard',
   component: WorkoutSessionExerciseCard,
   args: {
     exercise: IN_PROGRESS_EXERCISE,

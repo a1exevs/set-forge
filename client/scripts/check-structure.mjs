@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Structural FSD checks that neither ESLint nor Steiger cover (see .cursor/rules/fsd-architecture.mdc):
+// Structural FSD checks that neither ESLint nor Steiger cover (see .claude/rules/fsd-architecture.md):
 //   1. `src` root holds only the layers and `vite-env.d.ts` (the entry point is `app/entrypoint/main.tsx`);
 //   2. slice root holds only `index.ts`, segment folders and (entities) the `@x` folder;
 //   3. `index.ts`: required for every slice and every `shared` segment (their public API); forbidden in layers,

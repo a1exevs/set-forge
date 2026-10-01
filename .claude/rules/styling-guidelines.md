@@ -1,7 +1,7 @@
 ---
 description: Styling — SCSS modules next to components, camelCase classes, variables, no inline styles
-globs: client/**
-alwaysApply: false
+paths:
+  - "client/**"
 ---
 
 # Styling Guidelines
@@ -32,7 +32,8 @@ Use the variables of `client/src/shared/ui/styles/variables.scss` (`$spacing-*`,
 
 ## No inline styles
 
-- No `style` attribute, except Storybook wrappers in `*.stories.tsx`.
+- No `style` attribute. Stories use the wrappers of `client/.storybook/showcase.tsx` or a `*.stories.module.scss`
+  (see storybook).
 - A runtime value (a progress width, a caller-given colour) reaches the stylesheet as a CSS custom property through
   `cssVars` from `@shared/lib`: `style={cssVars({ '--progress': `${n}%` })}` + `width: var(--progress, 0%);`.
 

@@ -1,4 +1,5 @@
 import eslintJs from '@eslint/js';
+import { defineConfig } from 'eslint/config';
 import prettierConfig from 'eslint-config-prettier';
 import storyBookPlugin from 'eslint-plugin-storybook';
 import globals from 'globals';
@@ -21,7 +22,7 @@ import { uiLayerFiles, uiRule } from './linter/rules/ui-segment-rule';
 import unusedVarsRule from './linter/rules/unused-vars-rule';
 import settings from './linter/settings';
 
-export default tsEslint.config(
+export default defineConfig(
   {
     ignores: ['src/app/router/route-tree.gen.ts'],
   },
@@ -136,6 +137,14 @@ export default tsEslint.config(
     rules: {
       'no-restricted-imports': 'off',
       '@typescript-eslint/ban-ts-comment': ['error', { 'ts-ignore': 'allow-with-description' }],
+    },
+  },
+  {
+    // Node CLI scripts (plain JavaScript): node globals, no TypeScript return types
+    files: ['scripts/**/*.mjs'],
+    languageOptions: { globals: { ...globals.node } },
+    rules: {
+      '@typescript-eslint/explicit-function-return-type': 'off',
     },
   },
 );

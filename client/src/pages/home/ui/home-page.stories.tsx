@@ -15,8 +15,6 @@ import { formatDate } from '@shared/lib';
 
 import HomePageLogicLayer from './home-page-logic-layer';
 
-const storyTitle = 'Pages/HomePage';
-
 const renderHomePage = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
     initialEntries: ['/'],
@@ -39,7 +37,7 @@ const renderHomePage = (): ReturnType<typeof renderWithPageRouter> =>
   });
 
 const meta = {
-  title: storyTitle,
+  title: 'Pages/HomePage',
   component: HomePageLogicLayer,
 } satisfies Meta<typeof HomePageLogicLayer>;
 

@@ -52,5 +52,5 @@
     "**/*.spec.*",
     "**/specs/**"
   ],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.linter.json" }]
 }

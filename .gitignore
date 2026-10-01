@@ -16,6 +16,13 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+.claude/*
+!.claude/launch.json
+!.claude/settings.json
+!.claude/rules/
+!.claude/skills/
+# Per-branch agent artifacts (code-review log read by /pr) — local to the machine
+.runtime/
 .idea
 .DS_Store
 *.suo

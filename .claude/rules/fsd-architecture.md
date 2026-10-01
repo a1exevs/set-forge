@@ -1,7 +1,7 @@
 ---
 description: Feature-Sliced Design (React) — layers, slices, segments, where code goes, public API, @x, import rules
-globs: client/**
-alwaysApply: false
+paths:
+  - "client/**"
 ---
 
 # Feature-Sliced Design
@@ -87,7 +87,7 @@ Five standard segments in slices. Names describe the **purpose**, never the esse
 
 | Segment | Put here | Examples |
 |---|---|---|
-| `ui/` | components (`.tsx` + `.module.scss`, stories, specs) | `home-page-logic-layer`, `workout-exercise-card` |
+| `ui/` | components (`.tsx` + `.module.scss`, one `*.stories.tsx` per component — see storybook, specs) | `home-page-logic-layer`, `workout-exercise-card` |
 | `model/` | domain types, query hooks and keys, stores, business logic | `workout-list`, `use-workout-queries` |
 | `api/` | requests to the backend, mapping responses | `workout-list-api` |
 | `lib/` | helpers used inside the slice, pure utilities | `history-formatters` |
@@ -109,8 +109,9 @@ same slice — `config/`, `model/` or `lib/`, named by purpose (`config/muscle-g
 
 - components: `const X: FC<Props> = ...`;
 - props types: `type Props`, `type EditProps` (`*Props`);
-- in `shared/ui` only: exported types of the component's contract (`MenuButtonItem`, `SelectOption`, `LegalContent`) —
-  shared has no model to put them in.
+- in `shared/ui` only: exported types of the component's contract (`MenuButtonItem`, `SelectOption`, `LegalContent`).
+  `shared/model` is for domain-agnostic state and types shared by several consumers, not for the shape of one
+  component's props — that contract stays next to the component.
 
 Hooks are logic → `model/` (slices) or `shared/lib` (a hook of a shared component, e.g. `useConfirm`).
 

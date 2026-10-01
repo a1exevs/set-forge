@@ -9,10 +9,8 @@ import {
 
 import WorkoutExerciseCard from './workout-exercise-card';
 
-const storyTitle = 'Entities/WorkoutExerciseCard';
-
 const meta = {
-  title: storyTitle,
+  title: 'Entities/WorkoutExerciseCard',
   component: WorkoutExerciseCard,
   args: {
     exercise: {

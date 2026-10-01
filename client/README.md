@@ -39,14 +39,21 @@ From the **repository root**, use the `client:*` aliases (see [root README](../R
 | `npm run build` | `tsc && vite build` |
 | `npm run preview` | Preview production build (`client/dist`) |
 | `npm run format` / `npm run format:check` | Prettier |
-| `npm run lint` / `npm run lint:fix` | ESLint |
+| `npm run lint` | Structure, stories, rules, linter config types, ESLint, Steiger, knip |
+| `npm run lint:structure` | FSD layers, slices, segments, public API, names by purpose, kebab-case |
+| `npm run lint:stories` | A stories file next to every component, titles by FSD layer, pages in every viewport |
+| `npm run lint:rules` | Claude Code rules in `.claude/rules` have one shape and their Enforcement references resolve |
+| `npm run lint:config` | Types of `eslint.config.ts` and `linter/` (`tsconfig.linter.json`) |
+| `npm run lint:eslint` / `npm run lint:eslint:fix` | ESLint (`:fix` applies its autofixes) |
+| `npm run lint:fsd` | Steiger (FSD boundaries) |
+| `npm run lint:unused` | knip (unused files, exports, dependencies) |
 | `npm run test:unit` / `npm run test:unit-cov` | Jest unit tests |
 | `npm run test:snap` / `npm run test:snap-cov` / `npm run test:snap-update` | Snapshot tests |
 | `npm run test:e2e` | Playwright e2e (headless in CI; headed locally via config) |
 | `npm run test:e2e:headed` | Playwright with a visible browser, one worker |
 | `npm run test:e2e:ui` | Playwright UI mode (pick and watch tests) |
 | `npm run test:e2e:debug` | Playwright debug (step through with inspector) |
-| `npm test` | Unit + snap + e2e |
+| `npm run test` | Unit + snap + e2e |
 | `npm run storybook` / `npm run build-storybook` | Storybook |
 | `npm run chromatic` | Chromatic |
 | `npm run docs` | TypeDoc |

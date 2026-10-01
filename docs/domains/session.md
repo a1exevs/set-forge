@@ -2,7 +2,7 @@
 
 Who the user is and what they agreed to: registration with separate consents, login (with a captcha after failed
 attempts), a short-lived access token refreshed through an httpOnly cookie, route guards, re-acceptance of changed legal
-documents, logout and account deletion. Legal duties behind this domain: `.cursor/rules/personal-data-compliance.mdc`.
+documents, logout and account deletion. Legal duties behind this domain: `.claude/rules/personal-data-compliance.md`.
 
 ## Glossary
 
@@ -73,4 +73,4 @@ confirmation first.
 
 ## Related
 
-- `.cursor/rules/personal-data-compliance.mdc` — what to update when personal data or the documents change.
+- `.claude/rules/personal-data-compliance.md` — what to update when personal data or the documents change.

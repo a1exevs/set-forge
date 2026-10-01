@@ -43,5 +43,6 @@
     "test-environment.ts",
     "linter",
     "eslint.config.ts"
-  ]
+  ],
+  "references": [{ "path": "./tsconfig.linter.json" }]
 }
