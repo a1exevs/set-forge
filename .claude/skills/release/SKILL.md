@@ -24,7 +24,7 @@ Usage: `/release patch` (or `minor` / `major`).
 3. Do **not** merge PRs yourself unless the user explicitly asks. After creating a PR, report the URL and wait.
 4. Do **not** push to a protected branch (`/branches` §1) directly.
 5. Do **not** include Selectel/deploy steps — out of scope.
-6. Before any mutating git/`gh` action in a phase, briefly state what you will do and get approval for that phase (except when the user already said "continue" into a clearly defined next phase — then execute that phase, still confirming before publish/force-push style actions). Branch operations — switch, create, reset, push, force-push, stash, including the ones `update-version` runs — always go through the gate of `/branches` §4: a "continue" does not approve them; name them and wait for a yes.
+6. Before any mutating git/`gh` action in a phase, briefly state what you will do and get approval for that phase (except when the user already said "continue" into a clearly defined next phase — then execute that phase, still confirming before publish/force-push style actions). Branch operations (`/branches` §4), including the ones `update-version` runs, always go through its gate: a "continue" does not approve them; name them and wait for a yes.
 7. Track and reuse `vX.X.X` (without inventing a version). Prefer reading it from `client/package.json` after the bump, or from the version-increase PR/commit if resuming mid-flow.
 8. Prefer `gh` for GitHub operations.
 9. When creating a release PR, always attach the label its phase lists (the labels are defined in `/branches` §2) via `gh pr create --label …` (or `gh pr edit --add-label …` if the PR already exists without it).
