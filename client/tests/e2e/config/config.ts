@@ -7,7 +7,7 @@ import { E2E_CLIENT_ORIGIN, E2E_CLIENT_PORT, E2E_HEALTH_URL, E2E_SERVER_ORIGIN }
 
 /**
  * Full-stack Playwright e2e: ephemeral MySQL + Nest (:5101) + Vite (:5174).
- * See tests/e2e/stack/start-api-stack.cjs.
+ * See tests/e2e/stack/start-api-stack.ts.
  */
 export default defineConfig({
   testMatch: '**/*.spec.e2e.ts',
@@ -36,7 +36,7 @@ export default defineConfig({
   // Always start a fresh stack — reusing :5101/:5174 can attach to a stale Nest without this run's MySQL.
   webServer: [
     {
-      command: 'node tests/e2e/stack/start-api-stack.cjs',
+      command: 'node tests/e2e/stack/start-api-stack.ts',
       url: E2E_HEALTH_URL,
       cwd: rootDir,
       reuseExistingServer: false,

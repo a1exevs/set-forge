@@ -56,13 +56,13 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 
 | Command | Description |
 |--------|-------------|
-| `npm run setup:env` / `npm run setup:env -- --fix` | Create the missing dev env files (`.env`, `server/.development.env`, `server/.e2e.env`) from their examples and check (or sync) the MySQL credentials between the root `.env` and `server/.development.env` ([`scripts/setup-env.sh`](scripts/setup-env.sh)) |
-| `npm run setup:env -- --prod` / `-- --prod --fix` | Same for the prod stack: `.env` + `server/.production.env` (see [`DEPLOY-SELECTEL.md`](DEPLOY-SELECTEL.md#8-configure-environment-variables)). On Windows run from Git Bash so `bash` is Git's, not WSL's |
+| `npm run setup:env` / `npm run setup:env -- --fix` | Create the missing dev env files (`.env`, `server/.development.env`, `server/.e2e.env`) from their examples and check (or sync) the MySQL credentials between the root `.env` and `server/.development.env` ([`scripts/setup-env.ts`](scripts/setup-env.ts)) |
+| `npm run setup:env -- --prod` / `-- --prod --fix` | Same for the prod stack: `.env` + `server/.production.env` (see [`DEPLOY-SELECTEL.md`](DEPLOY-SELECTEL.md#8-configure-environment-variables)) |
 | `npm run prepare` | Husky install (runs automatically after `npm install` unless `HUSKY=0`) |
-| `npm run format:root` / `npm run format:root:check` | Prettier for `scripts/**/*.{ts,tsx,mjs}` |
-| `npm run lint:root` / `npm run lint:docs` | Repo-wide checks (what CI runs): domain docs in `docs/domains` are thin and point at real code |
+| `npm run format:root` / `npm run format:root:check` | Prettier for `scripts/**/*.ts` |
+| `npm run lint:root` / `npm run lint:scripts` / `npm run lint:docs` | Repo-wide checks (what CI runs): the repo scripts type-check (`scripts/tsconfig.json`), domain docs in `docs/domains` are thin and point at real code |
 | `npm run version:patch` / `npm run version:minor` / `npm run version:major` | Bump version via `scripts/increase-version.ts` |
-| `npm run update-version:patch` / `npm run update-version:minor` / `npm run update-version:major` | Version bump branch (`scripts/update-version.sh`), run by `/release` in phase A |
+| `npm run update-version:patch` / `npm run update-version:minor` / `npm run update-version:major` | Version bump branch (`scripts/update-version.ts`), run by `/release` in phase A |
 
 ### Client (`@set-forge/client`)
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Keeps the domain docs (docs/domains/*.md) thin and pointing at real code (see .claude/rules/domain-docs.md):
 //   1. one `# Title`, then exactly Glossary, Invariants, Flows, Map (+ optional Related); at most MAX_LINES lines;
 //   2. Invariants is `| Id | Invariant |`; tests prove an invariant with `// @invariant <domain>/<id>`, and both sides
@@ -11,9 +10,8 @@
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const repoRoot = join(fileURLToPath(import.meta.url), '..', '..');
+const repoRoot = join(import.meta.dirname, '..');
 const clientDir = join(repoRoot, 'client');
 const docsDir = join(repoRoot, 'docs', 'domains');
 
@@ -26,21 +24,26 @@ const REVIEW = '❌ review';
 /** Server modules that are infrastructure, not a domain. */
 const INFRA_MODULES = new Set(['app', 'health', 'logger']);
 
-const problems = [];
-const rel = path => relative(repoRoot, path).split('\\').join('/');
-const dirs = path =>
+type Section = {
+  name: string;
+  body: string;
+};
+
+const problems: string[] = [];
+const rel = (path: string): string => relative(repoRoot, path).split('\\').join('/');
+const dirs = (path: string): string[] =>
   existsSync(path)
     ? readdirSync(path, { withFileTypes: true })
         .filter(entry => entry.isDirectory())
         .map(entry => entry.name)
     : [];
 
-const backtickedPaths = text =>
+const backtickedPaths = (text: string): string[] =>
   [...text.matchAll(/`([^`\s]+)`/g)]
-    .map(match => match[1])
+    .map(match => match[1] ?? '')
     .filter(token => PATH_PREFIXES.some(prefix => token.startsWith(prefix)));
 
-function tableRows(section, header) {
+function tableRows(section: string, header: string[]): string[][] | null {
   const rows = section
     .split('\n')
     .filter(line => line.startsWith('|'))
@@ -58,9 +61,9 @@ function tableRows(section, header) {
 }
 
 /** `## Name` sections outside fenced code: { name, body }. */
-function sections(body) {
+function sections(body: string): Section[] {
   const lines = body.split('\n');
-  const found = [];
+  const found: { name: string; start: number }[] = [];
   let fenced = false;
   lines.forEach((line, index) => {
     if (line.startsWith('```')) {
@@ -75,9 +78,9 @@ function sections(body) {
   }));
 }
 
-const mapPaths = [];
+const mapPaths: string[] = [];
 /** `<domain>/<id>` → where it is declared and whether it is marked `❌ review`. */
-const invariantsById = new Map();
+const invariantsById = new Map<string, { file: string; review: boolean }>();
 
 for (const name of existsSync(docsDir) ? readdirSync(docsDir).filter(entry => entry.endsWith('.md')) : []) {
   const path = join(docsDir, name);
@@ -137,7 +140,7 @@ for (const name of existsSync(docsDir) ? readdirSync(docsDir).filter(entry => en
       problems.push(`${file}: \`${token}\` does not exist — renamed or removed? Update the doc`);
     }
   }
-  for (const [, target] of text.matchAll(/\]\(([^)#\s]+)(#[^)]*)?\)/g)) {
+  for (const [, target = ''] of text.matchAll(/\]\(([^)#\s]+)(#[^)]*)?\)/g)) {
     if (!/^[a-z]+:/.test(target) && !existsSync(join(dirname(path), target))) {
       problems.push(`${file}: link \`${target}\` does not resolve`);
     }
@@ -147,8 +150,8 @@ for (const name of existsSync(docsDir) ? readdirSync(docsDir).filter(entry => en
 // Invariants ↔ tests: a test proves an invariant by a `// @invariant <domain>/<id>` comment. Both directions must
 // agree — a tagged invariant can't stay `❌ review`, an untagged one must say so, a tag must name a real invariant.
 const TAG = /@invariant\s+([a-z0-9-]+\/[a-z0-9-]+)/g;
-const testsById = new Map();
-function scanTags(dir) {
+const testsById = new Map<string, string[]>();
+function scanTags(dir: string): void {
   for (const entry of existsSync(dir) ? readdirSync(dir, { withFileTypes: true }) : []) {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {
@@ -157,10 +160,10 @@ function scanTags(dir) {
       }
       continue;
     }
-    if (!/\.(tsx?|cjs|mjs)$/.test(entry.name) || path.includes(join('client', 'scripts'))) {
+    if (!/\.tsx?$/.test(entry.name) || path.includes(join('client', 'scripts'))) {
       continue;
     }
-    for (const [, key] of readFileSync(path, 'utf8').matchAll(TAG)) {
+    for (const [, key = ''] of readFileSync(path, 'utf8').matchAll(TAG)) {
       if (!TEST_FILE.test(entry.name)) {
         problems.push(`${rel(path)}: \`@invariant ${key}\` outside a test file — tag the test that proves it`);
       }
@@ -193,8 +196,8 @@ for (const [key, tests] of testsById) {
 // Coverage: every place that owns domain code is mapped by some doc.
 /** Widgets that are app chrome, not part of a domain. */
 const APP_CHROME = new Set(['client/src/widgets/main-tabs-bar']);
-const serverModels = [];
-(function findModels(dir) {
+const serverModels: string[] = [];
+(function findModels(dir: string): void {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {

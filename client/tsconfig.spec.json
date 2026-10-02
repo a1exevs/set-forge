@@ -8,5 +8,5 @@
     "types": ["jest", "@testing-library/jest-dom"]
   },
   "include": ["src/vite-env.d.ts", "src/**/*.spec.*", "tests/**/*"],
-  "exclude": ["node_modules", "dist", "build", "coverage"]
+  "exclude": ["node_modules", "dist", "build", "coverage", "tests/e2e/stack/start-api-stack.ts"]
 }

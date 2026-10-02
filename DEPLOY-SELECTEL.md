@@ -162,7 +162,7 @@ Install Node.js 22 (includes npm) via the [NodeSource](https://github.com/nodeso
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt install -y nodejs
-node --version   # expect v22.x
+node --version   # expect v22.18+ (the repo scripts are TypeScript run by Node directly)
 npm --version    # expect 10.x
 ```
 
@@ -199,7 +199,7 @@ cd ~/set-forge
 npm run setup:env -- --prod     # .env + server/.production.env from their examples; never overwrites
 ```
 
-The script ([`scripts/setup-env.sh`](scripts/setup-env.sh)) only needs `npm` and `bash` — no `npm install`. Run it again after editing: it checks that `MYSQL_USER` / `MYSQL_PASSWORD` / `MYSQL_DATABASE` in the root `.env` match `MYSQL_USER` / `MYSQL_PASSWORD` / `MYSQL_DB` in `server/.production.env` and that `MYSQL_HOST` is `mysql`, printing key names only. `npm run setup:env -- --prod --fix` copies the root MySQL values into the server file.
+The script ([`scripts/setup-env.ts`](scripts/setup-env.ts)) only needs Node.js 22.18+ (§6), which runs TypeScript as is — no `npm install`. Run it again after editing: it checks that `MYSQL_USER` / `MYSQL_PASSWORD` / `MYSQL_DATABASE` in the root `.env` match `MYSQL_USER` / `MYSQL_PASSWORD` / `MYSQL_DB` in `server/.production.env` and that `MYSQL_HOST` is `mysql`, printing key names only. `npm run setup:env -- --prod --fix` copies the root MySQL values into the server file.
 
 ### 8.1. Root `.env`
 

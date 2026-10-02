@@ -4,17 +4,24 @@
   "entry": [
     "src/**/*.spec.{unit,snap}.{ts,tsx}",
     "src/**/*.stories.tsx",
-    "tests/**/*.{ts,cjs}",
+    "tests/**/*.ts",
     ".storybook/*.{ts,tsx}",
-    "scripts/*.mjs",
+    "scripts/*.ts",
     "steiger.config.ts",
   ],
-  "project": ["src/**/*.{ts,tsx}", "linter/**/*.ts", ".storybook/**/*.{ts,tsx}", "tests/**/*.{ts,tsx,cjs}"],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "linter/**/*.ts",
+    ".storybook/**/*.{ts,tsx}",
+    "tests/**/*.{ts,tsx}",
+    "scripts/**/*.ts",
+  ],
   "ignore": ["src/app/router/route-tree.gen.ts"],
   // Jest resolves `tests/...` through moduleNameMapper.
   "paths": { "tests/*": ["tests/*"] },
   "typedoc": false,
-  "ignoreBinaries": ["chromatic"],
+  // pgrep: a system tool the e2e API stack calls (tests/e2e/stack/start-api-stack.ts).
+  "ignoreBinaries": ["chromatic", "pgrep"],
   "ignoreDependencies": [
     // Used indirectly: Jest config loader, @testcontainers/mysql peer, Babel preset warning, Storybook essentials.
     "ts-node",

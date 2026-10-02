@@ -1,0 +1,28 @@
+{
+  // Type-checks the Node scripts of the client: scripts/ and the Playwright API stack. Node runs them as they are
+  // (`node scripts/<name>.ts`) by stripping the types, so the code is limited to erasable syntax (no enum /
+  // namespace / parameter properties). Their folders hold a `{ "type": "module" }` package.json: Node and
+  // `nodenext` treat them as ES modules. `npm run lint:scripts` runs this check.
+  // Composite so that tsconfig.json can reference it (the IDE then type-checks the scripts with these options), like
+  // tsconfig.linter.json: a referenced project may not disable emit, so declarations go to a cache.
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "outDir": "node_modules/.cache/tsconfig.scripts",
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["scripts/**/*.ts", "tests/e2e/stack/start-api-stack.ts"]
+}

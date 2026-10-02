@@ -80,9 +80,9 @@ export const Variant: Story = {
 
 | Rule | Checked by |
 |---|---|
-| A `<component>.stories.tsx` next to every component of a `ui` segment (layers count as the component); no orphan story | `npm run client:lint` · `client/scripts/check-stories.mjs` |
-| `title` is the literal `'<Layer>/<ComponentName>'` | `npm run client:lint` · `client/scripts/check-stories.mjs` |
-| Page stories cover `Desktop4k`, `Desktop`, `Tablet` and `Mobile` | `npm run client:lint` · `client/scripts/check-stories.mjs` |
+| A `<component>.stories.tsx` next to every component of a `ui` segment (layers count as the component); no orphan story | `npm run client:lint` · `client/scripts/check-stories.ts` |
+| `title` is the literal `'<Layer>/<ComponentName>'` | `npm run client:lint` · `client/scripts/check-stories.ts` |
+| Page stories cover `Desktop4k`, `Desktop`, `Tablet` and `Mobile` | `npm run client:lint` · `client/scripts/check-stories.ts` |
 | Stories compile and render | `npm run client:build-storybook` |
 | `Default` + one story per axis / state, matrices in `Row` / `Grid`, JSDoc on every story | ❌ review |
 | User-driven states reached through `play` | ❌ review |

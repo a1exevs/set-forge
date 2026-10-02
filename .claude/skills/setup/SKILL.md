@@ -20,7 +20,7 @@ Optional argument `--full` (`$1`): also download Playwright browsers and run the
 - **Interactive steps belong to the developer:** `gh auth login`, the first launch of Docker Desktop, SSH key
   passphrases. Print the exact command, wait for the developer to say it is done, then re-run the check.
 - **Never read `.env*` files** (denied in `.claude/settings.json`) — env files are handled only through
-  `scripts/setup-env.sh`, which prints key names, never values.
+  `scripts/setup-env.ts`, which prints key names, never values.
 - **Never change the developer's git identity, remotes or shell profile silently** — propose the command, let them
   run it or approve it.
 - Keep a running status table; end with the report in [Report](#report).
@@ -133,7 +133,7 @@ Node version first — that is the usual cause.
 ## 6. Env files
 
 ```bash
-npm run setup:env          # = scripts/setup-env.sh
+npm run setup:env          # = scripts/setup-env.ts
 ```
 
 The script copies the missing `.env`, `server/.development.env` and `server/.e2e.env` from their `*.example`,
