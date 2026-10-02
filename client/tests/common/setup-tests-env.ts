@@ -5,7 +5,7 @@ jest.mock('src/shared/api/api-base-url', () => ({
 }));
 
 // Polyfill TextEncoder/TextDecoder for environments where they are missing (e.g., Jest + jsdom)
-import { TextDecoder, TextEncoder } from 'util';
+import { TextDecoder, TextEncoder } from 'node:util';
 
 const globalAny = global as unknown as {
   TextEncoder: typeof TextEncoder;

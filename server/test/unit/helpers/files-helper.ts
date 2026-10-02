@@ -1,4 +1,4 @@
-import { existsSync, rmdirSync } from 'fs';
+import { existsSync, rmdirSync } from 'node:fs';
 
 const removeTestDir = (dir: string) => {
   if (existsSync(dir)) {

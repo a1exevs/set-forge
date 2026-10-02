@@ -1,9 +1,13 @@
 ---
-description: TypeScript — strict mode, no any, explicit return types, interface vs type, curly braces, Node scripts
+description: TypeScript — strict mode, no any, explicit return types, interface vs type, curly braces, Node built-ins, Node scripts
 paths:
   - "client/**"
   - "server/**"
   - "scripts/**"
+  - "eslint.config.ts"
+  - "lint-staged.config.cjs"
+  - "package.json"
+  - "docker-compose.yml"
 ---
 
 # TypeScript Guidelines
@@ -55,6 +59,17 @@ if (!value) {
 }
 ```
 
+## Node built-ins
+
+Node's own modules are imported with the `node:` scheme — `import { join } from 'node:path'`,
+`const { existsSync } = require('node:fs')` — in TypeScript, CommonJS configs and inline `node -e` alike. They are part of Node, never
+npm dependencies; the scheme says so at the import and no package of the same name can stand in for them.
+
+Take what the file uses by name — `import { existsSync, readFileSync } from 'node:fs'`,
+`const { join } = require('node:path')` — not the whole module (`import path from`, `import * as fs from`). A name
+that clashes with a local one gets an alias (`resolve as resolvePath` next to a Promise's `resolve`). The one
+exception is a spec that spies on the module: `jest.spyOn(fs, 'existsSync')` needs `import * as fs`.
+
 ## Node scripts
 
 Repository scripts (`scripts/`, `client/scripts/`, the Playwright API stack) are TypeScript that Node runs as is —
@@ -80,4 +95,7 @@ Node does not type-check either, so every script folder is covered by a `tsc` pr
 | `interface` only in `entities/*/model` (client) | `npm run client:lint` · ESLint `@typescript-eslint/consistent-type-definitions` · `client/eslint.config.ts` |
 | No `any`, explicit return types, `interface` vs `type` (server) | ❌ review (`no-explicit-any` is off in `server/eslint.config.ts` until the typing clean-up) |
 | Minimal `as`, DTOs as `type` inside entity models | ❌ review |
+| Node built-ins via `node:` | `npm run lint:root` · `npm run client:lint` · `npm run server:lint` · ESLint `import/enforce-node-protocol-usage` |
+| Node built-ins imported by name, `* as` only for `jest.spyOn` | ❌ review |
+| `node:` where no linter reads: `server/database/config.js`, `server/.sequelizerc`, inline `node -e` (`package.json`, `docker-compose.yml`) | ❌ review |
 | Node scripts: erasable syntax, strict types | `npm run lint:root` · `scripts/tsconfig.json` · `npm run client:lint` · `client/tsconfig.scripts.json` |

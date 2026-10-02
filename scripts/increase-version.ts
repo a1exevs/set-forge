@@ -1,5 +1,5 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { relative, resolve } from 'node:path';
 
 import { rootDir } from './common.ts';
 
@@ -11,11 +11,11 @@ const IncreaseVersionMode = {
 type IncreaseVersionMode = (typeof IncreaseVersionMode)[keyof typeof IncreaseVersionMode];
 
 /** App version is always taken from the client workspace; server stays in lockstep. */
-const CANONICAL_PACKAGE_JSON = path.resolve(rootDir, 'client', 'package.json');
+const CANONICAL_PACKAGE_JSON = resolve(rootDir, 'client', 'package.json');
 const PACKAGE_JSON_PATHS = [
-  path.resolve(rootDir, 'client', 'package.json'),
-  path.resolve(rootDir, 'client', 'public', 'manifest.json'),
-  path.resolve(rootDir, 'server', 'package.json'),
+  resolve(rootDir, 'client', 'package.json'),
+  resolve(rootDir, 'client', 'public', 'manifest.json'),
+  resolve(rootDir, 'server', 'package.json'),
 ];
 
 function increaseVersion(version: string, type: IncreaseVersionMode): string {
@@ -36,8 +36,8 @@ function increaseVersion(version: string, type: IncreaseVersionMode): string {
 }
 
 function readVersion(filePath: string): string {
-  const fileAbsolutePath = path.resolve(filePath);
-  const content = fs.readFileSync(fileAbsolutePath, 'utf8');
+  const fileAbsolutePath = resolve(filePath);
+  const content = readFileSync(fileAbsolutePath, 'utf8');
   const json = JSON.parse(content) as { version?: string };
   if (!json.version) {
     throw new Error(`No "version" field found in ${filePath}`);
@@ -46,8 +46,8 @@ function readVersion(filePath: string): string {
 }
 
 function setVersionInFile(filePath: string, newVersion: string): void {
-  const fileAbsolutePath = path.resolve(filePath);
-  const content = fs.readFileSync(fileAbsolutePath, 'utf8');
+  const fileAbsolutePath = resolve(filePath);
+  const content = readFileSync(fileAbsolutePath, 'utf8');
   const json = JSON.parse(content) as { version?: string };
 
   if (!json.version) {
@@ -57,7 +57,7 @@ function setVersionInFile(filePath: string, newVersion: string): void {
   const oldVersion = json.version;
   json.version = newVersion;
 
-  fs.writeFileSync(fileAbsolutePath, JSON.stringify(json, null, 2) + '\n', 'utf8');
+  writeFileSync(fileAbsolutePath, JSON.stringify(json, null, 2) + '\n', 'utf8');
   console.log(`Updated version in ${filePath}: ${oldVersion} -> ${newVersion}`);
 }
 
@@ -81,7 +81,7 @@ function main(): void {
       const other = readVersion(pkgPath);
       if (other !== oldCanonical) {
         console.warn(
-          `Warning: version in ${path.relative(rootDir, pkgPath)} (${other}) differs from client (${oldCanonical}). Both will be set to ${newVersion}.`,
+          `Warning: version in ${relative(rootDir, pkgPath)} (${other}) differs from client (${oldCanonical}). Both will be set to ${newVersion}.`,
         );
       }
     }

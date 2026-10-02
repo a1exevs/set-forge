@@ -1,5 +1,5 @@
-import { existsSync, readdirSync } from 'fs';
-import path from 'path';
+import { existsSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 
 import { rootDir } from './common';
 
@@ -13,7 +13,7 @@ export const slicedLayers = ['pages', 'widgets', 'features', 'entities'] as cons
 
 export type SlicedLayer = (typeof slicedLayers)[number];
 
-const srcDir = path.join(rootDir, 'src');
+const srcDir = join(rootDir, 'src');
 
 const directories = (dir: string): string[] =>
   existsSync(dir)
@@ -23,7 +23,7 @@ const directories = (dir: string): string[] =>
     : [];
 
 /** Slices of a layer, read from disk so every new slice is covered without touching the config. */
-export const slicesOf = (layer: SlicedLayer): string[] => directories(path.join(srcDir, layer));
+export const slicesOf = (layer: SlicedLayer): string[] => directories(join(srcDir, layer));
 
 /** Segments of `shared`, read from disk. */
-export const sharedSegments = (): string[] => directories(path.join(srcDir, 'shared'));
+export const sharedSegments = (): string[] => directories(join(srcDir, 'shared'));

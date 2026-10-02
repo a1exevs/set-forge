@@ -1,6 +1,6 @@
 /** @jest-config-loader ts-node */
 import type { Config } from 'jest';
-import path from 'path';
+import { resolve } from 'node:path';
 
 import {
   COVERAGE_DIR_NAME,
@@ -14,8 +14,8 @@ import {
 } from '../../common/consts';
 import { rootDir } from '../../common/paths';
 
-const setupTestsEnvPath = path.resolve(rootDir, 'tests', 'common', 'setup-tests-env.ts');
-const setupTestingLibraryPath = path.resolve(rootDir, 'tests', 'common', 'setup-testing-library.ts');
+const setupTestsEnvPath = resolve(rootDir, 'tests', 'common', 'setup-tests-env.ts');
+const setupTestingLibraryPath = resolve(rootDir, 'tests', 'common', 'setup-testing-library.ts');
 
 const config: Config = {
   moduleFileExtensions: ['js', 'jsx', 'json', 'ts', 'tsx'],

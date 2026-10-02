@@ -1,7 +1,7 @@
-const path = require("node:path");
+const { isAbsolute, join, relative, sep } = require("node:path");
 
-const clientDir = path.join(__dirname, "client");
-const serverDir = path.join(__dirname, "server");
+const clientDir = join(__dirname, "client");
+const serverDir = join(__dirname, "server");
 
 /**
  * @param {string} filePath
@@ -20,12 +20,12 @@ function quoteFileArg(filePath) {
  */
 function toClientRelativePosix(absoluteOrCwdRelativePaths) {
   return absoluteOrCwdRelativePaths.map((file) => {
-    const abs = path.isAbsolute(file) ? file : path.join(process.cwd(), file);
-    const rel = path.relative(clientDir, abs);
-    if (rel.startsWith("..") || path.isAbsolute(rel)) {
+    const abs = isAbsolute(file) ? file : join(process.cwd(), file);
+    const rel = relative(clientDir, abs);
+    if (rel.startsWith("..") || isAbsolute(rel)) {
       throw new Error(`lint-staged: expected a path under client/, got ${file} (resolved: ${abs})`);
     }
-    return rel.split(path.sep).join("/");
+    return rel.split(sep).join("/");
   });
 }
 
@@ -35,12 +35,12 @@ function toClientRelativePosix(absoluteOrCwdRelativePaths) {
  */
 function toServerRelativePosix(absoluteOrCwdRelativePaths) {
   return absoluteOrCwdRelativePaths.map((file) => {
-    const abs = path.isAbsolute(file) ? file : path.join(process.cwd(), file);
-    const rel = path.relative(serverDir, abs);
-    if (rel.startsWith("..") || path.isAbsolute(rel)) {
+    const abs = isAbsolute(file) ? file : join(process.cwd(), file);
+    const rel = relative(serverDir, abs);
+    if (rel.startsWith("..") || isAbsolute(rel)) {
       throw new Error(`lint-staged: expected a path under server/, got ${file} (resolved: ${abs})`);
     }
-    return rel.split(path.sep).join("/");
+    return rel.split(sep).join("/");
   });
 }
 
@@ -73,6 +73,7 @@ function serverTsTasks(files) {
 module.exports = {
   "client/**/*.{ts,tsx}": clientTsTasks,
   "client/{src,.storybook}/**/*.{css,scss}": ["prettier --ignore-path client/.prettierignore --write"],
-  "scripts/**/*.ts": ["prettier --config client/.prettierrc.cjs --write"],
+  "{scripts/**/*.ts,eslint.config.ts}": ["prettier --write", "eslint --fix"],
+  "lint-staged.config.cjs": ["eslint --fix"],
   "server/{src,test}/**/*.ts": serverTsTasks,
 };

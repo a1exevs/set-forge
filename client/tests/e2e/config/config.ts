@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import * as path from 'path';
+import { resolve } from 'node:path';
 
 import { rootDir } from 'tests/common/paths';
 import { isCI } from 'tests/e2e/helpers/ci-helpers';
@@ -11,7 +11,7 @@ import { E2E_CLIENT_ORIGIN, E2E_CLIENT_PORT, E2E_HEALTH_URL, E2E_SERVER_ORIGIN }
  */
 export default defineConfig({
   testMatch: '**/*.spec.e2e.ts',
-  testDir: path.resolve(rootDir, 'tests', 'e2e', 'tests'),
+  testDir: resolve(rootDir, 'tests', 'e2e', 'tests'),
   fullyParallel: true,
   forbidOnly: isCI(),
   retries: isCI() ? 2 : 0,

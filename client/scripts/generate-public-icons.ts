@@ -1,9 +1,9 @@
 import { Resvg } from '@resvg/resvg-js';
-import fs from 'node:fs';
-import path from 'node:path';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import toIco from 'to-ico';
 
-const publicDir = path.resolve(import.meta.dirname, '../public');
+const publicDir = resolve(import.meta.dirname, '../public');
 
 const renderPng = (svg: string, outputPath: string, width: number, { withText = false } = {}): void => {
   const resvg = new Resvg(svg, {
@@ -20,10 +20,10 @@ const renderPng = (svg: string, outputPath: string, width: number, { withText = 
         }
       : {}),
   });
-  fs.writeFileSync(outputPath, resvg.render().asPng());
+  writeFileSync(outputPath, resvg.render().asPng());
 };
 
-const logoSvg = fs.readFileSync(path.join(publicDir, 'logo.svg'), 'utf8');
+const logoSvg = readFileSync(join(publicDir, 'logo.svg'), 'utf8');
 const logoInnerMatch = logoSvg.match(/<\/clipPath>([\s\S]*)<\/svg>/);
 const defsMatch = logoSvg.match(/<defs>[\s\S]*?<\/defs>/);
 if (!logoInnerMatch) {
@@ -92,9 +92,9 @@ const logoOgSvg = `<?xml version="1.0" encoding="utf-8"?>
   >${OG_BADGE_TEXT}</text>
 </svg>`;
 
-fs.writeFileSync(path.join(publicDir, 'logo-og.svg'), logoOgSvg);
+writeFileSync(join(publicDir, 'logo-og.svg'), logoOgSvg);
 
-const faviconSvg = fs.readFileSync(path.join(publicDir, 'favicon.svg'), 'utf8');
+const faviconSvg = readFileSync(join(publicDir, 'favicon.svg'), 'utf8');
 
 const pngTargets = [
   { svg: faviconSvg, name: 'favicon-16x16.png', width: 16 },
@@ -107,14 +107,14 @@ const pngTargets = [
 ];
 
 for (const target of pngTargets) {
-  renderPng(target.svg, path.join(publicDir, target.name), target.width, {
+  renderPng(target.svg, join(publicDir, target.name), target.width, {
     withText: target.name === 'logo-og.png',
   });
 }
 
 const icoSizes = ['favicon-16x16.png', 'favicon-32x32.png', 'favicon-48x48.png'];
-const icoBuffers = icoSizes.map(name => fs.readFileSync(path.join(publicDir, name)));
+const icoBuffers = icoSizes.map(name => readFileSync(join(publicDir, name)));
 const ico = await toIco(icoBuffers);
-fs.writeFileSync(path.join(publicDir, 'favicon.ico'), ico);
+writeFileSync(join(publicDir, 'favicon.ico'), ico);
 
 process.stdout.write(`Generated ${pngTargets.length + 2} public icon files in ${publicDir}\n`);

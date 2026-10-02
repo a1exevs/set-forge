@@ -42,6 +42,7 @@ export default defineConfig(
       ...curlyRule,
       ...returnTypeRule,
       'no-console': 'error',
+      'import/enforce-node-protocol-usage': ['error', 'always'],
     },
   },
   {

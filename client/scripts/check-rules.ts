@@ -8,11 +8,9 @@
 // Exit code 1 lists every violation.
 //
 // TODO: this is a repo-wide check (it reads the root package.json, resolves paths from the repo root and asks ESLint
-//   of both projects), so it belongs next to scripts/check-domain-docs.ts and `npm run lint:root`. What keeps it
-//   here are its imports: `eslint` (the same 9.x in client and server, but declared by neither root nor a root
-//   script) and `@feature-sliced/steiger-plugin` (a client tool). Move it once the root declares `eslint` and the
-//   Steiger rule list is resolved from the client workspace
-//   (`createRequire(join(repoRoot, 'client', 'package.json'))`).
+//   of both projects), so it belongs next to scripts/check-domain-docs.ts and `npm run lint:root`. The root declares
+//   `eslint` now; what keeps it here is `@feature-sliced/steiger-plugin` (a client tool). Move it once the Steiger
+//   rule list is resolved from the client workspace (`createRequire(join(repoRoot, 'client', 'package.json'))`).
 
 import fsd from '@feature-sliced/steiger-plugin';
 import { ESLint } from 'eslint';

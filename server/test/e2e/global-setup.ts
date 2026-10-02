@@ -1,10 +1,10 @@
 import { MySqlContainer } from '@testcontainers/mysql';
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
+import { execSync } from 'node:child_process';
+import { writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
-const SERVER_ROOT = path.resolve(__dirname, '../..');
-const RUNTIME_ENV_PATH = path.join(__dirname, '.runtime-env.json');
+const SERVER_ROOT = resolve(__dirname, '../..');
+const RUNTIME_ENV_PATH = join(__dirname, '.runtime-env.json');
 
 function assertDockerAvailable(): void {
   try {
@@ -42,7 +42,7 @@ export default async function globalSetup(): Promise<void> {
     stdio: 'inherit',
   });
 
-  fs.writeFileSync(
+  writeFileSync(
     RUNTIME_ENV_PATH,
     JSON.stringify(
       {
