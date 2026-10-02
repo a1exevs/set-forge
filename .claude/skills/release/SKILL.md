@@ -6,7 +6,7 @@ argument-hint: "[patch|minor|major]"
 
 # release
 
-Act as a Release Automation Agent for this repository. Orchestrate the full release pipeline from README "Release steps" in **phases**. Never skip ahead. After every phase that requires a manual merge (or human review), STOP and wait for the user to say continue before starting the next phase.
+Act as a Release Automation Agent for this repository. Orchestrate the full release pipeline in **phases**. Never skip ahead. After every phase that requires a manual merge (or human review), STOP and wait for the user to say continue before starting the next phase.
 
 ## Parameter
 
@@ -19,18 +19,15 @@ Usage: `/release patch` (or `minor` / `major`).
 
 ## Global rules
 
-1. Source of truth for the flow: README.md section **Release steps**. Keep titles/branches exactly as specified there.
-2. This command intentionally creates PRs between protected branches (`develop` → `testing` → `main`). Do **not** apply the `/pr` safety lock that forbids PRs from those branches.
+1. This skill is the source of truth for the flow (README links here). Keep the PR titles and branches exactly as the phases below specify.
+2. Branches, their roles and the PR labels come from `.claude/skills/branches/SKILL.md` (`/branches`). This command intentionally creates PRs between protected branches (`develop` → `testing` → `main`). Do **not** apply the `/pr` safety lock that forbids PRs from those branches.
 3. Do **not** merge PRs yourself unless the user explicitly asks. After creating a PR, report the URL and wait.
-4. Do **not** push to `develop`, `testing`, or `main` directly.
+4. Do **not** push to a protected branch (`/branches` §1) directly.
 5. Do **not** include Selectel/deploy steps — out of scope.
-6. Before any mutating git/`gh` action in a phase, briefly state what you will do and get approval for that phase (except when the user already said "continue" into a clearly defined next phase — then execute that phase, still confirming before publish/force-push style actions).
+6. Before any mutating git/`gh` action in a phase, briefly state what you will do and get approval for that phase (except when the user already said "continue" into a clearly defined next phase — then execute that phase, still confirming before publish/force-push style actions). Branch operations (`/branches` §4), including the ones `update-version` runs, always go through its gate: a "continue" does not approve them; name them and wait for a yes.
 7. Track and reuse `vX.X.X` (without inventing a version). Prefer reading it from `client/package.json` after the bump, or from the version-increase PR/commit if resuming mid-flow.
 8. Prefer `gh` for GitHub operations.
-9. When creating a release PR, always attach the matching GitHub label via `gh pr create --label …` (or `gh pr edit --add-label …` if the PR already exists without it):
-   - Phase A / Phase E (`common/*` → `develop`): `common`
-   - Phase B (`develop` → `testing`): `testing`
-   - Phase C (`testing` → `main`): `release`
+9. When creating a release PR, always attach the label its phase lists (the labels are defined in `/branches` §2) via `gh pr create --label …` (or `gh pr edit --add-label …` if the PR already exists without it).
 10. If the user resumes mid-release (e.g. "continue after version PR merged"), detect the current phase from git/`gh` state and continue from the next incomplete phase. Ask only if ambiguous.
 11. At each STOP, print a short status block:
 
@@ -46,10 +43,10 @@ Release status
 
 Goal: bump version and open the version-increase PR.
 
-1. Ensure working tree is clean. If not, STOP and ask the user to commit/stash.
+1. Ensure working tree is clean. If not, STOP and ask the user to commit/stash (`/branches` §5).
 2. Confirm bump type with the user if not already explicit in the command args.
 3. Run: `npm run update-version:<bump>`
-   - This script checks out `common/version-increase`, resets to `origin/develop`, bumps, commits, and force-pushes with lease.
+   - This script checks out `common/version-increase`, resets to `origin/develop`, bumps, commits, and force-pushes with lease (`/branches` §1). Name these branch operations and wait for a yes before running it (`/branches` §4).
 4. Read the new version from `client/package.json` → `vX.X.X`.
 5. Create PR (if one is not already open):
    - head: `common/version-increase`
@@ -104,9 +101,9 @@ Precondition: Phase C PR is merged into `main`.
 
 Precondition: GitHub Release `vX.X.X` is published; you have the final notes body.
 
-1. Ensure clean working tree (or stash only with user approval). Start from latest `origin/develop`:
+1. Ensure clean working tree (or stash only with user approval). Start from latest `origin/develop` (`/branches` §5, every step gated):
    - `git fetch origin`
-   - create/switch branch: `common/release-notes-update-vX.X.X` from `origin/develop`
+   - create/switch branch: `git switch --no-track -c common/release-notes-update-vX.X.X origin/develop`
 2. Prepend a new top section to `RELEASE-NOTES.md` matching existing style, e.g.:
 
 ```markdown
@@ -120,7 +117,7 @@ Precondition: GitHub Release `vX.X.X` is published; you have the final notes bod
 
    Keep formatting consistent with prior entries in the file. Do not rewrite older releases.
 3. Commit: `[Common] RELEASE-NOTES.md update vX.X.X`
-4. Push branch and create PR:
+4. Push branch (first push, `/branches` §5, gated) and create PR:
    - head: `common/release-notes-update-vX.X.X`
    - base: `develop`
    - title: `[Common] RELEASE-NOTES.md update vX.X.X`

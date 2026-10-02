@@ -36,21 +36,8 @@ npm install
 npm run setup:env          # .env, server/.development.env, server/.e2e.env from their examples
 npm run db:up              # wait until `docker compose --profile dev ps` shows mysql-dev healthy (~20 s on the first run)
 npm run server:db:migrate && npm run server:db:seed
+npm run client:e2e:install # once, for the client e2e
 ```
-
-## Install
-
-From the **repository root**:
-
-```bash
-npm install
-```
-
-This installs npm workspaces (`client`, `server`), hoists dependencies, and runs **`prepare`** (Husky git hooks).
-
-To run client e2e tests locally, also download Playwright browsers once: `npm run client:e2e:install`.
-
-Server e2e tests need **Docker** locally (Testcontainers starts ephemeral MySQL).
 
 ## CI (GitHub Actions)
 
@@ -75,7 +62,7 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 | `npm run format:root` / `npm run format:root:check` | Prettier for `scripts/**/*.{ts,tsx,mjs}` |
 | `npm run lint:root` / `npm run lint:docs` | Repo-wide checks (what CI runs): domain docs in `docs/domains` are thin and point at real code |
 | `npm run version:patch` / `npm run version:minor` / `npm run version:major` | Bump version via `scripts/increase-version.ts` |
-| `npm run update-version:patch` / `npm run update-version:minor` / `npm run update-version:major` | Version branch workflow (`scripts/update-version.sh`) |
+| `npm run update-version:patch` / `npm run update-version:minor` / `npm run update-version:major` | Version bump branch (`scripts/update-version.sh`), run by `/release` in phase A |
 
 ### Client (`@set-forge/client`)
 
@@ -213,18 +200,13 @@ npm run prod:db:seed            # inserts default `user` / `admin` roles (idempo
 
 For local development against `mysql-dev`, the equivalent flow is `npm run db:up` → `npm run server:db:migrate` → `npm run server:db:seed`. See [`server/README.md`](server/README.md#database-schema-sequelize-migrations) for full details and how to add new migrations.
 
-## Release steps
-1. run npm update-version:patch (or :minor, :major)
-2. create PR with message "[Common] Version increase vX.X.X" from "common/version-increase" into "develop"
-3. create PR with message "[Testing] Release vX.X.X" from "develop" into "testing"
-4. create PR with message "Release vX.X.X" from "testing" into "main"
-5. go to Github Repo Home page -> Tags -> Releases -> Draft a new release.
-- create a new tag via "Choose a tag" autocomplete
-- select "develop" branch as a target
-- click the "Generate release notes" button, remove unnecessary notes if necessary, check PR messages and correct the messages if necessary (via PR editing)
-- select "main" branch as a target
-- click the "Publish release"
-6. update RELEASE-NOTES.md with using generated notes in step 5, create PR from "common/release-notes-update-vX.X.X" to "develop" with message "[Common] RELEASE-NOTES.md update vX.X.X"
+## Release
+
+Run `/release <patch|minor|major>` in Claude Code. The phases, PR titles and labels are in
+[`.claude/skills/release/SKILL.md`](.claude/skills/release/SKILL.md), the branch model in
+[`.claude/skills/branches/SKILL.md`](.claude/skills/branches/SKILL.md).
+
+## Deploy
 
 **Full-stack production on [VDS Selectel](https://vds.selectel.ru/):** step-by-step deploy guide — [`DEPLOY-SELECTEL.md`](DEPLOY-SELECTEL.md) (Docker Compose + Caddy + MySQL on Ubuntu).
 
