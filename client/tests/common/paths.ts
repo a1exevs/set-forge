@@ -1,3 +1,3 @@
-import path from 'path';
+import { resolve } from 'node:path';
 
-export const rootDir = path.resolve(process.cwd());
+export const rootDir = resolve(process.cwd());

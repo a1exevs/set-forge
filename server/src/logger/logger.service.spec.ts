@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { existsSync, readFileSync } from 'fs';
-import * as fs from 'fs';
-import * as path from 'path';
+import { existsSync, readFileSync } from 'node:fs';
+import * as fs from 'node:fs';
+import { resolve } from 'node:path';
 
 import { LoggerService } from '@logger/logger.service';
 import { removeTestLogsDir } from '@test/unit/helpers';
@@ -12,7 +12,7 @@ const getLogFilePath = () => {
   const month = date.getMonth() + 1;
   const day = date.getDate();
 
-  return path.resolve(__dirname, './../../', process.env.SERVER_LOGS) + `/${year}/${month}/${day}.ts`;
+  return resolve(__dirname, './../../', process.env.SERVER_LOGS) + `/${year}/${month}/${day}.ts`;
 };
 
 describe('Logger', () => {

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import * as path from 'path';
+import { resolve } from 'node:path';
 
 import { AuthModule, RefreshToken } from '@src/auth';
 import { HealthModule } from '@src/health/health.module';
@@ -23,7 +23,7 @@ import { WorkoutSession, WorkoutSessionExercise, WorkoutSessionsModule } from '@
       envFilePath: `.${process.env.NODE_ENV}.env`,
     }),
     ServeStaticModule.forRoot({
-      rootPath: path.resolve(__dirname, '../', process.env.SERVER_STATIC || 'static'),
+      rootPath: resolve(__dirname, '../', process.env.SERVER_STATIC || 'static'),
     }),
     SequelizeModule.forRoot({
       dialect: 'mysql',

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 
 import { E2E_SERVER_ORIGIN } from 'tests/e2e/stack/ports';
 

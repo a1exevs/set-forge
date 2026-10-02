@@ -4,12 +4,12 @@
  */
 import { MySqlContainer } from '@testcontainers/mysql';
 import { type ChildProcess, execSync, spawn } from 'node:child_process';
-import fs from 'node:fs';
-import net from 'node:net';
-import path from 'node:path';
+import { copyFileSync, existsSync, readFileSync } from 'node:fs';
+import { createServer } from 'node:net';
+import { join, resolve as resolvePath } from 'node:path';
 
 // Plain Node runs this file, so it reads ports.json itself instead of the `tests/...` alias of ports.ts.
-const ports = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'ports.json'), 'utf8')) as {
+const ports = JSON.parse(readFileSync(join(import.meta.dirname, 'ports.json'), 'utf8')) as {
   clientPort: number;
   serverPort: number;
 };
@@ -18,10 +18,10 @@ const E2E_CLIENT_PORT = ports.clientPort;
 const E2E_SERVER_PORT = ports.serverPort;
 const E2E_CLIENT_ORIGIN = `http://localhost:${E2E_CLIENT_PORT}`;
 
-const CLIENT_ROOT = path.resolve(import.meta.dirname, '../../..');
-const SERVER_ROOT = path.resolve(CLIENT_ROOT, '..', 'server');
-const E2E_ENV_PATH = path.join(SERVER_ROOT, '.e2e.env');
-const E2E_ENV_EXAMPLE_PATH = path.join(SERVER_ROOT, '.e2e.env.example');
+const CLIENT_ROOT = resolvePath(import.meta.dirname, '../../..');
+const SERVER_ROOT = resolvePath(CLIENT_ROOT, '..', 'server');
+const E2E_ENV_PATH = join(SERVER_ROOT, '.e2e.env');
+const E2E_ENV_EXAMPLE_PATH = join(SERVER_ROOT, '.e2e.env.example');
 
 const NEST_SHUTDOWN_TIMEOUT_MS = 15_000;
 
@@ -36,14 +36,14 @@ function assertDockerAvailable(): void {
 }
 
 function ensureE2eEnvFile(): void {
-  if (!fs.existsSync(E2E_ENV_PATH)) {
-    fs.copyFileSync(E2E_ENV_EXAMPLE_PATH, E2E_ENV_PATH);
+  if (!existsSync(E2E_ENV_PATH)) {
+    copyFileSync(E2E_ENV_EXAMPLE_PATH, E2E_ENV_PATH);
   }
 }
 
 function assertPortFree(port: number): Promise<void> {
   return new Promise((resolve, reject) => {
-    const server = net.createServer();
+    const server = createServer();
     server.once('error', (err: NodeJS.ErrnoException) => {
       reject(
         new Error(

@@ -1,7 +1,7 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
+const { existsSync, readFileSync } = require('node:fs');
+const { basename, join } = require('node:path');
 
 /**
  * Match sequelize-cli environment resolution: `--env` / `-e` wins, else NODE_ENV, else development.
@@ -18,10 +18,10 @@ function getSequelizeEnv() {
 }
 
 function loadEnvFile(filePath) {
-  if (!fs.existsSync(filePath)) {
+  if (!existsSync(filePath)) {
     return;
   }
-  const content = fs.readFileSync(filePath, 'utf8');
+  const content = readFileSync(filePath, 'utf8');
   for (const line of content.split(/\n/)) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) {
@@ -46,7 +46,7 @@ function loadEnvFile(filePath) {
 }
 
 const sequelizeEnv = getSequelizeEnv();
-const envFile = path.join(__dirname, '..', `.${sequelizeEnv}.env`);
+const envFile = join(__dirname, '..', `.${sequelizeEnv}.env`);
 loadEnvFile(envFile);
 
 function mysqlConfig() {
@@ -59,7 +59,7 @@ function mysqlConfig() {
   if (!username || !database) {
     // eslint-disable-next-line no-console
     console.warn(
-      `[sequelize config] MYSQL_USER / MYSQL_DB are missing after loading "${path.basename(
+      `[sequelize config] MYSQL_USER / MYSQL_DB are missing after loading "${basename(
         envFile,
       )}". CLI uses database/config.js, not Nest ConfigModule — set MYSQL_* in that file or export them in the shell.`,
     );

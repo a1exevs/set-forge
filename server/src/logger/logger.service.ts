@@ -1,6 +1,6 @@
 import { ConsoleLogger, Injectable } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
+import { appendFile, appendFileSync, existsSync, mkdirSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 @Injectable()
 export class LoggerService extends ConsoleLogger {
@@ -14,20 +14,20 @@ export class LoggerService extends ConsoleLogger {
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    const logDir = `${path.resolve(__dirname, './../../', process.env.SERVER_LOGS)}/${year}/${month}/`;
-    if (!fs.existsSync(logDir)) {
-      fs.mkdirSync(logDir, { recursive: true });
+    const logDir = `${resolve(__dirname, './../../', process.env.SERVER_LOGS)}/${year}/${month}/`;
+    if (!existsSync(logDir)) {
+      mkdirSync(logDir, { recursive: true });
     }
 
     const data = `[YYYY/MM/DD HH:MM:SS][${year}/${month}/${day} ${date.toLocaleTimeString()}]\n[${message}]\n[${stack}]\n[${context}]\n\n`;
     if (isLogAsync) {
-      fs.appendFile(`${logDir}${day}.ts`, data, 'utf-8', err => {
+      appendFile(`${logDir}${day}.ts`, data, 'utf-8', err => {
         if (err) {
           this.logToFile(message, stack, context, false);
         }
       });
     } else {
-      fs.appendFileSync(`${logDir}${day}.ts`, data, 'utf-8');
+      appendFileSync(`${logDir}${day}.ts`, data, 'utf-8');
     }
   }
 }

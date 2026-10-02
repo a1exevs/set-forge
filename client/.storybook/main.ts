@@ -1,5 +1,5 @@
 import type { StorybookConfig } from '@storybook/react-vite';
-import path, { dirname, join } from 'path';
+import { dirname, join, normalize, resolve } from 'node:path';
 import { mergeConfig, type Plugin } from 'vite';
 
 /**
@@ -11,7 +11,7 @@ function getAbsolutePath(value: string): string {
   return dirname(require.resolve(join(value, 'package.json')));
 }
 
-const bootstrapSessionFile = path.resolve(__dirname, '../src/entities/session/model/bootstrap-session.ts');
+const bootstrapSessionFile = resolve(__dirname, '../src/entities/session/model/bootstrap-session.ts');
 
 /**
  * Swaps the real session bootstrap for a stub. Matches the resolved file, not the specifier: inside its slice the
@@ -26,8 +26,8 @@ function mockBootstrapSession(): Plugin {
         return null;
       }
       const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
-      return resolved && path.normalize(resolved.id) === bootstrapSessionFile
-        ? path.resolve(__dirname, 'mock-bootstrap-session.ts')
+      return resolved && normalize(resolved.id) === bootstrapSessionFile
+        ? resolve(__dirname, 'mock-bootstrap-session.ts')
         : null;
     },
   };
@@ -51,8 +51,8 @@ const config: StorybookConfig = {
       plugins: [mockBootstrapSession()],
       resolve: {
         alias: {
-          src: path.resolve(__dirname, '../src'),
-          'storybook-dir': path.resolve(__dirname, '.'),
+          src: resolve(__dirname, '../src'),
+          'storybook-dir': resolve(__dirname, '.'),
           // Add other aliases from vite.config.ts if needed
         },
       },

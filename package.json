@@ -12,11 +12,14 @@
   },
   "scripts": {
     "setup:env": "node scripts/setup-env.ts",
-    "prepare": "node -e \"if (process.env.HUSKY === '0') process.exit(0); const fs=require('fs'); if (fs.existsSync('node_modules/husky')) require('child_process').execSync('husky install',{stdio:'inherit'});\"",
-    "format:root": "prettier --config client/.prettierrc.cjs --write \"scripts/**/*.ts\"",
-    "format:root:check": "prettier --config client/.prettierrc.cjs --check \"scripts/**/*.ts\"",
-    "lint:root": "npm run lint:scripts && npm run lint:docs",
+    "prepare": "node -e \"if (process.env.HUSKY === '0') process.exit(0); const {existsSync}=require('node:fs'); if (existsSync('node_modules/husky')) require('node:child_process').execSync('husky install',{stdio:'inherit'});\"",
+    "format:root": "prettier --write \"scripts/**/*.ts\" eslint.config.ts",
+    "format:root:check": "prettier --check \"scripts/**/*.ts\" eslint.config.ts",
+    "lint:root": "npm run lint:scripts && npm run lint:config && npm run lint:eslint && npm run lint:docs",
     "lint:scripts": "tsc -p scripts/tsconfig.json",
+    "lint:config": "tsc -p tsconfig.json",
+    "lint:eslint": "eslint scripts lint-staged.config.cjs eslint.config.ts",
+    "lint:eslint:fix": "eslint scripts lint-staged.config.cjs eslint.config.ts --fix",
     "lint:docs": "node scripts/check-domain-docs.ts",
     "version:patch": "node scripts/increase-version.ts patch",
     "version:minor": "node scripts/increase-version.ts minor",
@@ -93,10 +96,17 @@
     "prod:db:seed:undo": "docker compose --profile prod exec server-prod npx sequelize-cli db:seed:undo:all"
   },
   "devDependencies": {
+    "@alexevs/prettier-config": "1.0.0",
+    "@eslint/js": "9.39.5",
     "@types/node": "22.20.4",
+    "eslint": "9.39.5",
+    "eslint-plugin-import": "2.32.0",
+    "globals": "16.4.0",
     "husky": "8.0.3",
+    "jiti": "2.7.0",
     "lint-staged": "13.3.0",
     "prettier": "3.5.3",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.65.0"
   }
 }
