@@ -1,6 +1,6 @@
 ---
 name: branches
-description: The repository's branch model (main ← testing ← develop, <type>/<name> work branches, shared branches, the release branches), the branch type ↔ PR label table, how to find the base of a branch, and the approval gate for every branch operation. Use before creating, switching, renaming, deleting, pushing, resetting, rebasing or merging a branch, when a skill needs the branch / base / label rules (/commit, /pr, /release), or when the user runs /branches.
+description: The repository's branch model (main ← testing ← develop, <type>/<name> work branches, shared branches and their <name>--<n> sub-branches, the release branches), the branch type ↔ PR label table, how to find the base of a branch, and the approval gate for every branch operation. Use before creating, switching, renaming, deleting, pushing, resetting, rebasing or merging a branch, when a skill needs the branch / base / label rules (/commit, /pr, /release), or when the user runs /branches.
 ---
 
 # branches
@@ -11,7 +11,7 @@ The single source of the branch rules: `/commit`, `/pr` and `/release` refer her
 
 ```
 main  ←  testing  ←  develop  ←  <type>/<name>
-                             ←  <shared branch>  ←  <type>/<name>
+                             ←  <type>/<name>  ←  <type>/<name>--1, <type>/<name>--2, …
 ```
 
 | Branch | Role | Changes only through |
@@ -19,16 +19,17 @@ main  ←  testing  ←  develop  ←  <type>/<name>
 | `main` | production; every GitHub Release `vX.X.X` is tagged on it | `/release` PR `testing` → `main` |
 | `testing` | pre-release check; branched from `main` | `/release` PR `develop` → `testing` |
 | `develop` | integration; branched from `testing`; the default base of all work | merged PRs |
-| shared branch | a large task split into several work branches; branched from `develop`, PR into `develop` | merged PRs of its work branches, its own commits |
-| `<type>/<name>` | one task: a feature, a fix, a doc change | commits of the task |
+| `<type>/<name>` | one task: a feature, a fix, a doc change; branched from `develop`, PR into `develop` | commits of the task; for a shared branch, merged PRs of its sub-branches |
+| `<type>/<name>--<n>` | one part of a long task (a sub-branch); branched from `<type>/<name>`, PR into it | commits of the part |
 
 - `main`, `testing` and `develop` are **protected**: never commit on them, never push to them, never open a PR from
   them — except the promotion PRs of `/release`.
-- A work branch starts from the latest `origin/develop` — or from a shared branch when the user names one — and goes
-  back into that base by a PR (`/pr`).
-- A **shared branch** is any work branch the user names as the base of another one; it needs no special name and
-  follows §2 like any work branch. Others build on it, so never force-push, rebase or reset it; its work branches
-  come in by PR.
+- A work branch starts from the latest `origin/develop` and goes back into `develop` by a PR (`/pr`).
+- A long task becomes a **shared branch** `<type>/<name>` (`feature/new-ui-component`) with numbered
+  **sub-branches** `<type>/<name>--<n>` (`feature/new-ui-component--1`, `--2`, …): each starts from the latest
+  `origin/<type>/<name>` and goes back into it by a PR; the shared branch goes into `develop` when the task is done.
+  One level only — a sub-branch has no sub-branches. Others build on a shared branch, so never force-push, rebase
+  or reset it.
 - Release branches (created only inside `/release`, PR into `develop`):
   - `common/version-increase` — the version bump; `update-version` rewrites it on every release (`/release`
     Phase A), so never commit anything else on it.
@@ -38,8 +39,10 @@ main  ←  testing  ←  develop  ←  <type>/<name>
 ## 2. Types and labels
 
 A work branch is `<type>/<name>`: `<type>` from the table, `<name>` short kebab-case by purpose
-(`bugfix/workout-list-menu-click-navigation`, `common/setup-skill`). The type is also the commit prefix
-(`[Common] …`, see `/commit`) and the PR label (see `/pr`).
+(`bugfix/workout-list-menu-click-navigation`, `common/setup-skill`). A sub-branch appends `--<n>`, a number from 1
+(`feature/new-ui-component--1`), and keeps the type of its shared branch. The type is also the commit prefix
+(`[Common] …`, see `/commit`) and the PR label (see `/pr`). On a sub-branch its number follows the type in every
+commit and PR title: `common/some-changes--1` → `[Common][1] …`.
 
 | Label | Used for | Description in the repo |
 |---|---|---|
@@ -59,18 +62,15 @@ means a new label there, a new row here and the type in the `argument-hint` of `
 
 ## 3. The base of a branch
 
-Git does not record which branch a branch was created from, so the base is found and then confirmed:
+The name gives the base:
 
-1. The branch already has a PR → its base (`gh pr view --json baseRefName -q .baseRefName`).
-2. Otherwise the candidates are `origin/develop`, the bases of open PRs (`gh pr list --json baseRefName`) and any
-   shared branch the user mentioned — never the current branch itself (a shared branch is the base of its own work
-   branches' PRs, and over itself it has 0 commits). After `git fetch origin`, count the branch's own commits over
-   each: `git rev-list --count origin/<candidate>..HEAD`. The candidate with the fewest is the closest fork point;
-   on a tie, `develop`.
-3. Show the result ("base: `feature/personal-data-compliance` — 2 own commits over it, 9 over `develop`") and let
-   the user confirm or name another one. Several close candidates, or none → ask.
+- `<type>/<name>--<n>` → `<type>/<name>` (`feature/new-ui-component--2` → `feature/new-ui-component`). It must exist
+  on `origin` (`git ls-remote --heads origin <type>/<name>`); if it does not, stop and ask.
+- any other work branch → `develop`.
 
-The confirmed base is what `/pr` targets (`--base`) and what `/code-review <base>` compares against.
+The branch already has a PR with another base (`gh pr view --json baseRefName -q .baseRefName`) → show both and ask.
+
+The base is what `/pr` targets (`--base`) and what `/code-review <base>` compares against.
 
 ## 4. The gate
 
@@ -91,18 +91,21 @@ How:
 3. The user naming the operation is the yes ("stash it and go to develop" approves exactly that stash and that
    switch — not the branch that comes next).
 
-Without the gate: reading (`git status`, `branch`, `log`, `diff`, `show`, `rev-parse`, `rev-list`), `git fetch`,
+Without the gate: reading (`git status`, `branch`, `log`, `diff`, `show`, `rev-parse`, `ls-remote`), `git fetch`,
 and commits on the current non-protected branch through `/commit` (it asks for its own approval).
 
 ## 5. Doing it safely
 
 - **Dirty tree before a switch:** stop and ask — commit (`/commit`) or stash (`git stash push -u -m "<what>"`, so
   untracked files go too). Never discard changes, never `checkout -- .` / `reset --hard` someone's work.
-- **New work branch:** `git fetch origin <base>`, then `git switch --no-track -c <type>/<name> origin/<base>`, where
-  `<base>` is `develop` unless the user named a shared branch. `--no-track` goes **before** `-c` (`-c` takes the
-  next word as the branch name). Without it the branch tracks `origin/<base>`, and a bare `git push` would push the
-  work into the base.
-- **First push:** `git push -u origin <type>/<name>` — the upstream is the branch itself.
+- **New work branch:** `git fetch origin <base>`, then `git switch --no-track -c <branch> origin/<base>` with the
+  base from §3:
+  - `git switch --no-track -c feature/new-ui-component origin/develop`
+  - `git switch --no-track -c feature/new-ui-component--1 origin/feature/new-ui-component`
+
+  `--no-track` goes **before** `-c` (`-c` takes the next word as the branch name). Without it the branch tracks
+  `origin/<base>`, and a bare `git push` would push the work into the base.
+- **First push:** `git push -u origin <branch>` — the upstream is the branch itself.
 - **Wrong branch for a change** (on a protected branch, or the type does not match): say so and propose the branch;
   don't create it on your own.
 - **Coming back:** after a detour (stash → another branch → back), restore with `git stash pop` on the original

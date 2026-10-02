@@ -9,7 +9,7 @@ Act as a Git Automation Agent. Your goal is to create a GitHub Pull Request foll
 
 1. BRANCH & ENVIRONMENT CHECK
 The branch rules live in `.claude/skills/branches/SKILL.md` (`/branches`); follow it, including its gate.
-Identify the current branch and its base: `develop` or a shared branch, found and confirmed as in branches §3.
+Identify the current branch and its base, given by the branch name (branches §3): `develop`, or the shared branch of a `--<n>` sub-branch.
 Safety Lock: If the current branch is protected (branches §1), STOP and warn the user that PRs cannot be created from it — promotion PRs belong to `/release`.
 Prefix Check: Ensure the branch name is `<type>/<name>` with a work type from branches §2.
 If it is not, STOP and propose a rename; renaming (and pushing the renamed branch) waits for the user's yes (branches §4).
@@ -23,7 +23,7 @@ Use that commit's title and body for the PR.
 Case B (Multiple commits):
 Analyze all commit messages in the current branch.
 Generate a Summarized Title and Structured Description.
-Title Format: [<Type>] <Summary> (Type must be derived from the branch prefix, e.g., [Feature]).
+Title Format: [<Type>] <Summary> (Type must be derived from the branch prefix, e.g., [Feature]), plus the sub-branch number on a sub-branch (branches §2).
 Description: 2-3 sentences explaining the overall impact and a bullet-point list of key changes.
 
 3. CODE REVIEW LOG
