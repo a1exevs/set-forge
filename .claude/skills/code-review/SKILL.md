@@ -97,7 +97,7 @@ Rounds: 2 · last: 2026-09-29 14:05 · scope: develop (77b0a62, 7 files)
 
 | # | Sev | Where | Problem | Proof | Fix | Status |
 |---|-----|-------|---------|-------|-----|--------|
-| 1 | 🔴 | scripts/setup-env.sh:112 | `grep -q healthy` also matches `unhealthy` … | `echo unhealthy \| grep -q healthy` → exit 0 | `grep -qx healthy` | fixed (r2) |
+| 1 | 🔴 | .claude/skills/setup/SKILL.md:112 | `grep -q healthy` also matches `unhealthy` … | `echo unhealthy \| grep -q healthy` → exit 0 | `grep -qx healthy` | fixed (r2) |
 | 2 | 🟠 | .claude/skills/setup/SKILL.md:88 | `nvm` is a shell function … | unverified: needs a Mac with brew nvm | source `nvm.sh` first | open (r1) |
 | 3 | 🟡 | README.md:41 | "the first and the third" relies on list order | — | name the files | wontfix |
 
@@ -140,7 +140,7 @@ Since round 1: 1 fixed (#1), 1 still open (#2), 1 wontfix (#3)
 
 | # | Sev | Where | Problem | Proof | Fix | Status |
 |---|-----|-------|---------|-------|-----|--------|
-| 4 | 🔴 | scripts/setup-env.sh:57 | … | … | … | new (r2) |
+| 4 | 🔴 | scripts/setup-env.ts:57 | … | … | … | new (r2) |
 | 2 | 🟠 | .claude/skills/setup/SKILL.md:88 | … | unverified: … | … | open (r1) |
 
 Verdict: Not ready — 1 blocker, 1 important.

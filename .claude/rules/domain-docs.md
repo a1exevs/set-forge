@@ -45,9 +45,9 @@ get renamed. No change logs or task plans: plans live in the PR, history in git.
 
 | Rule | Checked by |
 |---|---|
-| Fixed sections, one title, size limit | `npm run lint:root` · `scripts/check-domain-docs.mjs` |
-| Every path in a doc exists | `npm run lint:root` · `scripts/check-domain-docs.mjs` |
-| Invariants ↔ tests: tagged ⇔ not `❌ review`; every tag names an existing invariant, only in test files | `npm run lint:root` · `scripts/check-domain-docs.mjs` |
-| Every client entity, feature, page, widget, every server domain module and model is in a Map, slice by slice (no layer-level path) | `npm run lint:root` · `scripts/check-domain-docs.mjs` |
+| Fixed sections, one title, size limit | `npm run lint:root` · `scripts/check-domain-docs.ts` |
+| Every path in a doc exists | `npm run lint:root` · `scripts/check-domain-docs.ts` |
+| Invariants ↔ tests: tagged ⇔ not `❌ review`; every tag names an existing invariant, only in test files | `npm run lint:root` · `scripts/check-domain-docs.ts` |
+| Every client entity, feature, page, widget, every server domain module and model is in a Map, slice by slice (no layer-level path) | `npm run lint:root` · `scripts/check-domain-docs.ts` |
 | A tagged test really proves its invariant | ❌ review |
 | The doc still tells the truth about rules and flows | ❌ review |

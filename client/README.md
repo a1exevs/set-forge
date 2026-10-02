@@ -63,7 +63,7 @@ From the **repository root**, use the `client:*` aliases (see [root README](../R
 
 ### `generate:icons`
 
-[`scripts/generate-public-icons.mjs`](scripts/generate-public-icons.mjs) — rasterizes SVG sources in [`public/`](public/) with `@resvg/resvg-js`, builds `favicon.ico` with `to-ico`.
+[`scripts/generate-public-icons.ts`](scripts/generate-public-icons.ts) — rasterizes SVG sources in [`public/`](public/) with `@resvg/resvg-js`, builds `favicon.ico` with `to-ico`.
 
 **Source of truth (edit manually, then re-run the script):**
 

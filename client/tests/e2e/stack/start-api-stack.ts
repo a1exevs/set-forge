@@ -2,27 +2,30 @@
  * Playwright webServer entry: ephemeral MySQL (Testcontainers) → migrate/seed → Nest on E2E_SERVER_PORT.
  * Stays alive until Playwright sends SIGTERM/SIGINT, then stops Nest and the container.
  */
-const { MySqlContainer } = require('@testcontainers/mysql');
-const { spawn, execSync } = require('child_process');
-const fs = require('fs');
-const net = require('net');
-const path = require('path');
+import { MySqlContainer } from '@testcontainers/mysql';
+import { type ChildProcess, execSync, spawn } from 'node:child_process';
+import fs from 'node:fs';
+import net from 'node:net';
+import path from 'node:path';
 
-
-const ports = require('./ports.json');
+// Plain Node runs this file, so it reads ports.json itself instead of the `tests/...` alias of ports.ts.
+const ports = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'ports.json'), 'utf8')) as {
+  clientPort: number;
+  serverPort: number;
+};
 
 const E2E_CLIENT_PORT = ports.clientPort;
 const E2E_SERVER_PORT = ports.serverPort;
 const E2E_CLIENT_ORIGIN = `http://localhost:${E2E_CLIENT_PORT}`;
 
-const CLIENT_ROOT = path.resolve(__dirname, '../../..');
+const CLIENT_ROOT = path.resolve(import.meta.dirname, '../../..');
 const SERVER_ROOT = path.resolve(CLIENT_ROOT, '..', 'server');
 const E2E_ENV_PATH = path.join(SERVER_ROOT, '.e2e.env');
 const E2E_ENV_EXAMPLE_PATH = path.join(SERVER_ROOT, '.e2e.env.example');
 
 const NEST_SHUTDOWN_TIMEOUT_MS = 15_000;
 
-function assertDockerAvailable() {
+function assertDockerAvailable(): void {
   try {
     execSync('docker info', { stdio: 'ignore' });
   } catch {
@@ -32,16 +35,16 @@ function assertDockerAvailable() {
   }
 }
 
-function ensureE2eEnvFile() {
+function ensureE2eEnvFile(): void {
   if (!fs.existsSync(E2E_ENV_PATH)) {
     fs.copyFileSync(E2E_ENV_EXAMPLE_PATH, E2E_ENV_PATH);
   }
 }
 
-function assertPortFree(port) {
+function assertPortFree(port: number): Promise<void> {
   return new Promise((resolve, reject) => {
     const server = net.createServer();
-    server.once('error', err => {
+    server.once('error', (err: NodeJS.ErrnoException) => {
       reject(
         new Error(
           `Port ${port} is already in use (${err.code}). Stop the process on that port (likely a leftover Nest from a previous e2e run) and retry.`,
@@ -56,12 +59,12 @@ function assertPortFree(port) {
 }
 
 /** Kill `pid` and its descendants without `detached` (avoids orphan Nest after Playwright stops the webServer). */
-function killProcessTree(pid, signal) {
+function killProcessTree(pid: number | undefined, signal: NodeJS.Signals): void {
   if (pid == null) {
     return;
   }
 
-  let childPids = [];
+  let childPids: number[] = [];
   try {
     childPids = execSync(`pgrep -P ${pid}`, { encoding: 'utf8' })
       .trim()
@@ -83,14 +86,14 @@ function killProcessTree(pid, signal) {
   }
 }
 
-function waitForChildExit(child, timeoutMs) {
+function waitForChildExit(child: ChildProcess, timeoutMs: number): Promise<number> {
   return new Promise(resolve => {
     if (child.exitCode !== null || child.signalCode !== null) {
       resolve(child.exitCode ?? 0);
       return;
     }
 
-    const onExit = code => {
+    const onExit = (code: number | null): void => {
       clearTimeout(timer);
       resolve(code ?? 0);
     };
@@ -107,7 +110,7 @@ function waitForChildExit(child, timeoutMs) {
   });
 }
 
-async function main() {
+async function main(): Promise<void> {
   assertDockerAvailable();
   ensureE2eEnvFile();
   await assertPortFree(E2E_SERVER_PORT);
@@ -153,7 +156,7 @@ async function main() {
 
   let shuttingDown = false;
 
-  const shutdown = async (exitCode = 0) => {
+  const shutdown = async (exitCode = 0): Promise<void> => {
     if (shuttingDown) {
       return;
     }
@@ -185,7 +188,7 @@ async function main() {
   });
 }
 
-main().catch(err => {
+main().catch((err: unknown) => {
   // eslint-disable-next-line no-console
   console.error('[e2e-stack] Failed to start API stack:', err);
   process.exit(1);

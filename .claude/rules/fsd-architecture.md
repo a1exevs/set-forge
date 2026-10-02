@@ -93,7 +93,7 @@ Five standard segments in slices. Names describe the **purpose**, never the esse
 | `lib/` | helpers used inside the slice, pure utilities | `history-formatters` |
 | `config/` | constants, configuration | `main-tab-routes` |
 
-`app` and `shared` use their own segments, named by purpose, from a fixed list (`client/scripts/check-structure.mjs`):
+`app` and `shared` use their own segments, named by purpose, from a fixed list (`client/scripts/check-structure.ts`):
 
 - `app/`: `entrypoint/` (`main.tsx`, referenced from `index.html`), `routes/` (TanStack file routes), `router/`
   (router + generated route tree), `api/` (query client), `styles/` (global styles). The FSD docs name `store/` for
@@ -281,8 +281,8 @@ src/
 
 ## Enforcement
 
-All client checks run in `npm run client:lint`: structure script → stories check → rules check → linter config types →
-ESLint → Steiger → knip. The domain docs check is `npm run lint:root` (`scripts/check-domain-docs.mjs`).
+All client checks run in `npm run client:lint`: structure script → stories check → rules check → linter config and script types →
+ESLint → Steiger → knip. The domain docs check is `npm run lint:root` (`scripts/check-domain-docs.ts`).
 
 | Rule | Checked by |
 |---|---|
@@ -297,9 +297,9 @@ ESLint → Steiger → knip. The domain docs check is `npm run lint:root` (`scri
 | `interface` only for domain entities in `entities/*/model` | `npm run client:lint` · ESLint `@typescript-eslint/consistent-type-definitions` · `client/eslint.config.ts` |
 | Headless UI / sonner only in `shared`; React Query not in `ui` | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
 | `shared` imports no other layer; other `shared` segments only via `@shared/<segment>` | `npm run client:lint` · ESLint `no-restricted-imports` · Steiger `fsd/forbidden-imports` |
-| `index.ts` placement, `@x` file names, allowed segments, nothing but `index.ts` in a slice root | `npm run client:lint` · `client/scripts/check-structure.mjs` · Steiger `fsd/public-api` · Steiger `fsd/no-layer-public-api` · Steiger `fsd/no-segmentless-slices` |
-| No `export *`; no `eslint-disable` of FSD rules | `npm run client:lint` · `client/scripts/check-structure.mjs` |
-| Names by purpose, tests in `specs/`, kebab-case | `npm run client:lint` · `client/scripts/check-structure.mjs` · Steiger `fsd/segments-by-purpose` |
+| `index.ts` placement, `@x` file names, allowed segments, nothing but `index.ts` in a slice root | `npm run client:lint` · `client/scripts/check-structure.ts` · Steiger `fsd/public-api` · Steiger `fsd/no-layer-public-api` · Steiger `fsd/no-segmentless-slices` |
+| No `export *`; no `eslint-disable` of FSD rules | `npm run client:lint` · `client/scripts/check-structure.ts` |
+| Names by purpose, tests in `specs/`, kebab-case | `npm run client:lint` · `client/scripts/check-structure.ts` · Steiger `fsd/segments-by-purpose` |
 | No unused exports, files or dependencies | `npm run client:lint` · knip · `client/knip.jsonc` |
 | Pages first | `npm run client:lint` · Steiger `fsd/insignificant-slice` (warning only) |
 | `shared` knows nothing about the domain | ❌ review (upward imports are caught, domain concepts are not) |

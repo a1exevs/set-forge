@@ -1,13 +1,11 @@
 import { Resvg } from '@resvg/resvg-js';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import toIco from 'to-ico';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const publicDir = path.resolve(__dirname, '../public');
+const publicDir = path.resolve(import.meta.dirname, '../public');
 
-const renderPng = (svg, outputPath, width, { withText = false } = {}) => {
+const renderPng = (svg: string, outputPath: string, width: number, { withText = false } = {}): void => {
   const resvg = new Resvg(svg, {
     fitTo: {
       mode: 'width',

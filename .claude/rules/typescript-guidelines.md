@@ -1,13 +1,14 @@
 ---
-description: TypeScript — strict mode, no any, explicit return types, interface vs type, curly braces
+description: TypeScript — strict mode, no any, explicit return types, interface vs type, curly braces, Node scripts
 paths:
   - "client/**"
   - "server/**"
+  - "scripts/**"
 ---
 
 # TypeScript Guidelines
 
-Strict TypeScript in the client and the server.
+Strict TypeScript in the client, the server and the repository scripts.
 
 ## Type safety
 
@@ -54,6 +55,20 @@ if (!value) {
 }
 ```
 
+## Node scripts
+
+Repository scripts (`scripts/`, `client/scripts/`, the Playwright API stack) are TypeScript that Node runs as is —
+`node scripts/check-domain-docs.ts`, no ts-node, no build. Node only strips the types, hence:
+
+- erasable syntax only: no `enum` (an `as const` object + a union type), `namespace` or constructor parameter
+  properties;
+- ES modules: the folder resolves to a `"type": "module"` package.json; `import.meta.dirname` instead of
+  `__dirname`;
+- relative imports name the file with its extension (`./common.ts`); type-only imports use `import type`;
+- no path aliases (`tests/...`, `@shared/...`): Node does not read `tsconfig.json`.
+
+Node does not type-check either, so every script folder is covered by a `tsc` project that emits no code.
+
 ## Enforcement
 
 | Rule | Checked by |
@@ -65,3 +80,4 @@ if (!value) {
 | `interface` only in `entities/*/model` (client) | `npm run client:lint` · ESLint `@typescript-eslint/consistent-type-definitions` · `client/eslint.config.ts` |
 | No `any`, explicit return types, `interface` vs `type` (server) | ❌ review (`no-explicit-any` is off in `server/eslint.config.ts` until the typing clean-up) |
 | Minimal `as`, DTOs as `type` inside entity models | ❌ review |
+| Node scripts: erasable syntax, strict types | `npm run lint:root` · `scripts/tsconfig.json` · `npm run client:lint` · `client/tsconfig.scripts.json` |

@@ -7,7 +7,7 @@
 - Rules in `.claude/rules/` are immutable conventions with one structure: frontmatter `description` / `paths` (the
   globs that load the rule when a matching file is read), `# Title`, topic sections, optional `## Related`, and
   `## Enforcement` last (what checks each rule, or `❌ review`). `npm run client:lint`
-  (`client/scripts/check-rules.mjs`) keeps that structure and every reference in Enforcement valid.
+  (`client/scripts/check-rules.ts`) keeps that structure and every reference in Enforcement valid.
 - Skills in `.claude/skills/<name>/SKILL.md` are the repository workflows (`/setup`, `/branches`, `/commit`, `/pr`,
   `/code-review`, `/privacy-audit`, `/release`); Claude also picks them up from a plain request ("commit this",
   "make a release", "set up my machine").
@@ -21,7 +21,7 @@
 
 `docs/domains/*.md` — glossary, invariants (proven by tests tagged `// @invariant <domain>/<id>`, or marked
 `❌ review`), flows and a map to the code.
-Format: [domain-docs](.claude/rules/domain-docs.md); `npm run lint:root` (`scripts/check-domain-docs.mjs`)
+Format: [domain-docs](.claude/rules/domain-docs.md); `npm run lint:root` (`scripts/check-domain-docs.ts`)
 fails on a broken path, a missing section or an unmapped slice / module.
 
 | Domain | Doc |

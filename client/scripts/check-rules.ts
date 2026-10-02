@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Keeps the agent rules (.claude/rules/*.md) in one shape and their `## Enforcement` sections truthful:
 //   1. frontmatter: exactly `description` (one line) and `paths` (a YAML list of quoted globs, one per line —
 //      the shape Claude Code reads); the static part of every glob exists;
@@ -9,7 +8,7 @@
 // Exit code 1 lists every violation.
 //
 // TODO: this is a repo-wide check (it reads the root package.json, resolves paths from the repo root and asks ESLint
-//   of both projects), so it belongs next to scripts/check-domain-docs.mjs and `npm run lint:root`. What keeps it
+//   of both projects), so it belongs next to scripts/check-domain-docs.ts and `npm run lint:root`. What keeps it
 //   here are its imports: `eslint` (the same 9.x in client and server, but declared by neither root nor a root
 //   script) and `@feature-sliced/steiger-plugin` (a client tool). Move it once the root declares `eslint` and the
 //   Steiger rule list is resolved from the client workspace
@@ -19,9 +18,16 @@ import fsd from '@feature-sliced/steiger-plugin';
 import { ESLint } from 'eslint';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const clientDir = join(fileURLToPath(import.meta.url), '..', '..');
+type Project = 'client' | 'server';
+
+type Heading = {
+  level: 1 | 2;
+  text: string;
+  index: number;
+};
+
+const clientDir = join(import.meta.dirname, '..');
 const repoRoot = join(clientDir, '..');
 const rulesDir = join(repoRoot, '.claude', 'rules');
 
@@ -29,12 +35,15 @@ const FRONTMATTER_KEYS = ['description', 'paths'];
 const PATH_PREFIXES = ['client/', 'server/', '.claude/', 'docs/', 'scripts/'];
 const REVIEW = '❌ review';
 
-const problems = [];
-const rel = path => relative(repoRoot, path).split('\\').join('/');
-const rootScripts = new Set(Object.keys(JSON.parse(readFileSync(join(repoRoot, 'package.json'), 'utf8')).scripts));
-const steigerRules = new Set(fsd.plugin.ruleDefinitions.map(rule => rule.name));
+const problems: string[] = [];
+const rel = (path: string): string => relative(repoRoot, path).split('\\').join('/');
+const rootPackage = JSON.parse(readFileSync(join(repoRoot, 'package.json'), 'utf8')) as {
+  scripts: Record<string, string>;
+};
+const rootScripts = new Set(Object.keys(rootPackage.scripts));
+const steigerRules = new Set(fsd.plugin.ruleDefinitions.map((rule: { name: string }) => rule.name));
 
-function sourceFiles(dir, out = []) {
+function sourceFiles(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {
@@ -49,16 +58,16 @@ function sourceFiles(dir, out = []) {
 }
 
 /** Rules enabled for at least one file of the project — what `npm run <project>:lint` actually checks. */
-async function enabledEslintRules(projectDir, roots) {
+async function enabledEslintRules(projectDir: string, roots: string[]): Promise<Set<string>> {
   const eslint = new ESLint({ cwd: projectDir });
-  const enabled = new Set();
+  const enabled = new Set<string>();
   for (const file of roots.flatMap(root => sourceFiles(join(projectDir, root)))) {
     if (await eslint.isPathIgnored(file)) {
       continue;
     }
-    const config = await eslint.calculateConfigForFile(file);
+    const config = (await eslint.calculateConfigForFile(file)) as { rules?: Record<string, unknown> } | undefined;
     for (const [rule, setting] of Object.entries(config?.rules ?? {})) {
-      const severity = Array.isArray(setting) ? setting[0] : setting;
+      const severity: unknown = Array.isArray(setting) ? setting[0] : setting;
       if (severity !== 0 && severity !== 'off') {
         enabled.add(rule);
       }
@@ -67,24 +76,27 @@ async function enabledEslintRules(projectDir, roots) {
   return enabled;
 }
 
-const eslintRules = {
+const eslintRules: Record<Project, Set<string>> = {
   client: await enabledEslintRules(clientDir, ['src', 'linter', 'tests', '.storybook']),
   server: await enabledEslintRules(join(repoRoot, 'server'), ['src', 'test']),
 };
 
-function parseFrontmatter(file, text) {
+/** First capture group of every match. */
+const captures = (text: string, pattern: RegExp): string[] => [...text.matchAll(pattern)].map(match => match[1] ?? '');
+
+function parseFrontmatter(file: string, text: string): number | null {
   const match = /^---\n([\s\S]*?)\n---\n/.exec(text);
   if (!match) {
     problems.push(`${file}: no frontmatter`);
     return null;
   }
-  const lines = match[1].split('\n');
+  const lines = (match[1] ?? '').split('\n');
   const keys = lines.filter(line => !line.startsWith(' ')).map(line => /^([A-Za-z]+):/.exec(line)?.[1]);
   if (keys.some(key => key === undefined) || keys.join() !== FRONTMATTER_KEYS.join()) {
     problems.push(`${file}: frontmatter must be exactly ${FRONTMATTER_KEYS.join(', ')} (in this order)`);
     return null;
   }
-  if (!lines[0].slice('description:'.length).trim()) {
+  if (!lines[0]?.slice('description:'.length).trim()) {
     problems.push(`${file}: empty description`);
   }
   const items = lines.slice(lines.indexOf('paths:') + 1);
@@ -92,7 +104,7 @@ function parseFrontmatter(file, text) {
   if (lines[1] !== 'paths:' || items.length === 0 || globs.some(glob => glob === undefined)) {
     problems.push(`${file}: paths must be a YAML list of quoted globs, one \`  - "client/**"\` per line`);
   } else {
-    for (const glob of globs) {
+    for (const glob of globs as string[]) {
       const staticPart = glob
         .split('/')
         .filter((_, index, parts) => !parts.slice(0, index + 1).some(p => /[*?{]/.test(p)));
@@ -105,8 +117,8 @@ function parseFrontmatter(file, text) {
 }
 
 /** Headings outside fenced code blocks. */
-function headings(body) {
-  const result = [];
+function headings(body: string): Heading[] {
+  const result: Heading[] = [];
   let fenced = false;
   body.split('\n').forEach((line, index) => {
     if (line.startsWith('```')) {
@@ -118,13 +130,11 @@ function headings(body) {
   return result;
 }
 
-function checkReferences(file, rule, cell) {
-  const eslintIds = [...cell.matchAll(/ESLint `([^`]+)`/g)].map(match => match[1]);
-  const steigerIds = [...cell.matchAll(/Steiger `([^`]+)`/g)].map(match => match[1]);
-  const scripts = [...cell.matchAll(/`npm run ([^`\s]+)`/g)].map(match => match[1]);
-  const paths = [...cell.matchAll(/`([^`]+)`/g)]
-    .map(match => match[1])
-    .filter(token => PATH_PREFIXES.some(prefix => token.startsWith(prefix)));
+function checkReferences(file: string, rule: string, cell: string): void {
+  const eslintIds = captures(cell, /ESLint `([^`]+)`/g);
+  const steigerIds = captures(cell, /Steiger `([^`]+)`/g);
+  const scripts = captures(cell, /`npm run ([^`\s]+)`/g);
+  const paths = captures(cell, /`([^`]+)`/g).filter(token => PATH_PREFIXES.some(prefix => token.startsWith(prefix)));
 
   for (const script of scripts) {
     if (!rootScripts.has(script)) {
@@ -134,10 +144,10 @@ function checkReferences(file, rule, cell) {
   // The project comes from the scripts the row names (`client:lint`, `server:lint:eslint`, …); a row that names
   // none must hold in both.
   const projects = [...new Set(scripts.map(script => script.split(':')[0]))].filter(
-    project => project === 'client' || project === 'server',
+    (project): project is Project => project === 'client' || project === 'server',
   );
   for (const id of eslintIds) {
-    for (const project of projects.length > 0 ? projects : ['client', 'server']) {
+    for (const project of projects.length > 0 ? projects : (['client', 'server'] as const)) {
       if (!eslintRules[project].has(id)) {
         problems.push(`${file}: "${rule}" — ESLint \`${id}\` is not enabled in ${project}`);
       }
@@ -153,13 +163,14 @@ function checkReferences(file, rule, cell) {
       problems.push(`${file}: "${rule}" — \`${path}\` does not exist`);
     }
   }
-  const references = eslintIds.length + steigerIds.length + scripts.length + paths.length + /\bknip\b/.test(cell);
+  const references =
+    eslintIds.length + steigerIds.length + scripts.length + paths.length + Number(/\bknip\b/.test(cell));
   if (!cell.includes(REVIEW) && references === 0) {
     problems.push(`${file}: "${rule}" — name a check (npm script, ESLint / Steiger rule, file) or write \`${REVIEW}\``);
   }
 }
 
-function checkEnforcement(file, section) {
+function checkEnforcement(file: string, section: string): void {
   const rows = section
     .split('\n')
     .filter(line => line.startsWith('|'))

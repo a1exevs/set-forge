@@ -47,8 +47,8 @@ In `client/src` a file or folder is named after **what it is for**, not what kin
 
 | Rule | Checked by |
 |---|---|
-| kebab-case in `client/src`, `client/tests`, `client/linter`, `client/scripts` (route files excepted) | `npm run client:lint` · `client/scripts/check-structure.mjs` |
-| Client names by purpose (folders and file suffixes) | `npm run client:lint` · `client/scripts/check-structure.mjs` · Steiger `fsd/segments-by-purpose` |
-| Client tests in `specs/` | `npm run client:lint` · `client/scripts/check-structure.mjs` |
+| kebab-case in `client/src`, `client/tests`, `client/linter`, `client/scripts` (route files excepted) | `npm run client:lint` · `client/scripts/check-structure.ts` |
+| Client names by purpose (folders and file suffixes) | `npm run client:lint` · `client/scripts/check-structure.ts` · Steiger `fsd/segments-by-purpose` |
+| Client tests in `specs/` | `npm run client:lint` · `client/scripts/check-structure.ts` |
 | kebab-case in `server/` | ❌ review |
 | Route import names | ❌ review (the route tree is generated) |

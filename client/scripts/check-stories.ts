@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Every component has its Storybook story next to it (see .claude/rules/storybook.md):
 //   1. each component of a `ui` segment — the base name of its files without the `-data-layer` / `-logic-layer` /
 //      `-provider` layer suffix — has `<base>.stories.tsx` in the same folder; a stories file whose component is
@@ -10,9 +9,13 @@
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const clientDir = join(fileURLToPath(import.meta.url), '..', '..');
+type UiSegment = {
+  layer: string;
+  dir: string;
+};
+
+const clientDir = join(import.meta.dirname, '..');
 const srcDir = join(clientDir, 'src');
 
 const LAYERS = ['pages', 'widgets', 'features', 'entities', 'shared'];
@@ -26,17 +29,17 @@ const STORY_EXPORT = /^export const (\w+)/gm;
 const PAGE_VIEWPORTS = ['Desktop4k', 'Desktop', 'Tablet', 'Mobile'];
 const SKIP_DIRS = new Set(['specs', '__snapshots__', '__mocks__']);
 
-const problems = [];
-const rel = path => relative(clientDir, path).split('\\').join('/');
-const pascal = kebab =>
+const problems: string[] = [];
+const rel = (path: string): string => relative(clientDir, path).split('\\').join('/');
+const pascal = (kebab: string): string =>
   kebab
     .split('-')
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))
     .join('');
 
 /** Every `ui` segment folder: `src/shared/ui` and `src/<layer>/<slice>/ui`. */
-function uiSegments() {
-  const segments = [];
+function uiSegments(): UiSegment[] {
+  const segments: UiSegment[] = [];
   for (const layer of LAYERS) {
     const layerDir = join(srcDir, layer);
     if (!existsSync(layerDir)) {
@@ -56,7 +59,7 @@ function uiSegments() {
 }
 
 /** The folder and every nested one (component folders of `shared/ui`), tests and snapshots skipped. */
-function folders(dir, out = []) {
+function folders(dir: string, out: string[] = []): string[] {
   out.push(dir);
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.isDirectory() && !SKIP_DIRS.has(entry.name)) {
@@ -66,7 +69,7 @@ function folders(dir, out = []) {
   return out;
 }
 
-function checkFolder(layer, dir) {
+function checkFolder(layer: string, dir: string): void {
   const files = readdirSync(dir, { withFileTypes: true })
     .filter(entry => entry.isFile())
     .map(entry => entry.name);
@@ -92,7 +95,7 @@ function checkFolder(layer, dir) {
   }
 }
 
-function checkStory(layer, path, component) {
+function checkStory(layer: string, path: string, component: string): void {
   const text = readFileSync(path, 'utf8');
   const expected = `${pascal(layer)}/${pascal(component)}`;
   // Only the meta's own `title`: a fixture or an options object above `const meta` may carry one too.
@@ -107,7 +110,7 @@ function checkStory(layer, path, component) {
   }
 
   if (layer === 'pages') {
-    const exports = [...text.matchAll(STORY_EXPORT)].map(match => match[1]);
+    const exports = [...text.matchAll(STORY_EXPORT)].map(match => match[1] ?? '');
     for (const viewport of PAGE_VIEWPORTS) {
       if (!exports.some(name => name.endsWith(viewport))) {
         problems.push(`${rel(path)}: no \`*${viewport}\` story — pages render in every viewport`);

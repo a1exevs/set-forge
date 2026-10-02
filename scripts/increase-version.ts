@@ -1,13 +1,14 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
-import { rootDir } from './common';
+import { rootDir } from './common.ts';
 
-enum IncreaseVersionMode {
-  MAJOR = 'major',
-  MINOR = 'minor',
-  PATCH = 'patch',
-}
+const IncreaseVersionMode = {
+  MAJOR: 'major',
+  MINOR: 'minor',
+  PATCH: 'patch',
+} as const;
+type IncreaseVersionMode = (typeof IncreaseVersionMode)[keyof typeof IncreaseVersionMode];
 
 /** App version is always taken from the client workspace; server stays in lockstep. */
 const CANONICAL_PACKAGE_JSON = path.resolve(rootDir, 'client', 'package.json');
@@ -18,28 +19,20 @@ const PACKAGE_JSON_PATHS = [
 ];
 
 function increaseVersion(version: string, type: IncreaseVersionMode): string {
-  const parts = version.split('.').map(Number);
+  const [major = 0, minor = 0, patch = 0] = version.split('.').map(Number);
 
   switch (type) {
     case IncreaseVersionMode.MAJOR:
-      parts[0]++;
-      parts[1] = 0;
-      parts[2] = 0;
-      break;
+      return [major + 1, 0, 0].join('.');
     case IncreaseVersionMode.MINOR:
-      parts[1]++;
-      parts[2] = 0;
-      break;
+      return [major, minor + 1, 0].join('.');
     case IncreaseVersionMode.PATCH:
-      parts[2]++;
-      break;
+      return [major, minor, patch + 1].join('.');
     default:
       throw new Error(
         `Invalid version type: ${type}. Use "${IncreaseVersionMode.MAJOR}", "${IncreaseVersionMode.MINOR}" or "${IncreaseVersionMode.PATCH}".`,
       );
   }
-
-  return parts.join('.');
 }
 
 function readVersion(filePath: string): string {
@@ -72,7 +65,7 @@ function main(): void {
   const args = process.argv.slice(2);
   const type = args[0] as IncreaseVersionMode;
 
-  if (![IncreaseVersionMode.MAJOR, IncreaseVersionMode.MINOR, IncreaseVersionMode.PATCH].includes(type)) {
+  if (!Object.values(IncreaseVersionMode).includes(type)) {
     console.error('Usage: node increase-version.ts <major|minor|patch>');
     process.exit(1);
   }

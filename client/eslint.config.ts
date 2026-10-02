@@ -117,21 +117,6 @@ export default defineConfig(
     },
   },
   {
-    // Playwright webServer bootstrap (Node CJS)
-    files: ['tests/**/*.cjs'],
-    languageOptions: {
-      sourceType: 'commonjs',
-      globals: {
-        ...globals.node,
-      },
-    },
-    rules: {
-      '@typescript-eslint/no-require-imports': 'off',
-      // Plain JS: no type annotations to write.
-      '@typescript-eslint/explicit-function-return-type': 'off',
-    },
-  },
-  {
     // linter config files
     files: ['linter/**/*.{ts,tsx}', 'eslint.config.ts', 'steiger.config.ts'],
     rules: {
@@ -140,11 +125,8 @@ export default defineConfig(
     },
   },
   {
-    // Node CLI scripts (plain JavaScript): node globals, no TypeScript return types
-    files: ['scripts/**/*.mjs'],
+    // Node CLI scripts and the Playwright API stack: TypeScript that Node runs as is (typescript-guidelines)
+    files: ['scripts/**/*.ts', 'tests/e2e/stack/start-api-stack.ts'],
     languageOptions: { globals: { ...globals.node } },
-    rules: {
-      '@typescript-eslint/explicit-function-return-type': 'off',
-    },
   },
 );

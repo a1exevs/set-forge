@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Structural FSD checks that neither ESLint nor Steiger cover (see .claude/rules/fsd-architecture.md):
 //   1. `src` root holds only the layers and `vite-env.d.ts` (the entry point is `app/entrypoint/main.tsx`);
 //   2. slice root holds only `index.ts`, segment folders and (entities) the `@x` folder;
@@ -14,11 +13,17 @@
 //   9. no `export *` anywhere in src; no `eslint-disable` of FSD boundary rules, no blanket `eslint-disable`.
 // Exit code 1 lists every violation.
 
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { type Dirent, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const clientDir = join(fileURLToPath(import.meta.url), '..', '..');
+type Visit = (path: string, entry: Dirent, isDir: boolean) => void;
+
+type SegmentPolicy = {
+  allowed: Set<string>;
+  index: 'required' | 'forbidden';
+};
+
+const clientDir = join(import.meta.dirname, '..');
 const srcDir = join(clientDir, 'src');
 
 const SLICE_SEGMENTS = new Set(['ui', 'model', 'api', 'lib', 'config']);
@@ -53,11 +58,11 @@ const ROUTE_FILE = /^(__root|\$[a-z][a-zA-Z0-9]*)\.tsx$/;
 const KEBAB_ROOTS = ['src', 'tests', 'linter', 'scripts'];
 const SKIP_NAMES = new Set(['node_modules', '__snapshots__', '__mocks__', '@x']);
 
-const problems = [];
-const rel = path => relative(clientDir, path).split('\\').join('/');
-const entries = dir => readdirSync(dir, { withFileTypes: true });
+const problems: string[] = [];
+const rel = (path: string): string => relative(clientDir, path).split('\\').join('/');
+const entries = (dir: string): Dirent[] => readdirSync(dir, { withFileTypes: true });
 
-function walkFiles(dir, visit) {
+function walkFiles(dir: string, visit: Visit): void {
   for (const entry of entries(dir)) {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {
@@ -71,7 +76,7 @@ function walkFiles(dir, visit) {
   }
 }
 
-function checkSegments(owner, dir, { allowed, index }) {
+function checkSegments(owner: string, dir: string, { allowed, index }: SegmentPolicy): void {
   for (const entry of entries(dir)) {
     const path = join(dir, entry.name);
     if (!entry.isDirectory()) {
@@ -106,7 +111,7 @@ function checkSegments(owner, dir, { allowed, index }) {
   }
 }
 
-function checkCrossImportApi(owner, dir) {
+function checkCrossImportApi(owner: string, dir: string): void {
   const entities = new Set(
     entries(join(srcDir, 'entities'))
       .filter(e => e.isDirectory())
@@ -121,7 +126,7 @@ function checkCrossImportApi(owner, dir) {
   }
 }
 
-function checkFsd() {
+function checkFsd(): void {
   for (const entry of entries(srcDir)) {
     const path = join(srcDir, entry.name);
     if (entry.isDirectory()) {
@@ -162,7 +167,7 @@ function checkFsd() {
   }
 }
 
-function checkNamesByPurpose() {
+function checkNamesByPurpose(): void {
   walkFiles(srcDir, (path, entry, isDir) => {
     if (isDir && BANNED_FOLDERS.has(entry.name)) {
       problems.push(`${rel(path)}: "${entry.name}/" names the essence, not the purpose — see fsd-architecture §4`);
@@ -173,7 +178,7 @@ function checkNamesByPurpose() {
   });
 }
 
-function checkSpecs() {
+function checkSpecs(): void {
   walkFiles(srcDir, (path, entry, isDir) => {
     const inSpecs = rel(path).split('/').slice(0, -1).includes('specs');
     if (!isDir && SPEC_FILE.test(entry.name) && !inSpecs) {
@@ -196,7 +201,7 @@ const FSD_RULES = [
 ];
 const DISABLE_DIRECTIVE = /eslint-disable(?:-next-line|-line)?(?<rules>[^\n*]*)/g;
 
-function checkSources() {
+function checkSources(): void {
   walkFiles(srcDir, (path, entry, isDir) => {
     if (isDir || !/\.tsx?$/.test(entry.name) || entry.name === 'route-tree.gen.ts') {
       return;
@@ -207,7 +212,7 @@ function checkSources() {
       problems.push(`${rel(path)}: no \`export *\` — list the public names explicitly`);
     }
     for (const match of text.matchAll(DISABLE_DIRECTIVE)) {
-      const rules = match.groups.rules.split('--')[0].trim();
+      const rules = (match.groups?.['rules'] ?? '').split('--')[0]?.trim() ?? '';
       if (rules === '') {
         problems.push(`${rel(path)}: blanket \`${match[0].trim()}\` — name the rule being disabled`);
       } else if (FSD_RULES.some(rule => rules.split(/[\s,]+/).includes(rule))) {
@@ -217,7 +222,7 @@ function checkSources() {
   });
 }
 
-function checkKebab(dir) {
+function checkKebab(dir: string): void {
   for (const entry of entries(dir)) {
     if (SKIP_NAMES.has(entry.name)) {
       continue;
