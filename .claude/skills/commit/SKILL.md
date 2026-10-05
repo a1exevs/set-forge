@@ -30,7 +30,9 @@ Available types: the work branch types of `.claude/skills/branches/SKILL.md` §2
    Example for /commit bugfix:
    [Bugfix] Resolving null pointer in User Profile
    Handling edge cases when user avatar is missing. Preventing application crash during initial login.
-   On a sub-branch the title also carries the sub-branch number (`/branches` §2).
+   The `[<Type>]` part is the title prefix of `/branches` §2: on a branch of a task the issue number goes before
+   the type, on a sub-branch its number goes after it — `feature/workout-export-12--2` →
+   `[12][Feature][2] Adding the export button`. No `#` and no `Refs #N`: the task is linked by the PR (`/pr`).
 4. APPROVAL REQUIRED
    Analyze staged changes (or all changes if none are staged).
    Present the generated message and ask: "Shall I commit these changes to <current-branch>?"

@@ -8,12 +8,13 @@
   globs that load the rule when a matching file is read), `# Title`, topic sections, optional `## Related`, and
   `## Enforcement` last (what checks each rule, or `❌ review`). `npm run client:lint`
   (`client/scripts/check-rules.ts`) keeps that structure and every reference in Enforcement valid.
-- Skills in `.claude/skills/<name>/SKILL.md` are the repository workflows (`/setup`, `/branches`, `/commit`, `/pr`,
-  `/code-review`, `/privacy-audit`, `/release`); Claude also picks them up from a plain request ("commit this",
-  "make a release", "set up my machine").
+- Skills in `.claude/skills/<name>/SKILL.md` are the repository workflows (`/setup`, `/analyst`, `/branches`,
+  `/commit`, `/pr`, `/code-review`, `/privacy-audit`, `/release`); Claude also picks them up from a plain request
+  ("write up this feature", "commit this", "make a release", "set up my machine").
 - Branch operations (create, switch, push, reset, …) wait for the user's yes, one by one — see `/branches`.
 - Secrets (`.env*`, `secrets/`, `*.pem`, `*.key`) are denied to the agent in `.claude/settings.json`.
-- No change logs or task plans in the repo: plans live in the PR, history in git. Agent artifacts that must
+- No change logs or task plans in the repo: requirements live in GitHub issues on the Set-forge board (written by
+  `/analyst`), plans and acceptance in the PR, history in git. Agent artifacts that must
   survive between runs (the per-branch `/code-review` log that `/pr` attaches to the description) live in
   `.runtime/`, which is gitignored.
 

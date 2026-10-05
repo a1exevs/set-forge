@@ -201,6 +201,13 @@ npm run prod:db:seed            # inserts default `user` / `admin` roles (idempo
 
 For local development against `mysql-dev`, the equivalent flow is `npm run db:up` → `npm run server:db:migrate` → `npm run server:db:seed`. See [`server/README.md`](server/README.md#database-schema-sequelize-migrations) for full details and how to add new migrations.
 
+## Development workflow
+
+`/analyst` turns a feature request into a GitHub issue with acceptance criteria on the Set-forge project board
+([`.claude/skills/analyst/SKILL.md`](.claude/skills/analyst/SKILL.md)); the work then goes through `/branches` →
+`/commit` → `/code-review` → `/pr`. The task, branch and title rules are in the skills under
+[`.claude/skills/`](.claude/skills/).
+
 ## Release
 
 Run `/release <patch|minor|major>` in Claude Code. The phases, PR titles and labels are in
