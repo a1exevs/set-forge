@@ -14,7 +14,7 @@ Safety Lock: If the current branch is protected (branches §1), STOP and warn th
 Prefix Check: Ensure the branch name is `<type>/<name>` with a work type from branches §2.
 If it is not, STOP and propose a rename; renaming (and pushing the renamed branch) waits for the user's yes (branches §4).
 If the branch is not on `origin` yet, its first push (branches §5) is part of the confirmation in step 6.
-Task Check: a branch of a task carries the issue number (branches §2: `feature/workout-export-12--2` → `12`). Read it
+Task Check: a branch of a task carries the issue number (branches §2: `feature/12-workout-export--2` → `12`). Read it
 with `gh issue view <N> --json state,title,url,body`; a missing or closed issue → STOP and ask. The task model lives
 in `.claude/skills/analyst/SKILL.md` §1 (`/analyst`).
 

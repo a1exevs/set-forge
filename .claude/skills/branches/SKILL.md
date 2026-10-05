@@ -1,6 +1,6 @@
 ---
 name: branches
-description: The repository's branch model (main ← testing ← develop, <type>/<name> work branches with an optional -<issue> number, shared branches and their <name>--<n> sub-branches, the release branches), the commit / PR title prefix, the branch type ↔ PR label table, how to find the base of a branch, and the approval gate for every branch operation. Use before creating, switching, renaming, deleting, pushing, resetting, rebasing or merging a branch, when starting work on an issue, when a skill needs the branch / title / base / label rules (/commit, /pr, /release), or when the user runs /branches.
+description: The repository's branch model (main ← testing ← develop, <type>/<name> work branches with an optional <issue>- number prefix in the name, shared branches and their <name>--<n> sub-branches, the release branches), the commit / PR title prefix, the branch type ↔ PR label table, how to find the base of a branch, and the approval gate for every branch operation. Use before creating, switching, renaming, deleting, pushing, resetting, rebasing or merging a branch, when starting work on an issue, when a skill needs the branch / title / base / label rules (/commit, /pr, /release), or when the user runs /branches.
 ---
 
 # branches
@@ -40,22 +40,23 @@ main  ←  testing  ←  develop  ←  <type>/<name>
 
 A work branch is `<type>/<name>`: `<type>` from the table, `<name>` short kebab-case by purpose
 (`bugfix/workout-list-menu-click-navigation`, `common/setup-skill`). A branch of a task — an issue, see `/analyst`
-§1 — ends its name with the issue number: `<type>/<name>-<N>` (`feature/workout-export-12`). A task is optional for
-every type for now. A sub-branch appends `--<n>`, a number from 1, after everything (`feature/new-ui-component--1`,
-`feature/workout-export-12--1`), and keeps the type and the task of its shared branch.
+§1 — starts its name with the issue number: `<type>/<N>-<name>` (`feature/12-workout-export`), the form GitHub
+itself proposes for a branch of an issue. A task is optional for every type for now. A sub-branch appends `--<n>`, a
+number from 1, after everything (`feature/new-ui-component--1`, `feature/12-workout-export--1`), and keeps the type
+and the task of its shared branch.
 
-Reading the numbers from a name, in this order: a trailing `--<n>` is the sub-branch number — drop it; then a
-trailing `-<N>` (one hyphen) of what is left is the issue number (`feature/workout-export-12--2` → sub-branch 2,
-task 12; `common/some-changes--1` → sub-branch 1, no task). So a name without a task must not end with `-<digits>`
-(`common/node24`, not `common/node-24`).
+Reading the numbers from a name: leading digits followed by `-` right after `<type>/` are the issue number, a
+trailing `--<n>` is the sub-branch number (`feature/12-workout-export--2` → task 12, sub-branch 2;
+`common/some-changes--1` → no task, sub-branch 1). So a name without a task must not start with `<digits>-`
+(`common/upgrade-node-24`, not `common/24-node`).
 
 The type is also the PR label (see `/pr`) and, with the two numbers, the prefix of every commit and PR title
 (`/commit`, `/pr`): the issue number before the type, the sub-branch number after it.
 
 | Branch | Title prefix |
 |---|---|
-| `feature/workout-export-12` | `[12][Feature] …` |
-| `feature/workout-export-12--2` | `[12][Feature][2] …` |
+| `feature/12-workout-export` | `[12][Feature] …` |
+| `feature/12-workout-export--2` | `[12][Feature][2] …` |
 | `common/some-changes` | `[Common] …` |
 | `common/some-changes--1` | `[Common][1] …` |
 
@@ -120,10 +121,10 @@ and commits on the current non-protected branch through `/commit` (it asks for i
 
   `--no-track` goes **before** `-c` (`-c` takes the next word as the branch name). Without it the branch tracks
   `origin/<base>`, and a bare `git push` would push the work into the base.
-- **Branch of a task** (`<type>/<name>-<N>`, not a sub-branch): this is where the task goes into work.
+- **Branch of a task** (`<type>/<N>-<name>`, not a sub-branch): this is where the task goes into work.
   - Before: `gh issue view <N> --json state,title,labels` must show an open issue; a closed or missing one → stop
     and ask. The type should match the issue label — a mismatch → ask.
-  - The gate line names both steps, one yes for them: `git switch --no-track -c feature/workout-export-12
+  - The gate line names both steps, one yes for them: `git switch --no-track -c feature/12-workout-export
     origin/develop — a branch for #12 "Workout export to CSV", then #12 → In progress`.
   - After the branch is created: `Status` = In progress (`/analyst` §1 Setting a field).
 

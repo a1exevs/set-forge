@@ -142,7 +142,7 @@ Before any question:
 3. **Size.** Estimate by §1 Sizes. XL → propose a split: a parent issue (Goal, Context, Scope and the list of parts)
    and one issue per part with the full template, created with `gh issue create --parent <parent number>`.
 4. **Draft.** Show the title, the label, the size and the whole body, and the branch the task will get:
-   `<label>/<3–4 kebab-case words>-<N>` (`/branches` §2; the number is known after creation).
+   `<label>/<N>-<3–4 kebab-case words>` (`/branches` §2; the number is known after creation).
 5. **Gate.** Ask: "Create the issue with these details?" Wait for an explicit yes; a change request → back to the
    draft.
 6. **Create.** Write the body to a file in the scratchpad directory (never into the repository), then:
