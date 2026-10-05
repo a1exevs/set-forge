@@ -7,8 +7,8 @@ argument-hint: "[--full]"
 # setup
 
 Act as an onboarding engineer. Bring this machine to the state where `npm run client:dev`, `npm run server:start:dev`,
-the tests and the GitHub workflows (`/commit`, `/pr`, `/release`) all work. macOS is the primary platform; Windows
-and Linux get a short fallback in every step.
+the tests and the GitHub workflows (`/analyst`, `/commit`, `/pr`, `/release`) all work. macOS is the primary
+platform; Windows and Linux get a short fallback in every step.
 
 Optional argument `--full` (`$1`): also download Playwright browsers and run the e2e suites at the end.
 
@@ -19,6 +19,8 @@ Optional argument `--full` (`$1`): also download Playwright browsers and run the
   Project-level steps (`npm install`, builds, migrations) need no confirmation.
 - **Interactive steps belong to the developer:** `gh auth login`, the first launch of Docker Desktop, SSH key
   passphrases. Print the exact command, wait for the developer to say it is done, then re-run the check.
+  On Windows the device flow of `gh auth login` / `gh auth refresh` runs in a separate terminal window: the
+  terminal embedded in the Claude desktop app ends `gh` right after Enter, before the browser hands it the token.
 - **Never read `.env*` files** (denied in `.claude/settings.json`) — env files are handled only through
   `scripts/setup-env.ts`, which prints key names, never values.
 - **Never change the developer's git identity, remotes or shell profile silently** — propose the command, let them
@@ -54,16 +56,18 @@ Install when missing: `brew install git gh` · Windows `winget install Git.Git G
 Then, in order:
 
 1. **Authentication** — if `gh auth status` fails, the developer runs
-   `gh auth login -h github.com -p ssh -s user:email` and lets gh generate and upload an SSH key. **SSH is the
+   `gh auth login -h github.com -p ssh -s user:email,project` and lets gh generate and upload an SSH key. **SSH is the
    recommended git protocol:** `origin` is already `git@github.com:a1exevs/set-forge.git`, pushes then go over the
    key and do not depend on the gh token or its scopes at all (no credential helper, no `workflow` scope needed
    for branches that touch `.github/workflows`), and gh's own API calls (`gh pr`, `gh release`) are covered by
-   the default `repo`, `read:org`, `gist`. `user:email` is only for the identity check below. An existing login
-   is extended with `gh auth refresh -h github.com -s user:email`; `gh auth status` lists the token's scopes and
+   the default `repo`, `read:org`, `gist`. `user:email` is only for the identity check below; `project` is for the
+   task board of `/analyst`, `/branches` and `/pr` (`.claude/skills/analyst/SKILL.md` §1). An existing login
+   is extended with `gh auth refresh -h github.com -s user:email,project`; `gh auth status` lists the token's scopes and
    the protocol.
    HTTPS only if the developer insists (a network that blocks port 22): `gh auth login -p https -s
-   workflow,user:email`, `gh auth setup-git` and `git remote set-url origin https://github.com/a1exevs/set-forge.git`
-   (with approval) — over HTTPS the token pushes, so `workflow` becomes necessary for the `/release` flow.
+   workflow,user:email,project`, `gh auth setup-git` and
+   `git remote set-url origin https://github.com/a1exevs/set-forge.git` (with approval) — over HTTPS the token
+   pushes, so `workflow` becomes necessary for the `/release` flow.
 2. **Repository access** — `gh repo view a1exevs/set-forge --json name,viewerPermission` must succeed;
    `ssh -T git@github.com` must greet the user when the remote is SSH.
 3. **Identity** — `user.name` / `user.email` must be set (global is fine). Compare the email with
@@ -74,6 +78,11 @@ Then, in order:
 4. **Labels** the `/pr` and `/release` skills attach must exist: `gh label list --repo a1exevs/set-forge` should
    include `feature`, `bugfix`, `common`, `improvement`, `storybook`, `tests`, `documentation`, `refactoring`,
    `testing`, `release`. Report missing ones; do not create them (the repo owner decides).
+5. **Task board** — `gh project view 9 --owner a1exevs` must succeed. A scope error → the developer runs
+   `gh auth refresh -h github.com -s project`; "not found" → the board is private and the developer is not on it:
+   report it — the owner adds them. Until then the board steps fail: `/analyst` cannot create an issue (it adds it
+   to the board), and `/branches` §5 and `/pr` stop at setting the status; branches, commits and PRs without a task
+   work as usual.
 
 ## 3. Docker
 
@@ -203,7 +212,7 @@ Finish with one table and nothing else beyond it:
 | Area | Status | Left for the developer |
 |---|---|---|
 | Package manager | ✅ / ❌ | |
-| git + gh (auth, repo access, identity, labels) | | e.g. `gh auth login` |
+| git + gh (auth, repo access, identity, labels, task board) | | e.g. `gh auth login` |
 | Docker (daemon, mysql:8.4) | | |
 | Node 22.23.2 / npm 10.9.8 via nvm | | |
 | `npm install` + Husky hooks | | |
