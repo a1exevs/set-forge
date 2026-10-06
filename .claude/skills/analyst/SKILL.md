@@ -42,10 +42,16 @@ The single source of the task rules: `/branches`, `/commit` and `/pr` refer here
 | Ready | requirements agreed, the task can be picked up | the user on the board |
 | In progress | a branch of the task exists | `/branches` §5, when it creates a branch whose name carries the number (`/developer` step 2) |
 | In review | a PR of the task into `develop` is open | `/pr` (and the board workflow "Pull request linked to issue") |
-| Done | that PR is merged, the issue is closed | the board workflows "Pull request merged" / "Item closed" |
+| Done | that PR is merged, the issue is closed | the board workflow "Item closed" (`Closes #N` closes the issue on merge) |
 
 A sub-branch and its PR into the shared branch never change the status. A branch made by hand outside the skills
 does not move the card either.
+
+The board workflows (set in the board's UI — the API cannot change them) are on: "Item added to project" → Backlog,
+"Pull request linked to issue" → In review, "Item closed" → Done. Off: "Auto-add to project", "Auto-add sub-issues to
+project", "Auto-close issue", and "Pull request merged" — it moves the cards of pull requests, and pull requests are
+not on the board. A card that stays behind after a merge → check these first
+(`gh api graphql` → `ProjectV2.workflows { name enabled }`).
 
 ### Sizes
 
