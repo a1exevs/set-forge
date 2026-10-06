@@ -52,8 +52,9 @@ user when presenting the description. Never tick a box: acceptance is the user's
 section.
 
 4. CODE REVIEW LOG
-`/code-review` keeps its findings per branch in `.runtime/code-review/<slug>.md` (gitignored), where `<slug>` is the
-branch name with `/` replaced by `--` (`feature/login` → `feature--login.md`); its format is defined in
+`/code-review` keeps its findings per branch in `code-review.md` of the branch's task folder (branches §2, gitignored:
+`feature/12-login` → `.runtime/tasks/12/code-review.md`, `common/login` → `.runtime/tasks/common--login/code-review.md`);
+its format is defined in
 `.claude/skills/code-review/SKILL.md`. Read that file (never modify it) and end the PR description with a
 `## Code review` section:
 

@@ -204,8 +204,10 @@ For local development against `mysql-dev`, the equivalent flow is `npm run db:up
 ## Development workflow
 
 `/analyst` turns a feature request into a GitHub issue with acceptance criteria on the Set-forge project board
-([`.claude/skills/analyst/SKILL.md`](.claude/skills/analyst/SKILL.md)); the work then goes through `/branches` →
-`/commit` → `/code-review` → `/pr`. The task, branch and title rules are in the skills under
+([`.claude/skills/analyst/SKILL.md`](.claude/skills/analyst/SKILL.md)); `/developer #<N>` takes it from the branch
+through understanding, HLD and LLD to a reviewed commit
+([`.claude/skills/developer/SKILL.md`](.claude/skills/developer/SKILL.md)), and `/pr` opens the pull request. The
+task, branch and title rules are in the skills under
 [`.claude/skills/`](.claude/skills/).
 
 ## Release

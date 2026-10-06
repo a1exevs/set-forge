@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Senior-engineer review of a change set with every finding verified (reproduced or tested), ranked as blocker / important / nit, printed as one table and logged per branch in .runtime/code-review/ so that later rounds mark what got fixed and /pr can attach the result. Use when the user asks to review the current changes, the branch since its base, or a commit range, or runs /code-review [base | range].
+description: Senior-engineer review of a change set with every finding verified (reproduced or tested), ranked as blocker / important / nit, printed as one table and logged per branch in its task folder under .runtime/tasks/ so that later rounds mark what got fixed and /pr can attach the result. Use when the user asks to review the current changes, the branch since its base, or a commit range, or runs /code-review [base | range].
 argument-hint: "[<base> | <base>..<head>]"
 ---
 
@@ -78,13 +78,14 @@ Fences between the categories:
 - "Might", "could", "in theory" without a reproduction is 🟠 at best; without a plausible input it is nothing.
 - A 🔴 candidate you failed to reproduce is 🟠 with `unverified`, not 🔴 "to be safe".
 
-## 5. Review log — `.runtime/code-review/<branch>.md`
+## 5. Review log — `code-review.md` in the task folder
 
 One file per branch, outside git (`.runtime/` is in `.gitignore`), keeps every finding of every round with a stable
 number and a status. `/pr` copies it into the PR description.
 
-- Path: `.runtime/code-review/<slug>.md`, where `<slug>` is the current branch with `/` replaced by `--`
-  (`common/setup-skill` → `common--setup-skill.md`). Compute it with `git rev-parse --abbrev-ref HEAD`.
+- Path: `code-review.md` in the task folder of the current branch (`/branches` §2): `feature/12-workout-export` →
+  `.runtime/tasks/12/code-review.md`, `common/setup-skill` → `.runtime/tasks/common--setup-skill/code-review.md`, a
+  sub-branch → its `part-<n>/`. Get the branch with `git rev-parse --abbrev-ref HEAD`.
 - Create the directory and the file on the first round. On later rounds **read it first**: it tells you what was
   already found and what is still open.
 
@@ -135,7 +136,7 @@ something is open above 🟡, the re-run hint. Nothing else — no prose summary
 findings in text. Fixed and `wontfix` rows live in the log, not in the chat.
 
 ```
-Reviewed: develop (77b0a62, 7 files) · round 2 · log: .runtime/code-review/common--setup-skill.md
+Reviewed: develop (77b0a62, 7 files) · round 2 · log: .runtime/tasks/common--setup-skill/code-review.md
 Since round 1: 1 fixed (#1), 1 still open (#2), 1 wontfix (#3)
 
 | # | Sev | Where | Problem | Proof | Fix | Status |

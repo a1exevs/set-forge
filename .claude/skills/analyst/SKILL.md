@@ -40,7 +40,7 @@ The single source of the task rules: `/branches`, `/commit` and `/pr` refer here
 |---|---|---|
 | Backlog | requirements written, not yet agreed to be taken | `/analyst` on create (§3) |
 | Ready | requirements agreed, the task can be picked up | the user on the board |
-| In progress | a branch of the task exists | `/branches` §5, when it creates a branch whose name carries the number |
+| In progress | a branch of the task exists | `/branches` §5, when it creates a branch whose name carries the number (`/developer` step 2) |
 | In review | a PR of the task into `develop` is open | `/pr` (and the board workflow "Pull request linked to issue") |
 | Done | that PR is merged, the issue is closed | the board workflows "Pull request merged" / "Item closed" |
 
@@ -152,8 +152,7 @@ Before any question:
    ```
    Set `Status` = Backlog and `Size` (§1 Setting a field). For a split, do it for every issue.
 7. **Report** the issue link and number, its status and size, and the branch name with the number. Next steps: the
-   user moves the card to Ready when the requirements are agreed; the work starts with a branch of the task
-   (`/branches` §5).
+   user moves the card to Ready when the requirements are agreed; the work starts with `/developer #<N>`.
 
 ## 4. Changing requirements
 
