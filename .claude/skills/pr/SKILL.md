@@ -51,6 +51,12 @@ The issue has no such section (filed by hand) → the section says `_Issue #<N> 
 user when presenting the description. Never tick a box: acceptance is the user's. A PR of a sub-branch has no such
 section.
 
+Then the developer's own check, before `## Code review` (after the acceptance criteria, or after the key changes
+when there are none): `/developer` keeps it in `stand-check.md` of the branch's task folder (branches §2). The file
+exists → copy it under `## Developer check` verbatim — a static table, so it neither looks
+like the user's acceptance nor counts in the checkbox progress. No file → `_No stand check was recorded._` (any
+branch, a sub-branch included).
+
 4. CODE REVIEW LOG
 `/code-review` keeps its findings per branch in `code-review.md` of the branch's task folder (branches §2, gitignored:
 `feature/12-login` → `.runtime/tasks/12/code-review.md`, `common/login` → `.runtime/tasks/common--login/code-review.md`);

@@ -72,8 +72,8 @@ exception is a spec that spies on the module: `jest.spyOn(fs, 'existsSync')` nee
 
 ## Node scripts
 
-Repository scripts (`scripts/`, `client/scripts/`, the Playwright API stack) are TypeScript that Node runs as is —
-`node scripts/check-domain-docs.ts`, no ts-node, no build. Node only strips the types, hence:
+Repository scripts (`scripts/`, `client/scripts/`, the Playwright API stack, the verification stand) are TypeScript
+that Node runs as is — `node scripts/check-domain-docs.ts`, no ts-node, no build. Node only strips the types, hence:
 
 - erasable syntax only: no `enum` (an `as const` object + a union type), `namespace` or constructor parameter
   properties;

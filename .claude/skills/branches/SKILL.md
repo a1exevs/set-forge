@@ -53,16 +53,22 @@ trailing `--<n>` is the sub-branch number (`feature/12-workout-export--2` → ta
 The type is also the PR label (see `/pr`) and, with the two numbers, the prefix of every commit and PR title
 (`/commit`, `/pr`): the issue number before the type, the sub-branch number after it.
 
-The same numbers give the **task folder** — the gitignored `.runtime/tasks/<key>/` where `/developer` keeps its
-artifacts and `/code-review` its log: `<key>` is the issue number, or for a branch without a task the branch name
-with `/` replaced by `--`; a sub-branch works in `part-<n>/` inside the folder of its shared branch.
+The same key names the branch's **task folder** and its **worktree**:
 
-| Branch | Title prefix | Task folder |
-|---|---|---|
-| `feature/12-workout-export` | `[12][Feature] …` | `.runtime/tasks/12/` |
-| `feature/12-workout-export--2` | `[12][Feature][2] …` | `.runtime/tasks/12/part-2/` |
-| `common/some-changes` | `[Common] …` | `.runtime/tasks/common--some-changes/` |
-| `common/some-changes--1` | `[Common][1] …` | `.runtime/tasks/common--some-changes/part-1/` |
+- `<key>` is the issue number, or for a branch without a task the branch name with `/` replaced by `--`.
+- Task folder — the gitignored `.runtime/tasks/<key>/` **of the main checkout**, where `/developer` keeps its
+  artifacts and `/code-review` its log; a sub-branch works in `part-<n>/` inside the folder of its shared branch.
+  Every worktree reads and writes the same folder, so a task resumes from any checkout. The main checkout is the
+  first entry of `git worktree list`.
+- Worktree — `.claude/worktrees/<key>/` (gitignored), when the branch lives in its own worktree (§5); a sub-branch
+  gets `.claude/worktrees/<key>--<n>/`.
+
+| Branch | Title prefix | Task folder (main checkout) | Worktree |
+|---|---|---|---|
+| `feature/12-workout-export` | `[12][Feature] …` | `.runtime/tasks/12/` | `.claude/worktrees/12/` |
+| `feature/12-workout-export--2` | `[12][Feature][2] …` | `.runtime/tasks/12/part-2/` | `.claude/worktrees/12--2/` |
+| `common/some-changes` | `[Common] …` | `.runtime/tasks/common--some-changes/` | `.claude/worktrees/common--some-changes/` |
+| `common/some-changes--1` | `[Common][1] …` | `.runtime/tasks/common--some-changes/part-1/` | `.claude/worktrees/common--some-changes--1/` |
 
 | Label | Used for | Description in the repo |
 |---|---|---|
@@ -101,7 +107,8 @@ explicit yes **for that operation**:
   (local or remote);
 - `git push` of any kind (first push, `--force-with-lease`), setting or changing an upstream;
 - `reset`, `rebase`, `merge` / `pull` into a branch, `cherry-pick`;
-- `git stash` / `stash pop` done to switch branches.
+- `git stash` / `stash pop` done to switch branches;
+- `git worktree add` / `git worktree remove`.
 
 How:
 
@@ -125,6 +132,11 @@ and commits on the current non-protected branch through `/commit` (it asks for i
 
   `--no-track` goes **before** `-c` (`-c` takes the next word as the branch name). Without it the branch tracks
   `origin/<base>`, and a bare `git push` would push the work into the base.
+- **New work branch in a worktree** — the main checkout stays where it is, and several branches are worked on at
+  once: `git fetch origin <base>`, then `git worktree add --no-track -b <branch> .claude/worktrees/<key> origin/<base>`
+  (the folder by §2). The worktree has no `node_modules` and no env files: run `npm ci` and `npm run setup:env` in
+  it. A session moves into it with `EnterWorktree` (`path`). Removing it after its PR is merged —
+  `git worktree remove .claude/worktrees/<key>` — is gated like any branch operation; the task folder stays.
 - **Branch of a task** (`<type>/<N>-<name>`, not a sub-branch): this is where the task goes into work.
   - Before: `gh issue view <N> --json state,title,labels` must show an open issue; a closed or missing one → stop
     and ask. The type should match the issue label — a mismatch → ask.

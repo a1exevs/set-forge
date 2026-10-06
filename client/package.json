@@ -52,6 +52,8 @@
     "docs": "typedoc",
     "generate:icons": "node scripts/generate-public-icons.ts",
     "e2e:install": "playwright install --with-deps",
+    "stand": "node tests/stand/start-stand.ts",
+    "stand:stop": "node tests/stand/stop-stand.ts",
     "check-deps": "npm outdated",
     "upgrade-deps": "npm upgrade --latest"
   },

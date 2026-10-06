@@ -16,8 +16,9 @@
 - Secrets (`.env*`, `secrets/`, `*.pem`, `*.key`) are denied to the agent in `.claude/settings.json`.
 - No change logs or task plans in the repo: requirements live in GitHub issues on the Set-forge board (written by
   `/analyst`), plans and acceptance in the PR, history in git. Agent artifacts that must survive between runs
-  (the `/developer` steps, the `/code-review` log that `/pr` attaches to the description) live in the task folder
-  `.runtime/tasks/<issue or branch>/` (`/branches` §2); `.runtime/` is gitignored.
+  (the `/developer` steps, the `/code-review` log and the stand check that `/pr` attaches to the description) live
+  in the task folder `.runtime/tasks/<issue or branch>/` of the main checkout, shared by every worktree
+  (`/branches` §2); `.runtime/` is gitignored.
 
 ## Domain docs
 

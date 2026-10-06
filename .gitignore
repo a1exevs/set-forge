@@ -10,6 +10,8 @@ lerna-debug.log*
 # Dependencies
 node_modules
 dist
+# API builds of the e2e stack and the verification stand (client/tests/e2e/stack/api-stack.ts)
+server/.stack/
 dist-ssr
 *.local
 

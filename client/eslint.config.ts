@@ -126,8 +126,13 @@ export default defineConfig(
     },
   },
   {
-    // Node CLI scripts and the Playwright API stack: TypeScript that Node runs as is (typescript-guidelines)
-    files: ['scripts/**/*.ts', 'tests/e2e/stack/start-api-stack.ts'],
+    // Node CLI scripts, the Playwright API stack and the stand: TypeScript that Node runs as is (typescript-guidelines)
+    files: [
+      'scripts/**/*.ts',
+      'tests/e2e/stack/start-api-stack.ts',
+      'tests/e2e/stack/api-stack.ts',
+      'tests/stand/**/*.ts',
+    ],
     languageOptions: { globals: { ...globals.node } },
   },
 );

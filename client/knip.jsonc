@@ -20,8 +20,8 @@
   // Jest resolves `tests/...` through moduleNameMapper.
   "paths": { "tests/*": ["tests/*"] },
   "typedoc": false,
-  // pgrep: a system tool the e2e API stack calls (tests/e2e/stack/start-api-stack.ts).
-  "ignoreBinaries": ["chromatic", "pgrep"],
+  // pgrep / taskkill: system tools the e2e API stack calls to stop a process tree (tests/e2e/stack/api-stack.ts).
+  "ignoreBinaries": ["chromatic", "pgrep", "taskkill"],
   "ignoreDependencies": [
     // Used indirectly: Jest config loader, @testcontainers/mysql peer, Babel preset warning, Storybook essentials.
     "ts-node",

@@ -87,6 +87,8 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 | `npm run client:test:e2e:headed` | Playwright with a visible browser, one worker |
 | `npm run client:test:e2e:ui` | Playwright UI mode (pick and watch tests) |
 | `npm run client:test:e2e:debug` | Playwright debug (step through with inspector) |
+| `npm run client:stand -- [--preset=empty\|user]` | Verification stand for a hand check: the e2e stack kept running on the ports of a free slot (API `5300+k`, client `5400+k`), throwaway MySQL, data from a preset (`client/tests/stand/`); needs Docker |
+| `npm run client:stand:stop` | Stop the stands of this checkout (`-- --slot=<k>` another one, `-- --list` the running ones) |
 | `npm run client:test` | Full client test script (unit + snap + e2e) |
 | `npm run client:storybook` / `npm run client:build-storybook` | Storybook |
 | `npm run client:chromatic` | Chromatic |
