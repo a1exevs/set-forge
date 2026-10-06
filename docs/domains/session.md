@@ -22,6 +22,7 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lin
 |---|---|
 | email-unique | Email is unique |
 | separate-consent | Registration requires `consent` and `termsAccepted`, both explicitly true, validated separately |
+| register-password-confirmed | Registration requires the password typed twice and both values equal; the confirmation never leaves the browser |
 | pending-derived | Pending acceptance is derived from accepted vs required versions (legacy users included) |
 | acceptance-stamps | Acceptance stamps the current versions and the time |
 | reconsent-gate | The gate blocks app routes until accept or logout, and stays closed on `/privacy` and `/terms` |

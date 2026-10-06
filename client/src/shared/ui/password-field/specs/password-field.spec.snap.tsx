@@ -44,4 +44,17 @@ describe('PasswordField', () => {
     );
     expect(container).toMatchSnapshot();
   });
+
+  it('matches snapshot when not revealable', () => {
+    const { container } = render(
+      <PasswordField
+        id="snap-pwd-plain"
+        name="password"
+        value="secret"
+        onChange={(): void => undefined}
+        revealable={false}
+      />,
+    );
+    expect(container).toMatchSnapshot();
+  });
 });

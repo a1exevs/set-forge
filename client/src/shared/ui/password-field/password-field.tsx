@@ -11,6 +11,7 @@ type Props = {
   value: string;
   autoComplete?: string;
   disabled?: boolean;
+  revealable?: boolean;
   visible: boolean;
   onChange: (value: string) => void;
   onToggleVisible: () => void;
@@ -22,6 +23,7 @@ const PasswordFieldView: FC<Props> = ({
   value,
   autoComplete,
   disabled = false,
+  revealable = true,
   visible,
   onChange,
   onToggleVisible,
@@ -30,26 +32,32 @@ const PasswordFieldView: FC<Props> = ({
     <Input
       id={id}
       name={name}
-      className={classes.input}
+      className={revealable ? classes.input : `${classes.input} ${classes.plain}`}
       type={visible ? 'text' : 'password'}
       autoComplete={autoComplete}
       value={value}
       onChange={(e: ChangeEvent<HTMLInputElement>): void => onChange(e.target.value)}
       disabled={disabled}
     />
-    <IconButton
-      type="button"
-      variant="ghost"
-      shape="square"
-      size="sm"
-      className={classes.toggle}
-      onClick={onToggleVisible}
-      disabled={disabled}
-      aria-label={visible ? 'Hide password' : 'Show password'}
-      aria-pressed={visible}
-    >
-      {visible ? <EyeOff size={18} strokeWidth={1.75} aria-hidden /> : <Eye size={18} strokeWidth={1.75} aria-hidden />}
-    </IconButton>
+    {revealable && (
+      <IconButton
+        type="button"
+        variant="ghost"
+        shape="square"
+        size="sm"
+        className={classes.toggle}
+        onClick={onToggleVisible}
+        disabled={disabled}
+        aria-label={visible ? 'Hide password' : 'Show password'}
+        aria-pressed={visible}
+      >
+        {visible ? (
+          <EyeOff size={18} strokeWidth={1.75} aria-hidden />
+        ) : (
+          <Eye size={18} strokeWidth={1.75} aria-hidden />
+        )}
+      </IconButton>
+    )}
   </div>
 );
 

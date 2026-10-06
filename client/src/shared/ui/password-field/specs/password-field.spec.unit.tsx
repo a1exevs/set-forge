@@ -55,6 +55,12 @@ describe('PasswordField', () => {
       render(<PasswordField id="pwd" name="password" value="" onChange={jest.fn()} />);
       expect(screen.getByDisplayValue('')).toHaveAttribute('name', 'password');
     });
+
+    it('renders no toggle and keeps the value hidden when not revealable', () => {
+      render(<PasswordField id="pwd" value="secret" onChange={jest.fn()} revealable={false} />);
+      expect(screen.getByDisplayValue('secret')).toHaveAttribute('type', 'password');
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
   });
 
   describe('interactions', () => {
