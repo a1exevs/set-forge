@@ -1,6 +1,6 @@
 ---
 name: branches
-description: The repository's branch model (main ← testing ← develop, <type>/<name> work branches with an optional <issue>- number prefix in the name, shared branches and their <name>--<n> sub-branches, the release branches), the commit / PR title prefix, the branch type ↔ PR label table, how to find the base of a branch, and the approval gate for every branch operation. Use before creating, switching, renaming, deleting, pushing, resetting, rebasing or merging a branch, when starting work on an issue, when a skill needs the branch / title / base / label rules (/commit, /pr, /release), or when the user runs /branches.
+description: The repository's branch model (main ← testing ← develop, <type>/<name> work branches with an optional <issue>- number prefix in the name, shared branches and their <name>--<n> sub-branches, the release branches), the commit / PR title prefix, the task folder in .runtime/tasks/, the branch type ↔ PR label table, how to find the base of a branch, and the approval gate for every branch operation. Use before creating, switching, renaming, deleting, pushing, resetting, rebasing or merging a branch, when starting work on an issue, when a skill needs the branch / title / base / label rules (/commit, /pr, /release), or when the user runs /branches.
 ---
 
 # branches
@@ -53,12 +53,16 @@ trailing `--<n>` is the sub-branch number (`feature/12-workout-export--2` → ta
 The type is also the PR label (see `/pr`) and, with the two numbers, the prefix of every commit and PR title
 (`/commit`, `/pr`): the issue number before the type, the sub-branch number after it.
 
-| Branch | Title prefix |
-|---|---|
-| `feature/12-workout-export` | `[12][Feature] …` |
-| `feature/12-workout-export--2` | `[12][Feature][2] …` |
-| `common/some-changes` | `[Common] …` |
-| `common/some-changes--1` | `[Common][1] …` |
+The same numbers give the **task folder** — the gitignored `.runtime/tasks/<key>/` where `/developer` keeps its
+artifacts and `/code-review` its log: `<key>` is the issue number, or for a branch without a task the branch name
+with `/` replaced by `--`; a sub-branch works in `part-<n>/` inside the folder of its shared branch.
+
+| Branch | Title prefix | Task folder |
+|---|---|---|
+| `feature/12-workout-export` | `[12][Feature] …` | `.runtime/tasks/12/` |
+| `feature/12-workout-export--2` | `[12][Feature][2] …` | `.runtime/tasks/12/part-2/` |
+| `common/some-changes` | `[Common] …` | `.runtime/tasks/common--some-changes/` |
+| `common/some-changes--1` | `[Common][1] …` | `.runtime/tasks/common--some-changes/part-1/` |
 
 | Label | Used for | Description in the repo |
 |---|---|---|
