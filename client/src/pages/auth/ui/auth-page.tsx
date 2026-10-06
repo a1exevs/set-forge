@@ -13,6 +13,7 @@ type Props = {
   activeTab: AuthTab;
   email: string;
   password: string;
+  confirmPassword: string;
   consent: boolean;
   termsAccepted: boolean;
   captcha: string;
@@ -20,6 +21,7 @@ type Props = {
   showCaptcha: boolean;
   emailError: string | null;
   passwordError: string | null;
+  confirmPasswordError: string | null;
   consentError: string | null;
   termsError: string | null;
   captchaError: string | null;
@@ -27,6 +29,7 @@ type Props = {
   isSubmitting: boolean;
   onEmailChange: (v: string) => void;
   onPasswordChange: (v: string) => void;
+  onConfirmPasswordChange: (v: string) => void;
   onConsentChange: (v: boolean) => void;
   onTermsChange: (v: boolean) => void;
   onCaptchaChange: (v: string) => void;
@@ -60,6 +63,7 @@ const AuthPage: FC<Props> = ({
   activeTab,
   email,
   password,
+  confirmPassword,
   consent,
   termsAccepted,
   captcha,
@@ -67,6 +71,7 @@ const AuthPage: FC<Props> = ({
   showCaptcha,
   emailError,
   passwordError,
+  confirmPasswordError,
   consentError,
   termsError,
   captchaError,
@@ -74,12 +79,15 @@ const AuthPage: FC<Props> = ({
   isSubmitting,
   onEmailChange,
   onPasswordChange,
+  onConfirmPasswordChange,
   onConsentChange,
   onTermsChange,
   onCaptchaChange,
   onSubmit,
   redirectSearch,
 }) => {
+  const isRegister = activeTab === 'register';
+
   return (
     <div className={classes.page}>
       <div className={classes.card}>
@@ -129,11 +137,30 @@ const AuthPage: FC<Props> = ({
             id="auth-password"
             name="password"
             value={password}
-            autoComplete={activeTab === 'login' ? 'current-password' : 'new-password'}
+            autoComplete={isRegister ? 'new-password' : 'current-password'}
             disabled={isSubmitting}
+            revealable={!isRegister}
             onChange={onPasswordChange}
           />
           {passwordError && <p className={classes.fieldError}>{passwordError}</p>}
+
+          {isRegister && (
+            <>
+              <label className={classes.label} htmlFor="auth-password-confirm">
+                Confirm password
+              </label>
+              <PasswordField
+                id="auth-password-confirm"
+                name="password-confirm"
+                value={confirmPassword}
+                autoComplete="new-password"
+                disabled={isSubmitting}
+                revealable={false}
+                onChange={onConfirmPasswordChange}
+              />
+              {confirmPasswordError && <p className={classes.fieldError}>{confirmPasswordError}</p>}
+            </>
+          )}
 
           {showCaptcha && (
             <>
@@ -157,7 +184,7 @@ const AuthPage: FC<Props> = ({
             </>
           )}
 
-          {activeTab === 'register' && (
+          {isRegister && (
             <>
               <label className={classes.consent}>
                 {/** TODO implement shared chackbox via Headless UI and use it **/}
@@ -200,7 +227,7 @@ const AuthPage: FC<Props> = ({
           {formError && <p className={classes.formError}>{formError}</p>}
 
           <Button type="submit" size="lg" disabled={isSubmitting} className={classes.submit}>
-            {activeTab === 'login' ? 'Log in' : 'Create account'}
+            {isRegister ? 'Create account' : 'Log in'}
           </Button>
         </form>
 

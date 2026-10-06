@@ -32,6 +32,7 @@ const AuthPageLogicLayer: FC<Props> = ({
 }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [consent, setConsent] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [captcha, setCaptcha] = useState('');
@@ -39,6 +40,7 @@ const AuthPageLogicLayer: FC<Props> = ({
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
   const [consentError, setConsentError] = useState<string | null>(null);
   const [termsError, setTermsError] = useState<string | null>(null);
   const [captchaError, setCaptchaError] = useState<string | null>(null);
@@ -49,6 +51,7 @@ const AuthPageLogicLayer: FC<Props> = ({
   const resetFieldErrors = useCallback((): void => {
     setEmailError(null);
     setPasswordError(null);
+    setConfirmPasswordError(null);
     setConsentError(null);
     setTermsError(null);
     setCaptchaError(null);
@@ -63,13 +66,15 @@ const AuthPageLogicLayer: FC<Props> = ({
       if (activeTab === 'register') {
         const eErr = validateRegisterEmail(email);
         const pErr = validateRegisterPassword(password);
+        const pcErr = confirmPassword === password ? null : 'Passwords do not match';
         const cErr = consent ? null : 'You must consent to the processing of your personal data';
         const tErr = termsAccepted ? null : 'You must accept the Terms of Use';
         setEmailError(eErr);
         setPasswordError(pErr);
+        setConfirmPasswordError(pcErr);
         setConsentError(cErr);
         setTermsError(tErr);
-        if (eErr || pErr || cErr || tErr) {
+        if (eErr || pErr || pcErr || cErr || tErr) {
           return;
         }
         try {
@@ -131,6 +136,7 @@ const AuthPageLogicLayer: FC<Props> = ({
     [
       activeTab,
       captcha,
+      confirmPassword,
       consent,
       termsAccepted,
       email,
@@ -149,6 +155,7 @@ const AuthPageLogicLayer: FC<Props> = ({
       activeTab={activeTab}
       email={email}
       password={password}
+      confirmPassword={confirmPassword}
       consent={consent}
       termsAccepted={termsAccepted}
       captcha={captcha}
@@ -156,6 +163,7 @@ const AuthPageLogicLayer: FC<Props> = ({
       showCaptcha={showCaptcha}
       emailError={emailError}
       passwordError={passwordError}
+      confirmPasswordError={confirmPasswordError}
       consentError={consentError}
       termsError={termsError}
       captchaError={captchaError}
@@ -163,6 +171,7 @@ const AuthPageLogicLayer: FC<Props> = ({
       isSubmitting={isSubmitting}
       onEmailChange={setEmail}
       onPasswordChange={setPassword}
+      onConfirmPasswordChange={setConfirmPassword}
       onConsentChange={setConsent}
       onTermsChange={setTermsAccepted}
       onCaptchaChange={setCaptcha}

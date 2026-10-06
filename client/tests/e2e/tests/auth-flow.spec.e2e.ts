@@ -12,6 +12,7 @@ test.describe('Auth register and login', () => {
 
     await page.locator('#auth-email').fill(email);
     await page.locator('#auth-password').fill(password);
+    await page.locator('#auth-password-confirm').fill(password);
     await page.getByRole('checkbox', { name: /consent to the processing/i }).check();
     await page.getByRole('checkbox', { name: /accept the/i }).check();
     await page.getByRole('button', { name: 'Create account' }).click();

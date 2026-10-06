@@ -14,8 +14,9 @@ const meta: Meta<typeof PasswordField> = {
     docs: {
       description: {
         component:
-          'A password input with a show / hide toggle (`aria-pressed` carries the state). Controlled through ' +
-          '`value` and `onChange`; the label is the caller’s.',
+          'A password input with a show / hide toggle (`aria-pressed` carries the state); `revealable={false}` ' +
+          'drops the toggle and keeps the value hidden. Controlled through `value` and `onChange`; the label is ' +
+          'the caller’s.',
       },
     },
   },
@@ -28,9 +29,10 @@ type StatefulProps = {
   id: string;
   initialValue?: string;
   disabled?: boolean;
+  revealable?: boolean;
 };
 
-const StatefulPasswordField: FC<StatefulProps> = ({ id, initialValue = '', disabled }) => {
+const StatefulPasswordField: FC<StatefulProps> = ({ id, initialValue = '', disabled, revealable }) => {
   const [value, setValue] = useState(initialValue);
 
   return (
@@ -43,6 +45,7 @@ const StatefulPasswordField: FC<StatefulProps> = ({ id, initialValue = '', disab
         value={value}
         onChange={setValue}
         disabled={disabled}
+        revealable={revealable}
       />
     </Stack>
   );
@@ -61,7 +64,7 @@ export const Visible: Story = {
   },
 };
 
-/** Empty and disabled. */
+/** Empty, disabled and without the toggle (the register form). */
 export const States: Story = {
   render: (): ReactElement => (
     <Stack>
@@ -69,6 +72,8 @@ export const States: Story = {
       <StatefulPasswordField id="password-empty" />
       <Caption>Disabled</Caption>
       <StatefulPasswordField id="password-disabled" initialValue="secret" disabled />
+      <Caption>Without toggle</Caption>
+      <StatefulPasswordField id="password-plain" initialValue="secret" revealable={false} />
     </Stack>
   ),
 };
