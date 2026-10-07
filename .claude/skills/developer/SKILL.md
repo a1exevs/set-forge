@@ -153,9 +153,13 @@ inventing a straw option. GATE for the pick. On yes save `hld.md` with the choic
 Run the HLD consistency check (§3). At the same gate ask two things:
 
 - the mode: **manual** (default) or **autonomous** — autonomous includes one commit and no push (step 8);
-- **the stand check** (step 8): yes by default when the change is visible to the user or crosses client ↔ server,
-  no for docs, scripts and a refactoring the tests cover — name which acceptance criteria it will walk and with
-  which preset (§7).
+- **the stand check** (step 8) — name what it will walk (the acceptance criteria, or for a task without them the
+  flows from the reach of step 4) and with which preset (§7):
+  - yes by default for any change of how the running app behaves — in the client or in the API alone (a validation,
+    a status code, an access rule, a response shape);
+  - yes for a refactoring that is large or risky: it touches a wide reach (step 4), a shared piece, the data flow,
+    auth, persistence or migrations — the tests prove what they cover, the stand shows the rest still works;
+  - no for docs, scripts, tooling, and a small refactoring the tests cover.
 
 GATE. On yes save `lld.md` with both answers (and `hld.md` if it changed).
 
@@ -166,7 +170,7 @@ GATE. On yes save `lld.md` with both answers (and `hld.md` if it changed).
 | `client/` | `npm run client:lint` · `npm run client:test` |
 | `server/` | `npm run server:lint` · `npm run server:test:unit` |
 | `scripts/`, `docs/`, root configs | `npm run lint:root` |
-| anything visual, while iterating | the verification stand (§7), checked on screen |
+| a behavior you can see — on screen or in the API — while iterating | the verification stand (§7) |
 
 Update snapshots (`npm run client:test:snap-update`) only for an intended visual change, and say so. The e2e suites
 belong to the testing stage.
@@ -187,15 +191,18 @@ A decision the LLD did not foresee → the HLD consistency check (§3), in both 
    the user picks what to fix (the fixes are re-verified and reviewed again). Autonomous: rounds of review → fix
    everything 🔴 and 🟠 → review again, until a round is clean or 5 rounds are spent.
 2. **The stand check**, when step 6 chose it — after the review, so the code checked is the code committed:
-   start the stand (§7), walk every acceptance criterion it was chosen for in the Browser pane, watch the console,
-   the network and the server log, stop the stand. Write `stand-check.md`:
+   start the stand (§7), walk everything it was chosen for, watch the console, the network and the server log, stop
+   the stand. Each criterion the way a person would check it: one about the screen in the Browser pane; one about the
+   API with HTTP requests, the way a tester uses Postman (§7); a server change that has a path through the UI — both,
+   the request proves the contract, the screen proves the client shows it. Write `stand-check.md`:
 
    ```
    Stand: slot <k> · client <url> · preset <name> · <date>
 
    | AC | Result | How |
    |---|---|---|
-   | AC-1 | ✓ | what was done and seen |
+   | AC-1 | ✓ | UI: what was done and seen |
+   | AC-2 | ✓ | API: POST /api/1.0/… with … → 400, message "…" |
    | AC-6 | — | why the stand cannot show it |
    ```
 
@@ -251,7 +258,7 @@ The steps are the same; the weight moves.
 | `bugfix` | step 2 — the root cause with evidence before any design; a test that fails before the fix |
 | `feature` | step 3 often splits it; HLD and LLD per part |
 | `improvement` | usually small (step 3 is one line); the weight is on steps 4–5 |
-| `refactoring` | behavior must not change: step 4's reach is the whole risk assessment, every iteration ends with a no-behavior-change check (the same tests pass unchanged) |
+| `refactoring` | behavior must not change: step 4's reach is the whole risk assessment, every iteration ends with a no-behavior-change check (the same tests pass unchanged); a large or risky one also walks its reach on the stand (step 6) |
 | `common`, `documentation`, `storybook`, `tests` | often without an issue — steps 1–2 agree the source and the goal in the chat; HLD may have fewer real options — say so instead of inventing them |
 
 ## 7. The verification stand
@@ -269,4 +276,10 @@ another session's stand. Code: `client/tests/stand/`.
   that needs more (lists, an active session) gets a new preset there, in the same task — never a hand-made state.
 - Stop — `npm run client:stand:stop` (every stand of this checkout) or `-- --slot=<k>`; `-- --list` shows every
   running stand. Always stop it before the commit.
+- API checks — the API URL is in the `Ready` line, every route under `/api/1.0`. A token: `POST /api/1.0/auth/login`
+  with the preset user's login (`user` preset) → `accessToken` → `Authorization: Bearer <token>`. The contract —
+  request and response shapes — is the stand's Swagger: `/api/docs`, as JSON `/api/docs-json`. Requests go through
+  `curl` or `node -e "fetch(…)"`; record each as method, path, the essential body and what came back.
+- The API is built once, at start: a change in `server/` → restart the stand (`client:stand:stop`, then
+  `client:stand`). Client changes reach the open page by themselves (Vite).
 - Docker is the only prerequisite (`/setup`).
