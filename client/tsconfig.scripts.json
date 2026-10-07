@@ -1,5 +1,5 @@
 {
-  // Type-checks the Node scripts of the client: scripts/ and the Playwright API stack. Node runs them as they are
+  // Type-checks the Node scripts of the client: scripts/, the Playwright API stack and the verification stand. Node runs them as they are
   // (`node scripts/<name>.ts`) by stripping the types, so the code is limited to erasable syntax (no enum /
   // namespace / parameter properties). Their folders hold a `{ "type": "module" }` package.json: Node and
   // `nodenext` treat them as ES modules. `npm run lint:scripts` runs this check.
@@ -24,5 +24,10 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["scripts/**/*.ts", "tests/e2e/stack/start-api-stack.ts"]
+  "include": [
+    "scripts/**/*.ts",
+    "tests/e2e/stack/start-api-stack.ts",
+    "tests/e2e/stack/api-stack.ts",
+    "tests/stand/**/*.ts"
+  ]
 }

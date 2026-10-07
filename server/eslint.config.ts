@@ -14,7 +14,7 @@ import settings from './linter/settings';
 
 export default defineConfig(
   {
-    ignores: ['dist/**', 'coverage/**', 'database/**', '_stub/**'],
+    ignores: ['dist/**', '.stack/**', 'coverage/**', 'database/**', '_stub/**'],
   },
   eslintJs.configs.recommended,
   tsEslint.configs.recommended,
