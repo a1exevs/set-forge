@@ -31,16 +31,20 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lin
 | no-open-redirect | After sign-in only an in-app `redirect` target is followed (no open redirect) |
 | logout-ends-on-login | Logout and account deletion end on `/login` also when the request fails |
 | user-scoped | All workout data is scoped to the signed-in user |
-| route-guards | Guest-only (`/login`, `/register`), always-public (`/privacy`, `/terms`) and protected routes — ❌ review (guard in `client/src/app/routes/__root.tsx`, no test) |
+| route-guards | Guest-only (`/login`, `/register`), always-public (`/privacy`, `/terms`) and protected routes |
+| bootstrap-once | The session is verified once per app open; navigation between screens and link intent (hover, touch, focus) never request the current user again — a session that ended on the server is discovered by the next data request |
 | hooks-dont-navigate | Session hooks never navigate — the calling flow does — ❌ review |
 
 ## Flows
 
 ### Opening the app
 
-The root route bootstraps the session before protected routes: refresh the access token, load the current user,
-retry once; no user → clear every cached query and redirect to `/login?redirect=<path>`. Signed-in users are sent
-home from the auth pages; the legal pages are open to everyone without a bootstrap.
+The root route bootstraps the session once per app open, on the first protected route: refresh the access token,
+load the current user, retry once; no user → clear every cached query and redirect to `/login?redirect=<path>`.
+From then on every navigation reads the cached user and a screen starts loading its own data at once; hovering,
+touching or focusing a link sends nothing. The next bootstrap happens on the next app open, or after the
+session-expired handler cleared the cache. Signed-in users are sent home from the auth pages; the legal pages are open
+to everyone without a bootstrap.
 
 ### Sign in / register
 
@@ -55,7 +59,9 @@ versions, logging out ends the session.
 ### Logout and account deletion
 
 Both clear every cached query and end on `/login`, also when the request fails. Deleting the account asks for
-confirmation first.
+confirmation first. The session ends for every open tab at once: a request without the session cookie is answered
+as unauthenticated — the same answer as for an expired access token — so another tab ends on `/login` with its
+next data request, without waiting for its access token to expire.
 
 ## Map
 

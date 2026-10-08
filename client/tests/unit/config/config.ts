@@ -16,13 +16,14 @@ import { rootDir } from '../../common/paths';
 
 const setupTestsEnvPath = resolve(rootDir, 'tests', 'common', 'setup-tests-env.ts');
 const setupTestingLibraryPath = resolve(rootDir, 'tests', 'common', 'setup-testing-library.ts');
+const jsdomEnvironmentPath = resolve(rootDir, 'tests', 'common', 'jsdom-environment.ts');
 
 const config: Config = {
   preset: 'ts-jest',
   moduleFileExtensions: ['js', 'jsx', 'json', 'ts', 'tsx'],
   rootDir,
   testRegex: `.*/${TESTS_DIR_NAME}/.*.${UNIT_TESTS_POSTFIX}.[jt]sx?$`,
-  testEnvironment: 'jsdom',
+  testEnvironment: jsdomEnvironmentPath,
   transformIgnorePatterns: ['/node_modules/(?!(@wavesurfer/react|wavesurfer.js)/)'],
   setupFiles: [setupTestsEnvPath],
   setupFilesAfterEnv: [setupTestingLibraryPath],
