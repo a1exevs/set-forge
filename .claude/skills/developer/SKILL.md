@@ -226,14 +226,16 @@ A decision the LLD did not foresee → the HLD consistency check (§3), in both 
    `stand-check.md` while the PR exists → refresh its description (`/pr` §7).
 5. Report, in the chat — after the commit; in the PR horizon after the CI is green or the rounds are spent: the
    iterations, the review rounds and what is still open, the stand check, the commit hashes, the PR link. Then the
-   hand check: the stand is still up — its client URL, slot and the preset's login — and the acceptance criteria are
-   the user's to walk; end with "say *stop the stand* when you are done". Set `status.md` to done (`stand: running:
-   slot <k>`) and, in the commit horizon, offer `/pr` — it links the task, carries the acceptance criteria and the
-   stand check, and moves the card to In review.
+   hand check: the acceptance criteria are the user's to walk. When step 6 chose the stand, it is still up — give
+   its client URL, slot and the preset's login and end with "say *stop the stand* when you are done"; without a
+   stand, say so in one line. Set `status.md` to done (`stand: running: slot <k>`, or as it was) and, unless a PR
+   exists, offer `/pr` — it links the task, carries the acceptance criteria and the stand check, and moves the
+   card to In review.
 6. **The hand check.** Only the user's word stops the stand (§7). A defect the user finds → fix it as an iteration
-   (verify, one `/code-review` round, that criterion again on the stand) and **its own commit** through `/commit`
-   (approved by the rule of p. 3) — never folded into the first one: the gap between your walk and the user's is
-   the signal that improves this skill and its presets, keep it visible. Add it to `stand-check.md`:
+   (verify, one `/code-review` round, that criterion again on the stand when there is one) and **its own commit**
+   through `/commit` (approved by the rule of p. 3) — never folded into the first one: the gap between your walk
+   and the user's is the signal that improves this skill and its presets, keep it visible. Add it to
+   `stand-check.md`:
 
    ```
    ## Hand check
@@ -280,7 +282,7 @@ Read before proposing, in this order:
 `/developer` on a branch of a task, or "continue #N": read `status.md` of the task folder (and the parent's
 `understanding.md` for a part), report the current step in one line and go on from there — every save still waits
 for its gate. `status.md` names a worktree → move the session into it first (`EnterWorktree` with `path`).
-`stand: running: slot <k>` → `npm run client:stand -- --list`: still running → ask first whether to stop it or
+`stand: running: slot <k>` → `npm run client:stand:stop -- --list`: still running → ask first whether to stop it or
 keep it for the hand check; gone → `stand: stopped`.
 
 ## 6. Task types
