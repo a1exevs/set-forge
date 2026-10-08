@@ -7,7 +7,7 @@ import { closeSync, mkdirSync, openSync, readFileSync, rmSync, statSync, unlinkS
 import { join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 
-import { isPortFree } from '../e2e/stack/api-stack.ts';
+import { isPortFree, killListeners } from '../e2e/stack/api-stack.ts';
 
 /** Slot k serves the API on 5300 + k and the client on 5400 + k — clear of dev (5000 / 5173) and e2e (5101 / 5174). */
 const SERVER_PORT_BASE = 5300;
@@ -16,6 +16,9 @@ const SLOT_COUNT = 10;
 
 const LOCK_STALE_MS = 10_000;
 const LOCK_TIMEOUT_MS = 15_000;
+
+/** How long a stand may take to come up (an image pull, the API build) — `client:stand:stop` waits as long for one. */
+export const STAND_START_TIMEOUT_MS = 300_000;
 
 export type StandEntry = {
   slot: number;
@@ -34,6 +37,11 @@ export type StandEntry = {
 };
 
 type Registry = { stands: StandEntry[] };
+
+function warn(message: string): void {
+  // eslint-disable-next-line no-console
+  console.warn(`[stand] ${message}`);
+}
 
 function git(args: string, cwd: string): string {
   return execSync(`git ${args}`, { cwd, encoding: 'utf8' }).trim();
@@ -68,9 +76,44 @@ export function isProcessAlive(pid: number): boolean {
   }
 }
 
+function commandLineOf(pid: number): string {
+  const command =
+    process.platform === 'win32'
+      ? `powershell -NoProfile -Command "(Get-CimInstance Win32_Process -Filter 'ProcessId=${pid}').CommandLine"`
+      : `ps -o args= -p ${pid}`;
+  try {
+    return execSync(command, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * The pid runs a stand. A pid alone proves nothing: after a reboot or enough process churn the pid of a dead stand
+ * belongs to something else, and that something must not be asked to stop, waited for or killed.
+ */
+export function isStandProcess(pid: number): boolean {
+  return isProcessAlive(pid) && commandLineOf(pid).includes('start-stand');
+}
+
 function registryPaths(cwd: string): { dir: string; file: string; lock: string } {
   const dir = join(mainCheckout(cwd), '.runtime');
   return { dir, file: join(dir, 'stands.json'), lock: join(dir, 'stands.lock') };
+}
+
+/**
+ * The stop request of a slot: `client:stand:stop` creates the file, the stand polls for it and stops itself the way
+ * it does on SIGTERM. Windows has no signal to send a process, and a kill from outside would leave Nest, Vite and
+ * the container to the fallback below.
+ */
+export function stopRequestPath(cwd: string, slot: number): string {
+  return join(registryPaths(cwd).dir, `stand-${slot}.stop`);
+}
+
+export function requestStop(cwd: string, slot: number): void {
+  const { dir } = registryPaths(cwd);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(stopRequestPath(cwd, slot), `${new Date().toISOString()}\n`);
 }
 
 function readRegistry(file: string): Registry {
@@ -122,16 +165,24 @@ async function withLock<T>(cwd: string, action: (file: string) => Promise<T>): P
 }
 
 /**
- * Removes what a killed stand leaves: its MySQL container — Testcontainers' reaper is shared by every stand on the
- * machine and keeps it while any other stand runs — and its API build in `server/.stack/<port>` of its checkout.
- * After a graceful stop both are already gone.
+ * Removes what a killed stand leaves: whatever still listens on its ports (a Nest or Vite the kill of the process
+ * tree missed), its MySQL container — Testcontainers' reaper is shared by every stand on the machine and keeps it
+ * while any other stand runs — and its API build in `server/.stack/<port>` of its checkout. After a graceful stop
+ * all of it is already gone.
  */
 export function removeLeftovers(entry: StandEntry): void {
+  const killed = killListeners([entry.serverPort, entry.clientPort]);
+  if (killed.length > 0) {
+    warn(`Slot ${entry.slot}: killed pid ${killed.join(', ')} still listening on its ports.`);
+  }
   if (entry.containerId) {
     try {
-      execSync(`docker rm -f ${entry.containerId}`, { stdio: 'ignore' });
-    } catch {
-      // Already gone.
+      execSync(`docker rm -f ${entry.containerId}`, { stdio: ['ignore', 'ignore', 'pipe'] });
+    } catch (err) {
+      const stderr = String((err as { stderr?: Buffer | string }).stderr ?? err).trim();
+      if (!stderr.includes('No such container')) {
+        warn(`Slot ${entry.slot}: \`docker rm -f ${entry.containerId.slice(0, 12)}\` failed: ${stderr}`);
+      }
     }
   }
   rmSync(join(entry.worktree, 'server', '.stack', String(entry.serverPort)), { recursive: true, force: true });
@@ -144,7 +195,7 @@ export function claimSlot(
 ): Promise<StandEntry> {
   return withLock(cwd, async file => {
     const registry = readRegistry(file);
-    const live = registry.stands.filter(entry => isProcessAlive(entry.pid));
+    const live = registry.stands.filter(entry => isStandProcess(entry.pid));
     // A stand that died without `client:stand:stop` left its container: the registry is the last place that knows it.
     for (const dead of registry.stands.filter(entry => !live.includes(entry))) {
       removeLeftovers(dead);
@@ -187,6 +238,12 @@ export function releaseSlot(cwd: string, slot: number): Promise<void> {
   });
 }
 
+/** Every registered stand, running or not: an entry outlives a killed stand until its leftovers are removed. */
 export function listStands(cwd: string): StandEntry[] {
-  return readRegistry(registryPaths(cwd).file).stands.filter(entry => isProcessAlive(entry.pid));
+  return readRegistry(registryPaths(cwd).file).stands;
+}
+
+/** The current record of a slot — it gains the container id while the stand starts. */
+export function findStand(cwd: string, slot: number): StandEntry | null {
+  return listStands(cwd).find(entry => entry.slot === slot) ?? null;
 }
