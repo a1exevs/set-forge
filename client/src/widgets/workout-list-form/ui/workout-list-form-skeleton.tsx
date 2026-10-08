@@ -6,10 +6,11 @@ import classes from './workout-list-form.module.scss';
 
 /**
  * The shape of the list form while the list it edits loads: the title, the name and description fields, three
- * exercise cards and the two actions, in the same sections and geometry as the form itself.
+ * exercise cards and the two actions, in the same sections and geometry as the form itself, clipped to the first
+ * screen so the placeholders fill it and never scroll.
  */
 const WorkoutListFormSkeleton: FC = () => (
-  <div className={classes.container}>
+  <div className={`${classes.container} ${classes.containerLoading}`}>
     <header className={classes.header}>
       <div className={classes.titleSkeleton}>
         <Skeleton width="14rem" height="1.5rem" />

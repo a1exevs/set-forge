@@ -7,10 +7,11 @@ import classes from './home-page.module.scss';
 /**
  * The shape of the workout list cards while the lists load: the same grid and card geometry as the content, each
  * bone the size of the line it stands in for (title, badge, the 44 px menu slot, description, two footer lines).
+ * Nine cards — three rows of the desktop grid; the page clips them to the first screen.
  */
 const HomePageSkeleton: FC = () => (
   <div role="status" aria-label="Loading workout lists" className={classes.listGrid}>
-    {Array.from({ length: 3 }, (_: unknown, index: number) => (
+    {Array.from({ length: 9 }, (_: unknown, index: number) => (
       <div key={index} className={classes.card}>
         <div className={classes.cardContent}>
           <div className={classes.cardHeader}>

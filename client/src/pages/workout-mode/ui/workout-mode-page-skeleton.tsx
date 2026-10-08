@@ -7,10 +7,11 @@ import classes from './workout-mode-page.module.scss';
 
 /**
  * The shape of the workout screen while the list and the active session load: the real way back, a title and the
- * progress in the header, three exercise cards below — the same geometry the preview and the training show.
+ * progress in the header, five exercise cards below — the same geometry the preview and the training show — clipped
+ * to the first screen, so the placeholders fill it and never scroll.
  */
 const WorkoutModePageSkeleton: FC = () => (
-  <div className={classes.container}>
+  <div className={`${classes.container} ${classes.containerLoading}`}>
     <header className={classes.header}>
       <div className={classes.headerTop}>
         <Link to="/" className={classes.backButton}>
@@ -35,7 +36,7 @@ const WorkoutModePageSkeleton: FC = () => (
         aria-label="Loading workout"
         className={`${classes.exerciseList} ${classes.exerciseListSkeleton}`}
       >
-        {Array.from({ length: 3 }, (_: unknown, index: number) => (
+        {Array.from({ length: 5 }, (_: unknown, index: number) => (
           <div key={index} className={classes.exerciseCardSkeleton}>
             <div className={classes.exerciseHeaderSkeleton}>
               <div className={classes.exerciseInfoSkeleton}>

@@ -91,7 +91,7 @@ const HomePage: FC<Props> = ({
   };
 
   return (
-    <div ref={swipeRef} className={classes.container}>
+    <div ref={swipeRef} className={isLoading ? `${classes.container} ${classes.containerLoading}` : classes.container}>
       <header className={classes.header}>
         <div className={classes.headerTop}>
           <BrandWordmark title="Workout lists" />

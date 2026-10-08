@@ -216,3 +216,22 @@
     width: 120px;
   }
 }
+
+// Loading: the skeleton fills the first screen and never scrolls; the cut at the bottom fades into the page
+.containerLoading {
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3rem;
+    background: linear-gradient(to bottom, transparent, $bg-primary);
+    pointer-events: none;
+  }
+}
