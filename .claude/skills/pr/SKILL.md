@@ -17,6 +17,8 @@ If the branch is not on `origin` yet, its first push (branches §5) is part of t
 Task Check: a branch of a task carries the issue number (branches §2: `feature/12-workout-export--2` → `12`). Read it
 with `gh issue view <N> --json state,title,url,body`; a missing or closed issue → STOP and ask. The task model lives
 in `.claude/skills/analyst/SKILL.md` §1 (`/analyst`).
+Open PR Check, last: `gh pr view --json number,state` — the branch already has an open PR → this is a refresh, go
+to step 7; never a second PR.
 
 2. COMMIT ANALYSIS
 Analyze the difference between the current branch and its base (step 1).
@@ -97,8 +99,8 @@ A PR of a task into `develop`: then read the task's status (`/analyst` §1 Setti
 workflow already moved it, set `Status` = In review. A sub-branch PR leaves the status alone.
 
 7. REFRESH
-The branch already has an open PR (`gh pr view --json number,body`): no new PR. Rebuild the description by steps 2–4
-from the current state — the commits, `stand-check.md` (its `## Hand check` included) and `code-review.md` — keep
-the acceptance boxes exactly as ticked, and apply it with `gh pr edit <n> --body-file <file>`. Called by `/developer`
-after a CI fix or the hand check (its step 8), or by the user as `/pr` on the same branch; show the diff of the
-description in one line before applying.
+Reached from step 1 when the branch already has an open PR (`gh pr view --json number,body`). Rebuild the
+description by steps 2–4 from the current state — the commits, `stand-check.md` (its `## Hand check` included)
+and `code-review.md` — keep the acceptance boxes exactly as ticked, and apply it with
+`gh pr edit <n> --body-file <file>`. Called by `/developer` after a CI fix or the hand check (its step 8), or by
+the user as `/pr` on the same branch; show the diff of the description in one line before applying.
