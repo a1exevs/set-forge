@@ -119,7 +119,9 @@ How:
    switch — not the branch that comes next).
 
 Without the gate: reading (`git status`, `branch`, `log`, `diff`, `show`, `rev-parse`, `ls-remote`), `git fetch`,
-and commits on the current non-protected branch through `/commit` (it asks for its own approval).
+and commits on the current non-protected branch through `/commit` (it asks for its own approval). The autonomous
+PR horizon of `/developer` (its step 6) is one explicit yes for the pushes of the task branch and the `/pr` that
+its gate line lists — they run without a second question.
 
 ## 5. Doing it safely
 
