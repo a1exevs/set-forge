@@ -59,7 +59,9 @@ versions, logging out ends the session.
 ### Logout and account deletion
 
 Both clear every cached query and end on `/login`, also when the request fails. Deleting the account asks for
-confirmation first.
+confirmation first. The session ends for every open tab at once: a request without the session cookie is answered
+as unauthenticated — the same answer as for an expired access token — so another tab ends on `/login` with its
+next data request, without waiting for its access token to expire.
 
 ## Map
 

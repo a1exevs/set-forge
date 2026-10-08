@@ -30,7 +30,8 @@ describe('RefreshTokenGuard', () => {
       expect(result).toBe(true);
       expect(mockGetRequest).toBeCalledTimes(1);
     });
-    it('should throw exception (no token in cookies)', async () => {
+    // A request without the session cookie carries no session credential: 401, like a missing access token.
+    it('should throw 401 Unauthorized (no token in cookies)', async () => {
       const { mockContext, mockGetRequest } = getMockExecutionContextData({});
       const refreshTokenGuard = new RefreshTokenGuard();
 
@@ -38,9 +39,22 @@ describe('RefreshTokenGuard', () => {
         refreshTokenGuard.canActivate(mockContext);
         sendPseudoError();
       } catch (err) {
-        expect(err.status).toBe(HttpStatus.FORBIDDEN);
-        expect(err.message).toBe(ErrorMessages.FORBIDDEN);
+        expect(err.status).toBe(HttpStatus.UNAUTHORIZED);
+        expect(err.message).toBe(ErrorMessages.UNAUTHORIZED);
         expect(mockGetRequest).toBeCalledTimes(1);
+      }
+    });
+    it('should throw 401 Unauthorized (no cookies on the request at all)', async () => {
+      const { mockContext, request } = getMockExecutionContextData({});
+      delete (request as { cookies?: unknown }).cookies;
+      const refreshTokenGuard = new RefreshTokenGuard();
+
+      try {
+        refreshTokenGuard.canActivate(mockContext);
+        sendPseudoError();
+      } catch (err) {
+        expect(err.status).toBe(HttpStatus.UNAUTHORIZED);
+        expect(err.message).toBe(ErrorMessages.UNAUTHORIZED);
       }
     });
   });
