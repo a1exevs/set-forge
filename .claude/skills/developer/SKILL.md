@@ -1,6 +1,6 @@
 ---
 name: developer
-description: Gated implementation of a task from its issue to a reviewed commit — intake → understanding (root cause for a bug) → scope / breakdown into sub-branches → reuse & reach → HLD with 3 options → LLD iterations → manual or autonomous implementation → /code-review → an optional check on the verification stand → one commit, with an approval gate after every step, the work in its own worktree by default and artifacts kept per task in .runtime/tasks/ of the main checkout. Use when the user wants to implement / take into work / fix an issue ("берём #12", "implement #12"), resumes a task on its branch, or runs /developer.
+description: Gated implementation of a task from its issue to a reviewed commit — intake → understanding (root cause for a bug) → scope / breakdown into sub-branches → reuse & reach → HLD with 3 options → LLD iterations → manual or autonomous implementation → /code-review → an optional check on the verification stand → one commit (autonomous mode may go on to the PR with a green CI) → the hand check by the user on the stand that stays up, with an approval gate after every step, the work in its own worktree by default and artifacts kept per task in .runtime/tasks/ of the main checkout. Use when the user wants to implement / take into work / fix an issue ("берём #12", "implement #12"), resumes a task on its branch, or runs /developer.
 argument-hint: "[#<issue> | <task without an issue>]"
 ---
 
@@ -20,7 +20,8 @@ Talk in the user's language; artifacts, code, commits and the PR are in English.
   before the yes.
 - **No skipping.** Unsure which step you are on → read `status.md`.
 - **Repository rules apply:** branch operations through `/branches` (its gate), commits through the `/commit`
-  template, no push — except the first push of a shared branch that step 3 names in its gate.
+  template, no push — except the first push of a shared branch that step 3 names in its gate and the pushes of the
+  PR horizon that step 6 names in its gate.
   `.claude/rules/*`, `CLAUDE.md` and the domain docs bind the code you write.
 - **Research before you propose** (§4). A business rule that neither the issue nor the domain docs state is a
   question for the user (or a change of the requirements through `/analyst #N`), never a guess.
@@ -48,7 +49,7 @@ shared by every worktree. The same folder holds the `/code-review` log and the s
 
 ```
 # <N> <issue title>
-Status: <step N: name> | <in progress | done> · mode: <manual | autonomous | —> · stand: <yes | no | —>
+Status: <step N: name> | <in progress | done> · mode: <manual | autonomous → commit | autonomous → PR | —> · stand: <no | planned | running: slot <k> | stopped | —>
 Branch: <branch> · Worktree: <.claude/worktrees/<key> | main checkout> · Parent: <../ or —>
 
 ## Steps
@@ -80,7 +81,7 @@ A split (parent) task tracks steps 2, 3 and Parts only; steps 4–8 live in its 
 | 5 | HLD | 3 options, one recommended | `hld.md` |
 | 6 | LLD | iterations, HLD consistency check, the mode | `lld.md` |
 | 7 | Implement | the iterations, verified | `status.md` per iteration |
-| 8 | Finish | review, the stand check, one commit, handoff | `stand-check.md`, `status.md` → done |
+| 8 | Finish | review, the stand check, one commit (the PR horizon: the PR with a green CI), the report, the hand check by the user on the stand | `stand-check.md`, `status.md` → done |
 
 **Housekeeping, at every start.** For each worktree under `.claude/worktrees/` (`git worktree list`) look up the PR
 of its branch (`gh pr list --head <branch> --state merged`). Merged ones → one line: "the PRs of X and Y are
@@ -150,9 +151,13 @@ inventing a straw option. GATE for the pick. On yes save `hld.md` with the choic
   (`.claude/rules/storybook.md`), `/privacy-audit` when the issue's `Privacy` is not `none`. A change that leaves a
   doc wrong is not finished.
 
-Run the HLD consistency check (§3). At the same gate ask two things:
+Run the HLD consistency check (§3). At the same gate ask three things:
 
-- the mode: **manual** (default) or **autonomous** — autonomous includes one commit and no push (step 8);
+- the mode: **manual** (default) or **autonomous**;
+- for autonomous, the **horizon** (step 8): **commit** (default) — one commit, no push; or **PR** — the commit, the
+  first push of the task branch, `/pr` without its own confirmation, then the CI fixed until it is green, every fix
+  its own commit and push. The yes to the PR horizon is the explicit yes `/branches` §4 wants for those pushes and
+  that PR — the gate line lists them (`git push -u origin <branch>`, `/pr`, the fix pushes), so the yes names them;
 - **the stand check** (step 8) — name what it will walk (the acceptance criteria, or for a task without them the
   flows from the reach of step 4) and with which preset (§7):
   - yes by default for any change of how the running app behaves — in the client or in the API alone (a validation,
@@ -161,7 +166,7 @@ Run the HLD consistency check (§3). At the same gate ask two things:
     auth, persistence or migrations — the tests prove what they cover, the stand shows the rest still works;
   - no for docs, scripts, tooling, and a small refactoring the tests cover.
 
-GATE. On yes save `lld.md` with both answers (and `hld.md` if it changed).
+GATE. On yes save `lld.md` with the answers (and `hld.md` if it changed).
 
 **7 Implement.** Verify every iteration before it counts:
 
@@ -191,8 +196,8 @@ A decision the LLD did not foresee → the HLD consistency check (§3), in both 
    the user picks what to fix (the fixes are re-verified and reviewed again). Autonomous: rounds of review → fix
    everything 🔴 and 🟠 → review again, until a round is clean or 5 rounds are spent.
 2. **The stand check**, when step 6 chose it — after the review, so the code checked is the code committed:
-   start the stand (§7), walk everything it was chosen for, watch the console, the network and the server log, stop
-   the stand. Each criterion the way a person would check it: one about the screen in the Browser pane; one about the
+   start the stand (§7), walk everything it was chosen for, watch the console, the network and the server log.
+   Each criterion the way a person would check it: one about the screen in the Browser pane; one about the
    API with HTTP requests, the way a tester uses Postman (§7); a server change that has a path through the UI — both,
    the request proves the contract, the screen proves the client shows it. Write `stand-check.md`:
 
@@ -209,11 +214,40 @@ A decision the LLD did not foresee → the HLD consistency check (§3), in both 
    `✓` seen working, `✗` broken, `—` cannot be checked on the stand. A `✗` → fix, verify the iteration, one more
    `/code-review` round on the fix, check that criterion again. Manual: the table goes to the user before the
    commit. Docker is not running → say so; the user starts it or the check is skipped and noted in the report.
+   The stand stays up after the walk — the user checks on it (p. 6); never stop it here.
 3. One commit with the `/commit` template. Manual: `/commit` asks for its approval as usual. Autonomous: choosing the
-   mode was that approval — commit without asking. No push in either mode.
-4. Report: the iterations, the review rounds and what is still open, the stand check, the commit hash. Set
-   `status.md` to done and offer `/pr` — it links the task, carries the acceptance criteria and the stand check, and
-   moves the card to In review.
+   mode was that approval — commit without asking. No push — except the PR horizon (p. 4).
+4. **The PR horizon** (autonomous → PR only). Push the branch (`git push -u origin <branch>`) and run `/pr` — its
+   confirmation was the yes of step 6 (`/pr` §6). Then the CI: the app binds the PR and reports its checks — never
+   poll them yourself (no `gh` loops). The turn ends with one line, not the report: "PR #<n> is open, CI is
+   running, the stand is up at <url>". A red check → read its log, fix it as an iteration (verify, one
+   `/code-review` round), one commit through `/commit`, push; a change in `server/` also restarts the stand (§7),
+   so the stand shows the code of the PR. Up to 3 fix rounds; still red → stop and report it as open. A change of
+   `stand-check.md` while the PR exists → refresh its description (`/pr` §7).
+5. Report, in the chat — after the commit; in the PR horizon after the CI is green or the rounds are spent: the
+   iterations, the review rounds and what is still open, the stand check, the commit hashes, the PR link. Then the
+   hand check: the acceptance criteria are the user's to walk. When step 6 chose the stand, it is still up — give
+   its client URL, slot and the preset's login and end with "say *stop the stand* when you are done"; without a
+   stand, say so in one line. Set `status.md` to done (`stand: running: slot <k>`, or as it was) and, unless a PR
+   exists, offer `/pr` — it links the task, carries the acceptance criteria and the stand check, and moves the
+   card to In review.
+6. **The hand check.** Only the user's word stops the stand (§7). A defect the user finds → fix it as an iteration
+   (verify, one `/code-review` round, that criterion again on the stand when there is one) and **its own commit**
+   through `/commit` (approved by the rule of p. 3) — never folded into the first one: the gap between your walk
+   and the user's is the signal that improves this skill and its presets, keep it visible. Add it to
+   `stand-check.md`:
+
+   ```
+   ## Hand check
+
+   | AC | Found | Missed because | Fix |
+   |---|---|---|---|
+   | AC-3 | what the user saw | why the walk of p. 2 did not catch it | <commit hash> |
+   ```
+
+   A PR exists → refresh its description (`/pr` §7). Before any next step of the task that is not about the stand
+   (an iteration, `/pr`, a branch operation) ask once: "is the stand still needed?". On the user's stop →
+   `npm run client:stand:stop -- --slot=<k>` and `stand: stopped` in `status.md`.
 
 A split task: a part finishes on its sub-branch the same way (its PR goes into the shared branch); after the last
 part, the shared branch goes to `/pr` into `develop`.
@@ -248,6 +282,8 @@ Read before proposing, in this order:
 `/developer` on a branch of a task, or "continue #N": read `status.md` of the task folder (and the parent's
 `understanding.md` for a part), report the current step in one line and go on from there — every save still waits
 for its gate. `status.md` names a worktree → move the session into it first (`EnterWorktree` with `path`).
+`stand: running: slot <k>` → `npm run client:stand:stop -- --list`: still running → ask first whether to stop it or
+keep it for the hand check; gone → `stand: stopped`.
 
 ## 6. Task types
 
@@ -270,13 +306,15 @@ another session's stand. Code: `client/tests/stand/`.
 - Start — in the background (Bash `run_in_background`), from the task's checkout:
   `npm run client:stand -- --preset=<name>`. Wait for the line `[stand] Ready: <client url> …`; the lines before it
   name the slot, and the preset's notes (the login) follow it. Open the client URL in the Browser pane
-  (`preview_start` with `url`); the server log is the output of the background task.
+  (`preview_start` with `url`); the server log is the output of the background task. Record `stand: running:
+  slot <k>` in `status.md`.
 - Presets — the state the stand starts in, built through the public API (`client/tests/stand/stand-presets.ts`):
   `empty` (no users — for flows that start at registration), `user` (a registered user without data), `data` (a
   registered user with two lists and one completed session). A criterion that needs more (an active session, …)
   gets a new preset there, in the same task — never a hand-made state.
 - Stop — `npm run client:stand:stop` (every stand of this checkout) or `-- --slot=<k>`; `-- --list` shows every
-  running stand. Always stop it before the commit.
+  running stand. Only the user's word stops it (step 8): the stand outlives the commit and the PR so the user can
+  walk the acceptance criteria on it; then `stand: stopped` in `status.md`.
 - API checks — the API URL is in the `Ready` line, every route under `/api/1.0`. A token: `POST /api/1.0/auth/login`
   with the preset user's login (`user` preset) → `accessToken` → `Authorization: Bearer <token>`. The contract —
   request and response shapes — is the stand's Swagger: `/api/docs`, as JSON `/api/docs-json`. Requests go through

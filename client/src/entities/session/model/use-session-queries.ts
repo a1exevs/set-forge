@@ -27,6 +27,10 @@ export function useCurrentUserQuery(enabled: boolean): UseQueryResult<CurrentUse
     queryKey: sessionQueryKeys.me,
     queryFn: fetchCurrentUser,
     enabled,
+    // The session is verified once per app open (the root route primes this query); it stays fresh for the life of
+    // the app, so a page mount or a window focus never asks the server who the user is again. A session that ended
+    // on the server is discovered by the next data request (401 → refresh → /login), not by refetching this one.
+    staleTime: Infinity,
   });
 }
 

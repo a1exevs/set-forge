@@ -1,10 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { type AnyRouter, createMemoryHistory, createRouter, RouterProvider } from '@tanstack/react-router';
+import { type AnyRouter, createMemoryHistory, RouterProvider } from '@tanstack/react-router';
 import { render } from '@testing-library/react';
 
 import { ConfirmDialogProvider } from '@shared/ui';
 
-import { routeTree } from '../route-tree.gen';
+import { createAppRouter } from '../router';
 
 export function createTestQueryClient(): QueryClient {
   return new QueryClient({
@@ -15,13 +15,9 @@ export function createTestQueryClient(): QueryClient {
   });
 }
 
+/** The production router (same factory, same options) on a memory history starting at `initialEntry`. */
 export function createTestRouter(initialEntry: string, queryClient: QueryClient): AnyRouter {
-  return createRouter({
-    routeTree,
-    context: { queryClient },
-    history: createMemoryHistory({ initialEntries: [initialEntry] }),
-    defaultPreload: 'intent',
-  });
+  return createAppRouter(queryClient, createMemoryHistory({ initialEntries: [initialEntry] }));
 }
 
 export const renderApp = (router: AnyRouter, queryClient: QueryClient): ReturnType<typeof render> =>

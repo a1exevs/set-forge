@@ -25,7 +25,9 @@ describe('Authorized user methods', () => {
 
     describe('/refresh POST', () => {
       it('Refresh Access Token', () => {
-        return request(app.getHttpServer()).post(`${api}/${Routes.ENDPOINT_AUTH}/refresh`).expect(HttpStatus.FORBIDDEN);
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_AUTH}/refresh`)
+          .expect(HttpStatus.UNAUTHORIZED);
       });
     });
 

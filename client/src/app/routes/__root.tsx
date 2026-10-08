@@ -28,6 +28,26 @@ const buildRedirectTarget = (pathname: string, search: unknown): string => {
   return pathname;
 };
 
+// The session is verified once per app open. The cache is empty only on the first protected route of this open and
+// after the session-expired handler cleared it; every later navigation reads the cached user synchronously, so a
+// screen starts loading its own data at once, and a session that ended on the server is discovered by that data
+// request (401 → refresh → /login). The router may run `beforeLoad` several times while the first bootstrap is still
+// pending (the initial load and the mount of the provider overlap), so concurrent runs share one bootstrap.
+type SessionUser = Awaited<ReturnType<typeof bootstrapSessionAndPrimeCache>>;
+
+let bootstrapInFlight: Promise<SessionUser> | null = null;
+
+const resolveSessionUser = (queryClient: QueryClient): SessionUser | Promise<SessionUser> => {
+  const cached = getCachedCurrentUser(queryClient);
+  if (cached) {
+    return cached;
+  }
+  bootstrapInFlight ??= bootstrapSessionAndPrimeCache(queryClient).finally(() => {
+    bootstrapInFlight = null;
+  });
+  return bootstrapInFlight;
+};
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: async ({ context, location }) => {
     const path = location.pathname;
@@ -46,7 +66,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       return;
     }
 
-    const user = await bootstrapSessionAndPrimeCache(context.queryClient);
+    const user = await resolveSessionUser(context.queryClient);
 
     if (!user) {
       throw redirect({
