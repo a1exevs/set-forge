@@ -14,7 +14,6 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBody,
-  ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -89,7 +88,7 @@ export class AuthController {
     description: Docs.REFRESH_TOKENS_SUCCESSFUL_RESULT,
   })
   @ApiUnprocessableEntityResponse({ description: Docs.REFRESH_TOKENS_UNPROCESSABLE_ENTITY })
-  @ApiForbiddenResponse({ description: Docs.REFRESH_TOKENS_FORBIDDEN })
+  @ApiUnauthorizedResponse({ description: Docs.REFRESH_TOKENS_UNAUTHORIZED })
   @UseGuards(RefreshTokenGuard)
   @UseInterceptors(ResponseInterceptor)
   @Post('/refresh')
@@ -109,7 +108,6 @@ export class AuthController {
     description: Docs.GET_CURRENT_USER_SUCCESSFUL_RESULT,
   })
   @ApiUnauthorizedResponse({ description: Docs.GET_CURRENT_USER_UNAUTHORIZED })
-  @ApiForbiddenResponse({ description: Docs.GET_CURRENT_USER_FORBIDDEN })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @UseInterceptors(ResponseInterceptor)
   @Get('/me')
@@ -125,7 +123,6 @@ export class AuthController {
     description: Docs.ACCEPT_DOCUMENTS_SUCCESSFUL_RESULT,
   })
   @ApiUnauthorizedResponse({ description: Docs.ACCEPT_DOCUMENTS_UNAUTHORIZED })
-  @ApiForbiddenResponse({ description: Docs.ACCEPT_DOCUMENTS_FORBIDDEN })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @UseInterceptors(ResponseInterceptor)
   @Patch('/documents-acceptance')
@@ -140,7 +137,6 @@ export class AuthController {
   })
   @ApiUnprocessableEntityResponse({ description: Docs.LOGOUT_UNPROCESSABLE_ENTITY })
   @ApiUnauthorizedResponse({ description: Docs.LOGOUT_UNAUTHORIZED })
-  @ApiForbiddenResponse({ description: Docs.LOGOUT_FORBIDDEN })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @Delete('/logout')
   async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
@@ -155,7 +151,6 @@ export class AuthController {
     description: Docs.DELETE_ACCOUNT_SUCCESSFUL_RESULT,
   })
   @ApiUnauthorizedResponse({ description: Docs.DELETE_ACCOUNT_UNAUTHORIZED })
-  @ApiForbiddenResponse({ description: Docs.DELETE_ACCOUNT_FORBIDDEN })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @UseInterceptors(ResponseInterceptor)
   @Delete('/account')
