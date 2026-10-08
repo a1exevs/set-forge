@@ -12,7 +12,8 @@
   `/branches`, `/commit`, `/pr`, `/code-review`, `/privacy-audit`, `/release`); Claude also picks them up from a plain
   request ("write up this feature", "take #12 into work", "commit this", "make a release", "set up my machine").
   The stages of the pipeline are named by role (`/analyst`, `/developer`), the tools they use by action.
-- Branch operations (create, switch, push, reset, …) wait for the user's yes, one by one — see `/branches`.
+- Branch operations (create, switch, push, reset, …) wait for the user's yes, one by one — see `/branches`; the one
+  exception is the autonomous PR horizon of `/developer`, whose gate names its pushes and PR in advance.
 - Secrets (`.env*`, `secrets/`, `*.pem`, `*.key`) are denied to the agent in `.claude/settings.json`.
 - No change logs or task plans in the repo: requirements live in GitHub issues on the Set-forge board (written by
   `/analyst`), plans and acceptance in the PR, history in git. Agent artifacts that must survive between runs

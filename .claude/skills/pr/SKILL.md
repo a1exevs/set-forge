@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Create a GitHub Pull Request for the current branch with the repository's title, description and label conventions, linked to its task (issue) with the acceptance criteria as checkboxes. Use when the user asks to open / create a PR or runs /pr.
+description: Create a GitHub Pull Request for the current branch with the repository's title, description and label conventions, linked to its task (issue) with the acceptance criteria as checkboxes — or refresh the description of the branch's open PR from the task folder. Use when the user asks to open / create / refresh a PR or runs /pr.
 ---
 
 # pr
@@ -53,9 +53,9 @@ section.
 
 Then the developer's own check, before `## Code review` (after the acceptance criteria, or after the key changes
 when there are none): `/developer` keeps it in `stand-check.md` of the branch's task folder (branches §2). The file
-exists → copy it under `## Developer check` verbatim — a static table, so it neither looks
-like the user's acceptance nor counts in the checkbox progress. No file → `_No stand check was recorded._` (any
-branch, a sub-branch included).
+exists → copy it under `## Developer check` verbatim, its `## Hand check` section included when present — static
+tables, so they neither look like the user's acceptance nor count in the checkbox progress. No file →
+`_No stand check was recorded._` (any branch, a sub-branch included).
 
 4. CODE REVIEW LOG
 `/code-review` keeps its findings per branch in `code-review.md` of the branch's task folder (branches §2, gitignored:
@@ -91,5 +91,14 @@ Labels: Add the label of the branch type (branches §2: `feature/login` → `fea
 Present the final Base, Title, Description, Labels and the task (number, title, link) to the user.
 Ask: "Ready to create the Pull Request with these details?"
 Upon approval, push the branch if needed and use `gh pr create --base <base>` to submit it.
+Called by `/developer` in its autonomous PR horizon (developer step 8): the yes was given at its LLD gate and
+named the push and this PR — skip the question, push and create.
 A PR of a task into `develop`: then read the task's status (`/analyst` §1 Setting a field); unless the board
 workflow already moved it, set `Status` = In review. A sub-branch PR leaves the status alone.
+
+7. REFRESH
+The branch already has an open PR (`gh pr view --json number,body`): no new PR. Rebuild the description by steps 2–4
+from the current state — the commits, `stand-check.md` (its `## Hand check` included) and `code-review.md` — keep
+the acceptance boxes exactly as ticked, and apply it with `gh pr edit <n> --body-file <file>`. Called by `/developer`
+after a CI fix or the hand check (its step 8), or by the user as `/pr` on the same branch; show the diff of the
+description in one line before applying.
