@@ -272,8 +272,9 @@ another session's stand. Code: `client/tests/stand/`.
   name the slot, and the preset's notes (the login) follow it. Open the client URL in the Browser pane
   (`preview_start` with `url`); the server log is the output of the background task.
 - Presets — the state the stand starts in, built through the public API (`client/tests/stand/stand-presets.ts`):
-  `empty` (no users — for flows that start at registration), `user` (a registered user without data). A criterion
-  that needs more (lists, an active session) gets a new preset there, in the same task — never a hand-made state.
+  `empty` (no users — for flows that start at registration), `user` (a registered user without data), `data` (a
+  registered user with two lists and one completed session). A criterion that needs more (an active session, …)
+  gets a new preset there, in the same task — never a hand-made state.
 - Stop — `npm run client:stand:stop` (every stand of this checkout) or `-- --slot=<k>`; `-- --list` shows every
   running stand. Always stop it before the commit.
 - API checks — the API URL is in the `Ready` line, every route under `/api/1.0`. A token: `POST /api/1.0/auth/login`

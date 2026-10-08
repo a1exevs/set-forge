@@ -27,6 +27,7 @@ jest.mock('@shared/ui', () => ({
 }));
 
 jest.mock('@widgets/workout-list-form', () => ({
+  WorkoutListFormSkeleton: () => <div role="status" aria-label="Loading workout list" />,
   WorkoutListForm: ({
     onSubmit,
     onCancel,
@@ -82,6 +83,21 @@ describe('EditWorkoutPageLogicLayer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     confirmDialogMock.mockResolvedValue('cancel');
+  });
+
+  it('shows the form skeleton while the list loads', () => {
+    render(
+      <EditWorkoutPageLogicLayer
+        id="list-1"
+        workout={undefined}
+        activeSessionId={null}
+        updateWorkoutList={jest.fn()}
+        resyncSession={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('status', { name: 'Loading workout list' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument();
   });
 
   it('saves immediately when there is no active session', async () => {

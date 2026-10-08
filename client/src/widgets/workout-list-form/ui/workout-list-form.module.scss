@@ -196,3 +196,23 @@
     }
   }
 }
+
+// Skeleton: the title line and the action buttons keep the form's geometry
+.titleSkeleton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 1.8rem;
+}
+
+.actionSkeleton {
+  flex: 1;
+  border-radius: $radius-md;
+}
+
+@media (min-width: 768px) {
+  .actionSkeleton {
+    flex: 0 0 auto;
+    width: 120px;
+  }
+}

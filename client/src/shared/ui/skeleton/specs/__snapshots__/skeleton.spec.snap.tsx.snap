@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Skeleton matches snapshot for a circle bone 1`] = `
+<div>
+  <span
+    aria-hidden="true"
+    class="skeleton circle"
+  />
+</div>
+`;
+
+exports[`Skeleton matches snapshot for a sized rect bone 1`] = `
+<div>
+  <span
+    aria-hidden="true"
+    class="skeleton rect"
+    style="--skeleton-width: 8rem; --skeleton-height: 2.5rem;"
+  />
+</div>
+`;
+
+exports[`Skeleton matches snapshot for the default text bone 1`] = `
+<div>
+  <span
+    aria-hidden="true"
+    class="skeleton text"
+  />
+</div>
+`;

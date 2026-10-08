@@ -37,6 +37,7 @@ exports[`HistoryPage matches snapshot with an expanded session 1`] = `
       </div>
     </header>
     <main
+      aria-busy="false"
       class="main"
     >
       <div

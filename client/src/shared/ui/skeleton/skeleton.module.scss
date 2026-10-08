@@ -1,0 +1,32 @@
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.skeleton {
+  display: block;
+  width: var(--skeleton-width, 100%);
+  height: var(--skeleton-height, 1.5rem);
+  background-color: $skeleton-bone;
+  animation: pulse 1.6s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.text {
+  border-radius: $radius-sm;
+}
+
+.rect {
+  height: var(--skeleton-height, 2.5rem);
+  border-radius: $radius-md;
+}
+
+.circle {
+  width: var(--skeleton-width, 1.5rem);
+  height: var(--skeleton-height, 1.5rem);
+  border-radius: 50%;
+}

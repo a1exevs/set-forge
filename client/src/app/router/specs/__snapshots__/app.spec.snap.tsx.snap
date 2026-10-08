@@ -104,6 +104,7 @@ exports[`App Page with route / matches snapshot, route / 1`] = `
       </div>
     </header>
     <main
+      aria-busy="false"
       class="main"
     >
       <div
