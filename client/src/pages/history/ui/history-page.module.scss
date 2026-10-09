@@ -183,21 +183,7 @@
   cursor: default;
 }
 
-// Loading: the skeleton fills the first screen and never scrolls; the cut at the bottom fades into the page
+// Loading: the skeleton fills the first screen and never scrolls
 .containerLoading {
-  position: relative;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: calc(3.5rem + env(safe-area-inset-bottom, 0));
-    height: 3rem;
-    background: linear-gradient(to bottom, transparent, $bg-primary);
-    pointer-events: none;
-  }
+  @include loading-screen($fade-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0)));
 }
