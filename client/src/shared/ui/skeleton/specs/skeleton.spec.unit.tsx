@@ -14,4 +14,13 @@ describe('Skeleton', () => {
     expect(bone.style.getPropertyValue('--skeleton-width')).toBe('8rem');
     expect(bone.style.getPropertyValue('--skeleton-height')).toBe('2.5rem');
   });
+
+  it('takes the shape of a given text without putting it in the DOM', () => {
+    const { container } = render(<Skeleton text="Ready to train?" />);
+    const bone = container.firstChild as HTMLElement;
+    expect(bone).toHaveAttribute('aria-hidden', 'true');
+    expect(bone).toHaveAttribute('data-text', 'Ready to train?');
+    expect(bone).toBeEmptyDOMElement();
+    expect(bone).toHaveClass('textShape');
+  });
 });

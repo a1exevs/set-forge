@@ -38,6 +38,18 @@ export const Variant: Story = {
   ),
 };
 
+/** `text` takes the shape of known copy: one bar per wrapped line, so the bone wraps exactly like the text will. */
+export const TextShape: Story = {
+  render: (args): ReactElement => (
+    <Stack>
+      <Skeleton
+        {...args}
+        text="Ready to train? Tap Start workout only when you are about to begin — the timer starts then, so your workout duration in history stays accurate."
+      />
+    </Stack>
+  ),
+};
+
 /** Lines of different widths stacked the way a paragraph or a card would lay them out. */
 export const Sizes: Story = {
   render: (args): ReactElement => (

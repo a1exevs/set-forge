@@ -14,11 +14,27 @@ type Props = {
    * content takes its place without moving. Defaults to `1.5rem` (`text`, `circle`) or `2.5rem` (`rect`).
    */
   height?: string;
+  /**
+   * A known text the bone takes the shape of: one bar per wrapped line, at any width, in the font of the parent —
+   * for static copy whose line count changes with the screen. Overrides `variant`, `width` and `height`.
+   */
+  text?: string;
   className?: string;
 };
 
 /** A placeholder bone with a calm pulse: hidden from assistive technology, so the page names its loading once. */
-const Skeleton: FC<Props> = ({ variant = 'text', width = undefined, height = undefined, className = undefined }) => {
+const Skeleton: FC<Props> = ({
+  variant = 'text',
+  width = undefined,
+  height = undefined,
+  text = undefined,
+  className = undefined,
+}) => {
+  if (text !== undefined) {
+    const shapeClassNames: string = [classes.textShape, className].filter(Boolean).join(' ');
+    return <span aria-hidden className={shapeClassNames} data-text={text} />;
+  }
+
   const classNames: string = [classes.skeleton, classes[variant], className].filter(Boolean).join(' ');
 
   return (

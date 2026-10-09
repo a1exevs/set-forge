@@ -19,6 +19,16 @@ exports[`Skeleton matches snapshot for a sized rect bone 1`] = `
 </div>
 `;
 
+exports[`Skeleton matches snapshot for a text-shaped bone 1`] = `
+<div>
+  <span
+    aria-hidden="true"
+    class="textShape"
+    data-text="Ready to train? Tap Start workout when you begin."
+  />
+</div>
+`;
+
 exports[`Skeleton matches snapshot for the default text bone 1`] = `
 <div>
   <span

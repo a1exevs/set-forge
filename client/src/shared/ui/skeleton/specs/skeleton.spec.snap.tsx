@@ -17,4 +17,9 @@ describe('Skeleton', () => {
     const { container } = render(<Skeleton variant="circle" />);
     expect(container).toMatchSnapshot();
   });
+
+  it('matches snapshot for a text-shaped bone', () => {
+    const { container } = render(<Skeleton text="Ready to train? Tap Start workout when you begin." />);
+    expect(container).toMatchSnapshot();
+  });
 });

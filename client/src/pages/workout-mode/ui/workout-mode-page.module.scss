@@ -165,8 +165,9 @@
   border-radius: $radius-lg;
 }
 
-.exerciseListSkeleton {
-  margin-top: $spacing-xl;
+.actionButtonSkeleton {
+  max-width: 400px;
+  border-radius: $radius-lg;
 }
 
 .exerciseCardSkeleton {
