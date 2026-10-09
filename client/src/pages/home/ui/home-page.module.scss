@@ -190,3 +190,8 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+// Loading: the skeleton fills the first screen and never scrolls
+.containerLoading {
+  @include loading-screen($fade-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0)));
+}

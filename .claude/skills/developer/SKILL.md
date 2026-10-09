@@ -309,8 +309,9 @@ another session's stand. Code: `client/tests/stand/`.
   (`preview_start` with `url`); the server log is the output of the background task. Record `stand: running:
   slot <k>` in `status.md`.
 - Presets — the state the stand starts in, built through the public API (`client/tests/stand/stand-presets.ts`):
-  `empty` (no users — for flows that start at registration), `user` (a registered user without data). A criterion
-  that needs more (lists, an active session) gets a new preset there, in the same task — never a hand-made state.
+  `empty` (no users — for flows that start at registration), `user` (a registered user without data), `data` (a
+  registered user with two lists and one completed session). A criterion that needs more (an active session, …)
+  gets a new preset there, in the same task — never a hand-made state.
 - Stop — `npm run client:stand:stop` (every stand of this checkout) or `-- --slot=<k>`; `-- --list` shows every
   running stand. The stand stops Nest, Vite and its MySQL itself; one that died or was killed is cleaned up by the
   same command (its orphans on the slot's ports, its container). Only the user's word stops it (step 8): the stand

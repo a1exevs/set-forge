@@ -6,6 +6,7 @@ import { hasRemainingSets } from '@entities/workout-session-exercise';
 import { toastError, useConfirm } from '@shared/lib';
 
 import WorkoutModePage from './workout-mode-page';
+import WorkoutModePageSkeleton from './workout-mode-page-skeleton';
 import { fireWorkoutCompleteConfetti } from '../lib/fire-workout-complete-confetti';
 
 type Props = {
@@ -188,7 +189,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   }, [session, phase, finishSession]);
 
   if (workoutList === undefined) {
-    return null;
+    return <WorkoutModePageSkeleton />;
   }
 
   return (

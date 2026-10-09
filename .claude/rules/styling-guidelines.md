@@ -12,8 +12,10 @@ Component styles are SCSS modules next to the component; global styles live in `
 
 - `component-name.module.scss` sits in the same directory as the component; components in `shared/ui/` have their own.
 - Import as `classes` by relative path: `import classes from './component-name.module.scss';` (never `src/...`).
-- `variables.scss` is injected into every stylesheet by Vite (`css.preprocessorOptions.scss.additionalData`) — don't
-  `@use` it. `@use` between files of `shared/ui/styles/` is relative (`@use './themes';`).
+- `variables.scss` (tokens) and `mixins.scss` (shared style blocks such as `loading-screen`) are injected into every
+  stylesheet by Vite (`css.preprocessorOptions.scss.additionalData`) — don't `@use` them. `@use` between files of
+  `shared/ui/styles/` is relative (`@use './themes';`, `@use './variables' as *;`).
+- A block repeated in several modules becomes a mixin in `mixins.scss`, with parameters for what differs.
 
 ## Class naming
 
@@ -43,4 +45,4 @@ Use the variables of `client/src/shared/ui/styles/variables.scss` (`$spacing-*`,
 |---|---|
 | `style` only via `cssVars()` in `ui` segments | `npm run client:lint` · ESLint `no-restricted-syntax` · `client/linter/rules/ui-segment-rule.ts` |
 | SCSS modules imported by relative path, no `src/...` | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
-| camelCase classes, variables instead of literals, module next to the component | ❌ review |
+| camelCase classes, variables instead of literals, module next to the component, repeated blocks as mixins | ❌ review |

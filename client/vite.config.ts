@@ -58,7 +58,13 @@ export default defineConfig(({ mode }) => {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: `@use "${resolve(__dirname, './src/shared/ui/styles/variables.scss').replace(/\\/g, '/')}" as *;`,
+          // Every stylesheet gets the tokens and the mixins of shared/ui/styles without an @use of its own.
+          additionalData: ['variables', 'mixins']
+            .map(
+              (name: string): string =>
+                `@use "${resolve(__dirname, `./src/shared/ui/styles/${name}.scss`).replace(/\\/g, '/')}" as *;`,
+            )
+            .join(' '),
         },
       },
     },

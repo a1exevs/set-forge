@@ -8,7 +8,7 @@ describe('App', () => {
       const queryClient = createTestQueryClient();
       const testRouter = createTestRouter('/', queryClient);
       const { container } = renderApp(testRouter, queryClient);
-      await screen.findByText('Workout lists');
+      await screen.findByText('No workout lists yet');
       expect(container).toMatchSnapshot();
     });
     it(`matches snapshot, route /create`, async () => {

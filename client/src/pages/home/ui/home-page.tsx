@@ -6,11 +6,13 @@ import type { WorkoutList } from '@entities/workout-list';
 import { BrandWordmark, IconButton, MenuButton } from '@shared/ui';
 import { MainTabsBar } from '@widgets/main-tabs-bar';
 
+import HomePageSkeleton from './home-page-skeleton';
 import classes from './home-page.module.scss';
 
 type Props = {
   swipeRef: RefObject<HTMLDivElement>;
   workoutLists: WorkoutList[];
+  isLoading: boolean;
   onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void | Promise<void>;
   onExport: () => void | Promise<void>;
@@ -23,6 +25,7 @@ type Props = {
 const HomePage: FC<Props> = ({
   swipeRef,
   workoutLists,
+  isLoading,
   onEdit,
   onDelete,
   onExport,
@@ -31,8 +34,64 @@ const HomePage: FC<Props> = ({
   importInputRef,
   formatDate,
 }) => {
+  const renderLists = (): JSX.Element => {
+    if (isLoading) {
+      return <HomePageSkeleton />;
+    }
+
+    if (workoutLists.length === 0) {
+      return (
+        <div className={classes.empty}>
+          <p>No workout lists yet</p>
+          <p className={classes.emptyHint}>Create your first list to start tracking progress</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className={classes.listGrid}>
+        {workoutLists.map((list: WorkoutList) => (
+          <div key={list.id} className={classes.card}>
+            <Link
+              to="/workout/$id"
+              params={{ id: list.id }}
+              className={classes.cardLink}
+              aria-label={`Open ${list.name}`}
+            />
+            <div className={classes.cardContent}>
+              <div className={classes.cardHeader}>
+                <h2>{list.name}</h2>
+                <span className={classes.badge}>{list.exercises.length} ex.</span>
+                <div className={classes.menuButton}>
+                  <MenuButton
+                    ariaLabel="Workout list actions"
+                    items={[
+                      { id: 'edit', label: 'Edit', onClick: (): void => onEdit(list.id) },
+                      {
+                        id: 'delete',
+                        label: 'Delete',
+                        onClick: (): void => {
+                          onDelete(list.id, list.name);
+                        },
+                      },
+                    ]}
+                  />
+                </div>
+              </div>
+              {list.description && <p className={classes.description}>{list.description}</p>}
+              <div className={classes.cardFooter}>
+                <span className={classes.date}>Created: {formatDate(list.createdAt)}</span>
+                {list.lastUsedAt && <span className={classes.lastUsed}>Last used: {formatDate(list.lastUsedAt)}</span>}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <div ref={swipeRef} className={classes.container}>
+    <div ref={swipeRef} className={isLoading ? `${classes.container} ${classes.containerLoading}` : classes.container}>
       <header className={classes.header}>
         <div className={classes.headerTop}>
           <BrandWordmark title="Workout lists" />
@@ -59,54 +118,8 @@ const HomePage: FC<Props> = ({
         </div>
       </header>
 
-      <main className={classes.main}>
-        {workoutLists.length === 0 ? (
-          <div className={classes.empty}>
-            <p>No workout lists yet</p>
-            <p className={classes.emptyHint}>Create your first list to start tracking progress</p>
-          </div>
-        ) : (
-          <div className={classes.listGrid}>
-            {workoutLists.map((list: WorkoutList) => (
-              <div key={list.id} className={classes.card}>
-                <Link
-                  to="/workout/$id"
-                  params={{ id: list.id }}
-                  className={classes.cardLink}
-                  aria-label={`Open ${list.name}`}
-                />
-                <div className={classes.cardContent}>
-                  <div className={classes.cardHeader}>
-                    <h2>{list.name}</h2>
-                    <span className={classes.badge}>{list.exercises.length} ex.</span>
-                    <div className={classes.menuButton}>
-                      <MenuButton
-                        ariaLabel="Workout list actions"
-                        items={[
-                          { id: 'edit', label: 'Edit', onClick: (): void => onEdit(list.id) },
-                          {
-                            id: 'delete',
-                            label: 'Delete',
-                            onClick: (): void => {
-                              onDelete(list.id, list.name);
-                            },
-                          },
-                        ]}
-                      />
-                    </div>
-                  </div>
-                  {list.description && <p className={classes.description}>{list.description}</p>}
-                  <div className={classes.cardFooter}>
-                    <span className={classes.date}>Created: {formatDate(list.createdAt)}</span>
-                    {list.lastUsedAt && (
-                      <span className={classes.lastUsed}>Last used: {formatDate(list.lastUsedAt)}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+      <main className={classes.main} aria-busy={isLoading}>
+        {renderLists()}
       </main>
 
       <IconButton

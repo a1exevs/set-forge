@@ -4,7 +4,7 @@ import { FC } from 'react';
 import type { UpdateWorkoutListDto, WorkoutList } from '@entities/workout-list';
 import { toastError, toastSuccess, useConfirm } from '@shared/lib';
 import { NotFoundMessage } from '@shared/ui';
-import { WorkoutListForm } from '@widgets/workout-list-form';
+import { WorkoutListForm, WorkoutListFormSkeleton } from '@widgets/workout-list-form';
 
 type Props = {
   id: string;
@@ -19,7 +19,7 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
   const confirmDialog = useConfirm();
 
   if (workout === undefined) {
-    return null;
+    return <WorkoutListFormSkeleton />;
   }
 
   // TODO: Distinguish query errors from a missing list — not only "Workout list not found" (see data layer)

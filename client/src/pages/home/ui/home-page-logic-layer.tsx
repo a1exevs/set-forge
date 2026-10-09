@@ -9,6 +9,7 @@ import { buildWorkoutListsExportFilename } from '../lib/workout-lists-export-fil
 
 type Props = {
   workoutLists: WorkoutList[];
+  isLoading: boolean;
   deleteWorkoutList: (id: string) => Promise<void>;
   clearWorkoutSessionCachesForDeletedList: (workoutListId: string) => void;
   exportAllWorkoutLists: () => Promise<WorkoutListsExportFile>;
@@ -19,6 +20,7 @@ type Props = {
 
 const HomePageLogicLayer: FC<Props> = ({
   workoutLists,
+  isLoading,
   deleteWorkoutList,
   clearWorkoutSessionCachesForDeletedList,
   exportAllWorkoutLists,
@@ -110,6 +112,7 @@ const HomePageLogicLayer: FC<Props> = ({
     <HomePage
       swipeRef={swipeRef}
       workoutLists={workoutLists}
+      isLoading={isLoading}
       onEdit={onEdit}
       onDelete={handleDelete}
       onExport={handleExport}

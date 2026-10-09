@@ -177,3 +177,13 @@
     padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0) + $spacing-xl);
   }
 }
+
+// Skeleton: a placeholder row is not a button
+.cardSkeleton {
+  cursor: default;
+}
+
+// Loading: the skeleton fills the first screen and never scrolls
+.containerLoading {
+  @include loading-screen($fade-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0)));
+}
