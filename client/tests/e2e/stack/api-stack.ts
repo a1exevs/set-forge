@@ -3,10 +3,18 @@
  * (`tests/stand/start-stand.ts`): ephemeral MySQL (Testcontainers) → migrate/seed → Nest on a given port.
  */
 import { MySqlContainer } from '@testcontainers/mysql';
-import { type ChildProcess, execSync, spawn, type SpawnOptions } from 'node:child_process';
+import {
+  type ChildProcess,
+  execSync,
+  type ExecSyncOptionsWithStringEncoding,
+  spawn,
+  type SpawnOptions,
+} from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { connect, createServer } from 'node:net';
 import { join, resolve as resolvePath } from 'node:path';
+
+import { parseLsofPids, parseNetstatListeners } from './listening-pids.ts';
 
 export const CLIENT_ROOT = resolvePath(import.meta.dirname, '../../..');
 export const SERVER_ROOT = resolvePath(CLIENT_ROOT, '..', 'server');
@@ -30,6 +38,11 @@ type StartApiStackOptions = {
   /** The client origin Nest allows in CORS (`CLIENT_URL`). */
   clientOrigin: string;
   log: (message: string) => void;
+  /**
+   * Called with the MySQL container id as soon as it runs, before the migrations and Nest: a caller that records
+   * it can remove the container even when the start is killed halfway.
+   */
+  onContainer?: (containerId: string) => Promise<void> | void;
 };
 
 export function assertDockerAvailable(retryHint: string): void {
@@ -130,6 +143,36 @@ export function killProcessTree(pid: number | undefined, signal: NodeJS.Signals)
   }
 }
 
+/** The pids listening on a TCP port (an orphan Nest or Vite after a kill that missed part of the tree). */
+export function listeningPids(port: number): number[] {
+  const quiet: ExecSyncOptionsWithStringEncoding = { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] };
+  try {
+    if (IS_WINDOWS) {
+      return parseNetstatListeners(execSync('netstat -ano', quiet), port);
+    }
+    return parseLsofPids(execSync(`lsof -t -iTCP:${port} -sTCP:LISTEN`, quiet));
+  } catch {
+    // lsof exits with 1 when nothing listens; a missing tool leaves the port to its owner.
+    return [];
+  }
+}
+
+/** Kills whatever still listens on the ports, with its descendants. Returns the pids it killed. */
+export function killListeners(ports: number[]): number[] {
+  const pids = [...new Set(ports.flatMap(port => listeningPids(port)))];
+  for (const pid of pids) {
+    killProcessTree(pid, 'SIGKILL');
+    // The listener itself once more, straight from Node (TerminateProcess on Windows): the shells and npm above it
+    // exit when it is gone, so the port is freed even where `taskkill` misses it.
+    try {
+      process.kill(pid, 'SIGKILL');
+    } catch {
+      // Already gone.
+    }
+  }
+  return pids;
+}
+
 export function waitForChildExit(child: ChildProcess, timeoutMs: number): Promise<number> {
   return new Promise(resolve => {
     if (child.exitCode !== null || child.signalCode !== null) {
@@ -178,12 +221,18 @@ function writeBuildConfig(serverPort: number): { buildDir: string; tsconfigPath:
   return { buildDir, tsconfigPath: `.stack/${serverPort}/tsconfig.json` };
 }
 
-export async function startApiStack({ serverPort, clientOrigin, log }: StartApiStackOptions): Promise<ApiStack> {
+export async function startApiStack({
+  serverPort,
+  clientOrigin,
+  log,
+  onContainer,
+}: StartApiStackOptions): Promise<ApiStack> {
   ensureE2eEnvFile();
   const { buildDir, tsconfigPath } = writeBuildConfig(serverPort);
 
   log('Starting MySQL 8.4 via Testcontainers…');
   const container = await new MySqlContainer('mysql:8.4').start();
+  await onContainer?.(container.getId());
 
   const mysqlEnv = {
     NODE_ENV: 'e2e',

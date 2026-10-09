@@ -28,6 +28,7 @@
     "scripts/**/*.ts",
     "tests/e2e/stack/start-api-stack.ts",
     "tests/e2e/stack/api-stack.ts",
+    "tests/e2e/stack/listening-pids.ts",
     "tests/stand/**/*.ts"
   ]
 }
