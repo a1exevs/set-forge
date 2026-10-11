@@ -1,3 +1,28 @@
+# Release v0.7.0
+## What's Changed
+* [Common] RELEASE-NOTES.md update v0.6.2 by @a1exevs in https://github.com/a1exevs/set-forge/pull/89
+* [Bugfix] Preventing workout card menu click from opening workout mode by @a1exevs in https://github.com/a1exevs/set-forge/pull/92
+* [Common] Aligning server ESLint with client flat-config linter by @a1exevs in https://github.com/a1exevs/set-forge/pull/91
+* [Feature] Adding shared toaster for mutation feedback by @a1exevs in https://github.com/a1exevs/set-forge/pull/94
+* [Common][Bugfix][Refactoring][Documentation][Storybook][Tests] Codebase guardrails: FSD, Claude Code rules and skills, domain docs and checked stories by @a1exevs in https://github.com/a1exevs/set-forge/pull/95
+* [Common] Adding branches skill with the branch model and an approval gate by @a1exevs in https://github.com/a1exevs/set-forge/pull/99
+* [Common] Rewriting repository scripts in TypeScript run natively by Node by @a1exevs in https://github.com/a1exevs/set-forge/pull/100
+* [Common] Importing Node built-ins by name through node: and linting the repository root by @a1exevs in https://github.com/a1exevs/set-forge/pull/101
+* [Common] Adding analyst skill and task flow through GitHub Project by @a1exevs in https://github.com/a1exevs/set-forge/pull/102
+* [Common] Adding developer skill with gated steps from issue to reviewed commit by @a1exevs in https://github.com/a1exevs/set-forge/pull/104
+* [103][Improvement] Adding password confirmation on registration by @a1exevs in https://github.com/a1exevs/set-forge/pull/105
+* [Common] Adding verification stand and parallel worktree flow to developer skill by @a1exevs in https://github.com/a1exevs/set-forge/pull/106
+* [107][Bugfix] Verifying the session once per app open, never on navigation or link hover by @a1exevs in https://github.com/a1exevs/set-forge/pull/113
+* [Common] Keeping the stand up for the user's hand check and adding the PR horizon to the autonomous mode by @a1exevs in https://github.com/a1exevs/set-forge/pull/119
+* [Common] Fixing the review findings of the stand hand check and PR horizon by @a1exevs in https://github.com/a1exevs/set-forge/pull/120
+* [Bugfix] Stopping the whole verification stand on Windows by @a1exevs in https://github.com/a1exevs/set-forge/pull/118
+* [108][Improvement] Adding skeleton placeholders while a screen loads its data by @a1exevs in https://github.com/a1exevs/set-forge/pull/114
+* [Common] Version increase v0.7.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/123
+* [Testing] Release v0.7.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/124
+* Release v0.7.0 by @a1exevs in https://github.com/a1exevs/set-forge/pull/125
+
+**Full Changelog**: https://github.com/a1exevs/set-forge/compare/v0.6.2...v0.7.0
+
 # Release v0.6.2
 ## What's Changed
 * [Common] RELEASE-NOTES.md update v0.6.1 by @a1exevs in https://github.com/a1exevs/set-forge/pull/81
