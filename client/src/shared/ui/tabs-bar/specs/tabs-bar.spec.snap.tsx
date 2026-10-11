@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { Home, User } from 'lucide-react';
 
-import TabsBar from 'src/shared/ui/tabs-bar/tabs-bar';
+import TabsBar from '../tabs-bar';
 
 jest.mock('@tanstack/react-router', () => ({
   Link: ({

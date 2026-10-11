@@ -1,4 +1,4 @@
-import type { MuscleGroup } from 'src/entities/workout-exercise/model/types';
+import type { MuscleGroup } from './workout-exercise';
 
 export const muscleGroupLabels: Record<MuscleGroup, string> = {
   chest: 'Chest',

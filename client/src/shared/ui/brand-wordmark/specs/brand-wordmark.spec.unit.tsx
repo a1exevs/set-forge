@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 
-import BrandWordmark from 'src/shared/ui/brand-wordmark/brand-wordmark';
+import BrandWordmark from '../brand-wordmark';
 
 describe('BrandWordmark', () => {
   it('renders favicon and styled title for Workout lists', () => {

@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 
-import UserAvatarMenu from 'src/shared/ui/user-avatar-menu/user-avatar-menu';
+import UserAvatarMenu from '../user-avatar-menu';
 
 describe('UserAvatarMenu', () => {
   it('matches snapshot', () => {

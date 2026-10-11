@@ -1,15 +1,16 @@
 import { FC } from 'react';
 
+import { useWorkoutQuery } from '@entities/workout-list';
 import {
   useActiveWorkoutSessionQuery,
   useDiscardWorkoutSessionMutation,
   useFinishWorkoutSessionMutation,
   useIncrementSessionProgressMutation,
   useStartWorkoutSessionMutation,
-  useWorkoutQuery,
-} from '@entities';
+  type WorkoutSession,
+} from '@entities/workout-session';
 
-import WorkoutModePageLogicLayer from 'src/pages/workout-mode/ui/workout-mode-page-logic-layer';
+import WorkoutModePageLogicLayer from './workout-mode-page-logic-layer';
 
 type Props = {
   id: string;
@@ -38,16 +39,16 @@ const WorkoutModePageDataLayer: FC<Props> = ({ id }) => {
       workoutList={isLoading ? undefined : (workoutList ?? null)}
       session={session}
       isStarting={startWorkoutSessionMutation.isPending}
-      startSession={async (workoutListId): Promise<void> => {
+      startSession={async (workoutListId: string): Promise<void> => {
         await startWorkoutSessionMutation.mutateAsync(workoutListId);
       }}
-      incrementProgress={async (sessionId, exerciseId) =>
+      incrementProgress={async (sessionId: string, exerciseId: string): Promise<WorkoutSession> =>
         incrementSessionProgressMutation.mutateAsync({ sessionId, workoutListId: id, exerciseId })
       }
-      finishSession={async (sessionId): Promise<void> => {
+      finishSession={async (sessionId: string): Promise<void> => {
         await finishWorkoutSessionMutation.mutateAsync({ sessionId, workoutListId: id });
       }}
-      discardSession={async (sessionId): Promise<void> => {
+      discardSession={async (sessionId: string): Promise<void> => {
         await discardWorkoutSessionMutation.mutateAsync({ sessionId, workoutListId: id });
         startWorkoutSessionMutation.reset();
         finishWorkoutSessionMutation.reset();

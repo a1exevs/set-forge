@@ -16,7 +16,9 @@ export class SvgCaptchaGuard implements CanActivate {
     session.captcha = null;
 
     if (Number(session.authFailedCount) >= MAX_AUTH_FAILED_COUNT) {
-      if (captchaText === body.captcha) return true;
+      if (captchaText === body.captcha) {
+        return true;
+      }
 
       throw new UnauthorizedException({ message: '' });
     }

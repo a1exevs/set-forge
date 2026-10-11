@@ -1,9 +1,9 @@
+import { checkForApiProperties } from '@test/unit/helpers';
 import {
   WORKOUT_LISTS_EXPORT_APP,
   WORKOUT_LISTS_EXPORT_FORMAT_VERSION,
   WorkoutListsExportFileResponse,
 } from '@workout-lists/dto/workout-lists-export-file.response';
-import { checkForApiProperties } from '@test/unit/helpers';
 
 describe('WorkoutListsExportFileResponse', () => {
   it('should has ApiProperty decorator for all properties on root Dto', () => {

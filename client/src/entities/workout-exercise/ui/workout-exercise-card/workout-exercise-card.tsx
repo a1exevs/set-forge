@@ -1,8 +1,8 @@
 import { FC } from 'react';
 
-import { muscleGroupLabels } from 'src/entities/workout-exercise/model/muscle-group-labels';
-import type { WorkoutExercise } from 'src/entities/workout-exercise/model/types';
-import classes from 'src/entities/workout-exercise/ui/workout-exercise-card/workout-exercise-card.module.scss';
+import classes from './workout-exercise-card.module.scss';
+import { muscleGroupLabels } from '../../model/muscle-group-labels';
+import type { WorkoutExercise } from '../../model/workout-exercise';
 
 type Props = {
   exercise: WorkoutExercise;

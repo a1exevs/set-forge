@@ -27,6 +27,7 @@ jobs:
       - name: Styling
         run: |
           npm run format:root:check
+          npm run lint:root
           npm run client:format:check
           npm run client:lint
           npm run server:format:check

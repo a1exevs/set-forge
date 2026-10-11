@@ -1,13 +1,16 @@
-import type { WorkoutExercise, WorkoutList, WorkoutSession, WorkoutSessionExercise } from '@entities';
 import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
 
-import { WorkoutExerciseCard, WorkoutSessionExerciseCard } from '@entities';
-import { NotFoundMessage } from '@widgets';
+import { type WorkoutExercise, WorkoutExerciseCard } from '@entities/workout-exercise';
+import type { WorkoutList } from '@entities/workout-list';
+import type { WorkoutSession } from '@entities/workout-session';
+import { type WorkoutSessionExercise, WorkoutSessionExerciseCard } from '@entities/workout-session-exercise';
+import { cssVars } from '@shared/lib';
+import { NotFoundMessage } from '@shared/ui';
 
-import classes from 'src/pages/workout-mode/ui/workout-mode-page.module.scss';
-
-export type WorkoutPhase = 'preview' | 'training';
+import classes from './workout-mode-page.module.scss';
+import { PREVIEW_HINT } from '../config/preview-hint';
+import type { WorkoutPhase } from '../model/workout-phase';
 
 type Props = {
   phase: WorkoutPhase;
@@ -66,7 +69,7 @@ const WorkoutModePage: FC<Props> = ({
             <span>{Math.round(overallProgress)}%</span>
           </div>
           <div className={classes.progressBarWrapper}>
-            <div className={classes.progressBarFill} style={{ width: `${overallProgress}%` }} />
+            <div className={classes.progressBarFill} style={cssVars({ '--progress': `${overallProgress}%` })} />
           </div>
         </div>
       </header>
@@ -74,10 +77,7 @@ const WorkoutModePage: FC<Props> = ({
       <main className={classes.main}>
         {phase === 'preview' ? (
           <div className={classes.previewStart}>
-            <p className={classes.previewHint}>
-              Ready to train? Tap Start workout only when you are about to begin — the timer starts then, so your
-              workout duration in history stays accurate.
-            </p>
+            <p className={classes.previewHint}>{PREVIEW_HINT}</p>
             <div className={classes.actionBar}>
               <button type="button" className={classes.actionButton} onClick={onStart} disabled={isStarting}>
                 {isStarting ? 'Starting…' : 'Start workout'}

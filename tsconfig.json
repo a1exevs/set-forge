@@ -1,0 +1,17 @@
+{
+  // Type-checks the root ESLint config (ESLint loads it through jiti, which only strips the types), the way
+  // client/ and server/ check theirs with tsconfig.linter.json. `npm run lint:root` runs this check; the scripts
+  // have their own project (scripts/tsconfig.json).
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "types": ["node"]
+  },
+  "include": ["eslint.config.ts"]
+}

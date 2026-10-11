@@ -1,0 +1,21 @@
+@use './variables' as *;
+
+// The loading state of a page: it fills the first screen and never scrolls, and the cut at the bottom fades into
+// the page. `$fade-bottom` is where the fade ends — above a fixed bottom bar, or the bottom of the screen.
+@mixin loading-screen($fade-bottom: 0) {
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: $fade-bottom;
+    height: 3rem;
+    background: linear-gradient(to bottom, transparent, $bg-primary);
+    pointer-events: none;
+  }
+}

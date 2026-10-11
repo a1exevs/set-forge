@@ -1,18 +1,19 @@
-import type { CreateWorkoutListDto, MuscleGroup, UpdateWorkoutListDto, WorkoutList } from '@entities';
 import { FC, FormEvent, useEffect, useState } from 'react';
 
-import { useConfirm } from '@shared';
-import { NotFoundMessage } from '@widgets';
+import type { MuscleGroup } from '@entities/workout-exercise';
+import type { CreateWorkoutListDto, UpdateWorkoutListDto, WorkoutList } from '@entities/workout-list';
+import { useConfirm } from '@shared/lib';
+import { NotFoundMessage } from '@shared/ui';
 
+import WorkoutListForm from './workout-list-form';
+import classes from './workout-list-form.module.scss';
+import type { ExerciseFormData } from '../model/exercise-form-data';
 import {
-  type ExerciseFormData,
   getExerciseNumericFieldError,
   hasInvalidExerciseName,
   hasInvalidExerciseNumericFields,
   toExerciseSubmitPayload,
-} from 'src/widgets/workout-list-form/model';
-import WorkoutListForm from 'src/widgets/workout-list-form/ui/workout-list-form';
-import classes from 'src/widgets/workout-list-form/ui/workout-list-form.module.scss';
+} from '../model/exercise-numeric-validation';
 
 type BaseProps = {
   onCancel: () => void;

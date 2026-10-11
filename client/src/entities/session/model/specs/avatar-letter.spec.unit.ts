@@ -1,4 +1,4 @@
-import { emailToAvatarLetter } from 'src/entities/session/model/avatar-letter';
+import { emailToAvatarLetter } from '../avatar-letter';
 
 describe('emailToAvatarLetter', () => {
   it('returns uppercase first letter of local part', () => {

@@ -10,9 +10,7 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
-import HistoryPageLogicLayer from 'src/pages/history/ui/history-page-logic-layer';
-
-const storyTitle = 'Pages/HistoryPage';
+import HistoryPageLogicLayer from './history-page-logic-layer';
 
 const renderHistoryPage = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
@@ -31,7 +29,7 @@ const renderHistoryPage = (): ReturnType<typeof renderWithPageRouter> =>
   });
 
 const meta = {
-  title: storyTitle,
+  title: 'Pages/HistoryPage',
   component: HistoryPageLogicLayer,
 } satisfies Meta<typeof HistoryPageLogicLayer>;
 
@@ -41,3 +39,22 @@ export const Desktop4k = buildDesktop4KStoryObj<typeof meta>({ render: renderHis
 export const Desktop = buildDesktopStoryObj<typeof meta>({ render: renderHistoryPage });
 export const Tablet = buildTabletStoryObj<typeof meta>({ render: renderHistoryPage });
 export const Mobile = buildMobileStoryObj<typeof meta>({ render: renderHistoryPage });
+
+const renderHistoryPageLoading = (): ReturnType<typeof renderWithPageRouter> =>
+  renderWithPageRouter({
+    initialEntries: ['/history'],
+    component: (): JSX.Element => (
+      <HistoryPageLogicLayer
+        sessions={[]}
+        total={0}
+        isLoading
+        isError={false}
+        isFetchingNextPage={false}
+        hasMore={false}
+        fetchNextPage={fn()}
+      />
+    ),
+  });
+
+/** The first page of history is still loading: the header is real, the rows are a skeleton. */
+export const LoadingMobile = buildMobileStoryObj<typeof meta>({ render: renderHistoryPageLoading });

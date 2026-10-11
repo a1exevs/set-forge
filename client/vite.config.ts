@@ -1,6 +1,6 @@
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import { resolve } from 'node:path';
 import { defineConfig, loadEnv } from 'vite';
 
 // https://vitejs.dev/config/
@@ -41,26 +41,30 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       TanStackRouterVite({
-        routesDirectory: './src/app/model/routes',
-        generatedRouteTree: './src/route-tree.gen.ts',
+        routesDirectory: './src/app/routes',
+        generatedRouteTree: './src/app/router/route-tree.gen.ts',
       }),
       react(),
     ],
     resolve: {
       alias: {
-        src: path.resolve(__dirname, './src'),
-        '@app': path.resolve(__dirname, './src/app'),
-        '@pages': path.resolve(__dirname, './src/pages'),
-        '@widgets': path.resolve(__dirname, './src/widgets'),
-        '@features': path.resolve(__dirname, './src/features'),
-        '@entities': path.resolve(__dirname, './src/entities'),
-        '@shared': path.resolve(__dirname, './src/shared'),
+        '@pages': resolve(__dirname, './src/pages'),
+        '@widgets': resolve(__dirname, './src/widgets'),
+        '@features': resolve(__dirname, './src/features'),
+        '@entities': resolve(__dirname, './src/entities'),
+        '@shared': resolve(__dirname, './src/shared'),
       },
     },
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: `@use "${path.resolve(__dirname, './src/shared/ui/styles/variables.scss').replace(/\\/g, '/')}" as *;`,
+          // Every stylesheet gets the tokens and the mixins of shared/ui/styles without an @use of its own.
+          additionalData: ['variables', 'mixins']
+            .map(
+              (name: string): string =>
+                `@use "${resolve(__dirname, `./src/shared/ui/styles/${name}.scss`).replace(/\\/g, '/')}" as *;`,
+            )
+            .join(' '),
         },
       },
     },

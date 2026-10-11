@@ -32,9 +32,15 @@ export class ValidationPipe implements PipeTransform<any> {
     return errors.map(error => {
       const message = error.constraints ? `${error.property} - ${Object.values(error.constraints).join(', ')}` : '';
       let childrenMessages;
-      if (error.children) childrenMessages = this.getErrorsMessages(error.children);
-      if (message && childrenMessages && childrenMessages.length) childrenMessages.push(message);
-      if (childrenMessages && childrenMessages.length) return childrenMessages;
+      if (error.children) {
+        childrenMessages = this.getErrorsMessages(error.children);
+      }
+      if (message && childrenMessages && childrenMessages.length) {
+        childrenMessages.push(message);
+      }
+      if (childrenMessages && childrenMessages.length) {
+        return childrenMessages;
+      }
       return message;
     });
   }

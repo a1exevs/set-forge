@@ -1,5 +1,4 @@
 import { ApiResult } from '@common/decorators';
-
 import { CommonResponse } from '@common/dto';
 
 const STATUS = 5;

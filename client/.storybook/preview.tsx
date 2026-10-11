@@ -1,7 +1,7 @@
 import { Controls, Description, Primary, Subtitle, Title } from '@storybook/blocks';
 import type { Preview } from '@storybook/react';
 
-import 'src/shared/ui/styles/global.scss';
+import 'src/app/styles/global.scss';
 
 const preview: Preview = {
   tags: ['autodocs'],

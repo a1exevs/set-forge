@@ -81,7 +81,7 @@ exports[`WorkoutSessionExerciseCard matches snapshot for completed exercise 1`] 
     >
       <div
         class="progressBar progressCompleted"
-        style="width: 100%;"
+        style="--progress: 100%;"
       />
     </div>
   </div>
@@ -169,7 +169,7 @@ exports[`WorkoutSessionExerciseCard matches snapshot for in-progress exercise 1`
     >
       <div
         class="progressBar "
-        style="width: 33.33333333333333%;"
+        style="--progress: 33.33333333333333%;"
       />
     </div>
     <p
@@ -267,7 +267,7 @@ exports[`WorkoutSessionExerciseCard matches snapshot when justCompleted 1`] = `
     >
       <div
         class="progressBar "
-        style="width: 33.33333333333333%;"
+        style="--progress: 33.33333333333333%;"
       />
     </div>
     <p

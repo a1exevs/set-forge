@@ -1,1 +1,1 @@
-export { CreateWorkoutPage } from 'src/pages/create-workout/ui';
+export { default as CreateWorkoutPage } from './ui/create-workout-page-data-layer';

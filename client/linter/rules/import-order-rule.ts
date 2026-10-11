@@ -8,12 +8,15 @@ const importOrderRule: Linter.RulesRecord = {
         caseInsensitive: true,
         order: 'asc',
       },
-      groups: [
-        ['builtin', 'external', 'object', 'type'],
-        ['internal', 'parent', 'sibling', 'index'],
-      ],
+      // packages → other slices/layers (`@entities/session`) → own slice (relative)
+      groups: [['builtin', 'external', 'object'], 'internal', ['parent', 'sibling', 'index']],
       'newlines-between': 'always',
       pathGroups: [
+        {
+          pattern: '@{pages,widgets,features,entities,shared}/**',
+          group: 'internal',
+          position: 'after',
+        },
         {
           pattern: 'src/**',
           group: 'internal',
@@ -23,6 +26,7 @@ const importOrderRule: Linter.RulesRecord = {
       pathGroupsExcludedImportTypes: ['builtin', 'external'],
     },
   ],
+  'import/newline-after-import': 'error',
 };
 
 export default importOrderRule;

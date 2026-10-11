@@ -1,6 +1,6 @@
-import { Table, Column, Model, DataType, ForeignKey, HasMany } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { UUIDV4 } from 'sequelize';
+import { Column, DataType, ForeignKey, HasMany, Model, Table } from 'sequelize-typescript';
 
 import { User } from '@users/users.model';
 import { WorkoutExercise } from '@workout-lists/workout-exercise.model';

@@ -1,16 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SignOptions } from 'jsonwebtoken';
 import { HttpStatus } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
+import { SignOptions } from 'jsonwebtoken';
 
-import { TokensService } from '@auth/tokens.service';
-import { RefreshTokensService } from '@auth/refresh-tokens.service';
-import { UsersService } from '@users/users.service';
-import { sendPseudoError } from '@test/unit/helpers';
-import { ErrorMessages } from '@common/constants';
-import { User } from '@users/users.model';
 import { RefreshToken } from '@auth/refresh-tokens.model';
+import { RefreshTokensService } from '@auth/refresh-tokens.service';
+import { TokensService } from '@auth/tokens.service';
+import { ErrorMessages } from '@common/constants';
+import { sendPseudoError } from '@test/unit/helpers';
+import { User } from '@users/users.model';
+import { UsersService } from '@users/users.service';
 
 interface IMockUser {
   id: number;
@@ -76,8 +76,12 @@ const getRefreshTokenGeneratedData = (params: IGetRefreshTokenGeneratedData) => 
   const opts: SignOptions = {
     expiresIn: params.expiresIn,
   };
-  if (!params.withoutSubject) opts.subject = String(mockUser.id);
-  if (!params.withoutJwtId) opts.jwtid = String(tokenUUID);
+  if (!params.withoutSubject) {
+    opts.subject = String(mockUser.id);
+  }
+  if (!params.withoutJwtId) {
+    opts.jwtid = String(tokenUUID);
+  }
   const refreshToken = params.jwtService.sign({}, opts);
   return {
     refreshToken,

@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
-import IconButton from 'src/shared/ui/icon-button/icon-button';
+import IconButton from '../icon-button';
 
 jest.mock('@tanstack/react-router', () => ({
   Link: ({

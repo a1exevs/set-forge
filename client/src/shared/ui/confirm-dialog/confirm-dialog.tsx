@@ -1,8 +1,8 @@
 import type { FC, ReactNode } from 'react';
 
-import Button from 'src/shared/ui/button/button';
-import classes from 'src/shared/ui/confirm-dialog/confirm-dialog.module.scss';
-import Dialog from 'src/shared/ui/dialog/dialog';
+import classes from './confirm-dialog.module.scss';
+import Button from '../button/button';
+import Dialog from '../dialog/dialog';
 
 type Props = {
   open: boolean;

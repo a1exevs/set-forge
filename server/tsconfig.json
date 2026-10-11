@@ -36,10 +36,14 @@
     "node_modules",
     "test",
     "dist",
+    ".stack",
     "**/*spec.ts",
     "coverage",
     "_stub",
     "assets",
-    "test-environment.ts"
-  ]
+    "test-environment.ts",
+    "linter",
+    "eslint.config.ts"
+  ],
+  "references": [{ "path": "./tsconfig.linter.json" }]
 }

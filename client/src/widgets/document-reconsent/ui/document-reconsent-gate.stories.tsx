@@ -9,12 +9,10 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 
-import DocumentReconsentGate from 'src/widgets/document-reconsent/ui/document-reconsent-gate';
-
-const storyTitle = 'Widgets/DocumentReconsentGate';
+import DocumentReconsentGate from './document-reconsent-gate';
 
 const meta = {
-  title: storyTitle,
+  title: 'Widgets/DocumentReconsentGate',
   component: DocumentReconsentGate,
 } satisfies Meta<typeof DocumentReconsentGate>;
 

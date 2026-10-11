@@ -1,5 +1,4 @@
 import { validateDto } from '@test/unit/helpers';
-
 import { GetActiveWorkoutSessionQuery } from '@workout-sessions/dto/get-active-workout-session.query';
 
 describe('GetActiveWorkoutSessionQuery.Dto', () => {

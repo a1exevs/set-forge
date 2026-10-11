@@ -1,15 +1,17 @@
-import type { WorkoutSession, WorkoutSessionExercise } from '@entities';
-import { useRouterState } from '@tanstack/react-router';
 import { ChevronDown } from 'lucide-react';
 import { FC, RefObject } from 'react';
 
-import { muscleGroupLabels } from '@entities';
-import { BrandWordmark, useTabSwipeNavigation } from '@shared';
-import { MAIN_TAB_ROUTES, MainTabsBar } from '@widgets';
+import { muscleGroupLabels } from '@entities/workout-exercise';
+import type { WorkoutSession } from '@entities/workout-session';
+import { isExerciseComplete, type WorkoutSessionExercise } from '@entities/workout-session-exercise';
+import { BrandWordmark } from '@shared/ui';
+import { MainTabsBar } from '@widgets/main-tabs-bar';
 
-import classes from 'src/pages/history/ui/history-page.module.scss';
+import HistoryPageSkeleton from './history-page-skeleton';
+import classes from './history-page.module.scss';
 
 type Props = {
+  swipeRef: RefObject<HTMLDivElement>;
   sessions: WorkoutSession[];
   total: number;
   isLoading: boolean;
@@ -23,6 +25,7 @@ type Props = {
 };
 
 const HistoryPage: FC<Props> = ({
+  swipeRef,
   sessions,
   total,
   isLoading,
@@ -34,16 +37,9 @@ const HistoryPage: FC<Props> = ({
   formatSessionDate,
   formatSummary,
 }) => {
-  const pathname = useRouterState({ select: state => state.location.pathname });
-  const swipeRef = useTabSwipeNavigation({ tabs: MAIN_TAB_ROUTES, activePath: pathname });
-
   const renderBody = (): JSX.Element => {
     if (isLoading) {
-      return (
-        <div className={classes.stateMessage}>
-          <p>Loading history…</p>
-        </div>
-      );
+      return <HistoryPageSkeleton />;
     }
 
     if (isError) {
@@ -96,7 +92,7 @@ const HistoryPage: FC<Props> = ({
                 {isOpen && (
                   <div className={classes.details}>
                     {session.exercises.map((exercise: WorkoutSessionExercise) => {
-                      const done = exercise.sets > 0 && exercise.completedSets >= exercise.sets;
+                      const done = isExerciseComplete(exercise);
 
                       return (
                         <div key={exercise.id} className={classes.exerciseRow}>
@@ -133,7 +129,7 @@ const HistoryPage: FC<Props> = ({
   };
 
   return (
-    <div ref={swipeRef} className={classes.container}>
+    <div ref={swipeRef} className={isLoading ? `${classes.container} ${classes.containerLoading}` : classes.container}>
       <header className={classes.header}>
         <div className={classes.headerTop}>
           <BrandWordmark title="History" />
@@ -145,7 +141,9 @@ const HistoryPage: FC<Props> = ({
         </div>
       </header>
 
-      <main className={classes.main}>{renderBody()}</main>
+      <main className={classes.main} aria-busy={isLoading}>
+        {renderBody()}
+      </main>
 
       <MainTabsBar />
     </div>

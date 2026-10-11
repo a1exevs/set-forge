@@ -1,4 +1,4 @@
-import { apiRequest, ApiRequestError } from '@shared';
+import { apiRequest, ApiRequestError, type CommonResponseEnvelope } from '@shared/api';
 
 import {
   discardWorkoutSession,
@@ -8,7 +8,7 @@ import {
   incrementSessionProgress,
   resyncWorkoutSession,
   startWorkoutSession,
-} from 'src/entities/workout-session/api/workout-session-api';
+} from '../workout-session-api';
 
 jest.mock('src/shared/api/http-client', () => {
   const actual = jest.requireActual('src/shared/api/http-client');
@@ -17,7 +17,7 @@ jest.mock('src/shared/api/http-client', () => {
 
 const mockedApiRequest = apiRequest as jest.MockedFunction<typeof apiRequest>;
 
-const okEnvelope = <T>(data: T) => ({ data, messages: [], fieldsErrors: [], resultCode: 0 });
+const okEnvelope = <T>(data: T): CommonResponseEnvelope<T> => ({ data, messages: [], fieldsErrors: [], resultCode: 0 });
 
 const SESSION = {
   id: 'session-1',

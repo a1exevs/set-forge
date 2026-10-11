@@ -2,8 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { Bell, Home, MessageCircle, MoreHorizontal, Play, User } from 'lucide-react';
 import type { ReactNode } from 'react';
 
-import TabsBar from 'src/shared/ui/tabs-bar/tabs-bar';
-import type { TabsBarItem } from 'src/shared/ui/tabs-bar/tabs-bar';
+import TabsBar, { type TabsBarItem } from '../tabs-bar';
 
 jest.mock('@tanstack/react-router', () => ({
   Link: ({

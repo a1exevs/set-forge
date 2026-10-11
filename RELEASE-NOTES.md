@@ -1,3 +1,17 @@
+# Release v0.6.2
+## What's Changed
+* [Common] RELEASE-NOTES.md update v0.6.1 by @a1exevs in https://github.com/a1exevs/set-forge/pull/81
+* [Feature] Adding PasswordField with show/hide toggle by @a1exevs in https://github.com/a1exevs/set-forge/pull/83
+* [Feature] Showing exercise cards in workout preview by @a1exevs in https://github.com/a1exevs/set-forge/pull/82
+* [Bugfix] Invalidating history cache after auto-completed workout by @a1exevs in https://github.com/a1exevs/set-forge/pull/85
+* [Common] Adding full-stack Playwright e2e harness by @a1exevs in https://github.com/a1exevs/set-forge/pull/84
+* [Common] Update non-major by @renovate[bot] in https://github.com/a1exevs/set-forge/pull/25
+* [Common] Version increase v0.6.2 by @a1exevs in https://github.com/a1exevs/set-forge/pull/86
+* [Testing] Release v0.6.2 by @a1exevs in https://github.com/a1exevs/set-forge/pull/87
+* Release v0.6.2 by @a1exevs in https://github.com/a1exevs/set-forge/pull/88
+
+**Full Changelog**: https://github.com/a1exevs/set-forge/compare/v0.6.1...v0.6.2
+
 # Release v0.6.1
 ## What's Changed
 * [Common] Adding Cursor /release command and restoring release steps by @a1exevs in https://github.com/a1exevs/set-forge/pull/75

@@ -13,28 +13,24 @@ export const Docs = {
   REFRESH_TOKENS_ENDPOINT: 'Refresh access tokens',
   REFRESH_TOKENS_SUCCESSFUL_RESULT: 'Tokens refreshed successfully',
   REFRESH_TOKENS_UNPROCESSABLE_ENTITY: 'Unprocessable entity',
-  REFRESH_TOKENS_FORBIDDEN: 'Forbidden',
+  REFRESH_TOKENS_UNAUTHORIZED: 'Unauthorized',
 
   GET_CURRENT_USER_ENDPOINT: 'Get current user',
   GET_CURRENT_USER_SUCCESSFUL_RESULT: 'Current user retrieved successfully',
   GET_CURRENT_USER_UNAUTHORIZED: 'Unauthorized',
-  GET_CURRENT_USER_FORBIDDEN: 'Forbidden',
 
   LOGOUT_ENDPOINT: 'Log out',
   LOGOUT_SUCCESSFUL_RESULT: 'Session closed successfully',
   LOGOUT_UNPROCESSABLE_ENTITY: 'Unprocessable entity',
   LOGOUT_UNAUTHORIZED: 'Unauthorized',
-  LOGOUT_FORBIDDEN: 'Forbidden',
 
   DELETE_ACCOUNT_ENDPOINT: 'Delete the current user account and all related data',
   DELETE_ACCOUNT_SUCCESSFUL_RESULT: 'Account and all related data deleted successfully',
   DELETE_ACCOUNT_UNAUTHORIZED: 'Unauthorized',
-  DELETE_ACCOUNT_FORBIDDEN: 'Forbidden',
 
   ACCEPT_DOCUMENTS_ENDPOINT: 'Accept the current legal documents (records accepted versions)',
   ACCEPT_DOCUMENTS_SUCCESSFUL_RESULT: 'Documents accepted successfully',
   ACCEPT_DOCUMENTS_UNAUTHORIZED: 'Unauthorized',
-  ACCEPT_DOCUMENTS_FORBIDDEN: 'Forbidden',
 
   SECURITY_CONTROLLER: 'Security',
 

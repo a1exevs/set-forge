@@ -1,5 +1,4 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
-
 import * as request from 'supertest';
 
 export interface E2eAuthContext {

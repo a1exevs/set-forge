@@ -1,19 +1,9 @@
 export const TESTS_DIR_NAME = 'specs';
 export const COVERAGE_DIR_NAME = '.coverage';
 
+/** FSD aliases: a slice (`@entities/session`) or a shared segment (`@shared/ui`) — layers have no public API. */
 export const PATH_ALIASES_MAP = {
-  '^@app$': '<rootDir>/src/app',
-  '^@app/(.*)$': '<rootDir>/src/app/$1',
-  '^@pages$': '<rootDir>/src/pages',
-  '^@pages/(.*)$': '<rootDir>/src/pages/$1',
-  '^@widgets$': '<rootDir>/src/widgets',
-  '^@widgets/(.*)$': '<rootDir>/src/widgets/$1',
-  '^@features$': '<rootDir>/src/features',
-  '^@features/(.*)$': '<rootDir>/src/features/$1',
-  '^@entities$': '<rootDir>/src/entities',
-  '^@entities/(.*)$': '<rootDir>/src/entities/$1',
-  '^@shared$': '<rootDir>/src/shared',
-  '^@shared/(.*)$': '<rootDir>/src/shared/$1',
+  '^@(pages|widgets|features|entities|shared)/(.*)$': '<rootDir>/src/$1/$2',
 } as const;
 
 export const MAIN_MODULES_MAP = {

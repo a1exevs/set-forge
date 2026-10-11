@@ -1,5 +1,4 @@
 import { validateDto } from '@test/unit/helpers';
-
 import { GetWorkoutHistoryQuery } from '@workout-sessions/dto/get-workout-history.query';
 
 describe('GetWorkoutHistoryQuery.Dto', () => {

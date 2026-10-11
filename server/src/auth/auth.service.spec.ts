@@ -1,16 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { JwtService } from '@nestjs/jwt';
 import { UnprocessableEntityException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
+import * as bcrypt from 'bcryptjs';
 
 import { AuthService } from '@auth/auth.service';
-import { TokensService } from '@auth/tokens.service';
-import { UsersService } from '@users/users.service';
 import { LoginRequest, RegisterRequest } from '@auth/dto';
-import { sendPseudoError } from '@test/unit/helpers';
+import { TokensService } from '@auth/tokens.service';
 import { ErrorMessages } from '@common/constants';
+import { sendPseudoError } from '@test/unit/helpers';
 import { User } from '@users/users.model';
-
-import * as bcrypt from 'bcryptjs';
+import { UsersService } from '@users/users.service';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -127,6 +126,7 @@ describe('AuthService', () => {
       );
       spyHashF.mockRestore();
     });
+    // @invariant session/email-unique
     it('Registration method: should throw Bad Request exception (user already exists)', async () => {
       const email = 'user@yandex.com';
       const password = '1234';
@@ -303,6 +303,7 @@ describe('AuthService', () => {
   });
 
   describe('AuthService - me', () => {
+    // @invariant session/pending-derived
     it('Me method: should be successful result (documents up to date)', async () => {
       const userId = 1;
       const userEmail = 'user@yandex.ru';
@@ -323,6 +324,7 @@ describe('AuthService', () => {
       expect(userService.getUserById).toBeCalledTimes(1);
       expect(userService.getUserById).toBeCalledWith(userId);
     });
+    // @invariant session/pending-derived
     it('Me method: documentsPendingAcceptance is true for a legacy user (null versions)', async () => {
       const userId = 1;
       const mockUser = { id: userId, email: 'user@yandex.ru', password: 'x', acceptedTermsVersion: null };

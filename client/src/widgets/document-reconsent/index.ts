@@ -1,1 +1,1 @@
-export { DocumentReconsentGate } from 'src/widgets/document-reconsent/ui';
+export { default as DocumentReconsentGate } from './ui/document-reconsent-gate-data-layer';

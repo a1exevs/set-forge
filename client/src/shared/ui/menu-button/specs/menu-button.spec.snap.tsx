@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import MenuButton from 'src/shared/ui/menu-button/menu-button';
-import type { MenuItem } from 'src/shared/ui/menu-button/menu-button.types';
+import MenuButton from '../menu-button';
+import type { MenuButtonItem } from '../menu-button';
 
-const defaultItems: MenuItem[] = [
+const defaultItems: MenuButtonItem[] = [
   { id: 'edit', label: 'Edit', onClick: (): void => undefined },
   { id: 'delete', label: 'Delete', onClick: (): void => undefined },
 ];

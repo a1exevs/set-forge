@@ -7,10 +7,8 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 
-import type { WorkoutSessionExercise } from 'src/entities/workout-session-exercise/model/types';
-import WorkoutSessionExerciseCard from 'src/entities/workout-session-exercise/ui/workout-session-exercise-card/workout-session-exercise-card-logic-layer';
-
-const storyTitle = 'Entities/WorkoutSessionExerciseCard';
+import WorkoutSessionExerciseCard from './workout-session-exercise-card-logic-layer';
+import type { WorkoutSessionExercise } from '../../model/workout-session-exercise';
 
 const IN_PROGRESS_EXERCISE: WorkoutSessionExercise = {
   id: 'sx-1',
@@ -29,7 +27,7 @@ const COMPLETED_EXERCISE: WorkoutSessionExercise = {
 };
 
 const meta = {
-  title: storyTitle,
+  title: 'Entities/WorkoutSessionExerciseCard',
   component: WorkoutSessionExerciseCard,
   args: {
     exercise: IN_PROGRESS_EXERCISE,

@@ -25,13 +25,12 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 
-import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
-import { ResponseInterceptor } from '@common/interceptors';
-import { HttpExceptionFilter } from '@common/exception-filters';
-import { Routes, Docs } from '@common/constants';
+import { Docs, Routes } from '@common/constants';
 import { ApiResult } from '@common/decorators';
 import { OperationResultResponse } from '@common/dto';
-import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
+import { HttpExceptionFilter } from '@common/exception-filters';
+import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
+import { ResponseInterceptor } from '@common/interceptors';
 import {
   GetActiveWorkoutSessionQuery,
   GetWorkoutHistoryQuery,
@@ -39,6 +38,7 @@ import {
   WorkoutHistoryResponse,
   WorkoutSessionResponse,
 } from '@workout-sessions/dto';
+import { WorkoutSessionsService } from '@workout-sessions/workout-sessions.service';
 
 @ApiTags(Docs.WORKOUT_SESSIONS_CONTROLLER)
 @UseGuards(JwtAuthGuard, RefreshTokenGuard)

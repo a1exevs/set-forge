@@ -1,5 +1,5 @@
-import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { applyDecorators } from '@nestjs/common';
+import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
 import { CommonResponse } from '@common/dto';
 

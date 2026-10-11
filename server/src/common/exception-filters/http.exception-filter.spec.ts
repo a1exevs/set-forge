@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
 
-import { getMockArgumentsHostData } from '@test/unit/helpers';
 import { HttpExceptionFilter } from '@common/exception-filters';
+import { getMockArgumentsHostData } from '@test/unit/helpers';
 
 describe('HttpExceptionFilter', () => {
   beforeEach(() => {

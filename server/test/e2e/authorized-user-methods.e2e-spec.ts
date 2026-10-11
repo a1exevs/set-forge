@@ -1,9 +1,7 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
-
-import { Routes } from '@common/constants';
-
 import * as request from 'supertest';
 
+import { Routes } from '@common/constants';
 import { createTestApp } from '@test/e2e/create-test-app';
 
 describe('Authorized user methods', () => {
@@ -27,7 +25,9 @@ describe('Authorized user methods', () => {
 
     describe('/refresh POST', () => {
       it('Refresh Access Token', () => {
-        return request(app.getHttpServer()).post(`${api}/${Routes.ENDPOINT_AUTH}/refresh`).expect(HttpStatus.FORBIDDEN);
+        return request(app.getHttpServer())
+          .post(`${api}/${Routes.ENDPOINT_AUTH}/refresh`)
+          .expect(HttpStatus.UNAUTHORIZED);
       });
     });
 

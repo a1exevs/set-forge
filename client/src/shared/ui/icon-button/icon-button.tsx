@@ -1,7 +1,7 @@
 import { Button as HeadlessButton } from '@headlessui/react';
 import { ButtonHTMLAttributes, ElementType, FC, PropsWithChildren } from 'react';
 
-import classes from 'src/shared/ui/icon-button/icon-button.module.scss';
+import classes from './icon-button.module.scss';
 
 type CommonProps = PropsWithChildren<{
   variant?: 'ghost' | 'primary';

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import Button from 'src/shared/ui/button/button';
+import Button from '../button';
 
 describe('Button', () => {
   describe('rendering', () => {

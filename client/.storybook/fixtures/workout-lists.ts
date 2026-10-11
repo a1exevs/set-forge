@@ -1,4 +1,4 @@
-import type { WorkoutList } from '@entities';
+import type { WorkoutList } from '@entities/workout-list';
 
 export const mockWorkoutList: WorkoutList = {
   id: 'list-1',

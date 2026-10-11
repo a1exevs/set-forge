@@ -4,5 +4,5 @@
     "noEmit": true
   },
   "include": ["src/**/*.ts", "test/**/*.ts", "*.ts"],
-  "exclude": ["node_modules", "dist", "coverage", "_stub", "assets"]
+  "exclude": ["node_modules", "dist", "coverage", "_stub", "assets", "linter", "eslint.config.ts"]
 }
