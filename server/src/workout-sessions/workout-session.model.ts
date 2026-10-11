@@ -1,11 +1,11 @@
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { UUIDV4 } from 'sequelize';
+import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from 'sequelize-typescript';
 
 import { User } from '@users/users.model';
 import { WorkoutList } from '@workout-lists/workout-list.model';
-import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exercise.model';
 import { SESSION_STATUS, SESSION_STATUSES, SessionStatus } from '@workout-sessions/constants/session-status';
+import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exercise.model';
 
 interface IWorkoutSession {
   userId: number;

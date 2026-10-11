@@ -1,4 +1,3 @@
-// model
 export {
   useCreateWorkoutListMutation,
   useDeleteWorkoutListMutation,
@@ -7,10 +6,10 @@ export {
   useUpdateWorkoutListMutation,
   useWorkoutListsQuery,
   useWorkoutQuery,
-  workoutQueryKeys,
-  type CreateWorkoutListDto,
-  type ImportWorkoutListsResult,
-  type UpdateWorkoutListDto,
-  type WorkoutList,
-  type WorkoutListsExportFile,
-} from 'src/entities/workout-list/model';
+} from './model/use-workout-queries';
+export type {
+  CreateWorkoutListDto,
+  UpdateWorkoutListDto,
+  WorkoutList,
+  WorkoutListsExportFile,
+} from './model/workout-list';

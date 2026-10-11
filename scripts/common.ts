@@ -1,3 +1,3 @@
-import path from 'path';
+import { join } from 'node:path';
 
-export const rootDir = path.join(__dirname, '../');
+export const rootDir = join(import.meta.dirname, '..');

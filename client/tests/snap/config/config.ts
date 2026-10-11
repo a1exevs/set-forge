@@ -1,6 +1,6 @@
 /** @jest-config-loader ts-node */
 import type { Config } from 'jest';
-import path from 'path';
+import { resolve } from 'node:path';
 
 import {
   COVERAGE_DIR_NAME,
@@ -14,14 +14,15 @@ import {
 } from '../../common/consts';
 import { rootDir } from '../../common/paths';
 
-const setupTestsEnvPath = path.resolve(rootDir, 'tests', 'common', 'setup-tests-env.ts');
-const setupTestingLibraryPath = path.resolve(rootDir, 'tests', 'common', 'setup-testing-library.ts');
+const setupTestsEnvPath = resolve(rootDir, 'tests', 'common', 'setup-tests-env.ts');
+const setupTestingLibraryPath = resolve(rootDir, 'tests', 'common', 'setup-testing-library.ts');
+const jsdomEnvironmentPath = resolve(rootDir, 'tests', 'common', 'jsdom-environment.ts');
 
 const config: Config = {
   moduleFileExtensions: ['js', 'jsx', 'json', 'ts', 'tsx'],
   rootDir,
   testRegex: `.*/${TESTS_DIR_NAME}/.*.${SNAPSHOT_TESTS_POSTFIX}.[jt]sx?$`,
-  testEnvironment: 'jsdom',
+  testEnvironment: jsdomEnvironmentPath,
   transformIgnorePatterns: ['/node_modules/(?!(@wavesurfer/react|wavesurfer.js)/)'],
   setupFiles: [setupTestsEnvPath],
   setupFilesAfterEnv: [setupTestingLibraryPath],

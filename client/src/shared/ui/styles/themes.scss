@@ -49,6 +49,9 @@
   --progress-bg: #374151;
   --progress-fill-start: #3b82f6;
   --progress-fill-end: #10b981;
+
+  // Skeleton bones: translucent, so they read on every surface (page, card, field)
+  --skeleton-bone: rgba(255, 255, 255, 0.09);
 }
 
 // Light Theme (Future)
@@ -86,4 +89,7 @@
   --progress-bg: #e5e7eb;
   --progress-fill-start: #3b82f6;
   --progress-fill-end: #10b981;
+
+  // Skeleton bones
+  --skeleton-bone: rgba(0, 0, 0, 0.08);
 }

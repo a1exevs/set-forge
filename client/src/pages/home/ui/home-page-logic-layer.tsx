@@ -1,12 +1,15 @@
-import type { WorkoutList, WorkoutListsExportFile } from '@entities';
 import { ChangeEvent, FC, useRef } from 'react';
 
-import { buildWorkoutListsExportFilename, downloadJsonFile, useConfirm } from '@shared';
+import type { WorkoutList, WorkoutListsExportFile } from '@entities/workout-list';
+import { downloadJsonFile, toastError, toastSuccess, useConfirm } from '@shared/lib';
+import { useMainTabSwipe } from '@widgets/main-tabs-bar';
 
-import HomePage from 'src/pages/home/ui/home-page';
+import HomePage from './home-page';
+import { buildWorkoutListsExportFilename } from '../lib/workout-lists-export-filename';
 
 type Props = {
   workoutLists: WorkoutList[];
+  isLoading: boolean;
   deleteWorkoutList: (id: string) => Promise<void>;
   clearWorkoutSessionCachesForDeletedList: (workoutListId: string) => void;
   exportAllWorkoutLists: () => Promise<WorkoutListsExportFile>;
@@ -17,6 +20,7 @@ type Props = {
 
 const HomePageLogicLayer: FC<Props> = ({
   workoutLists,
+  isLoading,
   deleteWorkoutList,
   clearWorkoutSessionCachesForDeletedList,
   exportAllWorkoutLists,
@@ -24,19 +28,25 @@ const HomePageLogicLayer: FC<Props> = ({
   onEdit,
   formatDate,
 }) => {
+  const swipeRef = useMainTabSwipe();
   const confirmDialog = useConfirm();
   const importInputRef = useRef<HTMLInputElement>(null);
 
   const handleDelete = async (id: string, name: string): Promise<void> => {
-    const ok = await confirmDialog({
-      title: 'Delete workout list?',
-      description: `Delete "${name}"? This cannot be undone.`,
-      confirmationText: 'Delete',
-      cancellationText: 'Cancel',
-    });
-    if (ok) {
-      await deleteWorkoutList(id);
-      clearWorkoutSessionCachesForDeletedList(id);
+    try {
+      const ok = await confirmDialog({
+        title: 'Delete workout list?',
+        description: `Delete "${name}"? This cannot be undone.`,
+        confirmationText: 'Delete',
+        cancellationText: 'Cancel',
+      });
+      if (ok) {
+        await deleteWorkoutList(id);
+        clearWorkoutSessionCachesForDeletedList(id);
+        toastSuccess('Workout list deleted');
+      }
+    } catch (error: unknown) {
+      toastError(error, 'Failed to delete workout list');
     }
   };
 
@@ -44,13 +54,9 @@ const HomePageLogicLayer: FC<Props> = ({
     try {
       const data = await exportAllWorkoutLists();
       downloadJsonFile(data, buildWorkoutListsExportFilename());
-    } catch (error) {
-      await confirmDialog({
-        title: 'Export failed',
-        description: error instanceof Error ? error.message : 'Failed to export workout lists',
-        confirmationText: 'OK',
-        cancellationText: 'Close',
-      });
+      toastSuccess('Workout lists exported');
+    } catch (error: unknown) {
+      toastError(error, 'Failed to export workout lists');
     }
   };
 
@@ -69,12 +75,7 @@ const HomePageLogicLayer: FC<Props> = ({
     try {
       parsed = JSON.parse(await file.text());
     } catch {
-      await confirmDialog({
-        title: 'Import failed',
-        description: 'The selected file is not valid JSON.',
-        confirmationText: 'OK',
-        cancellationText: 'Close',
-      });
+      toastError(null, 'The selected file is not valid JSON.');
       return;
     }
 
@@ -85,12 +86,7 @@ const HomePageLogicLayer: FC<Props> = ({
         : 0;
 
     if (count === 0) {
-      await confirmDialog({
-        title: 'Import failed',
-        description: 'The file does not contain any workout lists to import.',
-        confirmationText: 'OK',
-        cancellationText: 'Close',
-      });
+      toastError(null, 'The file does not contain any workout lists to import.');
       return;
     }
 
@@ -106,19 +102,17 @@ const HomePageLogicLayer: FC<Props> = ({
 
     try {
       await importWorkoutLists(parsed as WorkoutListsExportFile);
-    } catch (error) {
-      await confirmDialog({
-        title: 'Import failed',
-        description: error instanceof Error ? error.message : 'Failed to import workout lists',
-        confirmationText: 'OK',
-        cancellationText: 'Close',
-      });
+      toastSuccess('Workout lists imported');
+    } catch (error: unknown) {
+      toastError(error, 'Failed to import workout lists');
     }
   };
 
   return (
     <HomePage
+      swipeRef={swipeRef}
       workoutLists={workoutLists}
+      isLoading={isLoading}
       onEdit={onEdit}
       onDelete={handleDelete}
       onExport={handleExport}

@@ -3,7 +3,8 @@ node_modules
 **/dist
 **/coverage
 .git
-.cursor
+.claude
+CLAUDE.md
 .idea
 server/_stub
 client/.storybook-static

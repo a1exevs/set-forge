@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
-import LegalFooter from 'src/widgets/legal-footer/ui/legal-footer';
+import LegalFooter from '../legal-footer';
 
 jest.mock('@tanstack/react-router', () => ({
   Link: ({ to, children, className }: { to: string; children: ReactNode; className?: string }) => (

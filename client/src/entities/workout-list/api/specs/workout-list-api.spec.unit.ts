@@ -1,4 +1,4 @@
-import { apiRequest, ApiRequestError } from '@shared';
+import { apiRequest, ApiRequestError, type CommonResponseEnvelope } from '@shared/api';
 
 import {
   createWorkoutList,
@@ -6,7 +6,7 @@ import {
   fetchWorkoutList,
   fetchWorkoutLists,
   updateWorkoutList,
-} from 'src/entities/workout-list/api/workout-list-api';
+} from '../workout-list-api';
 
 jest.mock('src/shared/api/http-client', () => {
   const actual = jest.requireActual('src/shared/api/http-client');
@@ -15,7 +15,7 @@ jest.mock('src/shared/api/http-client', () => {
 
 const mockedApiRequest = apiRequest as jest.MockedFunction<typeof apiRequest>;
 
-const okEnvelope = <T>(data: T) => ({ data, messages: [], fieldsErrors: [], resultCode: 0 });
+const okEnvelope = <T>(data: T): CommonResponseEnvelope<T> => ({ data, messages: [], fieldsErrors: [], resultCode: 0 });
 
 const LIST = {
   id: 'list-1',

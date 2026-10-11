@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import NumericField from 'src/shared/ui/numeric-field/numeric-field-logic-layer';
+import NumericField from '../numeric-field-logic-layer';
 
 describe('NumericField', () => {
   describe('rendering', () => {

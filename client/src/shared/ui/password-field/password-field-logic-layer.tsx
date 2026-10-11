@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 
-import PasswordFieldView from 'src/shared/ui/password-field/password-field';
+import PasswordFieldView from './password-field';
 
 type Props = {
   id?: string;
@@ -8,10 +8,11 @@ type Props = {
   value: string;
   autoComplete?: string;
   disabled?: boolean;
+  revealable?: boolean;
   onChange: (value: string) => void;
 };
 
-const PasswordField: FC<Props> = ({ id, name, value, autoComplete, disabled = false, onChange }) => {
+const PasswordField: FC<Props> = ({ id, name, value, autoComplete, disabled = false, revealable = true, onChange }) => {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -21,7 +22,8 @@ const PasswordField: FC<Props> = ({ id, name, value, autoComplete, disabled = fa
       value={value}
       autoComplete={autoComplete}
       disabled={disabled}
-      visible={visible}
+      revealable={revealable}
+      visible={revealable && visible}
       onChange={onChange}
       onToggleVisible={(): void => setVisible(v => !v)}
     />

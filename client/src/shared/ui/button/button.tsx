@@ -1,7 +1,7 @@
 import { Button as HeadlessButton } from '@headlessui/react';
 import { ButtonHTMLAttributes, FC, PropsWithChildren } from 'react';
 
-import classes from 'src/shared/ui/button/button.module.scss';
+import classes from './button.module.scss';
 
 type Props = PropsWithChildren<
   ButtonHTMLAttributes<HTMLButtonElement> & {

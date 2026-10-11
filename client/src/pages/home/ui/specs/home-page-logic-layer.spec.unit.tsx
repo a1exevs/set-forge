@@ -1,14 +1,20 @@
-import type { WorkoutList } from '@entities';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import HomePageLogicLayer from 'src/pages/home/ui/home-page-logic-layer';
+import type { WorkoutList } from '@entities/workout-list';
+
+import HomePageLogicLayer from '../home-page-logic-layer';
 
 const confirmDialogMock = jest.fn();
+const toastSuccessMock = jest.fn();
+const toastErrorMock = jest.fn();
 
-jest.mock('@shared', () => ({
-  ...jest.requireActual('@shared'),
+jest.mock('@shared/lib', () => ({
+  ...jest.requireActual('@shared/lib'),
   useConfirm: () => confirmDialogMock,
+  toastSuccess: (...args: unknown[]): void => toastSuccessMock(...args),
+  toastError: (...args: unknown[]): void => toastErrorMock(...args),
+  downloadJsonFile: jest.fn(),
 }));
 
 jest.mock('@tanstack/react-router', () => ({
@@ -18,8 +24,8 @@ jest.mock('@tanstack/react-router', () => ({
   useNavigate: () => jest.fn(),
 }));
 
-jest.mock('@widgets', () => ({
-  MAIN_TAB_ROUTES: [],
+jest.mock('@widgets/main-tabs-bar', () => ({
+  useMainTabSwipe: (): { current: null } => ({ current: null }),
   MainTabsBar: () => null,
 }));
 
@@ -56,12 +62,13 @@ describe('HomePageLogicLayer', () => {
     render(
       <HomePageLogicLayer
         workoutLists={[WORKOUT_LIST]}
+        isLoading={false}
         deleteWorkoutList={deleteWorkoutList}
         clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date): string => date ?? ''}
+        formatDate={(date: string | null): string => date ?? ''}
       />,
     );
 
@@ -71,6 +78,36 @@ describe('HomePageLogicLayer', () => {
     await waitFor(() => {
       expect(deleteWorkoutList).toHaveBeenCalledWith('list-1');
       expect(clearWorkoutSessionCachesForDeletedList).toHaveBeenCalledWith('list-1');
+      expect(toastSuccessMock).toHaveBeenCalledWith('Workout list deleted');
+      expect(toastErrorMock).not.toHaveBeenCalled();
+    });
+  });
+
+  it('shows error toast when delete fails', async () => {
+    const user = userEvent.setup();
+    const error = new Error('Delete failed');
+    deleteWorkoutList.mockRejectedValueOnce(error);
+
+    render(
+      <HomePageLogicLayer
+        workoutLists={[WORKOUT_LIST]}
+        isLoading={false}
+        deleteWorkoutList={deleteWorkoutList}
+        clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
+        exportAllWorkoutLists={jest.fn()}
+        importWorkoutLists={jest.fn()}
+        onEdit={jest.fn()}
+        formatDate={(date: string | null): string => date ?? ''}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Workout list actions' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
+
+    await waitFor(() => {
+      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to delete workout list');
+      expect(toastSuccessMock).not.toHaveBeenCalled();
+      expect(clearWorkoutSessionCachesForDeletedList).not.toHaveBeenCalled();
     });
   });
 
@@ -81,12 +118,13 @@ describe('HomePageLogicLayer', () => {
     render(
       <HomePageLogicLayer
         workoutLists={[WORKOUT_LIST]}
+        isLoading={false}
         deleteWorkoutList={deleteWorkoutList}
         clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date): string => date ?? ''}
+        formatDate={(date: string | null): string => date ?? ''}
       />,
     );
 
@@ -99,5 +137,77 @@ describe('HomePageLogicLayer', () => {
 
     expect(deleteWorkoutList).not.toHaveBeenCalled();
     expect(clearWorkoutSessionCachesForDeletedList).not.toHaveBeenCalled();
+  });
+
+  it('exports lists and shows success toast', async () => {
+    const user = userEvent.setup();
+    const exportData = { version: 1 as const, exportedAt: '2026-01-01', workoutLists: [] };
+    const exportAllWorkoutLists = jest.fn().mockResolvedValue(exportData);
+
+    render(
+      <HomePageLogicLayer
+        workoutLists={[WORKOUT_LIST]}
+        isLoading={false}
+        deleteWorkoutList={deleteWorkoutList}
+        clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
+        exportAllWorkoutLists={exportAllWorkoutLists}
+        importWorkoutLists={jest.fn()}
+        onEdit={jest.fn()}
+        formatDate={(date: string | null): string => date ?? ''}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Export workout lists' }));
+
+    await waitFor(() => {
+      expect(exportAllWorkoutLists).toHaveBeenCalled();
+      expect(toastSuccessMock).toHaveBeenCalledWith('Workout lists exported');
+      expect(toastErrorMock).not.toHaveBeenCalled();
+    });
+  });
+
+  it('shows error toast when export fails', async () => {
+    const user = userEvent.setup();
+    const error = new Error('Export failed');
+    const exportAllWorkoutLists = jest.fn().mockRejectedValue(error);
+
+    render(
+      <HomePageLogicLayer
+        workoutLists={[WORKOUT_LIST]}
+        isLoading={false}
+        deleteWorkoutList={deleteWorkoutList}
+        clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
+        exportAllWorkoutLists={exportAllWorkoutLists}
+        importWorkoutLists={jest.fn()}
+        onEdit={jest.fn()}
+        formatDate={(date: string | null): string => date ?? ''}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Export workout lists' }));
+
+    await waitFor(() => {
+      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to export workout lists');
+      expect(toastSuccessMock).not.toHaveBeenCalled();
+    });
+  });
+
+  it('shows the skeleton while the lists load, not the empty state', () => {
+    render(
+      <HomePageLogicLayer
+        workoutLists={[]}
+        isLoading
+        deleteWorkoutList={deleteWorkoutList}
+        clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
+        exportAllWorkoutLists={jest.fn()}
+        importWorkoutLists={jest.fn()}
+        onEdit={jest.fn()}
+        formatDate={(date: string | null): string => date ?? ''}
+      />,
+    );
+
+    expect(screen.getByRole('status', { name: 'Loading workout lists' })).toBeInTheDocument();
+    expect(screen.getByRole('main')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByText('No workout lists yet')).not.toBeInTheDocument();
   });
 });

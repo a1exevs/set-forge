@@ -2,8 +2,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FC } from 'react';
 
-import ConfirmDialogProvider from 'src/shared/ui/confirm-dialog/confirm-dialog-provider';
-import { useConfirm } from 'src/shared/ui/confirm-dialog/hooks/use-confirm';
+import { useConfirm } from '@shared/lib';
+
+import ConfirmDialogProvider from '../confirm-dialog-provider';
 
 const ConfirmDialogOpener: FC<{
   options: Parameters<ReturnType<typeof useConfirm>>[0];

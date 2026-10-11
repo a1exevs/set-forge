@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
 
-import classes from 'src/widgets/legal-footer/ui/legal-footer.module.scss';
+import classes from './legal-footer.module.scss';
 
 type Props = {
   /** Optional extra class for page-specific outer spacing (the widget owns the inner styling). */

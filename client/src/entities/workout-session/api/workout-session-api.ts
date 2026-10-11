@@ -1,6 +1,6 @@
-import { apiRequest, ApiRequestError, ResultCodes } from '@shared';
+import { apiRequest, ApiRequestError, ResultCodes } from '@shared/api';
 
-import type { WorkoutHistoryPage, WorkoutSession } from 'src/entities/workout-session/model/types';
+import type { WorkoutHistoryPage, WorkoutSession } from '../model/workout-session';
 
 const BASE = '/workout-sessions';
 

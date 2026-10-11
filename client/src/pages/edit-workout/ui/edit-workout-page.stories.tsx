@@ -9,15 +9,13 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
-import EditWorkoutPageLogicLayer from 'src/pages/edit-workout/ui/edit-workout-page-logic-layer';
-
-const storyTitle = 'Pages/EditWorkoutPage';
+import EditWorkoutPageLogicLayer from './edit-workout-page-logic-layer';
 
 const editWithDataProps = {
   id: mockWorkoutList.id,
   workout: mockWorkoutList,
   activeSessionId: null,
-  updateWorkoutList: async (): Promise<boolean> => true,
+  updateWorkoutList: async (): Promise<void> => undefined,
   resyncSession: async (): Promise<void> => undefined,
 };
 
@@ -25,7 +23,7 @@ const editNotFoundProps = {
   id: 'non-existent-id',
   workout: null,
   activeSessionId: null,
-  updateWorkoutList: async (): Promise<boolean> => true,
+  updateWorkoutList: async (): Promise<void> => undefined,
   resyncSession: async (): Promise<void> => undefined,
 };
 
@@ -42,7 +40,7 @@ const renderEditNotFound = (): ReturnType<typeof renderWithPageRouter> =>
   });
 
 const meta = {
-  title: storyTitle,
+  title: 'Pages/EditWorkoutPage',
   component: EditWorkoutPageLogicLayer,
 } satisfies Meta<typeof EditWorkoutPageLogicLayer>;
 
@@ -57,3 +55,12 @@ export const EditNotFoundDesktop4k = buildDesktop4KStoryObj<typeof meta>({ rende
 export const EditNotFoundDesktop = buildDesktopStoryObj<typeof meta>({ render: renderEditNotFound });
 export const EditNotFoundTablet = buildTabletStoryObj<typeof meta>({ render: renderEditNotFound });
 export const EditNotFoundMobile = buildMobileStoryObj<typeof meta>({ render: renderEditNotFound });
+
+const renderEditLoading = (): ReturnType<typeof renderWithPageRouter> =>
+  renderWithPageRouter({
+    initialEntries: [`/edit/${mockWorkoutList.id}`],
+    component: (): JSX.Element => <EditWorkoutPageLogicLayer {...editWithDataProps} workout={undefined} />,
+  });
+
+/** The list is still loading: the form as a skeleton. */
+export const EditLoadingMobile = buildMobileStoryObj<typeof meta>({ render: renderEditLoading });

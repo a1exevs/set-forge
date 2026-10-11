@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
-import type { ReactNode } from 'react';
+import { createRef, type ReactNode } from 'react';
 
-import ProfilePage from 'src/pages/profile/ui/profile-page';
+import ProfilePage from '../profile-page';
 
 jest.mock('@tanstack/react-router', () => ({
   useRouterState: ({ select }: { select: (state: { location: { pathname: string } }) => string }) =>
@@ -9,27 +9,19 @@ jest.mock('@tanstack/react-router', () => ({
   Link: ({ to, children }: { to: string; children: ReactNode }) => <a href={to}>{children}</a>,
 }));
 
-jest.mock('@widgets', () => ({
+jest.mock('@widgets/main-tabs-bar', () => ({
   MainTabsBar: (): JSX.Element => <nav data-testid="main-tabs-bar" />,
-  MAIN_TAB_ROUTES: [
-    { id: 'home', to: '/' },
-    { id: 'profile', to: '/profile' },
-  ],
-  LegalFooter: (): JSX.Element => <footer data-testid="legal-footer" />,
 }));
 
-jest.mock('@shared', () => {
-  const actual = jest.requireActual<typeof import('@shared')>('@shared');
-  return {
-    ...actual,
-    useTabSwipeNavigation: () => ({ current: null }),
-  };
-});
+jest.mock('@widgets/legal-footer', () => ({
+  LegalFooter: (): JSX.Element => <footer data-testid="legal-footer" />,
+}));
 
 describe('ProfilePage', () => {
   it('matches snapshot', () => {
     const { container } = render(
       <ProfilePage
+        swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
         onLogout={(): void => undefined}

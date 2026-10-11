@@ -1,1 +1,1 @@
-export { AuthPage } from 'src/pages/auth/ui';
+export { default as AuthPage } from './ui/auth-page-data-layer';

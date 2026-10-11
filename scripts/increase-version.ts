@@ -1,50 +1,43 @@
-import fs from 'fs';
-import path from 'path';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { relative, resolve } from 'node:path';
 
-import { rootDir } from './common';
+import { rootDir } from './common.ts';
 
-enum IncreaseVersionMode {
-  MAJOR = 'major',
-  MINOR = 'minor',
-  PATCH = 'patch',
-}
+const IncreaseVersionMode = {
+  MAJOR: 'major',
+  MINOR: 'minor',
+  PATCH: 'patch',
+} as const;
+type IncreaseVersionMode = (typeof IncreaseVersionMode)[keyof typeof IncreaseVersionMode];
 
 /** App version is always taken from the client workspace; server stays in lockstep. */
-const CANONICAL_PACKAGE_JSON = path.resolve(rootDir, 'client', 'package.json');
+const CANONICAL_PACKAGE_JSON = resolve(rootDir, 'client', 'package.json');
 const PACKAGE_JSON_PATHS = [
-  path.resolve(rootDir, 'client', 'package.json'),
-  path.resolve(rootDir, 'client', 'public', 'manifest.json'),
-  path.resolve(rootDir, 'server', 'package.json'),
+  resolve(rootDir, 'client', 'package.json'),
+  resolve(rootDir, 'client', 'public', 'manifest.json'),
+  resolve(rootDir, 'server', 'package.json'),
 ];
 
 function increaseVersion(version: string, type: IncreaseVersionMode): string {
-  const parts = version.split('.').map(Number);
+  const [major = 0, minor = 0, patch = 0] = version.split('.').map(Number);
 
   switch (type) {
     case IncreaseVersionMode.MAJOR:
-      parts[0]++;
-      parts[1] = 0;
-      parts[2] = 0;
-      break;
+      return [major + 1, 0, 0].join('.');
     case IncreaseVersionMode.MINOR:
-      parts[1]++;
-      parts[2] = 0;
-      break;
+      return [major, minor + 1, 0].join('.');
     case IncreaseVersionMode.PATCH:
-      parts[2]++;
-      break;
+      return [major, minor, patch + 1].join('.');
     default:
       throw new Error(
         `Invalid version type: ${type}. Use "${IncreaseVersionMode.MAJOR}", "${IncreaseVersionMode.MINOR}" or "${IncreaseVersionMode.PATCH}".`,
       );
   }
-
-  return parts.join('.');
 }
 
 function readVersion(filePath: string): string {
-  const fileAbsolutePath = path.resolve(filePath);
-  const content = fs.readFileSync(fileAbsolutePath, 'utf8');
+  const fileAbsolutePath = resolve(filePath);
+  const content = readFileSync(fileAbsolutePath, 'utf8');
   const json = JSON.parse(content) as { version?: string };
   if (!json.version) {
     throw new Error(`No "version" field found in ${filePath}`);
@@ -53,8 +46,8 @@ function readVersion(filePath: string): string {
 }
 
 function setVersionInFile(filePath: string, newVersion: string): void {
-  const fileAbsolutePath = path.resolve(filePath);
-  const content = fs.readFileSync(fileAbsolutePath, 'utf8');
+  const fileAbsolutePath = resolve(filePath);
+  const content = readFileSync(fileAbsolutePath, 'utf8');
   const json = JSON.parse(content) as { version?: string };
 
   if (!json.version) {
@@ -64,7 +57,7 @@ function setVersionInFile(filePath: string, newVersion: string): void {
   const oldVersion = json.version;
   json.version = newVersion;
 
-  fs.writeFileSync(fileAbsolutePath, JSON.stringify(json, null, 2) + '\n', 'utf8');
+  writeFileSync(fileAbsolutePath, JSON.stringify(json, null, 2) + '\n', 'utf8');
   console.log(`Updated version in ${filePath}: ${oldVersion} -> ${newVersion}`);
 }
 
@@ -72,7 +65,7 @@ function main(): void {
   const args = process.argv.slice(2);
   const type = args[0] as IncreaseVersionMode;
 
-  if (![IncreaseVersionMode.MAJOR, IncreaseVersionMode.MINOR, IncreaseVersionMode.PATCH].includes(type)) {
+  if (!Object.values(IncreaseVersionMode).includes(type)) {
     console.error('Usage: node increase-version.ts <major|minor|patch>');
     process.exit(1);
   }
@@ -88,7 +81,7 @@ function main(): void {
       const other = readVersion(pkgPath);
       if (other !== oldCanonical) {
         console.warn(
-          `Warning: version in ${path.relative(rootDir, pkgPath)} (${other}) differs from client (${oldCanonical}). Both will be set to ${newVersion}.`,
+          `Warning: version in ${relative(rootDir, pkgPath)} (${other}) differs from client (${oldCanonical}). Both will be set to ${newVersion}.`,
         );
       }
     }

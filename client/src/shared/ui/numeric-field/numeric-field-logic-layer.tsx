@@ -1,63 +1,24 @@
 import { ChangeEvent, FC, FocusEvent, useEffect, useState } from 'react';
 
-import NumericFieldView from 'src/shared/ui/numeric-field/numeric-field';
+import {
+  decimalDraftMatchesValue,
+  initialDraft,
+  type NumericVariant,
+  sanitizeDecimalInput,
+  sanitizeIntegerInput,
+} from '@shared/lib';
 
-type Variant = 'integer' | 'decimal';
+import NumericFieldView from './numeric-field';
 
 type Props = {
   label: string;
   value: number | null;
   onChange: (value: number | null) => void;
-  variant: Variant;
+  variant: NumericVariant;
   error?: string;
   id?: string;
   disabled?: boolean;
   size?: 'md' | 'sm';
-};
-
-const parseDecimalDraft = (draft: string): number | null => {
-  if (draft === '' || draft === '.') {
-    return null;
-  }
-  const n = parseFloat(draft);
-  if (Number.isNaN(n)) {
-    return null;
-  }
-  return n;
-};
-
-const decimalDraftMatchesValue = (val: number | null, draft: string): boolean => {
-  if (val === null) {
-    return draft === '' || draft === '.';
-  }
-  const parsed = parseDecimalDraft(draft);
-  if (parsed === null) {
-    return false;
-  }
-  return parsed === val;
-};
-
-const sanitizeDecimalInput = (raw: string): string => {
-  let next = raw.replace(/[^\d.]/g, '');
-  const firstDot = next.indexOf('.');
-  if (firstDot !== -1) {
-    next = next.slice(0, firstDot + 1) + next.slice(firstDot + 1).replace(/\./g, '');
-  }
-  return next;
-};
-
-const sanitizeIntegerInput = (raw: string): string => {
-  return raw.replace(/\D/g, '');
-};
-
-const initialDraft = (val: number | null, variant: Variant): string => {
-  if (val === null || Number.isNaN(val)) {
-    return '';
-  }
-  if (variant === 'integer') {
-    return String(Math.trunc(val));
-  }
-  return String(val);
 };
 
 const NumericField: FC<Props> = ({ label, value, onChange, variant, error, id, disabled = false, size = 'md' }) => {

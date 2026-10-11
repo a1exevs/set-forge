@@ -38,7 +38,7 @@ exports[`Dialog matches snapshot when open 1`] = `
             class="dialogBackdrop"
             data-headlessui-state="open"
             data-open=""
-            style="background-color: rgb(0, 0, 0);"
+            style="--dialog-backdrop: #000000;"
           />
           <div
             class="dialogOverlay"
@@ -98,7 +98,7 @@ exports[`Dialog matches snapshot with ariaLabel 1`] = `
             class="dialogBackdrop"
             data-headlessui-state="open"
             data-open=""
-            style="background-color: rgb(0, 0, 0);"
+            style="--dialog-backdrop: #000000;"
           />
           <div
             class="dialogOverlay"
@@ -157,7 +157,7 @@ exports[`Dialog matches snapshot with custom backdropColor 1`] = `
             class="dialogBackdrop"
             data-headlessui-state="open"
             data-open=""
-            style="background-color: rgb(2, 86, 176);"
+            style="--dialog-backdrop: #0256b0;"
           />
           <div
             class="dialogOverlay"
@@ -216,7 +216,7 @@ exports[`Dialog matches snapshot with disableAnimation 1`] = `
             class="dialogBackdrop"
             data-headlessui-state="open"
             data-open=""
-            style="background-color: rgb(0, 0, 0);"
+            style="--dialog-backdrop: #000000;"
           />
           <div
             class="dialogOverlay"

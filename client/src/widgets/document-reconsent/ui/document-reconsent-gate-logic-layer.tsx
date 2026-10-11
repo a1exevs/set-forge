@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 
-import DocumentReconsentGate from 'src/widgets/document-reconsent/ui/document-reconsent-gate';
+import DocumentReconsentGate from './document-reconsent-gate';
 
 type Props = {
   open: boolean;

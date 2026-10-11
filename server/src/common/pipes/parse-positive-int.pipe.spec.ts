@@ -2,9 +2,9 @@ import '@root/string.extensions';
 
 import { ArgumentMetadata, HttpStatus } from '@nestjs/common';
 
+import { ErrorMessages } from '@common/constants';
 import { ParsePositiveIntPipe } from '@common/pipes';
 import { sendPseudoError } from '@test/unit/helpers';
-import { ErrorMessages } from '@common/constants';
 
 describe('ParsePositiveIntPipe', () => {
   beforeEach(() => {

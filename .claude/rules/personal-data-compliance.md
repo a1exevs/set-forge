@@ -1,0 +1,73 @@
+---
+description: Personal-data / privacy compliance — keep Privacy Policy & Terms in sync and versioned when user data or legal-relevant behaviour changes
+paths:
+  - "server/src/users/**"
+  - "server/src/auth/**"
+  - "server/src/security/**"
+  - "server/database/migrations/**"
+  - "server/src/common/constants/document-versions.ts"
+  - "client/src/entities/session/**"
+  - "client/src/pages/privacy/**"
+  - "client/src/pages/terms/**"
+  - "client/src/widgets/document-reconsent/**"
+---
+
+# Personal-Data & Privacy Compliance
+
+Set Forge is operated under Russian 152-ФЗ. The Privacy Policy and Terms of Use are **contracts with the user**, not just docs: they must always describe the code's *actual* data handling, and users must re-accept when they change materially. Treat any change under the paths above as potentially compliance-relevant.
+
+## What counts as "personal data" (PD)
+
+Anything tied to an identifiable user: `email`, `password` (hash), workout data the user enters, technical/log data (IP, user-agent, session id), the document-acceptance columns, and any **new** column/field/log/third-party call that stores, exposes, or transmits user-linked data.
+
+## Trigger → required action
+
+When a change does any of the following, the linked document(s) MUST be updated **in the same PR** and the version bumped.
+
+| Change | Update | Bump |
+|--------|--------|------|
+| New/changed PD collected, stored, logged, or exposed (e.g. new `users` column, new field on `CurrentUser`/`GetCurrentUserResponse`, new log of user data) | Privacy Policy §"What data we process" (+ purpose & legal basis) | `PRIVACY_VERSION` + `PRIVACY_EFFECTIVE_DATE` |
+| New third party / sub-processor, analytics, tracker, ad network, or data leaves the RF | Privacy Policy §"Sharing" / §"Where data is stored" | `PRIVACY_VERSION` + `PRIVACY_EFFECTIVE_DATE` |
+| Change to retention, deletion, or data-subject rights (e.g. account-deletion flow, export) | Privacy Policy §"Rights" / §"Retention" | `PRIVACY_VERSION` + `PRIVACY_EFFECTIVE_DATE` |
+| New cookie beyond strictly-necessary session | Privacy Policy §"Cookies" | `PRIVACY_VERSION` + `PRIVACY_EFFECTIVE_DATE` |
+| Change to user obligations, service scope, liability/health disclaimer, governing law, or contact | Terms of Use relevant section | `TERMS_VERSION` + `TERMS_EFFECTIVE_DATE` |
+
+If a change is purely internal and does not alter *what* PD is handled or *what* the user agreed to (refactor, rename, test), no bump is required — state this explicitly in the PR.
+
+## Where to change things (keep in sync)
+
+- **Privacy text (RU + EN):** `client/src/pages/privacy/config/privacy-policy-content.ts` — update both languages; bump `PRIVACY_EFFECTIVE_DATE`.
+- **Terms text (RU + EN):** `client/src/pages/terms/config/terms-content.ts` — update both languages; bump `TERMS_EFFECTIVE_DATE`.
+- **Required versions (server, runtime):** `TERMS_VERSION` / `PRIVACY_VERSION` env (read via `server/src/common/constants/document-versions.ts`); update `server/.production.env.example` and the deploy guide. Increment the number so users with a lower stored version are re-prompted.
+- **Effective date and env version must move together:** a text change without a version bump means users silently keep an outdated acceptance; a version bump without a text/date change forces a pointless re-consent.
+
+## Hard invariants (do not break)
+
+1. **Separate consent.** Registration keeps `consent` (PD processing) and `termsAccepted` (Terms) as two distinct, explicit, non-defaulted `@Equals(true)` fields. Never merge them or default them to `true`.
+2. **Re-consent gate.** `documentsPendingAcceptance` stays *derived* from stored vs required versions (never persisted as a flag); the root re-consent gate must remain reachable and non-dismissable on app routes (accept or log out). **Exception:** the gate must stay closed on `/privacy` and `/terms` so the user can read the documents before accepting — never bootstrap/session-restore in a way that re-blocks those pages.
+3. **Deletion cascade.** Account deletion must remove *all* user-owned data (DB `ON DELETE CASCADE`); a new user-owned table MUST add a cascading FK and be covered by `account-deletion-cascade.e2e-spec.ts`.
+4. **Operator identity stays out of source.** Real operator name / contact come from build-time env — the per-language operator name (`VITE_PRIVACY_OPERATOR_NAME_RU` / `VITE_PRIVACY_OPERATOR_NAME_EN`, with `VITE_PRIVACY_OPERATOR_NAME` as a shared fallback) and `VITE_PRIVACY_CONTACT_EMAIL`; do not hardcode real values in the repo.
+5. **Data localization & minimization.** Do not add collection of data the policy says is not collected (full name, phone, address, payments, biometrics, analytics) without first updating the policy and legal basis.
+
+## When adding a new PD-bearing entity
+
+1. Add the entity + cascading FK to `users`.
+2. Describe it in the Privacy Policy (both languages) with purpose + legal basis; bump `PRIVACY_VERSION` + date.
+3. Extend `account-deletion-cascade.e2e-spec.ts`.
+4. Update the Map and invariants in `docs/domains/session.md` (and the doc of the new entity's domain).
+
+## Related
+
+- Domain: `docs/domains/session.md` (consents, re-consent gate, account deletion)
+- Server API conventions: [server-api.md](server-api.md)
+- Command: run `/privacy-audit` to audit a change against this rule.
+
+## Enforcement
+
+| Rule | Checked by |
+|---|---|
+| Separate, explicit consent and terms acceptance at registration | `npm run server:test:unit` · `server/src/auth/dto/register.request.spec.ts` |
+| Account deletion removes all user-owned data | `npm run server:test:e2e` · `server/test/e2e/account-deletion-cascade.e2e-spec.ts` |
+| Re-consent gate stays closed on the legal pages and blocks the other routes | `npm run client:test:unit` · `client/src/widgets/document-reconsent/ui/specs/document-reconsent-gate.spec.unit.tsx` |
+| Policy / terms text matches the data handling; versions and dates bumped together | ❌ review (run `/privacy-audit`) |
+| No real operator identity in the repo; no new PD without a policy update | ❌ review |

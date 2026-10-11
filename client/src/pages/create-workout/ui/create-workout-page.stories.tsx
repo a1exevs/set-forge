@@ -8,18 +8,16 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
-import CreateWorkoutPageLogicLayer from 'src/pages/create-workout/ui/create-workout-page-logic-layer';
-
-const storyTitle = 'Pages/CreateWorkoutPage';
+import CreateWorkoutPageLogicLayer from './create-workout-page-logic-layer';
 
 const renderCreateWorkoutPage = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
     initialEntries: ['/create'],
-    component: (): JSX.Element => <CreateWorkoutPageLogicLayer onSubmit={async (): Promise<boolean> => true} />,
+    component: (): JSX.Element => <CreateWorkoutPageLogicLayer onCreate={async (): Promise<void> => undefined} />,
   });
 
 const meta = {
-  title: storyTitle,
+  title: 'Pages/CreateWorkoutPage',
   component: CreateWorkoutPageLogicLayer,
 } satisfies Meta<typeof CreateWorkoutPageLogicLayer>;
 

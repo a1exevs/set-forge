@@ -1,8 +1,9 @@
 import { FC } from 'react';
 
-import { useCurrentUserQuery, useWorkoutHistoryInfiniteQuery } from '@entities';
+import { useCurrentUserQuery } from '@entities/session';
+import { useWorkoutHistoryInfiniteQuery } from '@entities/workout-session';
 
-import HistoryPageLogicLayer from 'src/pages/history/ui/history-page-logic-layer';
+import HistoryPageLogicLayer from './history-page-logic-layer';
 
 const HistoryPageDataLayer: FC = () => {
   const { data: user } = useCurrentUserQuery(true);

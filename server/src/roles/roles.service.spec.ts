@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { getModelToken } from '@nestjs/sequelize';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { getModelToken } from '@nestjs/sequelize';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { RolesService } from '@roles/roles.service';
-import { Role } from '@roles/roles.model';
-import { CreateRoleRequest } from '@roles/dto';
 import { ErrorMessages } from '@common/constants';
+import { CreateRoleRequest } from '@roles/dto';
+import { Role } from '@roles/roles.model';
+import { RolesService } from '@roles/roles.service';
 
 describe('RolesService', () => {
   let rolesService: RolesService;

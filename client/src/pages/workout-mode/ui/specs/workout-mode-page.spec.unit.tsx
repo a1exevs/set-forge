@@ -1,14 +1,17 @@
-import type { WorkoutList, WorkoutSession } from '@entities';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import WorkoutModePage from 'src/pages/workout-mode/ui/workout-mode-page';
+import type { WorkoutList } from '@entities/workout-list';
+import type { WorkoutSession } from '@entities/workout-session';
+
+import WorkoutModePage from '../workout-mode-page';
 
 jest.mock('@tanstack/react-router', () => ({
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
 }));
 
-jest.mock('@widgets', () => ({
+jest.mock('@shared/ui', () => ({
+  ...jest.requireActual('@shared/ui'),
   NotFoundMessage: ({ title }: { title: string }) => <div>{title}</div>,
 }));
 

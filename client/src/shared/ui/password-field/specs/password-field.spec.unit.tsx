@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FC, useState } from 'react';
 
-import PasswordField from 'src/shared/ui/password-field/password-field-logic-layer';
+import PasswordField from '../password-field-logic-layer';
 
 const StatefulPasswordField: FC<{
   initialValue?: string;
@@ -19,7 +19,7 @@ const StatefulPasswordField: FC<{
       value={value}
       disabled={disabled}
       autoComplete={autoComplete}
-      onChange={(next): void => {
+      onChange={(next: string): void => {
         setValue(next);
         onChange?.(next);
       }}
@@ -54,6 +54,12 @@ describe('PasswordField', () => {
     it('applies name when provided', () => {
       render(<PasswordField id="pwd" name="password" value="" onChange={jest.fn()} />);
       expect(screen.getByDisplayValue('')).toHaveAttribute('name', 'password');
+    });
+
+    it('renders no toggle and keeps the value hidden when not revealable', () => {
+      render(<PasswordField id="pwd" value="secret" onChange={jest.fn()} revealable={false} />);
+      expect(screen.getByDisplayValue('secret')).toHaveAttribute('type', 'password');
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
   });
 

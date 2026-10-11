@@ -1,9 +1,11 @@
-import { Transition } from '@headlessui/react';
 import { FC, KeyboardEvent } from 'react';
 
-import { muscleGroupLabels } from 'src/entities/workout-exercise/model/muscle-group-labels';
-import type { WorkoutSessionExercise } from 'src/entities/workout-session-exercise/model/types';
-import classes from 'src/entities/workout-session-exercise/ui/workout-session-exercise-card/workout-session-exercise-card.module.scss';
+import { muscleGroupLabels } from '@entities/workout-exercise/@x/workout-session-exercise';
+import { cssVars } from '@shared/lib';
+import { Transition } from '@shared/ui';
+
+import classes from './workout-session-exercise-card.module.scss';
+import type { WorkoutSessionExercise } from '../../model/workout-session-exercise';
 
 type Props = {
   exercise: WorkoutSessionExercise;
@@ -71,7 +73,7 @@ const WorkoutSessionExerciseCard: FC<Props> = ({
       <div className={classes.progressBarContainer} aria-hidden="true">
         <div
           className={`${classes.progressBar} ${isCompleted ? classes.progressCompleted : ''}`}
-          style={{ width: `${progress}%` }}
+          style={cssVars({ '--progress': `${progress}%` })}
         />
       </div>
 

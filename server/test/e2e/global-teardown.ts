@@ -1,15 +1,15 @@
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
+import { execSync } from 'node:child_process';
+import { existsSync, readFileSync, unlinkSync } from 'node:fs';
+import { join } from 'node:path';
 
-const RUNTIME_ENV_PATH = path.join(__dirname, '.runtime-env.json');
+const RUNTIME_ENV_PATH = join(__dirname, '.runtime-env.json');
 
 export default async function globalTeardown(): Promise<void> {
-  if (!fs.existsSync(RUNTIME_ENV_PATH)) {
+  if (!existsSync(RUNTIME_ENV_PATH)) {
     return;
   }
 
-  const runtimeEnv = JSON.parse(fs.readFileSync(RUNTIME_ENV_PATH, 'utf8')) as {
+  const runtimeEnv = JSON.parse(readFileSync(RUNTIME_ENV_PATH, 'utf8')) as {
     containerId?: string;
   };
 
@@ -21,5 +21,5 @@ export default async function globalTeardown(): Promise<void> {
     }
   }
 
-  fs.unlinkSync(RUNTIME_ENV_PATH);
+  unlinkSync(RUNTIME_ENV_PATH);
 }

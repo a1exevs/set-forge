@@ -1,19 +1,19 @@
 import { Link } from '@tanstack/react-router';
 import { LogIn, UserPlus } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { FC, FormEvent } from 'react';
+import { ChangeEvent, FC, FormEvent } from 'react';
 
-import { BrandWordmark, Button, PasswordField } from '@shared';
-import { LegalFooter } from '@widgets';
+import { BrandWordmark, Button, PasswordField } from '@shared/ui';
+import { LegalFooter } from '@widgets/legal-footer';
 
-import classes from 'src/pages/auth/ui/auth-page.module.scss';
-
-export type AuthTab = 'login' | 'register';
+import classes from './auth-page.module.scss';
+import type { AuthTab } from '../model/auth-tab';
 
 type Props = {
   activeTab: AuthTab;
   email: string;
   password: string;
+  confirmPassword: string;
   consent: boolean;
   termsAccepted: boolean;
   captcha: string;
@@ -21,6 +21,7 @@ type Props = {
   showCaptcha: boolean;
   emailError: string | null;
   passwordError: string | null;
+  confirmPasswordError: string | null;
   consentError: string | null;
   termsError: string | null;
   captchaError: string | null;
@@ -28,6 +29,7 @@ type Props = {
   isSubmitting: boolean;
   onEmailChange: (v: string) => void;
   onPasswordChange: (v: string) => void;
+  onConfirmPasswordChange: (v: string) => void;
   onConsentChange: (v: boolean) => void;
   onTermsChange: (v: boolean) => void;
   onCaptchaChange: (v: string) => void;
@@ -35,13 +37,15 @@ type Props = {
   redirectSearch: Record<string, string | undefined>;
 };
 
-const TabLink: FC<{
+type TabLinkProps = {
   to: '/login' | '/register';
   active: boolean;
   children: ReactNode;
   icon: ReactNode;
   search: Record<string, string | undefined>;
-}> = ({ to, active, children, icon, search }) => (
+};
+
+const TabLink: FC<TabLinkProps> = ({ to, active, children, icon, search }) => (
   <Link
     to={to}
     search={search}
@@ -59,6 +63,7 @@ const AuthPage: FC<Props> = ({
   activeTab,
   email,
   password,
+  confirmPassword,
   consent,
   termsAccepted,
   captcha,
@@ -66,6 +71,7 @@ const AuthPage: FC<Props> = ({
   showCaptcha,
   emailError,
   passwordError,
+  confirmPasswordError,
   consentError,
   termsError,
   captchaError,
@@ -73,12 +79,15 @@ const AuthPage: FC<Props> = ({
   isSubmitting,
   onEmailChange,
   onPasswordChange,
+  onConfirmPasswordChange,
   onConsentChange,
   onTermsChange,
   onCaptchaChange,
   onSubmit,
   redirectSearch,
 }) => {
+  const isRegister = activeTab === 'register';
+
   return (
     <div className={classes.page}>
       <div className={classes.card}>
@@ -116,7 +125,7 @@ const AuthPage: FC<Props> = ({
             type="email"
             autoComplete="email"
             value={email}
-            onChange={(e): void => onEmailChange(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>): void => onEmailChange(e.target.value)}
             disabled={isSubmitting}
           />
           {emailError && <p className={classes.fieldError}>{emailError}</p>}
@@ -128,11 +137,30 @@ const AuthPage: FC<Props> = ({
             id="auth-password"
             name="password"
             value={password}
-            autoComplete={activeTab === 'login' ? 'current-password' : 'new-password'}
+            autoComplete={isRegister ? 'new-password' : 'current-password'}
             disabled={isSubmitting}
+            revealable={!isRegister}
             onChange={onPasswordChange}
           />
           {passwordError && <p className={classes.fieldError}>{passwordError}</p>}
+
+          {isRegister && (
+            <>
+              <label className={classes.label} htmlFor="auth-password-confirm">
+                Confirm password
+              </label>
+              <PasswordField
+                id="auth-password-confirm"
+                name="password-confirm"
+                value={confirmPassword}
+                autoComplete="new-password"
+                disabled={isSubmitting}
+                revealable={false}
+                onChange={onConfirmPasswordChange}
+              />
+              {confirmPasswordError && <p className={classes.fieldError}>{confirmPasswordError}</p>}
+            </>
+          )}
 
           {showCaptcha && (
             <>
@@ -149,14 +177,14 @@ const AuthPage: FC<Props> = ({
                 type="text"
                 autoComplete="off"
                 value={captcha}
-                onChange={(e): void => onCaptchaChange(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>): void => onCaptchaChange(e.target.value)}
                 disabled={isSubmitting}
               />
               {captchaError && <p className={classes.fieldError}>{captchaError}</p>}
             </>
           )}
 
-          {activeTab === 'register' && (
+          {isRegister && (
             <>
               <label className={classes.consent}>
                 {/** TODO implement shared chackbox via Headless UI and use it **/}
@@ -164,7 +192,7 @@ const AuthPage: FC<Props> = ({
                   type="checkbox"
                   className={classes.consentCheckbox}
                   checked={consent}
-                  onChange={(e): void => onConsentChange(e.target.checked)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>): void => onConsentChange(e.target.checked)}
                   disabled={isSubmitting}
                 />
                 <span>
@@ -182,7 +210,7 @@ const AuthPage: FC<Props> = ({
                   type="checkbox"
                   className={classes.consentCheckbox}
                   checked={termsAccepted}
-                  onChange={(e): void => onTermsChange(e.target.checked)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>): void => onTermsChange(e.target.checked)}
                   disabled={isSubmitting}
                 />
                 <span>
@@ -199,7 +227,7 @@ const AuthPage: FC<Props> = ({
           {formError && <p className={classes.formError}>{formError}</p>}
 
           <Button type="submit" size="lg" disabled={isSubmitting} className={classes.submit}>
-            {activeTab === 'login' ? 'Log in' : 'Create account'}
+            {isRegister ? 'Create account' : 'Log in'}
           </Button>
         </form>
 

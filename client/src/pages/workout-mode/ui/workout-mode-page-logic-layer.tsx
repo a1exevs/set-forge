@@ -1,20 +1,13 @@
-import type { WorkoutList, WorkoutSession } from '@entities';
-import confetti from 'canvas-confetti';
 import { FC, useEffect, useRef, useState } from 'react';
 
-import { useConfirm } from '@shared';
+import type { WorkoutList } from '@entities/workout-list';
+import { countCompletedExercises, isSessionFullyComplete, type WorkoutSession } from '@entities/workout-session';
+import { hasRemainingSets } from '@entities/workout-session-exercise';
+import { toastError, useConfirm } from '@shared/lib';
 
-import WorkoutModePage from 'src/pages/workout-mode/ui/workout-mode-page';
-
-const fireWorkoutCompleteConfetti = (): void => {
-  void confetti({ particleCount: 110, spread: 72, origin: { y: 0.62 } });
-  void confetti({ particleCount: 70, angle: 55, spread: 58, origin: { x: 0, y: 0.62 } });
-  void confetti({ particleCount: 70, angle: 125, spread: 58, origin: { x: 1, y: 0.62 } });
-};
-
-const isSessionFullyComplete = (session: WorkoutSession): boolean =>
-  session.exercises.length > 0 &&
-  session.exercises.every(exercise => exercise.sets > 0 && exercise.completedSets === exercise.sets);
+import WorkoutModePage from './workout-mode-page';
+import WorkoutModePageSkeleton from './workout-mode-page-skeleton';
+import { fireWorkoutCompleteConfetti } from '../lib/fire-workout-complete-confetti';
 
 type Props = {
   workoutList: WorkoutList | null | undefined;
@@ -60,8 +53,8 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
 
     try {
       await startSession(workoutList.id);
-    } catch {
-      // TODO: Support common toaster
+    } catch (error: unknown) {
+      toastError(error, 'Failed to start workout session');
     }
   };
 
@@ -75,7 +68,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
       return;
     }
 
-    if (exercise.completedSets >= exercise.sets) {
+    if (!hasRemainingSets(exercise)) {
       return;
     }
 
@@ -91,8 +84,8 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
         if (updated.status === 'completed') {
           celebrateOnce();
         }
-      } catch {
-        // TODO: Support common toaster
+      } catch (error: unknown) {
+        toastError(error, 'Failed to update session progress');
       }
     })();
   };
@@ -129,8 +122,8 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
       try {
         await finishSession(session.id);
         celebrateOnce();
-      } catch {
-        // TODO: Support common toaster
+      } catch (error: unknown) {
+        toastError(error, 'Failed to finish workout session');
       }
       return;
     }
@@ -138,8 +131,8 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     if (result === 'alternate') {
       try {
         await discardSession(session.id);
-      } catch {
-        // TODO: Support common toaster
+      } catch (error: unknown) {
+        toastError(error, 'Failed to discard workout session');
       }
     }
   };
@@ -155,7 +148,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     }
 
     const totalExercises = session.exercises.length;
-    const completedExercises = session.exercises.filter(ex => ex.sets > 0 && ex.completedSets === ex.sets).length;
+    const completedExercises = countCompletedExercises(session);
     const overallProgress = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0;
 
     return { totalExercises, completedExercises, overallProgress };
@@ -196,7 +189,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   }, [session, phase, finishSession]);
 
   if (workoutList === undefined) {
-    return null;
+    return <WorkoutModePageSkeleton />;
   }
 
   return (

@@ -1,14 +1,6 @@
+export { countCompletedExercises, isSessionFullyComplete } from './model/session-progress';
+export { useClearWorkoutSessionCachesForDeletedList } from './model/clear-workout-session-caches-for-deleted-list';
 export {
-  discardWorkoutSession,
-  fetchActiveWorkoutSession,
-  fetchWorkoutHistory,
-  finishWorkoutSession,
-  incrementSessionProgress,
-  resyncWorkoutSession,
-  startWorkoutSession,
-} from 'src/entities/workout-session/api';
-export {
-  clearWorkoutSessionCachesForDeletedList,
   useActiveWorkoutSessionQuery,
   useDiscardWorkoutSessionMutation,
   useFinishWorkoutSessionMutation,
@@ -16,6 +8,5 @@ export {
   useResyncWorkoutSessionMutation,
   useStartWorkoutSessionMutation,
   useWorkoutHistoryInfiniteQuery,
-  workoutSessionQueryKeys,
-} from 'src/entities/workout-session/model';
-export type { SessionStatus, WorkoutHistoryPage, WorkoutSession } from 'src/entities/workout-session/model/types';
+} from './model/use-workout-session-queries';
+export type { WorkoutSession } from './model/workout-session';

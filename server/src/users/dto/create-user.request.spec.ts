@@ -1,8 +1,8 @@
 import '@root/string.extensions';
 
+import { ErrorMessages } from '@common/constants';
 import { validateDto } from '@test/unit/helpers';
 import { CreateUserRequest } from '@users/dto/create-user.request';
-import { ErrorMessages } from '@common/constants';
 
 describe('CreateUserRequest', () => {
   beforeEach(async () => {

@@ -1,0 +1,18 @@
+.box {
+  padding: $spacing-lg;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  background-color: $bg-secondary;
+}
+
+.fade {
+  transition: opacity 300ms ease;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+.visible {
+  opacity: 1;
+}

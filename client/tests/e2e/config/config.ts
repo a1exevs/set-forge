@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import * as path from 'path';
+import { resolve } from 'node:path';
 
 import { rootDir } from 'tests/common/paths';
 import { isCI } from 'tests/e2e/helpers/ci-helpers';
@@ -7,11 +7,11 @@ import { E2E_CLIENT_ORIGIN, E2E_CLIENT_PORT, E2E_HEALTH_URL, E2E_SERVER_ORIGIN }
 
 /**
  * Full-stack Playwright e2e: ephemeral MySQL + Nest (:5101) + Vite (:5174).
- * See tests/e2e/stack/start-api-stack.cjs.
+ * See tests/e2e/stack/start-api-stack.ts.
  */
 export default defineConfig({
   testMatch: '**/*.spec.e2e.ts',
-  testDir: path.resolve(rootDir, 'tests', 'e2e', 'tests'),
+  testDir: resolve(rootDir, 'tests', 'e2e', 'tests'),
   fullyParallel: true,
   forbidOnly: isCI(),
   retries: isCI() ? 2 : 0,
@@ -36,7 +36,7 @@ export default defineConfig({
   // Always start a fresh stack — reusing :5101/:5174 can attach to a stale Nest without this run's MySQL.
   webServer: [
     {
-      command: 'node tests/e2e/stack/start-api-stack.cjs',
+      command: 'node tests/e2e/stack/start-api-stack.ts',
       url: E2E_HEALTH_URL,
       cwd: rootDir,
       reuseExistingServer: false,

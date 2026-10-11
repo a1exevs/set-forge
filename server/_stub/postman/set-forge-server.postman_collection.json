@@ -257,6 +257,52 @@
 									"response": []
 								},
 								{
+									"name": "refresh access token (no cookie)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Refresh without the session cookie: 401 Unauthorized\", function () {",
+													"    pm.response.to.have.status(401);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableCookies": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{api/access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{dev-url}}/1.0/{{auth-end-point}}/refresh",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{dev-url}}"
+											],
+											"path": [
+												"1.0",
+												"{{auth-end-point}}",
+												"refresh"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "get current user",
 									"event": [
 										{

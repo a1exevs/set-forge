@@ -1,0 +1,17 @@
+# Line endings: LF in the repo and in every working copy, whatever core.autocrlf says on the machine.
+# Prettier (endOfLine: lf) and .editorconfig expect the same; without this, autocrlf=true checks files out as CRLF.
+* text=auto eol=lf
+
+# Binary assets: no text detection, no conversion.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary

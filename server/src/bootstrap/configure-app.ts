@@ -1,12 +1,11 @@
 import { INestApplication } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
+import * as session from 'express-session';
+import { Sequelize } from 'sequelize';
 
 import { ValidationPipe } from '@common/pipes';
 import { LoggerService } from '@src/logger';
 import { SequelizeSessionStore } from '@src/security/sequelize-session.store';
-
-import * as cookieParser from 'cookie-parser';
-import * as session from 'express-session';
-import { Sequelize } from 'sequelize';
 
 function setupCORS(app: INestApplication, whiteList: string[]) {
   app.enableCors({

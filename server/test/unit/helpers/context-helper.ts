@@ -1,6 +1,6 @@
+import { CallHandler, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { createRequest, createResponse } from 'node-mocks-http';
-import { CallHandler, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
 interface IGetMockRequest {
@@ -17,13 +17,17 @@ type IGetMockArgumentsHost = IGetMockExecutionContextData;
 
 export const getMockRequest = function (props: IGetMockRequest): Request {
   const request = createRequest();
-  if (props.sessionVariables && props.sessionVariables.length)
+  if (props.sessionVariables && props.sessionVariables.length) {
     props.sessionVariables.forEach(variable => request._setSessionVariable(variable.key, variable.value));
+  }
 
-  if (props.cookiesVariable && props.cookiesVariable.length)
+  if (props.cookiesVariable && props.cookiesVariable.length) {
     props.cookiesVariable.forEach(cookie => request._setCookiesVariable(cookie.key, cookie.value));
+  }
 
-  if (props.body) request._setBody(props.body);
+  if (props.body) {
+    request._setBody(props.body);
+  }
 
   return request;
 };

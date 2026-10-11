@@ -1,8 +1,8 @@
 import { HttpException } from '@nestjs/common';
 import { Response } from 'express';
 
-import { CommonResponse } from '@common/dto';
 import { ResultCodes } from '@common/constants';
+import { CommonResponse } from '@common/dto';
 
 export const sendResponse = (
   exception: HttpException,
@@ -15,7 +15,9 @@ export const sendResponse = (
   if (exception.message) {
     if (Array.isArray(exception.message)) {
       messagesList = [...exception.message];
-    } else messagesList = [exception.message];
+    } else {
+      messagesList = [exception.message];
+    }
   }
 
   if (messages.length) {

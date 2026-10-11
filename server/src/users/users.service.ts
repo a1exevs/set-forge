@@ -2,10 +2,10 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { FindOptions } from 'sequelize';
 
-import { User } from '@users/users.model';
-import { CreateUserRequest } from '@users/dto';
+import { DocumentVersions, ErrorMessages } from '@common/constants';
 import { RolesService } from '@roles/roles.service';
-import { ErrorMessages, DocumentVersions } from '@common/constants';
+import { CreateUserRequest } from '@users/dto';
+import { User } from '@users/users.model';
 
 @Injectable()
 export class UsersService {
@@ -16,11 +16,12 @@ export class UsersService {
 
   async createUser(dto: CreateUserRequest.Dto): Promise<User> {
     const role = await this.roleService.getRoleByValue('user');
-    if (!role)
+    if (!role) {
       throw new HttpException(
         `${ErrorMessages.SERVICE_IS_UNAVAILABLE}: ${ErrorMessages.USER_ROLE_CONFIGURATION_IS_MISSING.toLowerCase()}`,
         HttpStatus.FORBIDDEN,
       );
+    }
     let user: User;
     try {
       // Registration is where the user just accepted the documents — stamp the current versions.
@@ -54,7 +55,9 @@ export class UsersService {
     const findOptions: FindOptions = {
       where: { email },
     };
-    if (withAllData) findOptions.include = { all: true };
+    if (withAllData) {
+      findOptions.include = { all: true };
+    }
 
     return this.userRepository.findOne(findOptions);
   }

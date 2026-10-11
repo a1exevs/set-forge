@@ -2,8 +2,9 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
-import ConfirmDialogProvider from 'src/shared/ui/confirm-dialog/confirm-dialog-provider';
-import WorkoutListForm from 'src/widgets/workout-list-form/ui/workout-list-form-logic-layer';
+import { ConfirmDialogProvider } from '@shared/ui';
+
+import WorkoutListForm from '../workout-list-form-logic-layer';
 
 jest.mock('@tanstack/react-router', () => ({
   Link: ({ to, children, className }: { to: string; children: ReactNode; className?: string }) => (
@@ -89,6 +90,7 @@ describe('WorkoutListForm', () => {
   });
 
   describe('validation', () => {
+    // @invariant workout-list/form-validation
     it('shows confirm when submitting with empty name', async () => {
       const { container } = render(
         <ConfirmDialogProvider>
@@ -108,6 +110,7 @@ describe('WorkoutListForm', () => {
       expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
+    // @invariant workout-list/form-validation
     it('shows confirm when submitting with no exercises', async () => {
       const user = userEvent.setup();
       render(
@@ -126,6 +129,7 @@ describe('WorkoutListForm', () => {
       expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
+    // @invariant workout-list/form-validation
     it('shows confirm when submitting with invalid exercise data', async () => {
       const user = userEvent.setup();
       const { container } = render(

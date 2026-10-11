@@ -1,6 +1,6 @@
+import { checkForApiProperties } from '@test/unit/helpers';
 import { ImportWorkoutListsResponse } from '@workout-lists/dto/import-workout-lists.response';
 import { WorkoutListResponse } from '@workout-lists/dto/workout-list.response';
-import { checkForApiProperties } from '@test/unit/helpers';
 
 describe('ImportWorkoutListsResponse', () => {
   it('should has ApiProperty decorator for all properties', () => {

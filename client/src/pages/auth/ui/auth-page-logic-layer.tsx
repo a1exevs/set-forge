@@ -1,33 +1,38 @@
 import { FC, FormEvent, useCallback, useState } from 'react';
 
-import { getCaptchaUrl, isNeedCaptchaEnvelope } from 'src/entities/session/api/session-api';
 import {
+  isNeedCaptchaEnvelope,
   validateLoginEmail,
   validateLoginPassword,
   validateRegisterEmail,
   validateRegisterPassword,
-} from 'src/entities/session/model/auth-validation';
-import type { AuthTab } from 'src/pages/auth/ui/auth-page';
-import AuthPage from 'src/pages/auth/ui/auth-page';
-import { ApiRequestError } from 'src/shared/api/http-client';
+} from '@entities/session';
+import { ApiRequestError } from '@shared/api';
+
+import AuthPage from './auth-page';
+import type { LoginInput, RegisterInput } from '../model/auth-input';
+import type { AuthTab } from '../model/auth-tab';
 
 type Props = {
   activeTab: AuthTab;
   redirectSearch: Record<string, string | undefined>;
   isSubmitting: boolean;
-  onLogin: (input: { email: string; password: string; captcha?: string; redirectTo?: string }) => Promise<void>;
-  onRegister: (input: {
-    email: string;
-    password: string;
-    consent: boolean;
-    termsAccepted: boolean;
-    redirectTo?: string;
-  }) => Promise<void>;
+  onLogin: (input: LoginInput) => Promise<void>;
+  onRegister: (input: RegisterInput) => Promise<void>;
+  loadCaptchaUrl: () => Promise<string>;
 };
 
-const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting, onLogin, onRegister }) => {
+const AuthPageLogicLayer: FC<Props> = ({
+  activeTab,
+  redirectSearch,
+  isSubmitting,
+  onLogin,
+  onRegister,
+  loadCaptchaUrl,
+}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [consent, setConsent] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [captcha, setCaptcha] = useState('');
@@ -35,6 +40,7 @@ const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
   const [consentError, setConsentError] = useState<string | null>(null);
   const [termsError, setTermsError] = useState<string | null>(null);
   const [captchaError, setCaptchaError] = useState<string | null>(null);
@@ -45,6 +51,7 @@ const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting
   const resetFieldErrors = useCallback((): void => {
     setEmailError(null);
     setPasswordError(null);
+    setConfirmPasswordError(null);
     setConsentError(null);
     setTermsError(null);
     setCaptchaError(null);
@@ -59,13 +66,15 @@ const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting
       if (activeTab === 'register') {
         const eErr = validateRegisterEmail(email);
         const pErr = validateRegisterPassword(password);
+        const pcErr = confirmPassword === password ? null : 'Passwords do not match';
         const cErr = consent ? null : 'You must consent to the processing of your personal data';
         const tErr = termsAccepted ? null : 'You must accept the Terms of Use';
         setEmailError(eErr);
         setPasswordError(pErr);
+        setConfirmPasswordError(pcErr);
         setConsentError(cErr);
         setTermsError(tErr);
-        if (eErr || pErr || cErr || tErr) {
+        if (eErr || pErr || pcErr || cErr || tErr) {
           return;
         }
         try {
@@ -110,7 +119,7 @@ const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting
             setShowCaptcha(true);
             setCaptcha('');
             try {
-              const url = await getCaptchaUrl();
+              const url = await loadCaptchaUrl();
               setCaptchaImageUrl(url);
             } catch {
               setCaptchaImageUrl(null);
@@ -127,9 +136,11 @@ const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting
     [
       activeTab,
       captcha,
+      confirmPassword,
       consent,
       termsAccepted,
       email,
+      loadCaptchaUrl,
       onLogin,
       onRegister,
       password,
@@ -144,6 +155,7 @@ const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting
       activeTab={activeTab}
       email={email}
       password={password}
+      confirmPassword={confirmPassword}
       consent={consent}
       termsAccepted={termsAccepted}
       captcha={captcha}
@@ -151,6 +163,7 @@ const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting
       showCaptcha={showCaptcha}
       emailError={emailError}
       passwordError={passwordError}
+      confirmPasswordError={confirmPasswordError}
       consentError={consentError}
       termsError={termsError}
       captchaError={captchaError}
@@ -158,6 +171,7 @@ const AuthPageLogicLayer: FC<Props> = ({ activeTab, redirectSearch, isSubmitting
       isSubmitting={isSubmitting}
       onEmailChange={setEmail}
       onPasswordChange={setPassword}
+      onConfirmPasswordChange={setConfirmPassword}
       onConsentChange={setConsent}
       onTermsChange={setTermsAccepted}
       onCaptchaChange={setCaptcha}

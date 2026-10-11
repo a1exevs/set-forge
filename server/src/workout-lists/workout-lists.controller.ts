@@ -21,13 +21,12 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
-import { ResponseInterceptor } from '@common/interceptors';
-import { HttpExceptionFilter } from '@common/exception-filters';
-import { Routes, Docs } from '@common/constants';
+import { Docs, Routes } from '@common/constants';
 import { ApiResult } from '@common/decorators';
 import { OperationResultResponse } from '@common/dto';
-import { WorkoutListsService } from '@workout-lists/workout-lists.service';
+import { HttpExceptionFilter } from '@common/exception-filters';
+import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
+import { ResponseInterceptor } from '@common/interceptors';
 import {
   CreateWorkoutListRequest,
   ImportWorkoutListsRequest,
@@ -36,6 +35,7 @@ import {
   WorkoutListResponse,
   WorkoutListsExportFileResponse,
 } from '@workout-lists/dto';
+import { WorkoutListsService } from '@workout-lists/workout-lists.service';
 
 @ApiTags(Docs.WORKOUT_LISTS_CONTROLLER)
 @UseGuards(JwtAuthGuard, RefreshTokenGuard)

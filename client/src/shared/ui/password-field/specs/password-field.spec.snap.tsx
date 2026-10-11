@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 
-import PasswordFieldView from 'src/shared/ui/password-field/password-field';
-import PasswordField from 'src/shared/ui/password-field/password-field-logic-layer';
+import PasswordFieldView from '../password-field';
+import PasswordField from '../password-field-logic-layer';
 
 describe('PasswordField', () => {
   it('matches snapshot for empty field', () => {
@@ -41,6 +41,19 @@ describe('PasswordField', () => {
   it('matches snapshot when disabled', () => {
     const { container } = render(
       <PasswordField id="snap-pwd-disabled" name="password" value="secret" onChange={(): void => undefined} disabled />,
+    );
+    expect(container).toMatchSnapshot();
+  });
+
+  it('matches snapshot when not revealable', () => {
+    const { container } = render(
+      <PasswordField
+        id="snap-pwd-plain"
+        name="password"
+        value="secret"
+        onChange={(): void => undefined}
+        revealable={false}
+      />,
     );
     expect(container).toMatchSnapshot();
   });

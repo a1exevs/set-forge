@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'node:fs';
+import * as fs from 'node:fs';
+import { resolve } from 'node:path';
 
 import { LoggerService } from '@logger/logger.service';
 import { removeTestLogsDir } from '@test/unit/helpers';
-
-import * as path from 'path';
-import * as fs from 'fs';
 
 const getLogFilePath = () => {
   const date = new Date();
@@ -13,7 +12,7 @@ const getLogFilePath = () => {
   const month = date.getMonth() + 1;
   const day = date.getDate();
 
-  return path.resolve(__dirname, './../../', process.env.SERVER_LOGS) + `/${year}/${month}/${day}.ts`;
+  return resolve(__dirname, './../../', process.env.SERVER_LOGS) + `/${year}/${month}/${day}.ts`;
 };
 
 describe('Logger', () => {
@@ -60,17 +59,12 @@ describe('Logger', () => {
       LoggerService.logToFile(error, stack, context, false);
       const logFilePath = getLogFilePath();
 
-      let logData: string;
-      try {
-        logData = readFileSync(logFilePath, { encoding: 'utf-8' });
-        expect(existsSync(process.env.SERVER_LOGS)).toBeTruthy();
-        expect(existsSync(logFilePath)).toBeTruthy();
-        expect(logData.includes(error)).toBeTruthy();
-        expect(logData.includes(stack)).toBeTruthy();
-        expect(logData.includes(context)).toBeTruthy();
-      } catch (error) {
-        console.log(error);
-      }
+      const logData = readFileSync(logFilePath, { encoding: 'utf-8' });
+      expect(existsSync(process.env.SERVER_LOGS)).toBeTruthy();
+      expect(existsSync(logFilePath)).toBeTruthy();
+      expect(logData.includes(error)).toBeTruthy();
+      expect(logData.includes(stack)).toBeTruthy();
+      expect(logData.includes(context)).toBeTruthy();
     });
     it('should call async method for append of file (by default)', () => {
       jest.mock('fs');

@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 
-import type { WorkoutExercise } from 'src/entities/workout-exercise/model/types';
-import WorkoutExerciseCard from 'src/entities/workout-exercise/ui/workout-exercise-card/workout-exercise-card';
+import type { WorkoutExercise } from '../../../model/workout-exercise';
+import WorkoutExerciseCard from '../workout-exercise-card';
 
 const EXERCISE: WorkoutExercise = {
   id: 'ex-1',

@@ -1,14 +1,19 @@
-import type { WorkoutList, WorkoutSession } from '@entities';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import confetti from 'canvas-confetti';
 
-import WorkoutModePageLogicLayer from 'src/pages/workout-mode/ui/workout-mode-page-logic-layer';
+import type { WorkoutList } from '@entities/workout-list';
+import type { WorkoutSession } from '@entities/workout-session';
+
+import WorkoutModePageLogicLayer from '../workout-mode-page-logic-layer';
 
 const confirmDialogMock = jest.fn();
+const toastErrorMock = jest.fn();
 
-jest.mock('@shared', () => ({
+jest.mock('@shared/lib', () => ({
+  ...jest.requireActual('@shared/lib'),
   useConfirm: () => confirmDialogMock,
+  toastError: (...args: unknown[]): void => toastErrorMock(...args),
 }));
 
 jest.mock('canvas-confetti', () => jest.fn());
@@ -17,7 +22,8 @@ jest.mock('@tanstack/react-router', () => ({
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
 }));
 
-jest.mock('@widgets', () => ({
+jest.mock('@shared/ui', () => ({
+  ...jest.requireActual('@shared/ui'),
   NotFoundMessage: ({ title }: { title: string }) => <div>{title}</div>,
 }));
 
@@ -82,8 +88,8 @@ describe('WorkoutModePageLogicLayer', () => {
     confirmDialogMock.mockResolvedValue('cancel');
   });
 
-  it('renders nothing while the workout list is loading', () => {
-    const { container } = render(
+  it('renders the skeleton while the workout list is loading', () => {
+    render(
       <WorkoutModePageLogicLayer
         workoutList={undefined}
         session={null}
@@ -95,7 +101,9 @@ describe('WorkoutModePageLogicLayer', () => {
       />,
     );
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.getByRole('status', { name: 'Loading workout' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '← Back' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Start workout|Finish workout/ })).not.toBeInTheDocument();
   });
 
   it('starts a session from preview when Start workout is clicked', async () => {
@@ -117,6 +125,31 @@ describe('WorkoutModePageLogicLayer', () => {
     await user.click(screen.getByRole('button', { name: 'Start workout' }));
 
     expect(startSession).toHaveBeenCalledWith('list-1');
+    expect(toastErrorMock).not.toHaveBeenCalled();
+  });
+
+  it('shows error toast when start session fails', async () => {
+    const user = userEvent.setup();
+    const error = new Error('Empty list');
+    const startSession = jest.fn().mockRejectedValue(error);
+
+    render(
+      <WorkoutModePageLogicLayer
+        workoutList={WORKOUT_LIST}
+        session={null}
+        isStarting={false}
+        startSession={startSession}
+        incrementProgress={jest.fn()}
+        finishSession={jest.fn()}
+        discardSession={jest.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Start workout' }));
+
+    await waitFor((): void => {
+      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to start workout session');
+    });
   });
 
   it('finishes the session when confirm returns confirm', async () => {
@@ -149,6 +182,31 @@ describe('WorkoutModePageLogicLayer', () => {
         }),
       );
       expect(finishSession).toHaveBeenCalledWith('sess-1');
+    });
+  });
+
+  it('shows error toast when finish session fails', async () => {
+    const user = userEvent.setup();
+    confirmDialogMock.mockResolvedValue('confirm');
+    const error = new Error('Finish failed');
+    const finishSession = jest.fn().mockRejectedValue(error);
+
+    render(
+      <WorkoutModePageLogicLayer
+        workoutList={WORKOUT_LIST}
+        session={SESSION}
+        isStarting={false}
+        startSession={jest.fn()}
+        incrementProgress={jest.fn()}
+        finishSession={finishSession}
+        discardSession={jest.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Finish workout' }));
+
+    await waitFor((): void => {
+      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to finish workout session');
     });
   });
 
@@ -202,6 +260,7 @@ describe('WorkoutModePageLogicLayer', () => {
     });
   });
 
+  // @invariant workout-session/finish-on-entry-if-complete
   it('auto-finishes once on entry when an active session is already fully complete', async () => {
     const finishSession = jest.fn().mockResolvedValue(undefined);
 
