@@ -62,6 +62,7 @@ describe('HomePageLogicLayer', () => {
     render(
       <HomePageLogicLayer
         workoutLists={[WORKOUT_LIST]}
+        isLoading={false}
         deleteWorkoutList={deleteWorkoutList}
         clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
         exportAllWorkoutLists={jest.fn()}
@@ -90,6 +91,7 @@ describe('HomePageLogicLayer', () => {
     render(
       <HomePageLogicLayer
         workoutLists={[WORKOUT_LIST]}
+        isLoading={false}
         deleteWorkoutList={deleteWorkoutList}
         clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
         exportAllWorkoutLists={jest.fn()}
@@ -116,6 +118,7 @@ describe('HomePageLogicLayer', () => {
     render(
       <HomePageLogicLayer
         workoutLists={[WORKOUT_LIST]}
+        isLoading={false}
         deleteWorkoutList={deleteWorkoutList}
         clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
         exportAllWorkoutLists={jest.fn()}
@@ -144,6 +147,7 @@ describe('HomePageLogicLayer', () => {
     render(
       <HomePageLogicLayer
         workoutLists={[WORKOUT_LIST]}
+        isLoading={false}
         deleteWorkoutList={deleteWorkoutList}
         clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
         exportAllWorkoutLists={exportAllWorkoutLists}
@@ -170,6 +174,7 @@ describe('HomePageLogicLayer', () => {
     render(
       <HomePageLogicLayer
         workoutLists={[WORKOUT_LIST]}
+        isLoading={false}
         deleteWorkoutList={deleteWorkoutList}
         clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
         exportAllWorkoutLists={exportAllWorkoutLists}
@@ -185,5 +190,24 @@ describe('HomePageLogicLayer', () => {
       expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to export workout lists');
       expect(toastSuccessMock).not.toHaveBeenCalled();
     });
+  });
+
+  it('shows the skeleton while the lists load, not the empty state', () => {
+    render(
+      <HomePageLogicLayer
+        workoutLists={[]}
+        isLoading
+        deleteWorkoutList={deleteWorkoutList}
+        clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
+        exportAllWorkoutLists={jest.fn()}
+        importWorkoutLists={jest.fn()}
+        onEdit={jest.fn()}
+        formatDate={(date: string | null): string => date ?? ''}
+      />,
+    );
+
+    expect(screen.getByRole('status', { name: 'Loading workout lists' })).toBeInTheDocument();
+    expect(screen.getByRole('main')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByText('No workout lists yet')).not.toBeInTheDocument();
   });
 });

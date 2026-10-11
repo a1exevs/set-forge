@@ -88,8 +88,8 @@ describe('WorkoutModePageLogicLayer', () => {
     confirmDialogMock.mockResolvedValue('cancel');
   });
 
-  it('renders nothing while the workout list is loading', () => {
-    const { container } = render(
+  it('renders the skeleton while the workout list is loading', () => {
+    render(
       <WorkoutModePageLogicLayer
         workoutList={undefined}
         session={null}
@@ -101,7 +101,9 @@ describe('WorkoutModePageLogicLayer', () => {
       />,
     );
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.getByRole('status', { name: 'Loading workout' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '← Back' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Start workout|Finish workout/ })).not.toBeInTheDocument();
   });
 
   it('starts a session from preview when Start workout is clicked', async () => {

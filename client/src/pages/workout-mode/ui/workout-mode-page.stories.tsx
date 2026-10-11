@@ -58,3 +58,22 @@ export const TrainingDesktop = buildDesktopStoryObj<typeof meta>({ render: rende
 export const TrainingTablet = buildTabletStoryObj<typeof meta>({ render: renderTraining });
 /** Training on a phone: progress and the set counter under the thumb. */
 export const TrainingMobile = buildMobileStoryObj<typeof meta>({ render: renderTraining });
+
+const renderLoading = (): ReturnType<typeof renderWithPageRouter> =>
+  renderWithPageRouter({
+    initialEntries: ['/'],
+    component: (): JSX.Element => (
+      <WorkoutModePageLogicLayer
+        workoutList={undefined}
+        session={null}
+        isStarting={false}
+        startSession={fn()}
+        incrementProgress={fn(async (): Promise<WorkoutSession> => mockActiveWorkoutSession)}
+        finishSession={fn()}
+        discardSession={fn()}
+      />
+    ),
+  });
+
+/** The list and the session are still loading: the way back is real, the rest is a skeleton. */
+export const LoadingMobile = buildMobileStoryObj<typeof meta>({ render: renderLoading });

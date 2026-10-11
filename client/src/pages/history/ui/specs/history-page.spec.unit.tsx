@@ -61,10 +61,12 @@ describe('HistoryPage', () => {
     expect(screen.getByTestId('main-tabs-bar')).toBeInTheDocument();
   });
 
-  it('shows the loading state', () => {
+  it('shows the skeleton while history loads', () => {
     render(<HistoryPage {...baseProps} sessions={[]} total={0} isLoading />);
 
-    expect(screen.getByText('Loading history…')).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Loading history' })).toBeInTheDocument();
+    expect(screen.getByRole('main')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByText('Loading history…')).not.toBeInTheDocument();
   });
 
   it('shows the error state', () => {

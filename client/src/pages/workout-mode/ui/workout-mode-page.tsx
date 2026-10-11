@@ -9,6 +9,7 @@ import { cssVars } from '@shared/lib';
 import { NotFoundMessage } from '@shared/ui';
 
 import classes from './workout-mode-page.module.scss';
+import { PREVIEW_HINT } from '../config/preview-hint';
 import type { WorkoutPhase } from '../model/workout-phase';
 
 type Props = {
@@ -76,10 +77,7 @@ const WorkoutModePage: FC<Props> = ({
       <main className={classes.main}>
         {phase === 'preview' ? (
           <div className={classes.previewStart}>
-            <p className={classes.previewHint}>
-              Ready to train? Tap Start workout only when you are about to begin — the timer starts then, so your
-              workout duration in history stays accurate.
-            </p>
+            <p className={classes.previewHint}>{PREVIEW_HINT}</p>
             <div className={classes.actionBar}>
               <button type="button" className={classes.actionButton} onClick={onStart} disabled={isStarting}>
                 {isStarting ? 'Starting…' : 'Start workout'}

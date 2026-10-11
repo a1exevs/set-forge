@@ -151,3 +151,60 @@
     padding: $spacing-xl;
   }
 }
+
+// Skeleton: the same geometry as the header title and the entity exercise cards
+.titleSkeleton {
+  display: flex;
+  justify-content: center;
+  margin-bottom: $spacing-xs;
+  min-height: 1.8rem;
+  align-items: center;
+}
+
+.progressBarSkeleton {
+  border-radius: $radius-lg;
+}
+
+.actionButtonSkeleton {
+  max-width: 400px;
+  border-radius: $radius-lg;
+}
+
+.exerciseCardSkeleton {
+  background-color: $bg-elevated;
+  border: 2px solid $border-color;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+}
+
+.exerciseHeaderSkeleton {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: $spacing-md;
+  min-height: 44px;
+}
+
+.exerciseInfoSkeleton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.exerciseDetailsSkeleton {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+}
+
+.detailSkeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+// Loading: the skeleton fills the first screen and never scrolls
+.containerLoading {
+  @include loading-screen;
+}

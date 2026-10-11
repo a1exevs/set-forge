@@ -7,6 +7,7 @@ import { isExerciseComplete, type WorkoutSessionExercise } from '@entities/worko
 import { BrandWordmark } from '@shared/ui';
 import { MainTabsBar } from '@widgets/main-tabs-bar';
 
+import HistoryPageSkeleton from './history-page-skeleton';
 import classes from './history-page.module.scss';
 
 type Props = {
@@ -38,11 +39,7 @@ const HistoryPage: FC<Props> = ({
 }) => {
   const renderBody = (): JSX.Element => {
     if (isLoading) {
-      return (
-        <div className={classes.stateMessage}>
-          <p>Loading history…</p>
-        </div>
-      );
+      return <HistoryPageSkeleton />;
     }
 
     if (isError) {
@@ -132,7 +129,7 @@ const HistoryPage: FC<Props> = ({
   };
 
   return (
-    <div ref={swipeRef} className={classes.container}>
+    <div ref={swipeRef} className={isLoading ? `${classes.container} ${classes.containerLoading}` : classes.container}>
       <header className={classes.header}>
         <div className={classes.headerTop}>
           <BrandWordmark title="History" />
@@ -144,7 +141,9 @@ const HistoryPage: FC<Props> = ({
         </div>
       </header>
 
-      <main className={classes.main}>{renderBody()}</main>
+      <main className={classes.main} aria-busy={isLoading}>
+        {renderBody()}
+      </main>
 
       <MainTabsBar />
     </div>

@@ -18,13 +18,14 @@ const HomePageDataLayer: FC = () => {
   const navigate = useNavigate();
   const clearWorkoutSessionCachesForDeletedList = useClearWorkoutSessionCachesForDeletedList();
   const { data: user } = useCurrentUserQuery(true);
-  const { data: workoutLists = [] } = useWorkoutListsQuery(Boolean(user));
+  const { data: workoutLists = [], isLoading } = useWorkoutListsQuery(Boolean(user));
   const deleteWorkoutListMutation = useDeleteWorkoutListMutation();
   const exportAllWorkoutListsMutation = useExportAllWorkoutListsMutation();
   const importWorkoutListsMutation = useImportWorkoutListsMutation();
   return (
     <HomePageLogicLayer
       workoutLists={workoutLists}
+      isLoading={isLoading}
       deleteWorkoutList={async (id: string): Promise<void> => {
         await deleteWorkoutListMutation.mutateAsync(id);
       }}

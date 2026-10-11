@@ -55,3 +55,12 @@ export const EditNotFoundDesktop4k = buildDesktop4KStoryObj<typeof meta>({ rende
 export const EditNotFoundDesktop = buildDesktopStoryObj<typeof meta>({ render: renderEditNotFound });
 export const EditNotFoundTablet = buildTabletStoryObj<typeof meta>({ render: renderEditNotFound });
 export const EditNotFoundMobile = buildMobileStoryObj<typeof meta>({ render: renderEditNotFound });
+
+const renderEditLoading = (): ReturnType<typeof renderWithPageRouter> =>
+  renderWithPageRouter({
+    initialEntries: [`/edit/${mockWorkoutList.id}`],
+    component: (): JSX.Element => <EditWorkoutPageLogicLayer {...editWithDataProps} workout={undefined} />,
+  });
+
+/** The list is still loading: the form as a skeleton. */
+export const EditLoadingMobile = buildMobileStoryObj<typeof meta>({ render: renderEditLoading });
