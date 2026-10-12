@@ -1,6 +1,6 @@
 /**
- * How an action control looks while a request of its group runs: `pending` — its own, no indicator yet; `shown` — its
- * own, the indicator is on; `locked` — another action of the group holds it, so it looks disabled.
+ * How an action control looks while a request of its group runs: `pending` — its own, no indicator yet;
+ * `shown` — its own, the indicator is on; `locked` — another action of the group holds it, so it looks disabled.
  */
 export type Progress = 'idle' | 'pending' | 'shown' | 'locked';
 

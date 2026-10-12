@@ -5,7 +5,7 @@ import { useClearSessionCache, useLogoutMutation } from '@entities/session';
 type Logout = {
   /** Signs the user out; never rejects — the local session is gone anyway. */
   logout: () => Promise<void>;
-  /** Ends the session on this device — clears every cached query — and goes to /login; also after a failed `logout`. */
+  /** Ends the session on this device: clears every cached query and goes to /login, also after a failed logout. */
   leave: () => void;
 };
 

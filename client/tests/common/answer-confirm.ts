@@ -4,7 +4,7 @@ type ConfirmAnswer = boolean | 'confirm' | 'alternate' | 'cancel';
 
 /**
  * A `useConfirm()` mock that answers like the dialog provider: runs the action of the answer, resolves once it
- * succeeds and stays open — never resolves — when it fails. `confirmMock.mockImplementation(answerWith('confirm'))`.
+ * succeeds and stays open — never resolves — when it fails: `mockImplementation(answerWith('confirm'))`.
  */
 export const answerWith =
   (answer: ConfirmAnswer) =>

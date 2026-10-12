@@ -75,7 +75,10 @@ export const Disabled: Story = {
   ),
 };
 
-/** `progress`: its own request — `pending` keeps the look, `shown` swaps the label for an indicator of the same size; `locked` — held by another action, looks disabled. */
+/**
+ * `progress`: its own request — `pending` keeps the look, `shown` swaps the label for an indicator of the same size;
+ * `locked` — held by another action, looks disabled.
+ */
 export const Progress: Story = {
   render: (args): ReactElement => (
     <Row>
