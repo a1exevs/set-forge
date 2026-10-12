@@ -98,6 +98,8 @@
   &::placeholder {
     color: $text-tertiary;
   }
+
+  @include field-disabled;
 }
 
 .textarea {
@@ -168,11 +170,13 @@
   align-items: center;
   justify-content: center;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: $danger-color;
     border-color: $danger-color;
     color: white;
   }
+
+  @include field-disabled;
 }
 
 .fieldRow {

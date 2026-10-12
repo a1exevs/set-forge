@@ -20,6 +20,15 @@
   }
 }
 
+// A disabled field — by its own prop or by a disabled fieldset around it — reads as unavailable
+@mixin field-disabled {
+  &:disabled,
+  &[data-disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
 // The progress of an action control (`data-progress` = `pending` | `shown` | `locked`): the label fades out but keeps
 // the size, an indicator spins in the center. `.label`, `.indicator`, `.indicatorText` are the parts it renders.
 @mixin action-progress {
