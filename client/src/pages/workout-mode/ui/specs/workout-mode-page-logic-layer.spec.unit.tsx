@@ -2,36 +2,15 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import confetti from 'canvas-confetti';
 
+import { answerWith } from 'tests/common/answer-confirm';
+
 import type { WorkoutList } from '@entities/workout-list';
 import type { WorkoutSession } from '@entities/workout-session';
-import type { ConfirmOptions } from '@shared/lib';
 
 import WorkoutModePageLogicLayer from '../workout-mode-page-logic-layer';
 
 const confirmDialogMock = jest.fn();
 const toastErrorMock = jest.fn();
-
-type ConfirmAnswer = boolean | 'confirm' | 'alternate' | 'cancel';
-
-// Like the dialog provider: runs the answer's action; resolves once it succeeds, stays open (pending) when it fails.
-const answerWith =
-  (answer: ConfirmAnswer) =>
-  async (options: ConfirmOptions): Promise<ConfirmAnswer> => {
-    const action =
-      answer === true || answer === 'confirm'
-        ? options.onConfirm
-        : answer === 'alternate'
-          ? options.onAlternate
-          : undefined;
-    if (action) {
-      try {
-        await action();
-      } catch {
-        return new Promise<ConfirmAnswer>((): void => undefined);
-      }
-    }
-    return answer;
-  };
 
 jest.mock('@shared/lib', () => ({
   ...jest.requireActual('@shared/lib'),
