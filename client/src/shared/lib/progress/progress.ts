@@ -1,8 +1,8 @@
 /**
- * How an action control looks while its request runs: `idle`; `locked` — its request (or its pair's) is in flight,
- * no indicator yet; `shown` — the indicator is on.
+ * How an action control looks while a request of its group runs: `pending` — its own, no indicator yet; `shown` — its
+ * own, the indicator is on; `locked` — another action of the group holds it, so it looks disabled.
  */
-export type Progress = 'idle' | 'locked' | 'shown';
+export type Progress = 'idle' | 'pending' | 'shown' | 'locked';
 
 /** A request that answers sooner shows no progress at all — a fast answer never flashes an indicator. */
 export const PROGRESS_SHOW_AFTER_MS = 300;

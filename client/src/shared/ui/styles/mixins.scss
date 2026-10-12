@@ -20,8 +20,8 @@
   }
 }
 
-// The progress of an action control (`data-progress` = `locked` | `shown`): the label fades out but keeps the size,
-// an indicator spins in the center. `.label`, `.indicator` and `.indicatorText` are the parts the component renders.
+// The progress of an action control (`data-progress` = `pending` | `shown` | `locked`): the label fades out but keeps
+// the size, an indicator spins in the center. `.label`, `.indicator`, `.indicatorText` are the parts it renders.
 @mixin action-progress {
   position: relative;
 
@@ -62,8 +62,15 @@
     white-space: nowrap;
   }
 
-  &[data-progress] {
+  &[data-progress='pending'],
+  &[data-progress='shown'] {
     cursor: progress;
+  }
+
+  // Held by another action of its group: looks as disabled as it is
+  &[data-progress='locked'] {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   &[data-progress='shown'] .label {

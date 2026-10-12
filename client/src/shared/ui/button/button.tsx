@@ -10,7 +10,7 @@ type Props = PropsWithChildren<
   ButtonHTMLAttributes<HTMLButtonElement> & {
     variant?: 'primary' | 'secondary' | 'danger' | 'accent';
     size?: 'sm' | 'md' | 'lg';
-    /** The request of this action: `locked` ignores presses, `shown` also swaps the label for an indicator. */
+    /** Ignores presses while not `idle`; `shown` swaps the label for an indicator, `locked` looks disabled. */
     progress?: Progress;
   }
 >;

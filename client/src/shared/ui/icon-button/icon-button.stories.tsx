@@ -17,7 +17,7 @@ type Size = NonNullable<ComponentProps<typeof IconButton>['size']>;
 const VARIANTS: Variant[] = ['ghost', 'primary'];
 const SHAPES: Shape[] = ['square', 'circle'];
 const SIZES: Size[] = ['sm', 'md', 'lg'];
-const PROGRESSES: ProgressState[] = ['idle', 'locked', 'shown'];
+const PROGRESSES: ProgressState[] = ['idle', 'pending', 'shown', 'locked'];
 
 const iconForSize = (size: Size): ReactElement =>
   size === 'lg' ? (
@@ -87,7 +87,7 @@ export const Disabled: Story = {
   ),
 };
 
-/** `progress`: `locked` ignores presses, `shown` swaps the icon for an indicator of the same size. */
+/** `progress`: `pending` keeps the look, `shown` swaps the icon for an indicator, `locked` looks disabled. */
 export const Progress: Story = {
   render: (args): ReactElement => (
     <Row>

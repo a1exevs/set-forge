@@ -83,7 +83,10 @@ export function useProgress<K extends string>(): ProgressControl<K> {
       if (active === null) {
         return 'idle';
       }
-      return active === key && shown ? 'shown' : 'locked';
+      if (active !== key) {
+        return 'locked';
+      }
+      return shown ? 'shown' : 'pending';
     },
     [active, shown],
   );

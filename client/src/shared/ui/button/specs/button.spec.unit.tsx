@@ -100,11 +100,11 @@ describe('Button', () => {
   });
 
   describe('progress', () => {
-    it('ignores a press while locked, keeping the label as the name', async () => {
+    it('ignores a press while its request is pending, keeping the label as the name', async () => {
       const handleClick = jest.fn();
       const user = userEvent.setup();
       render(
-        <Button progress="locked" onClick={handleClick}>
+        <Button progress="pending" onClick={handleClick}>
           Save
         </Button>,
       );
@@ -141,6 +141,23 @@ describe('Button', () => {
       await user.click(screen.getByRole('button', { name: /Log in/ }));
 
       expect(handleSubmit).not.toHaveBeenCalled();
+    });
+
+    it('ignores a press and is marked as held by another action when locked', async () => {
+      const handleClick = jest.fn();
+      const user = userEvent.setup();
+      render(
+        <Button variant="secondary" progress="locked" onClick={handleClick}>
+          Cancel
+        </Button>,
+      );
+
+      const button = screen.getByRole('button', { name: 'Cancel' });
+      await user.click(button);
+
+      expect(handleClick).not.toHaveBeenCalled();
+      expect(button).toHaveAttribute('data-progress', 'locked');
+      expect(button).toHaveAttribute('aria-disabled', 'true');
     });
 
     it('is a plain button when idle', async () => {

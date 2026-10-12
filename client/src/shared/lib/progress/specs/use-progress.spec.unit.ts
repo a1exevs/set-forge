@@ -32,7 +32,7 @@ describe('useProgress', () => {
     act(() => {
       done = result.current.run('save', () => request.promise);
     });
-    expect(result.current.progressOf('save')).toBe('locked');
+    expect(result.current.progressOf('save')).toBe('pending');
     expect(result.current.busy).toBe(true);
 
     await act(async () => {

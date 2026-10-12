@@ -12,7 +12,7 @@ type Size = NonNullable<ComponentProps<typeof Button>['size']>;
 
 const VARIANTS: Variant[] = ['primary', 'secondary', 'danger', 'accent'];
 const SIZES: Size[] = ['sm', 'md', 'lg'];
-const PROGRESSES: ProgressState[] = ['idle', 'locked', 'shown'];
+const PROGRESSES: ProgressState[] = ['idle', 'pending', 'shown', 'locked'];
 
 const meta = {
   title: 'Shared/Button',
@@ -75,7 +75,7 @@ export const Disabled: Story = {
   ),
 };
 
-/** `progress`: `locked` ignores presses and keeps the look, `shown` swaps the label for an indicator — same size. */
+/** `progress`: its own request — `pending` keeps the look, `shown` swaps the label for an indicator of the same size; `locked` — held by another action, looks disabled. */
 export const Progress: Story = {
   render: (args): ReactElement => (
     <Row>

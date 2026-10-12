@@ -10,7 +10,7 @@ type CommonProps = PropsWithChildren<{
   variant?: 'ghost' | 'primary';
   shape?: 'square' | 'circle';
   size?: 'sm' | 'md' | 'lg';
-  /** The request of this action: `locked` ignores presses, `shown` also swaps the icon for an indicator. */
+  /** Ignores presses while not `idle`; `shown` swaps the icon for an indicator, `locked` looks disabled. */
   progress?: Progress;
 }>;
 
