@@ -39,16 +39,11 @@ role.
 
 A control that sends a request shows it one way across the app; the logic layer owns it.
 
-- `useProgress()` (`@shared/lib`) runs the request: a second press is ignored at once, the indicator shows after
-  300 ms and stays at least 500 ms. `progressOf(key)` goes to the control's `progress` prop (`Button`,
-  `IconButton`); actions that end each other (Log out / Delete account) share one `useProgress`, so one in flight
-  locks the other; `busy` locks a form's fields.
-- The flow goes on — navigates, toasts success — only after `run` resolves: `if (await run('save', task)) { … }`.
-- A confirmed action passes its request as `onConfirm` / `onAlternate` to `useConfirm()`: the dialog stays open with
-  its button in progress until the answer, and on a rejection (the action shows its own error first).
-- A screen that loads shows its skeleton through `useLoadingPhase(isLoading)`: nothing for 300 ms, then at least
-  500 ms of skeleton.
-- Data layers pass the request, never its `isPending`.
+- The request goes through `useProgress` (`@shared/lib`), a confirmed one through the `onConfirm` / `onAlternate`
+  of `useConfirm()`, a loading screen through `useLoadingPhase` — never an ad-hoc `isPending` from a data layer:
+  the timing and the locks live in those hooks.
+- The flow goes on — navigates, closes, toasts success — only after `run` resolves, so the indicator is never
+  cut short.
 
 ## File naming
 
