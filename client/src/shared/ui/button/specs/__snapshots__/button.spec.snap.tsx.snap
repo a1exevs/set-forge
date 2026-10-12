@@ -7,7 +7,11 @@ exports[`Button matches snapshot for custom className 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    Custom
+    <span
+      class="label"
+    >
+      Custom
+    </span>
   </button>
 </div>
 `;
@@ -19,7 +23,11 @@ exports[`Button matches snapshot for danger variant 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    Danger
+    <span
+      class="label"
+    >
+      Danger
+    </span>
   </button>
 </div>
 `;
@@ -31,7 +39,11 @@ exports[`Button matches snapshot for default 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    Button
+    <span
+      class="label"
+    >
+      Button
+    </span>
   </button>
 </div>
 `;
@@ -45,7 +57,11 @@ exports[`Button matches snapshot for disabled 1`] = `
     disabled=""
     type="button"
   >
-    Disabled
+    <span
+      class="label"
+    >
+      Disabled
+    </span>
   </button>
 </div>
 `;
@@ -57,7 +73,11 @@ exports[`Button matches snapshot for lg size 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    Large
+    <span
+      class="label"
+    >
+      Large
+    </span>
   </button>
 </div>
 `;
@@ -69,7 +89,11 @@ exports[`Button matches snapshot for md size 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    Medium
+    <span
+      class="label"
+    >
+      Medium
+    </span>
   </button>
 </div>
 `;
@@ -81,7 +105,11 @@ exports[`Button matches snapshot for primary variant 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    Primary
+    <span
+      class="label"
+    >
+      Primary
+    </span>
   </button>
 </div>
 `;
@@ -93,7 +121,11 @@ exports[`Button matches snapshot for secondary variant 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    Secondary
+    <span
+      class="label"
+    >
+      Secondary
+    </span>
   </button>
 </div>
 `;
@@ -105,7 +137,11 @@ exports[`Button matches snapshot for sm size 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    Small
+    <span
+      class="label"
+    >
+      Small
+    </span>
   </button>
 </div>
 `;

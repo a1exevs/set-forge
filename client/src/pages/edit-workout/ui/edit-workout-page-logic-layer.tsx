@@ -2,7 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 
 import type { UpdateWorkoutListDto, WorkoutList } from '@entities/workout-list';
-import { toastError, toastSuccess, useConfirm } from '@shared/lib';
+import { toastError, toastSuccess, useConfirm, useLoadingPhase, useProgress } from '@shared/lib';
 import { NotFoundMessage } from '@shared/ui';
 import { WorkoutListForm, WorkoutListFormSkeleton } from '@widgets/workout-list-form';
 
@@ -17,9 +17,15 @@ type Props = {
 const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, updateWorkoutList, resyncSession }) => {
   const navigate = useNavigate();
   const confirmDialog = useConfirm();
+  const { run, progressOf } = useProgress<'save'>();
+  const loadingPhase = useLoadingPhase(workout === undefined);
 
-  if (workout === undefined) {
+  if (loadingPhase === 'skeleton') {
     return <WorkoutListFormSkeleton />;
+  }
+  // The first 300 ms of loading: a list that comes sooner shows with no skeleton
+  if (workout === undefined) {
+    return null;
   }
 
   // TODO: Distinguish query errors from a missing list — not only "Workout list not found" (see data layer)
@@ -27,9 +33,26 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
     return <NotFoundMessage title="Workout list not found" />;
   }
 
-  const onSubmit = async (dto: UpdateWorkoutListDto): Promise<void> => {
-    let shouldResync = false;
+  // Rejects after its toast, so the button or the dialog that runs it goes back to normal and the user stays.
+  const save = async (dto: UpdateWorkoutListDto, resyncSessionId: string | null): Promise<void> => {
+    try {
+      await updateWorkoutList(id, dto);
+    } catch (error: unknown) {
+      toastError(error, 'Failed to update workout list');
+      throw error;
+    }
 
+    if (resyncSessionId) {
+      try {
+        await resyncSession(resyncSessionId);
+      } catch (error: unknown) {
+        toastError(error, 'Failed to update the current session');
+        throw error;
+      }
+    }
+  };
+
+  const onSubmit = async (dto: UpdateWorkoutListDto): Promise<void> => {
     if (activeSessionId) {
       const result = await confirmDialog({
         title: 'Also update the current session?',
@@ -38,27 +61,19 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
         confirmationText: 'Update session',
         alternateText: 'Keep session',
         cancellationText: 'Cancel',
+        onConfirm: () => save(dto, activeSessionId),
+        onAlternate: () => save(dto, null),
       });
 
       if (result === 'cancel') {
         return;
       }
-
-      shouldResync = result === 'confirm';
-    }
-
-    try {
-      await updateWorkoutList(id, dto);
-    } catch (error: unknown) {
-      toastError(error, 'Failed to update workout list');
-      return;
-    }
-
-    if (shouldResync && activeSessionId) {
+    } else {
       try {
-        await resyncSession(activeSessionId);
-      } catch (error: unknown) {
-        toastError(error, 'Failed to update the current session');
+        if (!(await run('save', () => save(dto, null)))) {
+          return;
+        }
+      } catch {
         return;
       }
     }
@@ -71,7 +86,8 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
     <WorkoutListForm
       mode="edit"
       initialData={workout}
-      onSubmit={onSubmit}
+      submitProgress={progressOf('save')}
+      onSubmit={(dto: UpdateWorkoutListDto): void => void onSubmit(dto)}
       onCancel={(): void => {
         navigate({ to: '/' });
       }}

@@ -1,14 +1,37 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import confetti from 'canvas-confetti';
 
 import type { WorkoutList } from '@entities/workout-list';
 import type { WorkoutSession } from '@entities/workout-session';
+import type { ConfirmOptions } from '@shared/lib';
 
 import WorkoutModePageLogicLayer from '../workout-mode-page-logic-layer';
 
 const confirmDialogMock = jest.fn();
 const toastErrorMock = jest.fn();
+
+type ConfirmAnswer = boolean | 'confirm' | 'alternate' | 'cancel';
+
+// Like the dialog provider: runs the answer's action; resolves once it succeeds, stays open (pending) when it fails.
+const answerWith =
+  (answer: ConfirmAnswer) =>
+  async (options: ConfirmOptions): Promise<ConfirmAnswer> => {
+    const action =
+      answer === true || answer === 'confirm'
+        ? options.onConfirm
+        : answer === 'alternate'
+          ? options.onAlternate
+          : undefined;
+    if (action) {
+      try {
+        await action();
+      } catch {
+        return new Promise<ConfirmAnswer>((): void => undefined);
+      }
+    }
+    return answer;
+  };
 
 jest.mock('@shared/lib', () => ({
   ...jest.requireActual('@shared/lib'),
@@ -88,12 +111,12 @@ describe('WorkoutModePageLogicLayer', () => {
     confirmDialogMock.mockResolvedValue('cancel');
   });
 
-  it('renders the skeleton while the workout list is loading', () => {
+  it('renders the skeleton after 300 ms while the workout list is loading', () => {
+    jest.useFakeTimers();
     render(
       <WorkoutModePageLogicLayer
         workoutList={undefined}
         session={null}
-        isStarting={false}
         startSession={jest.fn()}
         incrementProgress={jest.fn()}
         finishSession={jest.fn()}
@@ -101,9 +124,14 @@ describe('WorkoutModePageLogicLayer', () => {
       />,
     );
 
+    expect(screen.queryByRole('status', { name: 'Loading workout' })).not.toBeInTheDocument();
+    act(() => {
+      jest.advanceTimersByTime(300);
+    });
     expect(screen.getByRole('status', { name: 'Loading workout' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: '← Back' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Start workout|Finish workout/ })).not.toBeInTheDocument();
+    jest.useRealTimers();
   });
 
   it('starts a session from preview when Start workout is clicked', async () => {
@@ -114,7 +142,6 @@ describe('WorkoutModePageLogicLayer', () => {
       <WorkoutModePageLogicLayer
         workoutList={WORKOUT_LIST}
         session={null}
-        isStarting={false}
         startSession={startSession}
         incrementProgress={jest.fn()}
         finishSession={jest.fn()}
@@ -137,7 +164,6 @@ describe('WorkoutModePageLogicLayer', () => {
       <WorkoutModePageLogicLayer
         workoutList={WORKOUT_LIST}
         session={null}
-        isStarting={false}
         startSession={startSession}
         incrementProgress={jest.fn()}
         finishSession={jest.fn()}
@@ -154,14 +180,13 @@ describe('WorkoutModePageLogicLayer', () => {
 
   it('finishes the session when confirm returns confirm', async () => {
     const user = userEvent.setup();
-    confirmDialogMock.mockResolvedValue('confirm');
+    confirmDialogMock.mockImplementation(answerWith('confirm'));
     const finishSession = jest.fn().mockResolvedValue(undefined);
 
     render(
       <WorkoutModePageLogicLayer
         workoutList={WORKOUT_LIST}
         session={SESSION}
-        isStarting={false}
         startSession={jest.fn()}
         incrementProgress={jest.fn()}
         finishSession={finishSession}
@@ -187,7 +212,7 @@ describe('WorkoutModePageLogicLayer', () => {
 
   it('shows error toast when finish session fails', async () => {
     const user = userEvent.setup();
-    confirmDialogMock.mockResolvedValue('confirm');
+    confirmDialogMock.mockImplementation(answerWith('confirm'));
     const error = new Error('Finish failed');
     const finishSession = jest.fn().mockRejectedValue(error);
 
@@ -195,7 +220,6 @@ describe('WorkoutModePageLogicLayer', () => {
       <WorkoutModePageLogicLayer
         workoutList={WORKOUT_LIST}
         session={SESSION}
-        isStarting={false}
         startSession={jest.fn()}
         incrementProgress={jest.fn()}
         finishSession={finishSession}
@@ -212,14 +236,13 @@ describe('WorkoutModePageLogicLayer', () => {
 
   it('discards the session when confirm returns alternate', async () => {
     const user = userEvent.setup();
-    confirmDialogMock.mockResolvedValue('alternate');
+    confirmDialogMock.mockImplementation(answerWith('alternate'));
     const discardSession = jest.fn().mockResolvedValue(undefined);
 
     render(
       <WorkoutModePageLogicLayer
         workoutList={WORKOUT_LIST}
         session={SESSION}
-        isStarting={false}
         startSession={jest.fn()}
         incrementProgress={jest.fn()}
         finishSession={jest.fn()}
@@ -244,7 +267,6 @@ describe('WorkoutModePageLogicLayer', () => {
       <WorkoutModePageLogicLayer
         workoutList={WORKOUT_LIST}
         session={SESSION}
-        isStarting={false}
         startSession={jest.fn()}
         incrementProgress={jest.fn()}
         finishSession={finishSession}
@@ -268,7 +290,6 @@ describe('WorkoutModePageLogicLayer', () => {
       <WorkoutModePageLogicLayer
         workoutList={WORKOUT_LIST}
         session={COMPLETE_ACTIVE_SESSION}
-        isStarting={false}
         startSession={jest.fn()}
         incrementProgress={jest.fn()}
         finishSession={finishSession}
@@ -290,7 +311,6 @@ describe('WorkoutModePageLogicLayer', () => {
       <WorkoutModePageLogicLayer
         workoutList={WORKOUT_LIST}
         session={SESSION}
-        isStarting={false}
         startSession={jest.fn()}
         incrementProgress={jest.fn()}
         finishSession={finishSession}
@@ -303,5 +323,28 @@ describe('WorkoutModePageLogicLayer', () => {
     });
 
     expect(finishSession).not.toHaveBeenCalled();
+  });
+
+  it('shows Start progress like every action button and starts one session on a double press', async () => {
+    const user = userEvent.setup();
+    const startSession = jest.fn(() => new Promise<void>((): void => undefined));
+
+    render(
+      <WorkoutModePageLogicLayer
+        workoutList={WORKOUT_LIST}
+        session={null}
+        startSession={startSession}
+        incrementProgress={jest.fn()}
+        finishSession={jest.fn()}
+        discardSession={jest.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Start workout' }));
+    await user.click(screen.getByRole('button', { name: 'Start workout' }));
+
+    expect(startSession).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: 'Start workout' })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByText('Starting…')).not.toBeInTheDocument();
   });
 });

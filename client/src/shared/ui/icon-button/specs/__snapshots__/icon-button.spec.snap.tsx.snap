@@ -8,15 +8,19 @@ exports[`IconButton matches snapshot as Link FAB 1`] = `
     data-headlessui-state=""
     href="/create"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </a>
 </div>
 `;
@@ -29,15 +33,19 @@ exports[`IconButton matches snapshot for default 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -52,15 +60,19 @@ exports[`IconButton matches snapshot for disabled 1`] = `
     disabled=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -73,15 +85,19 @@ exports[`IconButton matches snapshot for ghost / circle / lg 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -94,15 +110,19 @@ exports[`IconButton matches snapshot for ghost / circle / md 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -115,15 +135,19 @@ exports[`IconButton matches snapshot for ghost / circle / sm 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -136,15 +160,19 @@ exports[`IconButton matches snapshot for ghost / square / lg 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -157,15 +185,19 @@ exports[`IconButton matches snapshot for ghost / square / md 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -178,15 +210,19 @@ exports[`IconButton matches snapshot for ghost / square / sm 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -199,15 +235,19 @@ exports[`IconButton matches snapshot for primary / circle / lg 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -220,15 +260,19 @@ exports[`IconButton matches snapshot for primary / circle / md 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -241,15 +285,19 @@ exports[`IconButton matches snapshot for primary / circle / sm 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -262,15 +310,19 @@ exports[`IconButton matches snapshot for primary / square / lg 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -283,15 +335,19 @@ exports[`IconButton matches snapshot for primary / square / md 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -304,15 +360,19 @@ exports[`IconButton matches snapshot for primary / square / sm 1`] = `
     data-headlessui-state=""
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;
@@ -326,15 +386,19 @@ exports[`IconButton matches snapshot with title 1`] = `
     title="Export workout lists"
     type="button"
   >
-    <svg
-      aria-hidden="true"
+    <span
+      class="label"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+      </svg>
+    </span>
   </button>
 </div>
 `;

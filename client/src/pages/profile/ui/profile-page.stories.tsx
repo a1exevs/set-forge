@@ -18,10 +18,9 @@ const renderProfilePage = (): ReturnType<typeof renderWithPageRouter> =>
       <ProfilePageLogicLayer
         email="jane@example.com"
         avatarLetter="J"
-        onLogout={fn()}
-        isLoggingOut={false}
+        onLogout={fn(() => Promise.resolve())}
         onDeleteAccount={fn(() => Promise.resolve())}
-        isDeletingAccount={false}
+        onLeave={fn()}
       />
     ),
   });

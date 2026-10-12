@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import type { WorkoutList } from '@entities/workout-list';
+import type { ConfirmOptions } from '@shared/lib';
 
 import EditWorkoutPageLogicLayer from '../edit-workout-page-logic-layer';
 
@@ -9,6 +10,28 @@ const confirmDialogMock = jest.fn();
 const navigateMock = jest.fn();
 const toastSuccessMock = jest.fn();
 const toastErrorMock = jest.fn();
+
+type ConfirmAnswer = boolean | 'confirm' | 'alternate' | 'cancel';
+
+// Like the dialog provider: runs the answer's action; resolves once it succeeds, stays open (pending) when it fails.
+const answerWith =
+  (answer: ConfirmAnswer) =>
+  async (options: ConfirmOptions): Promise<ConfirmAnswer> => {
+    const action =
+      answer === true || answer === 'confirm'
+        ? options.onConfirm
+        : answer === 'alternate'
+          ? options.onAlternate
+          : undefined;
+    if (action) {
+      try {
+        await action();
+      } catch {
+        return new Promise<ConfirmAnswer>((): void => undefined);
+      }
+    }
+    return answer;
+  };
 
 jest.mock('@shared/lib', () => ({
   ...jest.requireActual('@shared/lib'),
@@ -85,7 +108,8 @@ describe('EditWorkoutPageLogicLayer', () => {
     confirmDialogMock.mockResolvedValue('cancel');
   });
 
-  it('shows the form skeleton while the list loads', () => {
+  it('shows nothing for 300 ms, then the form skeleton while the list loads', () => {
+    jest.useFakeTimers();
     render(
       <EditWorkoutPageLogicLayer
         id="list-1"
@@ -96,8 +120,13 @@ describe('EditWorkoutPageLogicLayer', () => {
       />,
     );
 
+    expect(screen.queryByRole('status', { name: 'Loading workout list' })).not.toBeInTheDocument();
+    act(() => {
+      jest.advanceTimersByTime(300);
+    });
     expect(screen.getByRole('status', { name: 'Loading workout list' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument();
+    jest.useRealTimers();
   });
 
   it('saves immediately when there is no active session', async () => {
@@ -151,7 +180,7 @@ describe('EditWorkoutPageLogicLayer', () => {
 
   it('saves without resync when Keep session is chosen', async () => {
     const user = userEvent.setup();
-    confirmDialogMock.mockResolvedValue('alternate');
+    confirmDialogMock.mockImplementation(answerWith('alternate'));
     const updateWorkoutList = jest.fn().mockResolvedValue(undefined);
     const resyncSession = jest.fn();
 
@@ -177,7 +206,7 @@ describe('EditWorkoutPageLogicLayer', () => {
 
   it('saves and resyncs when Update session is chosen', async () => {
     const user = userEvent.setup();
-    confirmDialogMock.mockResolvedValue('confirm');
+    confirmDialogMock.mockImplementation(answerWith('confirm'));
     const updateWorkoutList = jest.fn().mockResolvedValue(undefined);
     const resyncSession = jest.fn().mockResolvedValue(undefined);
 
@@ -229,7 +258,7 @@ describe('EditWorkoutPageLogicLayer', () => {
 
   it('shows resync error toast and does not navigate when resync fails after update', async () => {
     const user = userEvent.setup();
-    confirmDialogMock.mockResolvedValue('confirm');
+    confirmDialogMock.mockImplementation(answerWith('confirm'));
     const updateWorkoutList = jest.fn().mockResolvedValue(undefined);
     const error = new Error('Session sync failed');
     const resyncSession = jest.fn().mockRejectedValue(error);

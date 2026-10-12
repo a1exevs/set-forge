@@ -1,7 +1,7 @@
 import { ChangeEvent, FC, useRef } from 'react';
 
 import type { WorkoutList, WorkoutListsExportFile } from '@entities/workout-list';
-import { downloadJsonFile, toastError, toastSuccess, useConfirm } from '@shared/lib';
+import { downloadJsonFile, toastError, toastSuccess, useConfirm, useLoadingPhase, useProgress } from '@shared/lib';
 import { useMainTabSwipe } from '@widgets/main-tabs-bar';
 
 import HomePage from './home-page';
@@ -31,30 +31,38 @@ const HomePageLogicLayer: FC<Props> = ({
   const swipeRef = useMainTabSwipe();
   const confirmDialog = useConfirm();
   const importInputRef = useRef<HTMLInputElement>(null);
+  const { run, progressOf } = useProgress<'export'>();
+  const loadingPhase = useLoadingPhase(isLoading);
 
   const handleDelete = async (id: string, name: string): Promise<void> => {
-    try {
-      const ok = await confirmDialog({
-        title: 'Delete workout list?',
-        description: `Delete "${name}"? This cannot be undone.`,
-        confirmationText: 'Delete',
-        cancellationText: 'Cancel',
-      });
-      if (ok) {
-        await deleteWorkoutList(id);
-        clearWorkoutSessionCachesForDeletedList(id);
-        toastSuccess('Workout list deleted');
-      }
-    } catch (error: unknown) {
-      toastError(error, 'Failed to delete workout list');
+    const ok = await confirmDialog({
+      title: 'Delete workout list?',
+      description: `Delete "${name}"? This cannot be undone.`,
+      confirmationText: 'Delete',
+      cancellationText: 'Cancel',
+      onConfirm: async (): Promise<void> => {
+        try {
+          await deleteWorkoutList(id);
+        } catch (error: unknown) {
+          toastError(error, 'Failed to delete workout list');
+          throw error;
+        }
+      },
+    });
+    if (ok) {
+      clearWorkoutSessionCachesForDeletedList(id);
+      toastSuccess('Workout list deleted');
     }
   };
 
   const handleExport = async (): Promise<void> => {
     try {
-      const data = await exportAllWorkoutLists();
-      downloadJsonFile(data, buildWorkoutListsExportFilename());
-      toastSuccess('Workout lists exported');
+      const done = await run('export', async (): Promise<void> => {
+        downloadJsonFile(await exportAllWorkoutLists(), buildWorkoutListsExportFilename());
+      });
+      if (done) {
+        toastSuccess('Workout lists exported');
+      }
     } catch (error: unknown) {
       toastError(error, 'Failed to export workout lists');
     }
@@ -95,16 +103,17 @@ const HomePageLogicLayer: FC<Props> = ({
       description: `Import ${count} workout list${count === 1 ? '' : 's'}?`,
       confirmationText: 'Import',
       cancellationText: 'Cancel',
+      onConfirm: async (): Promise<void> => {
+        try {
+          await importWorkoutLists(parsed as WorkoutListsExportFile);
+        } catch (error: unknown) {
+          toastError(error, 'Failed to import workout lists');
+          throw error;
+        }
+      },
     });
-    if (!ok) {
-      return;
-    }
-
-    try {
-      await importWorkoutLists(parsed as WorkoutListsExportFile);
+    if (ok) {
       toastSuccess('Workout lists imported');
-    } catch (error: unknown) {
-      toastError(error, 'Failed to import workout lists');
     }
   };
 
@@ -112,9 +121,10 @@ const HomePageLogicLayer: FC<Props> = ({
     <HomePage
       swipeRef={swipeRef}
       workoutLists={workoutLists}
-      isLoading={isLoading}
+      loadingPhase={loadingPhase}
       onEdit={onEdit}
       onDelete={handleDelete}
+      exportProgress={progressOf('export')}
       onExport={handleExport}
       onImportClick={handleImportClick}
       onImportFile={handleImportFile}

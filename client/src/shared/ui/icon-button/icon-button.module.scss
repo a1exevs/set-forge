@@ -11,6 +11,8 @@
     opacity 0.2s ease,
     transform 0.2s ease;
 
+  @include action-progress;
+
   svg {
     display: block;
   }

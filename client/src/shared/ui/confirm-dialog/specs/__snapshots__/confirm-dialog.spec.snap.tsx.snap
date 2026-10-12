@@ -69,14 +69,22 @@ exports[`ConfirmDialog matches snapshot with custom button texts 1`] = `
                     data-headlessui-state=""
                     type="button"
                   >
-                    Keep
+                    <span
+                      class="label"
+                    >
+                      Keep
+                    </span>
                   </button>
                   <button
                     class="button primary md"
                     data-headlessui-state=""
                     type="button"
                   >
-                    Reset
+                    <span
+                      class="label"
+                    >
+                      Reset
+                    </span>
                   </button>
                 </div>
               </div>
@@ -161,14 +169,22 @@ exports[`ConfirmDialog matches snapshot with default options 1`] = `
                     data-headlessui-state=""
                     type="button"
                   >
-                    Cancel
+                    <span
+                      class="label"
+                    >
+                      Cancel
+                    </span>
                   </button>
                   <button
                     class="button primary md"
                     data-headlessui-state=""
                     type="button"
                   >
-                    Confirm
+                    <span
+                      class="label"
+                    >
+                      Confirm
+                    </span>
                   </button>
                 </div>
               </div>
@@ -256,14 +272,22 @@ exports[`ConfirmDialog matches snapshot with description 1`] = `
                     data-headlessui-state=""
                     type="button"
                   >
-                    Cancel
+                    <span
+                      class="label"
+                    >
+                      Cancel
+                    </span>
                   </button>
                   <button
                     class="button primary md"
                     data-headlessui-state=""
                     type="button"
                   >
-                    Confirm
+                    <span
+                      class="label"
+                    >
+                      Confirm
+                    </span>
                   </button>
                 </div>
               </div>
@@ -346,7 +370,11 @@ exports[`ConfirmDialog matches snapshot with hideCancelButton 1`] = `
                     data-headlessui-state=""
                     type="button"
                   >
-                    Ok
+                    <span
+                      class="label"
+                    >
+                      Ok
+                    </span>
                   </button>
                 </div>
               </div>

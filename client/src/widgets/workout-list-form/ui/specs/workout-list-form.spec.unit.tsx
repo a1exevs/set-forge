@@ -241,4 +241,22 @@ describe('WorkoutListForm', () => {
       expect(screen.getByText('Add exercises to your list')).toBeInTheDocument();
     });
   });
+
+  describe('save in flight', () => {
+    it('locks the fields and Cancel and shows the save progress', async () => {
+      const user = userEvent.setup();
+      render(
+        <ConfirmDialogProvider>
+          <WorkoutListForm {...defaultProps} submitProgress="shown" />
+        </ConfirmDialogProvider>,
+      );
+
+      expect(screen.getByPlaceholderText(/Push Day/)).toBeDisabled();
+      expect(screen.getByRole('button', { name: '+ Add Exercise' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: /Create List/ })).toHaveAttribute('data-progress', 'shown');
+
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+      expect(mockOnCancel).not.toHaveBeenCalled();
+    });
+  });
 });

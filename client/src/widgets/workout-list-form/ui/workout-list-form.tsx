@@ -1,6 +1,7 @@
 import { ChangeEvent, FC, FormEvent } from 'react';
 
 import { type MuscleGroup, muscleGroups } from '@entities/workout-exercise';
+import type { Progress } from '@shared/lib';
 import { Button, NumericField, Select } from '@shared/ui';
 
 import classes from './workout-list-form.module.scss';
@@ -10,6 +11,8 @@ import type { ExerciseFormData } from '../model/exercise-form-data';
 type Props = {
   title: string;
   submitButtonText: string;
+  /** The save in flight: the fields and Cancel wait for its answer. */
+  submitProgress: Progress;
   name: string;
   description: string;
   exercises: ExerciseFormData[];
@@ -34,6 +37,7 @@ type Props = {
 const WorkoutListForm: FC<Props> = ({
   title,
   submitButtonText,
+  submitProgress,
   name,
   description,
   exercises,
@@ -55,131 +59,140 @@ const WorkoutListForm: FC<Props> = ({
 
       <main className={classes.main}>
         <form className={classes.form} onSubmit={onSubmit}>
-          <div className={classes.section}>
-            <div>
-              <label htmlFor="name" className={classes.label}>
-                List Name *
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e: ChangeEvent<HTMLInputElement>): void => onNameChange(e.target.value)}
-                className={classes.input}
-                placeholder="e.g., Push Day"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="description" className={classes.label}>
-                Description
-              </label>
-              <textarea
-                id="description"
-                value={description}
-                onChange={(e: ChangeEvent<HTMLTextAreaElement>): void => onDescriptionChange(e.target.value)}
-                className={classes.textarea}
-                placeholder="Chest, shoulders, triceps"
-                rows={2}
-              />
-            </div>
-          </div>
-
-          <div className={`${classes.section} ${classes.section_withoutGap}`}>
-            <div className={classes.sectionHeader}>
-              <h2>Exercises</h2>
-              <Button type="button" onClick={onAddExercise} size="sm">
-                + Add Exercise
-              </Button>
-            </div>
-
-            {exercises.length === 0 ? (
-              <p className={classes.emptyExercises}>Add exercises to your list</p>
-            ) : (
-              <div className={classes.exerciseList}>
-                {exercises.map((exercise: ExerciseFormData, index: number) => (
-                  <div key={exercise.tempId} className={classes.exerciseCard}>
-                    <div className={classes.exerciseHeader}>
-                      <span className={classes.exerciseNumber}>{index + 1}</span>
-                      <button
-                        type="button"
-                        className={classes.removeButton}
-                        onClick={(): void => onRemoveExercise(exercise.tempId)}
-                        aria-label="Remove exercise"
-                      >
-                        ✕
-                      </button>
-                    </div>
-
-                    <div>
-                      <label className={classes.label}>Name *</label>
-                      <input
-                        type="text"
-                        value={exercise.name}
-                        onChange={(e: ChangeEvent<HTMLInputElement>): void =>
-                          onUpdateExercise(exercise.tempId, 'name', e.target.value)
-                        }
-                        className={classes.input}
-                        placeholder="Bench Press"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className={classes.label}>Muscle Group</label>
-                      <Select
-                        value={exercise.muscleGroup}
-                        options={muscleGroupOptions}
-                        onChange={(value: string): void => {
-                          const muscleGroup = muscleGroups.find((group: MuscleGroup) => group === value);
-                          if (muscleGroup) {
-                            onUpdateExercise(exercise.tempId, 'muscleGroup', muscleGroup);
-                          }
-                        }}
-                      />
-                    </div>
-
-                    <div className={classes.fieldRow}>
-                      <NumericField
-                        label="Weight (kg)"
-                        id={`weight-${exercise.tempId}`}
-                        value={exercise.weight}
-                        onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'weight', v)}
-                        variant="decimal"
-                        size="sm"
-                        error={submitAttempted ? getExerciseNumericFieldError(exercise, 'weight') : undefined}
-                      />
-                      <NumericField
-                        label="Reps"
-                        id={`reps-${exercise.tempId}`}
-                        value={exercise.reps}
-                        onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'reps', v)}
-                        variant="integer"
-                        size="sm"
-                        error={submitAttempted ? getExerciseNumericFieldError(exercise, 'reps') : undefined}
-                      />
-                      <NumericField
-                        label="Sets"
-                        id={`sets-${exercise.tempId}`}
-                        value={exercise.sets}
-                        onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'sets', v)}
-                        variant="integer"
-                        size="sm"
-                        error={submitAttempted ? getExerciseNumericFieldError(exercise, 'sets') : undefined}
-                      />
-                    </div>
-                  </div>
-                ))}
+          <fieldset className={classes.fields} disabled={submitProgress !== 'idle'}>
+            <div className={classes.section}>
+              <div>
+                <label htmlFor="name" className={classes.label}>
+                  List Name *
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e: ChangeEvent<HTMLInputElement>): void => onNameChange(e.target.value)}
+                  className={classes.input}
+                  placeholder="e.g., Push Day"
+                  required
+                />
               </div>
-            )}
-          </div>
+
+              <div>
+                <label htmlFor="description" className={classes.label}>
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  value={description}
+                  onChange={(e: ChangeEvent<HTMLTextAreaElement>): void => onDescriptionChange(e.target.value)}
+                  className={classes.textarea}
+                  placeholder="Chest, shoulders, triceps"
+                  rows={2}
+                />
+              </div>
+            </div>
+
+            <div className={`${classes.section} ${classes.section_withoutGap}`}>
+              <div className={classes.sectionHeader}>
+                <h2>Exercises</h2>
+                <Button type="button" onClick={onAddExercise} size="sm">
+                  + Add Exercise
+                </Button>
+              </div>
+
+              {exercises.length === 0 ? (
+                <p className={classes.emptyExercises}>Add exercises to your list</p>
+              ) : (
+                <div className={classes.exerciseList}>
+                  {exercises.map((exercise: ExerciseFormData, index: number) => (
+                    <div key={exercise.tempId} className={classes.exerciseCard}>
+                      <div className={classes.exerciseHeader}>
+                        <span className={classes.exerciseNumber}>{index + 1}</span>
+                        <button
+                          type="button"
+                          className={classes.removeButton}
+                          onClick={(): void => onRemoveExercise(exercise.tempId)}
+                          aria-label="Remove exercise"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      <div>
+                        <label className={classes.label}>Name *</label>
+                        <input
+                          type="text"
+                          value={exercise.name}
+                          onChange={(e: ChangeEvent<HTMLInputElement>): void =>
+                            onUpdateExercise(exercise.tempId, 'name', e.target.value)
+                          }
+                          className={classes.input}
+                          placeholder="Bench Press"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className={classes.label}>Muscle Group</label>
+                        <Select
+                          value={exercise.muscleGroup}
+                          options={muscleGroupOptions}
+                          onChange={(value: string): void => {
+                            const muscleGroup = muscleGroups.find((group: MuscleGroup) => group === value);
+                            if (muscleGroup) {
+                              onUpdateExercise(exercise.tempId, 'muscleGroup', muscleGroup);
+                            }
+                          }}
+                        />
+                      </div>
+
+                      <div className={classes.fieldRow}>
+                        <NumericField
+                          label="Weight (kg)"
+                          id={`weight-${exercise.tempId}`}
+                          value={exercise.weight}
+                          onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'weight', v)}
+                          variant="decimal"
+                          size="sm"
+                          error={submitAttempted ? getExerciseNumericFieldError(exercise, 'weight') : undefined}
+                        />
+                        <NumericField
+                          label="Reps"
+                          id={`reps-${exercise.tempId}`}
+                          value={exercise.reps}
+                          onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'reps', v)}
+                          variant="integer"
+                          size="sm"
+                          error={submitAttempted ? getExerciseNumericFieldError(exercise, 'reps') : undefined}
+                        />
+                        <NumericField
+                          label="Sets"
+                          id={`sets-${exercise.tempId}`}
+                          value={exercise.sets}
+                          onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'sets', v)}
+                          variant="integer"
+                          size="sm"
+                          error={submitAttempted ? getExerciseNumericFieldError(exercise, 'sets') : undefined}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </fieldset>
 
           <div className={classes.actions}>
-            <Button type="button" variant="secondary" onClick={onCancel}>
+            <Button
+              type="button"
+              variant="secondary"
+              progress={submitProgress === 'idle' ? 'idle' : 'locked'}
+              onClick={onCancel}
+            >
               Cancel
             </Button>
-            <Button type="submit">{submitButtonText}</Button>
+            <Button type="submit" progress={submitProgress}>
+              {submitButtonText}
+            </Button>
           </div>
         </form>
       </main>

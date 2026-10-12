@@ -36,13 +36,15 @@ Each id is proven by the tests tagged `// @invariant workout-session/<id>`; `npm
 1. Opening a list shows a preview; a session is created only on **Start workout**, never on mount.
 2. A double tap on an exercise logs a set optimistically; requests are serialized and the server finishes the session
    on the last set (confetti on the client).
-3. Early finish asks: **Finish** (save to history), **Discard** (drop, back to preview) or **Cancel**.
+3. Early finish asks: **Finish** (save to history), **Discard** (drop, back to preview) or **Cancel**; the dialog
+   stays open until Finish or Discard answers, and on an error.
 4. Coming back to a list with an active session resumes training; after completion a new start creates a new session.
 
 ### Editing a list during a session
 
 Saving a list that has an active session asks whether to also update the session: **Update session** saves and
-resyncs, **Keep session** saves only, **Cancel** saves nothing.
+resyncs, **Keep session** saves only, **Cancel** saves nothing. The dialog stays open until the save answers, and on
+an error.
 
 ## Map
 

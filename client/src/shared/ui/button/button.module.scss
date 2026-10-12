@@ -11,6 +11,8 @@
   gap: $spacing-sm;
   min-height: 44px;
 
+  @include action-progress;
+
   &[data-disabled] {
     opacity: 0.5;
     cursor: not-allowed;
@@ -48,6 +50,15 @@
     &[data-hover]:not([data-disabled]) {
       opacity: 0.9;
       box-shadow: $shadow-md;
+    }
+  }
+
+  &.accent {
+    background: linear-gradient(90deg, $progress-fill-start, $progress-fill-end);
+    color: $text-primary;
+
+    &[data-hover]:not([data-disabled]) {
+      filter: brightness(1.08);
     }
   }
 

@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { userEvent, within } from '@storybook/test';
+import { fn, userEvent, within } from '@storybook/test';
 import { FC, ReactElement, useState } from 'react';
 
 import { Caption, Row, Stack, withFrame } from 'storybook-dir/showcase';
 
 import { type ConfirmOptions, useConfirm } from '@shared/lib';
 
+import ConfirmDialog from './confirm-dialog';
 import ConfirmDialogProvider from './confirm-dialog-provider';
 import Button from '../button/button';
 
@@ -20,7 +21,8 @@ const meta: Meta<typeof ConfirmDialogProvider> = {
       description: {
         component:
           'Confirmation as a promise: `useConfirm()` from `@shared/lib` opens the dialog the provider renders and ' +
-          'resolves with the answer. Two buttons by default, one with `hideCancelButton`, three with `alternateText`.',
+          'resolves with the answer. Two buttons by default, one with `hideCancelButton`, three with `alternateText`. ' +
+          'With `onConfirm` / `onAlternate` the dialog runs the request itself and stays open until it answers.',
       },
     },
   },
@@ -88,4 +90,26 @@ export const ThreeAnswers: Story = {
     cancellationText: 'Keep going',
   }),
   play: openDialog,
+};
+
+/** `onConfirm` in flight: Confirm shows its progress, Cancel is locked; Esc and a click outside wait too. */
+export const InProgress: Story = {
+  render: (): ReactElement => (
+    <ConfirmDialog
+      open
+      title="Delete workout list?"
+      description="This action cannot be undone."
+      confirmationText="Delete"
+      cancellationText="Cancel"
+      hideCancelButton={false}
+      confirmProgress="shown"
+      alternateProgress="locked"
+      cancelProgress="locked"
+      onConfirm={fn()}
+      onAlternate={fn()}
+      onCancel={fn()}
+      onClose={fn()}
+      ariaLabel="Delete workout list?"
+    />
+  ),
 };

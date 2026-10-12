@@ -6,10 +6,14 @@
 /** Test values for a throwaway database: the stand's MySQL lives only as long as the stand. */
 export const STAND_USER = { email: 'stand-user@set-forge.test', password: 'stand-password' } as const;
 
+/** History loads 20 sessions a page: 1 + 24 completed sessions make the second page. */
+const EXTRA_HISTORY_SESSIONS = 24;
+
 export const STAND_PRESETS = {
   empty: 'no users — for flows that start from registration',
   user: `a registered user ${STAND_USER.email} without data`,
   data: `a registered user ${STAND_USER.email} with two workout lists and one completed session`,
+  history: `the data of "data" plus a one-set list finished ${EXTRA_HISTORY_SESSIONS} times — history has a second page`,
 } as const;
 
 export type StandPreset = keyof typeof STAND_PRESETS;
@@ -82,16 +86,19 @@ const LEG_DAY = {
   ],
 };
 
-/** Two lists and one completed session of the first: every set logged, which finishes the session by itself. */
-async function seedData(serverOrigin: string): Promise<void> {
-  const auth = await login(serverOrigin);
-  const { data: pushDay } = await call<SeededList>(serverOrigin, 'POST', '/workout-lists', PUSH_DAY, auth);
-  await call<SeededList>(serverOrigin, 'POST', '/workout-lists', LEG_DAY, auth);
+const PLANK = {
+  name: 'Plank',
+  description: 'One set, for a long history',
+  exercises: [{ name: 'Plank', muscleGroup: 'core', weight: 0, reps: 1, sets: 1 }],
+};
+
+/** Starts a session of the list and logs every set, which finishes the session by itself. */
+async function completeSession(serverOrigin: string, workoutListId: string, auth: Auth): Promise<void> {
   const { data: session } = await call<SeededSession>(
     serverOrigin,
     'POST',
     '/workout-sessions',
-    { workoutListId: pushDay.id },
+    { workoutListId },
     auth,
   );
   for (const exercise of session.exercises) {
@@ -107,14 +114,32 @@ async function seedData(serverOrigin: string): Promise<void> {
   }
 }
 
+/** Two lists and one completed session of the first. */
+async function seedData(serverOrigin: string, auth: Auth): Promise<void> {
+  const { data: pushDay } = await call<SeededList>(serverOrigin, 'POST', '/workout-lists', PUSH_DAY, auth);
+  await call<SeededList>(serverOrigin, 'POST', '/workout-lists', LEG_DAY, auth);
+  await completeSession(serverOrigin, pushDay.id, auth);
+}
+
+async function seedHistory(serverOrigin: string, auth: Auth): Promise<void> {
+  const { data: plank } = await call<SeededList>(serverOrigin, 'POST', '/workout-lists', PLANK, auth);
+  for (let index = 0; index < EXTRA_HISTORY_SESSIONS; index += 1) {
+    await completeSession(serverOrigin, plank.id, auth);
+  }
+}
+
 /** Builds the preset's data and returns what to tell the person or agent who uses the stand. */
 export async function applyPreset(preset: StandPreset, serverOrigin: string): Promise<string[]> {
   if (preset === 'empty') {
     return [];
   }
   await register(serverOrigin);
-  if (preset === 'data') {
-    await seedData(serverOrigin);
+  if (preset === 'data' || preset === 'history') {
+    const auth = await login(serverOrigin);
+    await seedData(serverOrigin, auth);
+    if (preset === 'history') {
+      await seedHistory(serverOrigin, auth);
+    }
   }
   return [`log in as ${STAND_USER.email} / ${STAND_USER.password}`];
 }

@@ -28,10 +28,10 @@ describe('ProfilePage', () => {
         swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
+        logoutProgress="idle"
+        deleteAccountProgress="idle"
         onLogout={noop}
-        isLoggingOut={false}
         onDeleteAccount={asyncNoop}
-        isDeletingAccount={false}
       />,
     );
 
@@ -52,10 +52,10 @@ describe('ProfilePage', () => {
         swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
+        logoutProgress="idle"
+        deleteAccountProgress="idle"
         onLogout={onLogout}
-        isLoggingOut={false}
         onDeleteAccount={asyncNoop}
-        isDeletingAccount={false}
       />,
     );
 
@@ -73,10 +73,10 @@ describe('ProfilePage', () => {
         swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
+        logoutProgress="idle"
+        deleteAccountProgress="idle"
         onLogout={noop}
-        isLoggingOut={false}
         onDeleteAccount={onDeleteAccount}
-        isDeletingAccount={false}
       />,
     );
 
@@ -85,35 +85,20 @@ describe('ProfilePage', () => {
     expect(onDeleteAccount).toHaveBeenCalledTimes(1);
   });
 
-  it('disables logout button while logging out', () => {
+  it('shows the logout progress and locks Delete account while logging out', () => {
     render(
       <ProfilePage
         swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
+        logoutProgress="shown"
+        deleteAccountProgress="locked"
         onLogout={noop}
-        isLoggingOut
         onDeleteAccount={asyncNoop}
-        isDeletingAccount={false}
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Log out' })).toBeDisabled();
-  });
-
-  it('disables delete-account button while deleting', () => {
-    render(
-      <ProfilePage
-        swipeRef={createRef<HTMLDivElement>()}
-        email="jane@example.com"
-        avatarLetter="J"
-        onLogout={noop}
-        isLoggingOut={false}
-        onDeleteAccount={asyncNoop}
-        isDeletingAccount
-      />,
-    );
-
-    expect(screen.getByRole('button', { name: 'Delete account' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Log out/ })).toHaveAttribute('data-progress', 'shown');
+    expect(screen.getByRole('button', { name: 'Delete account' })).toHaveAttribute('aria-disabled', 'true');
   });
 });

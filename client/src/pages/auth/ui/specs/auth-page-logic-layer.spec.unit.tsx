@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
@@ -14,15 +14,16 @@ const PASSWORD = 'correct-horse';
 describe('AuthPageLogicLayer', () => {
   const onLogin = jest.fn().mockResolvedValue(undefined);
   const onRegister = jest.fn().mockResolvedValue(undefined);
+  const onAuthenticated = jest.fn().mockResolvedValue(undefined);
 
   const renderTab = (activeTab: AuthTab): void => {
     render(
       <AuthPageLogicLayer
         activeTab={activeTab}
         redirectSearch={{}}
-        isSubmitting={false}
         onLogin={onLogin}
         onRegister={onRegister}
+        onAuthenticated={onAuthenticated}
         loadCaptchaUrl={jest.fn()}
       />,
     );
@@ -93,8 +94,8 @@ describe('AuthPageLogicLayer', () => {
         password: PASSWORD,
         consent: true,
         termsAccepted: true,
-        redirectTo: undefined,
       });
+      expect(onAuthenticated).toHaveBeenCalledWith(undefined);
       expect(screen.queryByText('Passwords do not match')).not.toBeInTheDocument();
     });
 
@@ -116,6 +117,48 @@ describe('AuthPageLogicLayer', () => {
       expect(screen.getByLabelText('Password')).toHaveAttribute('autocomplete', 'current-password');
       expect(screen.queryByLabelText('Confirm password')).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Show password' })).toBeInTheDocument();
+    });
+  });
+
+  describe('submit in flight', () => {
+    it('locks the fields and ignores a second Log in until the answer', async () => {
+      let answer: () => void = (): void => undefined;
+      onLogin.mockImplementationOnce(
+        () =>
+          new Promise<void>((resolve): void => {
+            answer = resolve;
+          }),
+      );
+      const user = userEvent.setup();
+      renderTab('login');
+      await user.type(screen.getByLabelText('Email'), 'jane@example.com');
+      await user.type(screen.getByLabelText('Password'), PASSWORD);
+
+      await user.click(screen.getByRole('button', { name: 'Log in' }));
+      await user.click(screen.getByRole('button', { name: 'Log in' }));
+
+      expect(onLogin).toHaveBeenCalledTimes(1);
+      expect(screen.getByLabelText('Email')).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Log in' })).toHaveAttribute('aria-busy', 'true');
+      expect(onAuthenticated).not.toHaveBeenCalled();
+
+      answer();
+      await waitFor((): void => expect(onAuthenticated).toHaveBeenCalledWith(undefined));
+    });
+
+    it('unlocks the form and shows the error when the login fails', async () => {
+      onLogin.mockRejectedValueOnce(new Error('offline'));
+      const user = userEvent.setup();
+      renderTab('login');
+      await user.type(screen.getByLabelText('Email'), 'jane@example.com');
+      await user.type(screen.getByLabelText('Password'), PASSWORD);
+
+      await user.click(screen.getByRole('button', { name: 'Log in' }));
+
+      expect(await screen.findByText('Something went wrong')).toBeInTheDocument();
+      expect(screen.getByLabelText('Email')).not.toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Log in' })).not.toHaveAttribute('aria-busy');
+      expect(onAuthenticated).not.toHaveBeenCalled();
     });
   });
 });

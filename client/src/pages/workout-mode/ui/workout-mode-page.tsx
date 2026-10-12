@@ -5,8 +5,8 @@ import { type WorkoutExercise, WorkoutExerciseCard } from '@entities/workout-exe
 import type { WorkoutList } from '@entities/workout-list';
 import type { WorkoutSession } from '@entities/workout-session';
 import { type WorkoutSessionExercise, WorkoutSessionExerciseCard } from '@entities/workout-session-exercise';
-import { cssVars } from '@shared/lib';
-import { NotFoundMessage } from '@shared/ui';
+import { cssVars, type Progress } from '@shared/lib';
+import { Button, NotFoundMessage } from '@shared/ui';
 
 import classes from './workout-mode-page.module.scss';
 import { PREVIEW_HINT } from '../config/preview-hint';
@@ -21,7 +21,7 @@ type Props = {
   totalExercises: number;
   completedExercises: number;
   overallProgress: number;
-  isStarting: boolean;
+  startProgress: Progress;
   onTap: (exerciseId: string) => void;
   onStart: () => void;
   onFinish: () => void;
@@ -36,7 +36,7 @@ const WorkoutModePage: FC<Props> = ({
   totalExercises,
   completedExercises,
   overallProgress,
-  isStarting,
+  startProgress,
   onTap,
   onStart,
   onFinish,
@@ -79,9 +79,9 @@ const WorkoutModePage: FC<Props> = ({
           <div className={classes.previewStart}>
             <p className={classes.previewHint}>{PREVIEW_HINT}</p>
             <div className={classes.actionBar}>
-              <button type="button" className={classes.actionButton} onClick={onStart} disabled={isStarting}>
-                {isStarting ? 'Starting…' : 'Start workout'}
-              </button>
+              <Button variant="accent" className={classes.startButton} progress={startProgress} onClick={onStart}>
+                Start workout
+              </Button>
             </div>
             <div className={`${classes.exerciseList} ${classes.previewExerciseList}`}>
               {workoutList.exercises.map((exercise: WorkoutExercise) => (

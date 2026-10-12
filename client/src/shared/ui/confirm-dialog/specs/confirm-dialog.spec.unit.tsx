@@ -279,6 +279,90 @@ describe('useConfirm', () => {
     });
   });
 
+  describe('actions', () => {
+    type ActionConsumerProps = { action: () => Promise<unknown>; onResult: (result: boolean) => void };
+
+    const ActionConsumer: FC<ActionConsumerProps> = ({ action, onResult }) => {
+      const confirmDialog = useConfirm();
+      return (
+        <button
+          type="button"
+          onClick={async (): Promise<void> => {
+            onResult(await confirmDialog({ title: 'Delete list?', confirmationText: 'Delete', onConfirm: action }));
+          }}
+        >
+          Open
+        </button>
+      );
+    };
+
+    const openWithAction = async (
+      action: () => Promise<unknown>,
+      onResult: (result: boolean) => void = jest.fn(),
+    ): Promise<ReturnType<typeof userEvent.setup>> => {
+      const user = userEvent.setup();
+      render(
+        <ConfirmDialogProvider>
+          <ActionConsumer action={action} onResult={onResult} />
+        </ConfirmDialogProvider>,
+      );
+      await user.click(screen.getByRole('button', { name: 'Open' }));
+      return user;
+    };
+
+    it('stays open while the action runs and ignores Cancel and Esc', async () => {
+      let finish: () => void = (): void => undefined;
+      const action = jest.fn(
+        () =>
+          new Promise<void>((resolve): void => {
+            finish = resolve;
+          }),
+      );
+      const onResult = jest.fn();
+      const user = await openWithAction(action, onResult);
+
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+      await user.keyboard('{Escape}');
+
+      expect(action).toHaveBeenCalledTimes(1);
+      expect(screen.getByText('Delete list?')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Delete' })).toHaveAttribute('aria-busy', 'true');
+      expect(onResult).not.toHaveBeenCalled();
+
+      finish();
+      await waitFor((): void => expect(onResult).toHaveBeenCalledWith(true));
+      expect(screen.queryByText('Delete list?')).not.toBeInTheDocument();
+    });
+
+    it('ignores a second press of Confirm while the action runs', async () => {
+      const action = jest.fn(() => new Promise<void>((): void => undefined));
+      const user = await openWithAction(action);
+
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+      expect(action).toHaveBeenCalledTimes(1);
+    });
+
+    it('stays open with its buttons back to normal when the action fails', async () => {
+      const action = jest.fn().mockRejectedValue(new Error('offline'));
+      const onResult = jest.fn();
+      const user = await openWithAction(action, onResult);
+
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+      await waitFor((): void =>
+        expect(screen.getByRole('button', { name: 'Delete' })).not.toHaveAttribute('aria-busy'),
+      );
+      expect(screen.getByText('Delete list?')).toBeInTheDocument();
+      expect(onResult).not.toHaveBeenCalled();
+
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+      await waitFor((): void => expect(onResult).toHaveBeenCalledWith(false));
+    });
+  });
+
   describe('error', () => {
     it('throws when used outside ConfirmDialogProvider', () => {
       const TestConsumerNoProvider: FC = () => {

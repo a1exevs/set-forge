@@ -17,19 +17,20 @@ const DocumentReconsentGateDataLayer: FC = () => {
   const pathname = useRouterState({ select: state => state.location.pathname });
   const { data: user } = useCurrentUserQuery(true);
   const acceptMutation = useAcceptDocumentsMutation();
-  const { logout, isPending: isLoggingOut } = useLogout();
+  const { logout, leave } = useLogout();
 
   const onLegalDocumentPage = LEGAL_DOCUMENT_PATHS.has(pathname);
   const open = Boolean(user?.documentsPendingAcceptance) && !onLegalDocumentPage;
-  const busy = acceptMutation.isPending || isLoggingOut;
 
   return (
     <DocumentReconsentGateLogicLayer
       open={open}
-      busy={busy}
       isError={acceptMutation.isError}
-      onAccept={(): void => void acceptMutation.mutateAsync().catch(() => undefined)}
+      onAccept={async (): Promise<void> => {
+        await acceptMutation.mutateAsync();
+      }}
       onLogout={logout}
+      onLeave={leave}
     />
   );
 };

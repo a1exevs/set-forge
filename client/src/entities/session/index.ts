@@ -10,6 +10,7 @@ export { isNeedCaptchaEnvelope } from './model/captcha';
 export {
   useAcceptDocumentsMutation,
   useCaptchaUrlMutation,
+  useClearSessionCache,
   useCurrentUserQuery,
   useDeleteAccountMutation,
   useLoginMutation,

@@ -2,7 +2,7 @@
  * The verification stand: the e2e stack kept running for a person or an agent to check a change by hand —
  * ephemeral MySQL → Nest → Vite, on the ports of a free slot (`stand-registry.ts`), with the data of a preset.
  *
- *   npm run client:stand -- [--preset=empty|user]     (default: user)
+ *   npm run client:stand -- [--preset=empty|user|data|history]     (default: user)
  *   npm run client:stand:stop                         (every stand of this checkout)
  *
  * Runs until Ctrl+C, SIGTERM or `client:stand:stop` (a signal, or on Windows the stop file of the slot), then stops

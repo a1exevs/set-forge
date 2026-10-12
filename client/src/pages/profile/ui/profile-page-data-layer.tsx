@@ -8,17 +8,16 @@ import { useDeleteAccount } from '../model/use-delete-account';
 
 const ProfilePageDataLayer: FC = () => {
   const { data: user } = useCurrentUserQuery(true);
-  const { logout, isPending: isLoggingOut } = useLogout();
-  const { deleteAccount, isPending: isDeletingAccount } = useDeleteAccount();
+  const { logout, leave } = useLogout();
+  const { deleteAccount } = useDeleteAccount();
 
   return (
     <ProfilePageLogicLayer
       email={user?.email ?? ''}
       avatarLetter={user ? emailToAvatarLetter(user.email) : '?'}
       onLogout={logout}
-      isLoggingOut={isLoggingOut}
       onDeleteAccount={deleteAccount}
-      isDeletingAccount={isDeletingAccount}
+      onLeave={leave}
     />
   );
 };

@@ -82,6 +82,14 @@
   }
 }
 
+// Start workout: the accent `Button` in the place and size of the action bar
+.startButton {
+  width: 100%;
+  max-width: 400px;
+  min-height: 52px;
+  border-radius: $radius-lg;
+}
+
 .header h1 {
   font-size: $font-size-2xl;
   color: $text-primary;
