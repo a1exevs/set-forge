@@ -71,8 +71,7 @@ export function useRegisterMutation(): UseMutationResult<AuthData, Error, Regist
   });
 }
 
-// Logout and account deletion leave the cache to `useClearSessionCache`: the screen keeps the user's data until the
-// caller leaves for /login, after the progress of the button has been held.
+// Logout and account deletion leave the cache to `useClearSessionCache`: the caller decides when the data goes.
 export function useLogoutMutation(): UseMutationResult<void, Error, void> {
   return useMutation({ mutationFn: deleteLogout });
 }
@@ -92,7 +91,7 @@ export function useDeleteAccountMutation(): UseMutationResult<void, Error, void>
   return useMutation({ mutationFn: deleteAccount });
 }
 
-/** Drops every cached query (profile, workout lists, sessions, history) once the session has ended on this device. */
+/** Drops every cached query once the session has ended on this device. */
 export function useClearSessionCache(): () => void {
   const qc = useQueryClient();
 

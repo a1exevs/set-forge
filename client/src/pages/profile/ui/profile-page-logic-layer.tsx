@@ -8,11 +8,11 @@ import ProfilePage from './profile-page';
 type Props = {
   email: string;
   avatarLetter: string;
-  /** Never rejects (see `useLogout`). */
+  /** Never rejects. */
   onLogout: () => Promise<void>;
-  /** Never rejects (see `useDeleteAccount`). */
+  /** Never rejects. */
   onDeleteAccount: () => Promise<void>;
-  /** To /login — after logout and after account deletion, also when their request failed. */
+  /** Leaves the profile once the session has ended — after logout and account deletion, also when they failed. */
   onLeave: () => void;
 };
 

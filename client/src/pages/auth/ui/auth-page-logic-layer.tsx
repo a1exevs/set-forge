@@ -19,7 +19,7 @@ type Props = {
   redirectSearch: Record<string, string | undefined>;
   onLogin: (input: LoginInput) => Promise<void>;
   onRegister: (input: RegisterInput) => Promise<void>;
-  /** After a successful login or registration: follows the `redirect` target or goes home. */
+  /** The next step after a successful login or registration. */
   onAuthenticated: (redirectTo: string | undefined) => Promise<void>;
   loadCaptchaUrl: () => Promise<string>;
 };

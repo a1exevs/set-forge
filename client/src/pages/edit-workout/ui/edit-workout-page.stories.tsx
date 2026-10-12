@@ -61,7 +61,7 @@ export const EditNotFoundMobile = buildMobileStoryObj<typeof meta>({ render: ren
 const renderEditLoading = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
     initialEntries: [`/edit/${mockWorkoutList.id}`],
-    // The skeleton itself: the page shows it after 300 ms of loading, and a story never waits on a timer.
+    // The skeleton itself: the page shows it after a delay, and a story never waits on a timer.
     component: (): JSX.Element => <WorkoutListFormSkeleton />,
   });
 

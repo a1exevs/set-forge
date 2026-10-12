@@ -9,7 +9,7 @@ type Props = {
   isError: boolean;
   /** Rejects on failure; the gate shows `isError`. */
   onAccept: () => Promise<void>;
-  /** Never rejects (see `useLogout`). */
+  /** Never rejects. */
   onLogout: () => Promise<void>;
   onLeave: () => void;
 };

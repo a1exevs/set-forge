@@ -5,14 +5,11 @@ import { useClearSessionCache, useLogoutMutation } from '@entities/session';
 type Logout = {
   /** Signs the user out; never rejects — the local session is gone anyway. */
   logout: () => Promise<void>;
-  /**
-   * Ends the session on this device — clears every cached query — and goes to /login: the caller's next step after
-   * `logout` or account deletion, also when the request failed.
-   */
+  /** Ends the session on this device — clears every cached query — and goes to /login; also after a failed `logout`. */
   leave: () => void;
 };
 
-/** Signing out in two steps, so the caller holds the button's progress between the request and leaving for /login. */
+/** Signing out in two steps — the request, then leaving — so the caller decides when to leave. */
 export function useLogout(): Logout {
   const navigate = useNavigate();
   const logoutMutation = useLogoutMutation();

@@ -1,7 +1,7 @@
 import { useDeleteAccountMutation } from '@entities/session';
 
 type DeleteAccount = {
-  /** Deletes the account; never rejects — the session is gone anyway, the caller goes to /login either way. */
+  /** Deletes the account; never rejects — the session ends either way. */
   deleteAccount: () => Promise<void>;
 };
 

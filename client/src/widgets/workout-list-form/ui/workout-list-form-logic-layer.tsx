@@ -17,7 +17,7 @@ import {
 
 type BaseProps = {
   onCancel: () => void;
-  /** The page runs the save; the form locks its fields while it is in flight. */
+  /** The save in flight, run by the caller: the form locks its fields meanwhile. */
   submitProgress?: Progress;
 };
 

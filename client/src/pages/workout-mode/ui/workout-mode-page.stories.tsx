@@ -65,5 +65,5 @@ const renderLoading = (): ReturnType<typeof renderWithPageRouter> =>
     component: (): JSX.Element => <WorkoutModePageSkeleton />,
   });
 
-/** The list and the session are still loading (after 300 ms): the way back is real, the rest is a skeleton. */
+/** The list and the session are still loading: the way back is real, the rest is a skeleton. */
 export const LoadingMobile = buildMobileStoryObj<typeof meta>({ render: renderLoading });

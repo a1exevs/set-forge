@@ -195,7 +195,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
   if (loadingPhase === 'skeleton') {
     return <WorkoutModePageSkeleton />;
   }
-  // The first 300 ms of loading: a list that comes sooner shows with no skeleton
+  // Before the skeleton is due: a list that comes sooner shows with no skeleton
   if (workoutList === undefined) {
     return null;
   }

@@ -20,9 +20,9 @@ const wait = (ms: number): Promise<void> =>
   });
 
 /**
- * One group of actions that lock each other (a form's submit, a pair like Log out / Delete account): a second press
+ * One group of actions that lock each other (a form's submit, two actions that end each other): a second press
  * is ignored at once, the indicator shows after `PROGRESS_SHOW_AFTER_MS` and stays `PROGRESS_MIN_VISIBLE_MS`.
- * The caller goes on (navigates, closes a dialog) only after `run` resolves, so progress never blinks away.
+ * The caller goes on only after `run` resolves, so progress never blinks away.
  */
 export function useProgress<K extends string>(): ProgressControl<K> {
   const [active, setActive] = useState<K | null>(null);
