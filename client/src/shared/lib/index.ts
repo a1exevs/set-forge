@@ -14,6 +14,7 @@ export {
 export type { Progress } from './progress/progress';
 export { type LoadingPhase, useLoadingPhase } from './progress/use-loading-phase';
 export { useProgress } from './progress/use-progress';
+export { createSingleFlight } from './single-flight';
 export type { TabRoute } from './swipe/get-adjacent-tab-route';
 export { useTabSwipeNavigation } from './swipe/use-tab-swipe-navigation';
 export type { Theme } from './theme/theme';
