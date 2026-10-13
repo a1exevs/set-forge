@@ -33,10 +33,10 @@ const buildRedirectTarget = (pathname: string, search: unknown): string => {
 // navigations read the cached user (session/bootstrap-once).
 type SessionUser = Awaited<ReturnType<typeof bootstrapSessionAndPrimeCache>>;
 
-const bootstrapOnce = createSingleFlight(bootstrapSessionAndPrimeCache);
+const sharedBootstrap = createSingleFlight(bootstrapSessionAndPrimeCache);
 
 const resolveSessionUser = (queryClient: QueryClient): SessionUser | Promise<SessionUser> =>
-  getCachedCurrentUser(queryClient) ?? bootstrapOnce(queryClient);
+  getCachedCurrentUser(queryClient) ?? sharedBootstrap(queryClient);
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: async ({ context, location }) => {
