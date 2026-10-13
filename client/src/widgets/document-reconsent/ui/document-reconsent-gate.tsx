@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { ChangeEvent, FC } from 'react';
 
+import type { Progress } from '@shared/lib';
 import { Button, Dialog } from '@shared/ui';
 
 import classes from './document-reconsent-gate.module.scss';
@@ -11,6 +12,8 @@ type Props = {
   isError: boolean;
   consent: boolean;
   termsAccepted: boolean;
+  acceptProgress: Progress;
+  logoutProgress: Progress;
   onConsentChange: (value: boolean) => void;
   onTermsChange: (value: boolean) => void;
   onAccept: () => void;
@@ -23,6 +26,8 @@ const DocumentReconsentGate: FC<Props> = ({
   isError,
   consent,
   termsAccepted,
+  acceptProgress,
+  logoutProgress,
   onConsentChange,
   onTermsChange,
   onAccept,
@@ -71,12 +76,18 @@ const DocumentReconsentGate: FC<Props> = ({
         {isError && <p className={classes.error}>Something went wrong. Please try again.</p>}
 
         <div className={classes.actions}>
-          <Button variant="secondary" onClick={(): void => onLogout()} disabled={busy} className={classes.action}>
+          <Button
+            variant="secondary"
+            progress={logoutProgress}
+            onClick={(): void => onLogout()}
+            className={classes.action}
+          >
             Log out
           </Button>
           <Button
+            progress={acceptProgress}
             onClick={(): void => onAccept()}
-            disabled={busy || !consent || !termsAccepted}
+            disabled={!consent || !termsAccepted}
             className={classes.action}
           >
             Accept

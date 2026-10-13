@@ -118,4 +118,26 @@ describe('CreateWorkoutPageLogicLayer', () => {
     expect(navigateMock).toHaveBeenCalledWith({ to: '/' });
     expect(onCreate).not.toHaveBeenCalled();
   });
+
+  it('creates one list when Create List is pressed again while the first request is in flight', async () => {
+    const user = userEvent.setup();
+    let answer: () => void = (): void => undefined;
+    const onCreate = jest.fn(
+      () =>
+        new Promise<void>((resolve): void => {
+          answer = resolve;
+        }),
+    );
+
+    render(<CreateWorkoutPageLogicLayer onCreate={onCreate} />);
+
+    await user.click(screen.getByRole('button', { name: 'Create List' }));
+    await user.click(screen.getByRole('button', { name: 'Create List' }));
+
+    expect(onCreate).toHaveBeenCalledTimes(1);
+    expect(navigateMock).not.toHaveBeenCalled();
+
+    answer();
+    await waitFor((): void => expect(navigateMock).toHaveBeenCalledTimes(1));
+  });
 });

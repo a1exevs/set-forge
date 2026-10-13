@@ -3,6 +3,7 @@ import { LogIn, UserPlus } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { ChangeEvent, FC, FormEvent } from 'react';
 
+import type { Progress } from '@shared/lib';
 import { BrandWordmark, Button, PasswordField } from '@shared/ui';
 import { LegalFooter } from '@widgets/legal-footer';
 
@@ -26,7 +27,9 @@ type Props = {
   termsError: string | null;
   captchaError: string | null;
   formError: string | null;
-  isSubmitting: boolean;
+  /** A submit is in flight: the fields wait for its answer. */
+  locked: boolean;
+  submitProgress: Progress;
   onEmailChange: (v: string) => void;
   onPasswordChange: (v: string) => void;
   onConfirmPasswordChange: (v: string) => void;
@@ -76,7 +79,8 @@ const AuthPage: FC<Props> = ({
   termsError,
   captchaError,
   formError,
-  isSubmitting,
+  locked,
+  submitProgress,
   onEmailChange,
   onPasswordChange,
   onConfirmPasswordChange,
@@ -126,7 +130,7 @@ const AuthPage: FC<Props> = ({
             autoComplete="email"
             value={email}
             onChange={(e: ChangeEvent<HTMLInputElement>): void => onEmailChange(e.target.value)}
-            disabled={isSubmitting}
+            disabled={locked}
           />
           {emailError && <p className={classes.fieldError}>{emailError}</p>}
 
@@ -138,7 +142,7 @@ const AuthPage: FC<Props> = ({
             name="password"
             value={password}
             autoComplete={isRegister ? 'new-password' : 'current-password'}
-            disabled={isSubmitting}
+            disabled={locked}
             revealable={!isRegister}
             onChange={onPasswordChange}
           />
@@ -154,7 +158,7 @@ const AuthPage: FC<Props> = ({
                 name="password-confirm"
                 value={confirmPassword}
                 autoComplete="new-password"
-                disabled={isSubmitting}
+                disabled={locked}
                 revealable={false}
                 onChange={onConfirmPasswordChange}
               />
@@ -178,7 +182,7 @@ const AuthPage: FC<Props> = ({
                 autoComplete="off"
                 value={captcha}
                 onChange={(e: ChangeEvent<HTMLInputElement>): void => onCaptchaChange(e.target.value)}
-                disabled={isSubmitting}
+                disabled={locked}
               />
               {captchaError && <p className={classes.fieldError}>{captchaError}</p>}
             </>
@@ -193,7 +197,7 @@ const AuthPage: FC<Props> = ({
                   className={classes.consentCheckbox}
                   checked={consent}
                   onChange={(e: ChangeEvent<HTMLInputElement>): void => onConsentChange(e.target.checked)}
-                  disabled={isSubmitting}
+                  disabled={locked}
                 />
                 <span>
                   I consent to the processing of my personal data as described in the{' '}
@@ -211,7 +215,7 @@ const AuthPage: FC<Props> = ({
                   className={classes.consentCheckbox}
                   checked={termsAccepted}
                   onChange={(e: ChangeEvent<HTMLInputElement>): void => onTermsChange(e.target.checked)}
-                  disabled={isSubmitting}
+                  disabled={locked}
                 />
                 <span>
                   I accept the{' '}
@@ -226,7 +230,7 @@ const AuthPage: FC<Props> = ({
 
           {formError && <p className={classes.formError}>{formError}</p>}
 
-          <Button type="submit" size="lg" disabled={isSubmitting} className={classes.submit}>
+          <Button type="submit" size="lg" progress={submitProgress} className={classes.submit}>
             {isRegister ? 'Create account' : 'Log in'}
           </Button>
         </form>

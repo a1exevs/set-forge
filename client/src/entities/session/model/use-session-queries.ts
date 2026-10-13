@@ -71,15 +71,9 @@ export function useRegisterMutation(): UseMutationResult<AuthData, Error, Regist
   });
 }
 
+// Logout and account deletion leave the cache to `useClearSessionCache`: the caller decides when the data goes.
 export function useLogoutMutation(): UseMutationResult<void, Error, void> {
-  const qc = useQueryClient();
-
-  return useMutation({
-    mutationFn: deleteLogout,
-    onSettled: () => {
-      qc.clear();
-    },
-  });
+  return useMutation({ mutationFn: deleteLogout });
 }
 
 export function useAcceptDocumentsMutation(): UseMutationResult<CurrentUser, Error, void> {
@@ -94,15 +88,14 @@ export function useAcceptDocumentsMutation(): UseMutationResult<CurrentUser, Err
 }
 
 export function useDeleteAccountMutation(): UseMutationResult<void, Error, void> {
+  return useMutation({ mutationFn: deleteAccount });
+}
+
+/** Drops every cached query once the session has ended on this device. */
+export function useClearSessionCache(): () => void {
   const qc = useQueryClient();
 
-  return useMutation({
-    mutationFn: deleteAccount,
-    onSettled: () => {
-      // The account is gone: drop every cached query (profile, workout lists, sessions, history).
-      qc.clear();
-    },
-  });
+  return (): void => qc.clear();
 }
 
 /** Loads a fresh captcha image URL (after the server answered a login with "captcha required"). */

@@ -1,5 +1,7 @@
 import type { FC, ReactNode } from 'react';
 
+import type { Progress } from '@shared/lib';
+
 import classes from './confirm-dialog.module.scss';
 import Button from '../button/button';
 import Dialog from '../dialog/dialog';
@@ -12,6 +14,9 @@ type Props = {
   cancellationText: string;
   alternateText?: string;
   hideCancelButton: boolean;
+  confirmProgress: Progress;
+  alternateProgress: Progress;
+  cancelProgress: Progress;
   onConfirm: () => void;
   onAlternate: () => void;
   onCancel: () => void;
@@ -27,6 +32,9 @@ const ConfirmDialog: FC<Props> = ({
   cancellationText,
   alternateText,
   hideCancelButton,
+  confirmProgress,
+  alternateProgress,
+  cancelProgress,
   onConfirm,
   onAlternate,
   onCancel,
@@ -44,16 +52,16 @@ const ConfirmDialog: FC<Props> = ({
           className={`${classes.buttons} ${hideCancelButton && !hasAlternate ? classes.singleButton : ''} ${hasAlternate ? classes.multiButton : ''}`}
         >
           {!hideCancelButton && (
-            <Button variant="secondary" onClick={onCancel}>
+            <Button variant="secondary" progress={cancelProgress} onClick={onCancel}>
               {cancellationText}
             </Button>
           )}
           {hasAlternate && (
-            <Button variant="secondary" onClick={onAlternate}>
+            <Button variant="secondary" progress={alternateProgress} onClick={onAlternate}>
               {alternateText}
             </Button>
           )}
-          <Button variant="primary" onClick={onConfirm}>
+          <Button variant="primary" progress={confirmProgress} onClick={onConfirm}>
             {confirmationText}
           </Button>
         </div>

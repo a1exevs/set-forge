@@ -19,7 +19,11 @@ exports[`NotFoundMessage matches snapshot with custom backToLink 1`] = `
         data-headlessui-state=""
         type="button"
       >
-        Back to Home
+        <span
+          class="label"
+        >
+          Back to Home
+        </span>
       </button>
     </a>
   </div>
@@ -45,7 +49,11 @@ exports[`NotFoundMessage matches snapshot with default props 1`] = `
         data-headlessui-state=""
         type="button"
       >
-        Back to Home
+        <span
+          class="label"
+        >
+          Back to Home
+        </span>
       </button>
     </a>
   </div>

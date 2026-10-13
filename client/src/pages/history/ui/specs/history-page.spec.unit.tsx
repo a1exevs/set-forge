@@ -40,9 +40,9 @@ const baseProps = {
   swipeRef: createRef<HTMLDivElement>(),
   sessions: [SESSION],
   total: 1,
-  isLoading: false,
+  loadingPhase: 'content' as const,
   isError: false,
-  isFetchingNextPage: false,
+  showNextPageSkeleton: false,
   expandedIds: {},
   onToggle: (): void => undefined,
   sentinelRef: createRef<HTMLDivElement>(),
@@ -62,11 +62,27 @@ describe('HistoryPage', () => {
   });
 
   it('shows the skeleton while history loads', () => {
-    render(<HistoryPage {...baseProps} sessions={[]} total={0} isLoading />);
+    render(<HistoryPage {...baseProps} sessions={[]} total={0} loadingPhase="skeleton" />);
 
     expect(screen.getByRole('status', { name: 'Loading history' })).toBeInTheDocument();
     expect(screen.getByRole('main')).toHaveAttribute('aria-busy', 'true');
     expect(screen.queryByText('Loading history…')).not.toBeInTheDocument();
+  });
+
+  it('shows nothing in the body during the first 300 ms of loading', () => {
+    render(<HistoryPage {...baseProps} sessions={[]} total={0} loadingPhase="blank" />);
+
+    expect(screen.queryByRole('status', { name: 'Loading history' })).not.toBeInTheDocument();
+    expect(screen.queryByText('No completed workouts yet')).not.toBeInTheDocument();
+    expect(screen.getByRole('main')).toHaveAttribute('aria-busy', 'true');
+  });
+
+  it('closes the list with two placeholder rows while the next page loads', () => {
+    const { container } = render(<HistoryPage {...baseProps} showNextPageSkeleton />);
+
+    const placeholder = screen.getByRole('status', { name: 'Loading more history' });
+    expect(placeholder.children).toHaveLength(2);
+    expect(container).not.toHaveTextContent('Loading more…');
   });
 
   it('shows the error state', () => {

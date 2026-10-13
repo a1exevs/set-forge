@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
@@ -30,7 +30,7 @@ const mockedLogout = useLogout as jest.Mock;
 
 describe('DocumentReconsentGate', () => {
   const acceptMutation = { mutateAsync: jest.fn().mockResolvedValue(undefined), isPending: false, isError: false };
-  const logout = { logout: jest.fn(), isPending: false };
+  const logout = { logout: jest.fn().mockResolvedValue(undefined), leave: jest.fn() };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -86,5 +86,46 @@ describe('DocumentReconsentGate', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Log out' }));
     expect(logout.logout).toHaveBeenCalledTimes(1);
+    await waitFor((): void => expect(logout.leave).toHaveBeenCalledTimes(1));
+  });
+
+  it('locks Log out while Accept is in flight and ignores a second Accept', async () => {
+    mockedCurrentUser.mockReturnValue({ data: { id: 1, email: 'a@b.c', documentsPendingAcceptance: true } });
+    acceptMutation.mutateAsync.mockReturnValue(new Promise<void>((): void => undefined));
+    const user = userEvent.setup();
+    render(<DocumentReconsentGate />);
+
+    await user.click(await screen.findByRole('checkbox', { name: /personal data/i }));
+    await user.click(screen.getByRole('checkbox', { name: /Terms of Use/i }));
+    await user.click(screen.getByRole('button', { name: 'Accept' }));
+    await user.click(screen.getByRole('button', { name: 'Accept' }));
+    await user.click(screen.getByRole('button', { name: 'Log out' }));
+
+    expect(acceptMutation.mutateAsync).toHaveBeenCalledTimes(1);
+    expect(logout.logout).not.toHaveBeenCalled();
+    expect(screen.getByRole('checkbox', { name: /personal data/i })).toBeDisabled();
+  });
+
+  it('stays open until the progress of Accept is over, although the documents are already accepted', async () => {
+    mockedCurrentUser.mockReturnValue({ data: { id: 1, email: 'a@b.c', documentsPendingAcceptance: true } });
+    let answer: () => void = (): void => undefined;
+    acceptMutation.mutateAsync.mockReturnValue(
+      new Promise<void>((resolve): void => {
+        answer = resolve;
+      }),
+    );
+    const user = userEvent.setup();
+    const { rerender } = render(<DocumentReconsentGate />);
+
+    await user.click(await screen.findByRole('checkbox', { name: /personal data/i }));
+    await user.click(screen.getByRole('checkbox', { name: /Terms of Use/i }));
+    await user.click(screen.getByRole('button', { name: 'Accept' }));
+    mockedCurrentUser.mockReturnValue({ data: { id: 1, email: 'a@b.c', documentsPendingAcceptance: false } });
+    rerender(<DocumentReconsentGate />);
+
+    expect(screen.getByText(/updated our documents/i)).toBeInTheDocument();
+
+    answer();
+    await waitFor((): void => expect(screen.queryByText(/updated our documents/i)).not.toBeInTheDocument());
   });
 });

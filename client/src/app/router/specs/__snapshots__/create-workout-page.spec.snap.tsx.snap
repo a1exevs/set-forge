@@ -18,63 +18,71 @@ exports[`CreateWorkoutPage matches snapshot 1`] = `
       <form
         class="form"
       >
-        <div
-          class="section"
-        >
-          <div>
-            <label
-              class="label"
-              for="name"
-            >
-              List Name *
-            </label>
-            <input
-              class="input"
-              id="name"
-              placeholder="e.g., Push Day"
-              required=""
-              type="text"
-              value=""
-            />
-          </div>
-          <div>
-            <label
-              class="label"
-              for="description"
-            >
-              Description
-            </label>
-            <textarea
-              class="textarea"
-              id="description"
-              placeholder="Chest, shoulders, triceps"
-              rows="2"
-            />
-          </div>
-        </div>
-        <div
-          class="section section_withoutGap"
+        <fieldset
+          class="fields"
         >
           <div
-            class="sectionHeader"
+            class="section"
           >
-            <h2>
-              Exercises
-            </h2>
-            <button
-              class="button primary sm"
-              data-headlessui-state=""
-              type="button"
-            >
-              + Add Exercise
-            </button>
+            <div>
+              <label
+                class="label"
+                for="name"
+              >
+                List Name *
+              </label>
+              <input
+                class="input"
+                id="name"
+                placeholder="e.g., Push Day"
+                required=""
+                type="text"
+                value=""
+              />
+            </div>
+            <div>
+              <label
+                class="label"
+                for="description"
+              >
+                Description
+              </label>
+              <textarea
+                class="textarea"
+                id="description"
+                placeholder="Chest, shoulders, triceps"
+                rows="2"
+              />
+            </div>
           </div>
-          <p
-            class="emptyExercises"
+          <div
+            class="section section_withoutGap"
           >
-            Add exercises to your list
-          </p>
-        </div>
+            <div
+              class="sectionHeader"
+            >
+              <h2>
+                Exercises
+              </h2>
+              <button
+                class="button primary sm"
+                data-headlessui-state=""
+                type="button"
+              >
+                <span
+                  class="label"
+                >
+                  + Add Exercise
+                </span>
+              </button>
+            </div>
+            <p
+              class="emptyExercises"
+            >
+              Add exercises to your list
+            </p>
+          </div>
+        </fieldset>
         <div
           class="actions"
         >
@@ -83,14 +91,22 @@ exports[`CreateWorkoutPage matches snapshot 1`] = `
             data-headlessui-state=""
             type="button"
           >
-            Cancel
+            <span
+              class="label"
+            >
+              Cancel
+            </span>
           </button>
           <button
             class="button primary md"
             data-headlessui-state=""
             type="submit"
           >
-            Create List
+            <span
+              class="label"
+            >
+              Create List
+            </span>
           </button>
         </div>
       </form>

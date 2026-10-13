@@ -3,6 +3,7 @@ import { Download, Plus, Upload } from 'lucide-react';
 import { ChangeEvent, FC, RefObject } from 'react';
 
 import type { WorkoutList } from '@entities/workout-list';
+import type { LoadingPhase, Progress } from '@shared/lib';
 import { BrandWordmark, IconButton, MenuButton } from '@shared/ui';
 import { MainTabsBar } from '@widgets/main-tabs-bar';
 
@@ -12,9 +13,10 @@ import classes from './home-page.module.scss';
 type Props = {
   swipeRef: RefObject<HTMLDivElement>;
   workoutLists: WorkoutList[];
-  isLoading: boolean;
+  loadingPhase: LoadingPhase;
   onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void | Promise<void>;
+  exportProgress: Progress;
   onExport: () => void | Promise<void>;
   onImportClick: () => void;
   onImportFile: (event: ChangeEvent<HTMLInputElement>) => void | Promise<void>;
@@ -25,18 +27,22 @@ type Props = {
 const HomePage: FC<Props> = ({
   swipeRef,
   workoutLists,
-  isLoading,
+  loadingPhase,
   onEdit,
   onDelete,
+  exportProgress,
   onExport,
   onImportClick,
   onImportFile,
   importInputRef,
   formatDate,
 }) => {
-  const renderLists = (): JSX.Element => {
-    if (isLoading) {
+  const renderLists = (): JSX.Element | null => {
+    if (loadingPhase === 'skeleton') {
       return <HomePageSkeleton />;
+    }
+    if (loadingPhase === 'blank') {
+      return null;
     }
 
     if (workoutLists.length === 0) {
@@ -91,7 +97,10 @@ const HomePage: FC<Props> = ({
   };
 
   return (
-    <div ref={swipeRef} className={isLoading ? `${classes.container} ${classes.containerLoading}` : classes.container}>
+    <div
+      ref={swipeRef}
+      className={loadingPhase === 'skeleton' ? `${classes.container} ${classes.containerLoading}` : classes.container}
+    >
       <header className={classes.header}>
         <div className={classes.headerTop}>
           <BrandWordmark title="Workout lists" />
@@ -100,6 +109,7 @@ const HomePage: FC<Props> = ({
               aria-label="Export workout lists"
               title="Export workout lists"
               disabled={workoutLists.length === 0}
+              progress={exportProgress}
               onClick={(): void => void onExport()}
             >
               <Download size={18} strokeWidth={1.75} aria-hidden />
@@ -118,7 +128,7 @@ const HomePage: FC<Props> = ({
         </div>
       </header>
 
-      <main className={classes.main} aria-busy={isLoading}>
+      <main className={classes.main} aria-busy={loadingPhase !== 'content'}>
         {renderLists()}
       </main>
 

@@ -24,10 +24,10 @@ describe('ProfilePage', () => {
         swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
+        logoutProgress="idle"
+        deleteAccountProgress="idle"
         onLogout={(): void => undefined}
-        isLoggingOut={false}
         onDeleteAccount={(): Promise<void> => Promise.resolve()}
-        isDeletingAccount={false}
       />,
     );
     expect(container).toMatchSnapshot();

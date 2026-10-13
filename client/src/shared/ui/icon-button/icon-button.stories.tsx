@@ -6,6 +6,8 @@ import type { ComponentProps, ReactElement } from 'react';
 import { renderWithRouter } from 'storybook-dir/render-with-router';
 import { Grid, Row, withFrame } from 'storybook-dir/showcase';
 
+import type { Progress as ProgressState } from '@shared/lib';
+
 import IconButton from './icon-button';
 
 type Variant = NonNullable<ComponentProps<typeof IconButton>['variant']>;
@@ -15,6 +17,7 @@ type Size = NonNullable<ComponentProps<typeof IconButton>['size']>;
 const VARIANTS: Variant[] = ['ghost', 'primary'];
 const SHAPES: Shape[] = ['square', 'circle'];
 const SIZES: Size[] = ['sm', 'md', 'lg'];
+const PROGRESSES: ProgressState[] = ['idle', 'pending', 'shown', 'locked'];
 
 const iconForSize = (size: Size): ReactElement =>
   size === 'lg' ? (
@@ -36,7 +39,7 @@ const meta = {
       description: {
         component:
           'A button that shows an icon only; `aria-label` is its name. `as={Link}` with `to` renders a router link ' +
-          'in the same skin.',
+          'in the same skin; `progress` shows the request of the action.',
       },
     },
   },
@@ -79,6 +82,17 @@ export const Disabled: Story = {
     <Row>
       {VARIANTS.map((variant: Variant) => (
         <IconButton key={variant} {...args} variant={variant} disabled />
+      ))}
+    </Row>
+  ),
+};
+
+/** `progress`: `pending` keeps the look, `shown` swaps the icon for an indicator, `locked` looks disabled. */
+export const Progress: Story = {
+  render: (args): ReactElement => (
+    <Row>
+      {PROGRESSES.map((progress: ProgressState) => (
+        <IconButton key={progress} {...args} progress={progress} aria-label={`Download, ${progress}`} />
       ))}
     </Row>
   ),

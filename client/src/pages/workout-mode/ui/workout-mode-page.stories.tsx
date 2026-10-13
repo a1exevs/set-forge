@@ -14,6 +14,7 @@ import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 import type { WorkoutSession } from '@entities/workout-session';
 
 import WorkoutModePageLogicLayer from './workout-mode-page-logic-layer';
+import WorkoutModePageSkeleton from './workout-mode-page-skeleton';
 
 const renderWorkoutModePage = (session: WorkoutSession | null) => (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
@@ -22,7 +23,6 @@ const renderWorkoutModePage = (session: WorkoutSession | null) => (): ReturnType
       <WorkoutModePageLogicLayer
         workoutList={mockWorkoutList}
         session={session}
-        isStarting={false}
         startSession={fn()}
         incrementProgress={fn(async (): Promise<WorkoutSession> => mockActiveWorkoutSession)}
         finishSession={fn()}
@@ -62,17 +62,7 @@ export const TrainingMobile = buildMobileStoryObj<typeof meta>({ render: renderT
 const renderLoading = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
     initialEntries: ['/'],
-    component: (): JSX.Element => (
-      <WorkoutModePageLogicLayer
-        workoutList={undefined}
-        session={null}
-        isStarting={false}
-        startSession={fn()}
-        incrementProgress={fn(async (): Promise<WorkoutSession> => mockActiveWorkoutSession)}
-        finishSession={fn()}
-        discardSession={fn()}
-      />
-    ),
+    component: (): JSX.Element => <WorkoutModePageSkeleton />,
   });
 
 /** The list and the session are still loading: the way back is real, the rest is a skeleton. */

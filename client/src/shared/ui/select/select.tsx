@@ -12,13 +12,14 @@ type Props = {
   value: string;
   options: SelectOption[];
   onChange: (value: string) => void;
+  disabled?: boolean;
 };
 
-const Select: FC<Props> = ({ value, options, onChange }) => {
+const Select: FC<Props> = ({ value, options, onChange, disabled = false }) => {
   const selectedLabel = options.find((option: SelectOption) => option.value === value)?.label ?? value;
 
   return (
-    <Listbox value={value} onChange={onChange}>
+    <Listbox value={value} onChange={onChange} disabled={disabled}>
       <div className={classes.listboxWrapper}>
         <Listbox.Button className={classes.listboxButton}>{selectedLabel}</Listbox.Button>
         <Listbox.Options className={classes.listboxOptions}>

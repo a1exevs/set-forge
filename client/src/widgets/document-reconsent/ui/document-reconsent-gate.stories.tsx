@@ -28,6 +28,8 @@ const renderGateWithRouter = (): ReactElement => {
         isError={false}
         consent={false}
         termsAccepted={false}
+        acceptProgress="idle"
+        logoutProgress="idle"
         onConsentChange={(): void => undefined}
         onTermsChange={(): void => undefined}
         onAccept={(): void => undefined}

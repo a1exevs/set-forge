@@ -1,6 +1,7 @@
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import type { WorkoutSession } from '@entities/workout-session';
+import { useLoadingPhase } from '@shared/lib';
 import { useMainTabSwipe } from '@widgets/main-tabs-bar';
 
 import HistoryPage from './history-page';
@@ -28,11 +29,14 @@ const HistoryPageLogicLayer: FC<Props> = ({
   const swipeRef = useMainTabSwipe();
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const loadingPhase = useLoadingPhase(isLoading);
+  const nextPagePhase = useLoadingPhase(isFetchingNextPage);
 
   const handleToggle = useCallback((id: string): void => {
     setExpandedIds(prev => ({ ...prev, [id]: !prev[id] }));
   }, []);
 
+  // `loadingPhase`: the sentinel renders with the list, which may come after the sessions while a skeleton is held
   useEffect(() => {
     const node = sentinelRef.current;
     if (!node || !hasMore) {
@@ -47,16 +51,16 @@ const HistoryPageLogicLayer: FC<Props> = ({
     observer.observe(node);
 
     return (): void => observer.disconnect();
-  }, [hasMore, isFetchingNextPage, fetchNextPage, sessions.length]);
+  }, [hasMore, isFetchingNextPage, fetchNextPage, sessions.length, loadingPhase]);
 
   return (
     <HistoryPage
       swipeRef={swipeRef}
       sessions={sessions}
       total={total}
-      isLoading={isLoading}
+      loadingPhase={loadingPhase}
       isError={isError}
-      isFetchingNextPage={isFetchingNextPage}
+      showNextPageSkeleton={nextPagePhase === 'skeleton'}
       expandedIds={expandedIds}
       onToggle={handleToggle}
       sentinelRef={sentinelRef}

@@ -4,6 +4,7 @@ import { FC, RefObject } from 'react';
 import { muscleGroupLabels } from '@entities/workout-exercise';
 import type { WorkoutSession } from '@entities/workout-session';
 import { isExerciseComplete, type WorkoutSessionExercise } from '@entities/workout-session-exercise';
+import type { LoadingPhase } from '@shared/lib';
 import { BrandWordmark } from '@shared/ui';
 import { MainTabsBar } from '@widgets/main-tabs-bar';
 
@@ -14,9 +15,10 @@ type Props = {
   swipeRef: RefObject<HTMLDivElement>;
   sessions: WorkoutSession[];
   total: number;
-  isLoading: boolean;
+  loadingPhase: LoadingPhase;
   isError: boolean;
-  isFetchingNextPage: boolean;
+  /** The next page is loading: placeholder rows close the list. */
+  showNextPageSkeleton: boolean;
   expandedIds: Record<string, boolean>;
   onToggle: (id: string) => void;
   sentinelRef: RefObject<HTMLDivElement>;
@@ -28,18 +30,21 @@ const HistoryPage: FC<Props> = ({
   swipeRef,
   sessions,
   total,
-  isLoading,
+  loadingPhase,
   isError,
-  isFetchingNextPage,
+  showNextPageSkeleton,
   expandedIds,
   onToggle,
   sentinelRef,
   formatSessionDate,
   formatSummary,
 }) => {
-  const renderBody = (): JSX.Element => {
-    if (isLoading) {
+  const renderBody = (): JSX.Element | null => {
+    if (loadingPhase === 'skeleton') {
       return <HistoryPageSkeleton />;
+    }
+    if (loadingPhase === 'blank') {
+      return null;
     }
 
     if (isError) {
@@ -123,13 +128,18 @@ const HistoryPage: FC<Props> = ({
         </div>
 
         <div ref={sentinelRef} className={classes.sentinel} aria-hidden />
-        {isFetchingNextPage && <div className={classes.loadingRow}>Loading more…</div>}
+        {showNextPageSkeleton && (
+          <HistoryPageSkeleton rows={2} label="Loading more history" className={classes.nextPageSkeleton} />
+        )}
       </>
     );
   };
 
   return (
-    <div ref={swipeRef} className={isLoading ? `${classes.container} ${classes.containerLoading}` : classes.container}>
+    <div
+      ref={swipeRef}
+      className={loadingPhase === 'skeleton' ? `${classes.container} ${classes.containerLoading}` : classes.container}
+    >
       <header className={classes.header}>
         <div className={classes.headerTop}>
           <BrandWordmark title="History" />
@@ -141,7 +151,7 @@ const HistoryPage: FC<Props> = ({
         </div>
       </header>
 
-      <main className={classes.main} aria-busy={isLoading}>
+      <main className={classes.main} aria-busy={loadingPhase !== 'content'}>
         {renderBody()}
       </main>
 

@@ -4,11 +4,17 @@ import { Skeleton } from '@shared/ui';
 
 import classes from './history-page.module.scss';
 
-/** The shape of the history rows while the first page loads: the same cards, a title, two meta lines, a chevron; ten
- * rows, clipped by the page to the first screen. */
-const HistoryPageSkeleton: FC = () => (
-  <div role="status" aria-label="Loading history" className={classes.list}>
-    {Array.from({ length: 10 }, (_: unknown, index: number) => (
+type Props = {
+  /** Ten fill the first screen while the first page loads; two close the list while the next one does. */
+  rows?: number;
+  label?: string;
+  className?: string;
+};
+
+/** The shape of the history rows while they load: the same cards, a title, two meta lines, a chevron. */
+const HistoryPageSkeleton: FC<Props> = ({ rows = 10, label = 'Loading history', className }) => (
+  <div role="status" aria-label={label} className={className ? `${classes.list} ${className}` : classes.list}>
+    {Array.from({ length: rows }, (_: unknown, index: number) => (
       <div key={index} className={classes.card}>
         <div className={`${classes.cardButton} ${classes.cardSkeleton}`}>
           <div className={classes.cardInfo}>

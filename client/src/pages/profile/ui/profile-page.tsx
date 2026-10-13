@@ -1,5 +1,6 @@
 import { FC, RefObject } from 'react';
 
+import type { Progress } from '@shared/lib';
 import { BrandWordmark, Button, UserAvatar } from '@shared/ui';
 import { LegalFooter } from '@widgets/legal-footer';
 import { MainTabsBar } from '@widgets/main-tabs-bar';
@@ -10,20 +11,20 @@ type Props = {
   swipeRef: RefObject<HTMLDivElement>;
   email: string;
   avatarLetter: string;
+  logoutProgress: Progress;
+  deleteAccountProgress: Progress;
   onLogout: () => void | Promise<void>;
-  isLoggingOut: boolean;
   onDeleteAccount: () => void | Promise<void>;
-  isDeletingAccount: boolean;
 };
 
 const ProfilePage: FC<Props> = ({
   swipeRef,
   email,
   avatarLetter,
+  logoutProgress,
+  deleteAccountProgress,
   onLogout,
-  isLoggingOut,
   onDeleteAccount,
-  isDeletingAccount,
 }) => {
   return (
     <div ref={swipeRef} className={classes.container}>
@@ -39,8 +40,8 @@ const ProfilePage: FC<Props> = ({
           <p className={classes.email}>{email}</p>
           <Button
             variant="secondary"
+            progress={logoutProgress}
             onClick={(): void => void onLogout()}
-            disabled={isLoggingOut}
             className={classes.logoutButton}
           >
             Log out
@@ -53,8 +54,8 @@ const ProfilePage: FC<Props> = ({
           </p>
           <Button
             variant="danger"
+            progress={deleteAccountProgress}
             onClick={(): void => void onDeleteAccount()}
-            disabled={isDeletingAccount}
             className={classes.deleteButton}
           >
             Delete account

@@ -2,7 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 
 import type { CreateWorkoutListDto } from '@entities/workout-list';
-import { toastError, toastSuccess } from '@shared/lib';
+import { toastError, toastSuccess, useProgress } from '@shared/lib';
 import { WorkoutListForm } from '@widgets/workout-list-form';
 
 type Props = {
@@ -11,12 +11,14 @@ type Props = {
 
 const CreateWorkoutPageLogicLayer: FC<Props> = ({ onCreate }) => {
   const navigate = useNavigate();
+  const { run, progressOf } = useProgress<'save'>();
 
   const onSubmit = async (dto: CreateWorkoutListDto): Promise<void> => {
     try {
-      await onCreate(dto);
-      toastSuccess('Workout list created');
-      navigate({ to: '/' });
+      if (await run('save', () => onCreate(dto))) {
+        toastSuccess('Workout list created');
+        navigate({ to: '/' });
+      }
     } catch (error: unknown) {
       toastError(error, 'Failed to create workout list');
     }
@@ -25,7 +27,8 @@ const CreateWorkoutPageLogicLayer: FC<Props> = ({ onCreate }) => {
   return (
     <WorkoutListForm
       mode="create"
-      onSubmit={onSubmit}
+      submitProgress={progressOf('save')}
+      onSubmit={(dto: CreateWorkoutListDto): void => void onSubmit(dto)}
       onCancel={(): void => {
         navigate({ to: '/' });
       }}

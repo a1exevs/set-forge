@@ -27,14 +27,17 @@ Each id is proven by the tests tagged `// @invariant workout-list/<id>`; `npm ru
 
 ### Manage lists (Home)
 
-1. Home shows the user's lists; **Edit** opens the editor, **Delete** asks for confirmation, then deletes the list and
-   drops the cached sessions of that list.
-2. **Export** downloads all lists; **Import** reads a file, asks for confirmation and adds the lists. Bad files and
-   API errors show a toast, the page stays.
+1. Home shows the user's lists; **Edit** opens the editor, **Delete** asks for confirmation and deletes the list from
+   inside it, then drops the cached sessions of that list.
+2. **Export** downloads all lists; **Import** reads a file, asks for confirmation and adds the lists from inside it.
+   Bad files and API errors show a toast, the page stays.
+3. A confirmation stays open until its request answers, and on an error too — a retry or Cancel, never a second
+   list or import from a double press.
 
 ### Create / edit
 
-The same form creates and edits a list. Editing a list with an active session asks about resync — see
+The same form creates and edits a list; while it is saved the form is locked. Editing a list with an active session
+asks about resync — see
 [workout session](workout-session.md#editing-a-list-during-a-session).
 
 ## Map

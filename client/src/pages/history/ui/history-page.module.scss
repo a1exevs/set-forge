@@ -164,11 +164,9 @@
   height: 1px;
 }
 
-.loadingRow {
-  text-align: center;
-  padding: $spacing-md;
-  font-size: $font-size-sm;
-  color: $text-tertiary;
+// The rows of the next page continue the list at its own spacing
+.nextPageSkeleton {
+  margin-top: $spacing-md;
 }
 
 @media (min-width: 768px) {

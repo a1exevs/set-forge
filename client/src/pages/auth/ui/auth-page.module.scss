@@ -100,9 +100,7 @@
     outline-offset: 1px;
   }
 
-  &:disabled {
-    opacity: 0.6;
-  }
+  @include field-disabled;
 }
 
 .fieldError,

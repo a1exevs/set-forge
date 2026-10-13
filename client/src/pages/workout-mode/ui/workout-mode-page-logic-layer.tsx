@@ -3,7 +3,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import type { WorkoutList } from '@entities/workout-list';
 import { countCompletedExercises, isSessionFullyComplete, type WorkoutSession } from '@entities/workout-session';
 import { hasRemainingSets } from '@entities/workout-session-exercise';
-import { toastError, useConfirm } from '@shared/lib';
+import { toastError, useConfirm, useLoadingPhase, useProgress } from '@shared/lib';
 
 import WorkoutModePage from './workout-mode-page';
 import WorkoutModePageSkeleton from './workout-mode-page-skeleton';
@@ -12,7 +12,6 @@ import { fireWorkoutCompleteConfetti } from '../lib/fire-workout-complete-confet
 type Props = {
   workoutList: WorkoutList | null | undefined;
   session: WorkoutSession | null;
-  isStarting: boolean;
   startSession: (workoutListId: string) => Promise<void>;
   incrementProgress: (sessionId: string, exerciseId: string) => Promise<WorkoutSession>;
   finishSession: (sessionId: string) => Promise<void>;
@@ -22,20 +21,23 @@ type Props = {
 const WorkoutModePageLogicLayer: FC<Props> = ({
   workoutList,
   session,
-  isStarting,
   startSession,
   incrementProgress,
   finishSession,
   discardSession,
 }) => {
   const confirmDialog = useConfirm();
+  const { run, progressOf } = useProgress<'start'>();
+  const loadingPhase = useLoadingPhase(workoutList === undefined);
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
   const lastTapRef = useRef<Record<string, number>>({});
   const confettiFiredRef = useRef(false);
   /** First observation of this sessionId — used only for the resync-all-complete-on-entry edge. */
   const entryHandledForSessionRef = useRef<string | null>(null);
 
-  const phase = session != null ? 'training' : 'preview';
+  const startProgress = progressOf('start');
+  // The started session waits for the hold of Start's progress, so the preview never blinks away under it.
+  const phase = session != null && startProgress === 'idle' ? 'training' : 'preview';
   const isFinished = session?.status === 'completed';
 
   const celebrateOnce = (): void => {
@@ -52,7 +54,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     }
 
     try {
-      await startSession(workoutList.id);
+      await run('start', () => startSession(workoutList.id));
     } catch (error: unknown) {
       toastError(error, 'Failed to start workout session');
     }
@@ -116,24 +118,26 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
       confirmationText: 'Finish',
       alternateText: 'Discard',
       cancellationText: 'Cancel',
+      onConfirm: async (): Promise<void> => {
+        try {
+          await finishSession(session.id);
+        } catch (error: unknown) {
+          toastError(error, 'Failed to finish workout session');
+          throw error;
+        }
+      },
+      onAlternate: async (): Promise<void> => {
+        try {
+          await discardSession(session.id);
+        } catch (error: unknown) {
+          toastError(error, 'Failed to discard workout session');
+          throw error;
+        }
+      },
     });
 
     if (result === 'confirm') {
-      try {
-        await finishSession(session.id);
-        celebrateOnce();
-      } catch (error: unknown) {
-        toastError(error, 'Failed to finish workout session');
-      }
-      return;
-    }
-
-    if (result === 'alternate') {
-      try {
-        await discardSession(session.id);
-      } catch (error: unknown) {
-        toastError(error, 'Failed to discard workout session');
-      }
+      celebrateOnce();
     }
   };
 
@@ -188,8 +192,12 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     })();
   }, [session, phase, finishSession]);
 
-  if (workoutList === undefined) {
+  if (loadingPhase === 'skeleton') {
     return <WorkoutModePageSkeleton />;
+  }
+  // Before the skeleton is due: a list that comes sooner shows with no skeleton
+  if (workoutList === undefined) {
+    return null;
   }
 
   return (
@@ -202,7 +210,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
       totalExercises={totalExercises}
       completedExercises={completedExercises}
       overallProgress={overallProgress}
-      isStarting={isStarting}
+      startProgress={startProgress}
       onTap={handleTap}
       onStart={handleStart}
       onFinish={handleFinish}

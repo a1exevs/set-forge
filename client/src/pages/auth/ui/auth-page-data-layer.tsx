@@ -22,15 +22,13 @@ const AuthPageDataLayer: FC<Props> = ({ activeTab, redirectSearch }) => {
     <AuthPageLogicLayer
       activeTab={activeTab}
       redirectSearch={redirectSearch}
-      isSubmitting={loginMutation.isPending || registerMutation.isPending}
-      onLogin={async ({ redirectTo, ...credentials }: LoginInput): Promise<void> => {
+      onLogin={async (credentials: LoginInput): Promise<void> => {
         await loginMutation.mutateAsync(credentials);
-        await redirectAfterAuth(redirectTo);
       }}
-      onRegister={async ({ redirectTo, ...registration }: RegisterInput): Promise<void> => {
+      onRegister={async (registration: RegisterInput): Promise<void> => {
         await registerMutation.mutateAsync(registration);
-        await redirectAfterAuth(redirectTo);
       }}
+      onAuthenticated={redirectAfterAuth}
       loadCaptchaUrl={async (): Promise<string> => captchaUrlMutation.mutateAsync()}
     />
   );

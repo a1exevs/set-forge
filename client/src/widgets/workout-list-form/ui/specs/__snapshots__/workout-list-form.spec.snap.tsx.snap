@@ -18,63 +18,71 @@ exports[`WorkoutListForm matches snapshot for create mode (empty) 1`] = `
       <form
         class="form"
       >
-        <div
-          class="section"
-        >
-          <div>
-            <label
-              class="label"
-              for="name"
-            >
-              List Name *
-            </label>
-            <input
-              class="input"
-              id="name"
-              placeholder="e.g., Push Day"
-              required=""
-              type="text"
-              value=""
-            />
-          </div>
-          <div>
-            <label
-              class="label"
-              for="description"
-            >
-              Description
-            </label>
-            <textarea
-              class="textarea"
-              id="description"
-              placeholder="Chest, shoulders, triceps"
-              rows="2"
-            />
-          </div>
-        </div>
-        <div
-          class="section section_withoutGap"
+        <fieldset
+          class="fields"
         >
           <div
-            class="sectionHeader"
+            class="section"
           >
-            <h2>
-              Exercises
-            </h2>
-            <button
-              class="button primary sm"
-              data-headlessui-state=""
-              type="button"
-            >
-              + Add Exercise
-            </button>
+            <div>
+              <label
+                class="label"
+                for="name"
+              >
+                List Name *
+              </label>
+              <input
+                class="input"
+                id="name"
+                placeholder="e.g., Push Day"
+                required=""
+                type="text"
+                value=""
+              />
+            </div>
+            <div>
+              <label
+                class="label"
+                for="description"
+              >
+                Description
+              </label>
+              <textarea
+                class="textarea"
+                id="description"
+                placeholder="Chest, shoulders, triceps"
+                rows="2"
+              />
+            </div>
           </div>
-          <p
-            class="emptyExercises"
+          <div
+            class="section section_withoutGap"
           >
-            Add exercises to your list
-          </p>
-        </div>
+            <div
+              class="sectionHeader"
+            >
+              <h2>
+                Exercises
+              </h2>
+              <button
+                class="button primary sm"
+                data-headlessui-state=""
+                type="button"
+              >
+                <span
+                  class="label"
+                >
+                  + Add Exercise
+                </span>
+              </button>
+            </div>
+            <p
+              class="emptyExercises"
+            >
+              Add exercises to your list
+            </p>
+          </div>
+        </fieldset>
         <div
           class="actions"
         >
@@ -83,14 +91,22 @@ exports[`WorkoutListForm matches snapshot for create mode (empty) 1`] = `
             data-headlessui-state=""
             type="button"
           >
-            Cancel
+            <span
+              class="label"
+            >
+              Cancel
+            </span>
           </button>
           <button
             class="button primary md"
             data-headlessui-state=""
             type="submit"
           >
-            Create List
+            <span
+              class="label"
+            >
+              Create List
+            </span>
           </button>
         </div>
       </form>
@@ -117,202 +133,210 @@ exports[`WorkoutListForm matches snapshot for create mode (with exercises) 1`] =
       <form
         class="form"
       >
-        <div
-          class="section"
-        >
-          <div>
-            <label
-              class="label"
-              for="name"
-            >
-              List Name *
-            </label>
-            <input
-              class="input"
-              id="name"
-              placeholder="e.g., Push Day"
-              required=""
-              type="text"
-              value="Push Day"
-            />
-          </div>
-          <div>
-            <label
-              class="label"
-              for="description"
-            >
-              Description
-            </label>
-            <textarea
-              class="textarea"
-              id="description"
-              placeholder="Chest, shoulders, triceps"
-              rows="2"
-            >
-              Chest focus
-            </textarea>
-          </div>
-        </div>
-        <div
-          class="section section_withoutGap"
+        <fieldset
+          class="fields"
         >
           <div
-            class="sectionHeader"
+            class="section"
           >
-            <h2>
-              Exercises
-            </h2>
-            <button
-              class="button primary sm"
-              data-headlessui-state=""
-              type="button"
-            >
-              + Add Exercise
-            </button>
+            <div>
+              <label
+                class="label"
+                for="name"
+              >
+                List Name *
+              </label>
+              <input
+                class="input"
+                id="name"
+                placeholder="e.g., Push Day"
+                required=""
+                type="text"
+                value="Push Day"
+              />
+            </div>
+            <div>
+              <label
+                class="label"
+                for="description"
+              >
+                Description
+              </label>
+              <textarea
+                class="textarea"
+                id="description"
+                placeholder="Chest, shoulders, triceps"
+                rows="2"
+              >
+                Chest focus
+              </textarea>
+            </div>
           </div>
           <div
-            class="exerciseList"
+            class="section section_withoutGap"
           >
             <div
-              class="exerciseCard"
+              class="sectionHeader"
             >
-              <div
-                class="exerciseHeader"
+              <h2>
+                Exercises
+              </h2>
+              <button
+                class="button primary sm"
+                data-headlessui-state=""
+                type="button"
               >
                 <span
-                  class="exerciseNumber"
+                  class="label"
                 >
-                  1
+                  + Add Exercise
                 </span>
-                <button
-                  aria-label="Remove exercise"
-                  class="removeButton"
-                  type="button"
-                >
-                  ✕
-                </button>
-              </div>
-              <div>
-                <label
-                  class="label"
-                >
-                  Name *
-                </label>
-                <input
-                  class="input"
-                  placeholder="Bench Press"
-                  required=""
-                  type="text"
-                  value="Bench Press"
-                />
-              </div>
-              <div>
-                <label
-                  class="label"
-                >
-                  Muscle Group
-                </label>
-                <div
-                  class="listboxWrapper"
-                  data-headlessui-state=""
-                >
-                  <button
-                    aria-expanded="false"
-                    aria-haspopup="listbox"
-                    class="listboxButton"
-                    data-headlessui-state=""
-                    id="headlessui-listbox-button-:r2:"
-                    type="button"
-                  >
-                    Chest
-                  </button>
-                </div>
-              </div>
+              </button>
+            </div>
+            <div
+              class="exerciseList"
+            >
               <div
-                class="fieldRow"
+                class="exerciseCard"
               >
                 <div
-                  class="field"
-                  data-headlessui-state=""
+                  class="exerciseHeader"
                 >
+                  <span
+                    class="exerciseNumber"
+                  >
+                    1
+                  </span>
+                  <button
+                    aria-label="Remove exercise"
+                    class="removeButton"
+                    type="button"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div>
                   <label
                     class="label"
-                    data-headlessui-state=""
-                    for="weight-temp-1"
-                    id="headlessui-label-:r7:"
                   >
-                    Weight (kg)
+                    Name *
                   </label>
                   <input
-                    aria-labelledby="headlessui-label-:r7:"
-                    class="input inputSm "
-                    data-headlessui-state=""
-                    id="weight-temp-1"
-                    inputmode="decimal"
+                    class="input"
+                    placeholder="Bench Press"
+                    required=""
                     type="text"
-                    value="80"
-                  />
-                  <span
-                    hidden=""
-                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    value="Bench Press"
                   />
                 </div>
-                <div
-                  class="field"
-                  data-headlessui-state=""
-                >
+                <div>
                   <label
                     class="label"
-                    data-headlessui-state=""
-                    for="reps-temp-1"
-                    id="headlessui-label-:ra:"
                   >
-                    Reps
+                    Muscle Group
                   </label>
-                  <input
-                    aria-labelledby="headlessui-label-:ra:"
-                    class="input inputSm "
+                  <div
+                    class="listboxWrapper"
                     data-headlessui-state=""
-                    id="reps-temp-1"
-                    inputmode="numeric"
-                    type="text"
-                    value="10"
-                  />
-                  <span
-                    hidden=""
-                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
-                  />
+                  >
+                    <button
+                      aria-expanded="false"
+                      aria-haspopup="listbox"
+                      class="listboxButton"
+                      data-headlessui-state=""
+                      id="headlessui-listbox-button-:r2:"
+                      type="button"
+                    >
+                      Chest
+                    </button>
+                  </div>
                 </div>
                 <div
-                  class="field"
-                  data-headlessui-state=""
+                  class="fieldRow"
                 >
-                  <label
-                    class="label"
+                  <div
+                    class="field"
                     data-headlessui-state=""
-                    for="sets-temp-1"
-                    id="headlessui-label-:rd:"
                   >
-                    Sets
-                  </label>
-                  <input
-                    aria-labelledby="headlessui-label-:rd:"
-                    class="input inputSm "
+                    <label
+                      class="label"
+                      data-headlessui-state=""
+                      for="weight-temp-1"
+                      id="headlessui-label-:r7:"
+                    >
+                      Weight (kg)
+                    </label>
+                    <input
+                      aria-labelledby="headlessui-label-:r7:"
+                      class="input inputSm "
+                      data-headlessui-state=""
+                      id="weight-temp-1"
+                      inputmode="decimal"
+                      type="text"
+                      value="80"
+                    />
+                    <span
+                      hidden=""
+                      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    />
+                  </div>
+                  <div
+                    class="field"
                     data-headlessui-state=""
-                    id="sets-temp-1"
-                    inputmode="numeric"
-                    type="text"
-                    value="3"
-                  />
-                  <span
-                    hidden=""
-                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
-                  />
+                  >
+                    <label
+                      class="label"
+                      data-headlessui-state=""
+                      for="reps-temp-1"
+                      id="headlessui-label-:ra:"
+                    >
+                      Reps
+                    </label>
+                    <input
+                      aria-labelledby="headlessui-label-:ra:"
+                      class="input inputSm "
+                      data-headlessui-state=""
+                      id="reps-temp-1"
+                      inputmode="numeric"
+                      type="text"
+                      value="10"
+                    />
+                    <span
+                      hidden=""
+                      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    />
+                  </div>
+                  <div
+                    class="field"
+                    data-headlessui-state=""
+                  >
+                    <label
+                      class="label"
+                      data-headlessui-state=""
+                      for="sets-temp-1"
+                      id="headlessui-label-:rd:"
+                    >
+                      Sets
+                    </label>
+                    <input
+                      aria-labelledby="headlessui-label-:rd:"
+                      class="input inputSm "
+                      data-headlessui-state=""
+                      id="sets-temp-1"
+                      inputmode="numeric"
+                      type="text"
+                      value="3"
+                    />
+                    <span
+                      hidden=""
+                      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </fieldset>
         <div
           class="actions"
         >
@@ -321,14 +345,22 @@ exports[`WorkoutListForm matches snapshot for create mode (with exercises) 1`] =
             data-headlessui-state=""
             type="button"
           >
-            Cancel
+            <span
+              class="label"
+            >
+              Cancel
+            </span>
           </button>
           <button
             class="button primary md"
             data-headlessui-state=""
             type="submit"
           >
-            Create List
+            <span
+              class="label"
+            >
+              Create List
+            </span>
           </button>
         </div>
       </form>
@@ -355,340 +387,348 @@ exports[`WorkoutListForm matches snapshot for edit mode (multiple exercises) 1`]
       <form
         class="form"
       >
-        <div
-          class="section"
-        >
-          <div>
-            <label
-              class="label"
-              for="name"
-            >
-              List Name *
-            </label>
-            <input
-              class="input"
-              id="name"
-              placeholder="e.g., Push Day"
-              required=""
-              type="text"
-              value="Full Body"
-            />
-          </div>
-          <div>
-            <label
-              class="label"
-              for="description"
-            >
-              Description
-            </label>
-            <textarea
-              class="textarea"
-              id="description"
-              placeholder="Chest, shoulders, triceps"
-              rows="2"
-            >
-              Chest, shoulders, triceps
-            </textarea>
-          </div>
-        </div>
-        <div
-          class="section section_withoutGap"
+        <fieldset
+          class="fields"
         >
           <div
-            class="sectionHeader"
+            class="section"
           >
-            <h2>
-              Exercises
-            </h2>
-            <button
-              class="button primary sm"
-              data-headlessui-state=""
-              type="button"
-            >
-              + Add Exercise
-            </button>
+            <div>
+              <label
+                class="label"
+                for="name"
+              >
+                List Name *
+              </label>
+              <input
+                class="input"
+                id="name"
+                placeholder="e.g., Push Day"
+                required=""
+                type="text"
+                value="Full Body"
+              />
+            </div>
+            <div>
+              <label
+                class="label"
+                for="description"
+              >
+                Description
+              </label>
+              <textarea
+                class="textarea"
+                id="description"
+                placeholder="Chest, shoulders, triceps"
+                rows="2"
+              >
+                Chest, shoulders, triceps
+              </textarea>
+            </div>
           </div>
           <div
-            class="exerciseList"
+            class="section section_withoutGap"
           >
             <div
-              class="exerciseCard"
+              class="sectionHeader"
             >
-              <div
-                class="exerciseHeader"
+              <h2>
+                Exercises
+              </h2>
+              <button
+                class="button primary sm"
+                data-headlessui-state=""
+                type="button"
               >
                 <span
-                  class="exerciseNumber"
+                  class="label"
                 >
-                  1
+                  + Add Exercise
                 </span>
-                <button
-                  aria-label="Remove exercise"
-                  class="removeButton"
-                  type="button"
-                >
-                  ✕
-                </button>
-              </div>
-              <div>
-                <label
-                  class="label"
-                >
-                  Name *
-                </label>
-                <input
-                  class="input"
-                  placeholder="Bench Press"
-                  required=""
-                  type="text"
-                  value="Bench Press"
-                />
-              </div>
-              <div>
-                <label
-                  class="label"
-                >
-                  Muscle Group
-                </label>
+              </button>
+            </div>
+            <div
+              class="exerciseList"
+            >
+              <div
+                class="exerciseCard"
+              >
                 <div
-                  class="listboxWrapper"
-                  data-headlessui-state=""
+                  class="exerciseHeader"
                 >
+                  <span
+                    class="exerciseNumber"
+                  >
+                    1
+                  </span>
                   <button
-                    aria-expanded="false"
-                    aria-haspopup="listbox"
-                    class="listboxButton"
-                    data-headlessui-state=""
-                    id="headlessui-listbox-button-:r10:"
+                    aria-label="Remove exercise"
+                    class="removeButton"
                     type="button"
                   >
-                    Chest
+                    ✕
                   </button>
+                </div>
+                <div>
+                  <label
+                    class="label"
+                  >
+                    Name *
+                  </label>
+                  <input
+                    class="input"
+                    placeholder="Bench Press"
+                    required=""
+                    type="text"
+                    value="Bench Press"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="label"
+                  >
+                    Muscle Group
+                  </label>
+                  <div
+                    class="listboxWrapper"
+                    data-headlessui-state=""
+                  >
+                    <button
+                      aria-expanded="false"
+                      aria-haspopup="listbox"
+                      class="listboxButton"
+                      data-headlessui-state=""
+                      id="headlessui-listbox-button-:r10:"
+                      type="button"
+                    >
+                      Chest
+                    </button>
+                  </div>
+                </div>
+                <div
+                  class="fieldRow"
+                >
+                  <div
+                    class="field"
+                    data-headlessui-state=""
+                  >
+                    <label
+                      class="label"
+                      data-headlessui-state=""
+                      for="weight-ex-1"
+                      id="headlessui-label-:r15:"
+                    >
+                      Weight (kg)
+                    </label>
+                    <input
+                      aria-labelledby="headlessui-label-:r15:"
+                      class="input inputSm "
+                      data-headlessui-state=""
+                      id="weight-ex-1"
+                      inputmode="decimal"
+                      type="text"
+                      value="80"
+                    />
+                    <span
+                      hidden=""
+                      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    />
+                  </div>
+                  <div
+                    class="field"
+                    data-headlessui-state=""
+                  >
+                    <label
+                      class="label"
+                      data-headlessui-state=""
+                      for="reps-ex-1"
+                      id="headlessui-label-:r18:"
+                    >
+                      Reps
+                    </label>
+                    <input
+                      aria-labelledby="headlessui-label-:r18:"
+                      class="input inputSm "
+                      data-headlessui-state=""
+                      id="reps-ex-1"
+                      inputmode="numeric"
+                      type="text"
+                      value="10"
+                    />
+                    <span
+                      hidden=""
+                      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    />
+                  </div>
+                  <div
+                    class="field"
+                    data-headlessui-state=""
+                  >
+                    <label
+                      class="label"
+                      data-headlessui-state=""
+                      for="sets-ex-1"
+                      id="headlessui-label-:r1b:"
+                    >
+                      Sets
+                    </label>
+                    <input
+                      aria-labelledby="headlessui-label-:r1b:"
+                      class="input inputSm "
+                      data-headlessui-state=""
+                      id="sets-ex-1"
+                      inputmode="numeric"
+                      type="text"
+                      value="3"
+                    />
+                    <span
+                      hidden=""
+                      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    />
+                  </div>
                 </div>
               </div>
               <div
-                class="fieldRow"
+                class="exerciseCard"
               >
                 <div
-                  class="field"
-                  data-headlessui-state=""
+                  class="exerciseHeader"
                 >
+                  <span
+                    class="exerciseNumber"
+                  >
+                    2
+                  </span>
+                  <button
+                    aria-label="Remove exercise"
+                    class="removeButton"
+                    type="button"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div>
                   <label
                     class="label"
-                    data-headlessui-state=""
-                    for="weight-ex-1"
-                    id="headlessui-label-:r15:"
                   >
-                    Weight (kg)
+                    Name *
                   </label>
                   <input
-                    aria-labelledby="headlessui-label-:r15:"
-                    class="input inputSm "
-                    data-headlessui-state=""
-                    id="weight-ex-1"
-                    inputmode="decimal"
+                    class="input"
+                    placeholder="Bench Press"
+                    required=""
                     type="text"
-                    value="80"
-                  />
-                  <span
-                    hidden=""
-                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    value="Overhead Press"
                   />
                 </div>
-                <div
-                  class="field"
-                  data-headlessui-state=""
-                >
+                <div>
                   <label
                     class="label"
-                    data-headlessui-state=""
-                    for="reps-ex-1"
-                    id="headlessui-label-:r18:"
                   >
-                    Reps
+                    Muscle Group
                   </label>
-                  <input
-                    aria-labelledby="headlessui-label-:r18:"
-                    class="input inputSm "
+                  <div
+                    class="listboxWrapper"
                     data-headlessui-state=""
-                    id="reps-ex-1"
-                    inputmode="numeric"
-                    type="text"
-                    value="10"
-                  />
-                  <span
-                    hidden=""
-                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
-                  />
+                  >
+                    <button
+                      aria-expanded="false"
+                      aria-haspopup="listbox"
+                      class="listboxButton"
+                      data-headlessui-state=""
+                      id="headlessui-listbox-button-:r1f:"
+                      type="button"
+                    >
+                      Shoulders
+                    </button>
+                  </div>
                 </div>
                 <div
-                  class="field"
-                  data-headlessui-state=""
+                  class="fieldRow"
                 >
-                  <label
-                    class="label"
+                  <div
+                    class="field"
                     data-headlessui-state=""
-                    for="sets-ex-1"
-                    id="headlessui-label-:r1b:"
                   >
-                    Sets
-                  </label>
-                  <input
-                    aria-labelledby="headlessui-label-:r1b:"
-                    class="input inputSm "
+                    <label
+                      class="label"
+                      data-headlessui-state=""
+                      for="weight-ex-2"
+                      id="headlessui-label-:r1k:"
+                    >
+                      Weight (kg)
+                    </label>
+                    <input
+                      aria-labelledby="headlessui-label-:r1k:"
+                      class="input inputSm "
+                      data-headlessui-state=""
+                      id="weight-ex-2"
+                      inputmode="decimal"
+                      type="text"
+                      value="50"
+                    />
+                    <span
+                      hidden=""
+                      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    />
+                  </div>
+                  <div
+                    class="field"
                     data-headlessui-state=""
-                    id="sets-ex-1"
-                    inputmode="numeric"
-                    type="text"
-                    value="3"
-                  />
-                  <span
-                    hidden=""
-                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
-                  />
+                  >
+                    <label
+                      class="label"
+                      data-headlessui-state=""
+                      for="reps-ex-2"
+                      id="headlessui-label-:r1n:"
+                    >
+                      Reps
+                    </label>
+                    <input
+                      aria-labelledby="headlessui-label-:r1n:"
+                      class="input inputSm "
+                      data-headlessui-state=""
+                      id="reps-ex-2"
+                      inputmode="numeric"
+                      type="text"
+                      value="8"
+                    />
+                    <span
+                      hidden=""
+                      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    />
+                  </div>
+                  <div
+                    class="field"
+                    data-headlessui-state=""
+                  >
+                    <label
+                      class="label"
+                      data-headlessui-state=""
+                      for="sets-ex-2"
+                      id="headlessui-label-:r1q:"
+                    >
+                      Sets
+                    </label>
+                    <input
+                      aria-labelledby="headlessui-label-:r1q:"
+                      class="input inputSm "
+                      data-headlessui-state=""
+                      id="sets-ex-2"
+                      inputmode="numeric"
+                      type="text"
+                      value="4"
+                    />
+                    <span
+                      hidden=""
+                      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-            <div
-              class="exerciseCard"
-            >
-              <div
-                class="exerciseHeader"
-              >
-                <span
-                  class="exerciseNumber"
-                >
-                  2
-                </span>
-                <button
-                  aria-label="Remove exercise"
-                  class="removeButton"
-                  type="button"
-                >
-                  ✕
-                </button>
-              </div>
-              <div>
-                <label
-                  class="label"
-                >
-                  Name *
-                </label>
-                <input
-                  class="input"
-                  placeholder="Bench Press"
-                  required=""
-                  type="text"
-                  value="Overhead Press"
-                />
-              </div>
-              <div>
-                <label
-                  class="label"
-                >
-                  Muscle Group
-                </label>
-                <div
-                  class="listboxWrapper"
-                  data-headlessui-state=""
-                >
-                  <button
-                    aria-expanded="false"
-                    aria-haspopup="listbox"
-                    class="listboxButton"
-                    data-headlessui-state=""
-                    id="headlessui-listbox-button-:r1f:"
-                    type="button"
-                  >
-                    Shoulders
-                  </button>
-                </div>
-              </div>
-              <div
-                class="fieldRow"
-              >
-                <div
-                  class="field"
-                  data-headlessui-state=""
-                >
-                  <label
-                    class="label"
-                    data-headlessui-state=""
-                    for="weight-ex-2"
-                    id="headlessui-label-:r1k:"
-                  >
-                    Weight (kg)
-                  </label>
-                  <input
-                    aria-labelledby="headlessui-label-:r1k:"
-                    class="input inputSm "
-                    data-headlessui-state=""
-                    id="weight-ex-2"
-                    inputmode="decimal"
-                    type="text"
-                    value="50"
-                  />
-                  <span
-                    hidden=""
-                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
-                  />
-                </div>
-                <div
-                  class="field"
-                  data-headlessui-state=""
-                >
-                  <label
-                    class="label"
-                    data-headlessui-state=""
-                    for="reps-ex-2"
-                    id="headlessui-label-:r1n:"
-                  >
-                    Reps
-                  </label>
-                  <input
-                    aria-labelledby="headlessui-label-:r1n:"
-                    class="input inputSm "
-                    data-headlessui-state=""
-                    id="reps-ex-2"
-                    inputmode="numeric"
-                    type="text"
-                    value="8"
-                  />
-                  <span
-                    hidden=""
-                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
-                  />
-                </div>
-                <div
-                  class="field"
-                  data-headlessui-state=""
-                >
-                  <label
-                    class="label"
-                    data-headlessui-state=""
-                    for="sets-ex-2"
-                    id="headlessui-label-:r1q:"
-                  >
-                    Sets
-                  </label>
-                  <input
-                    aria-labelledby="headlessui-label-:r1q:"
-                    class="input inputSm "
-                    data-headlessui-state=""
-                    id="sets-ex-2"
-                    inputmode="numeric"
-                    type="text"
-                    value="4"
-                  />
-                  <span
-                    hidden=""
-                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
-                  />
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
+        </fieldset>
         <div
           class="actions"
         >
@@ -697,14 +737,22 @@ exports[`WorkoutListForm matches snapshot for edit mode (multiple exercises) 1`]
             data-headlessui-state=""
             type="button"
           >
-            Cancel
+            <span
+              class="label"
+            >
+              Cancel
+            </span>
           </button>
           <button
             class="button primary md"
             data-headlessui-state=""
             type="submit"
           >
-            Save
+            <span
+              class="label"
+            >
+              Save
+            </span>
           </button>
         </div>
       </form>
@@ -731,202 +779,210 @@ exports[`WorkoutListForm matches snapshot for edit mode (single exercise) 1`] = 
       <form
         class="form"
       >
-        <div
-          class="section"
-        >
-          <div>
-            <label
-              class="label"
-              for="name"
-            >
-              List Name *
-            </label>
-            <input
-              class="input"
-              id="name"
-              placeholder="e.g., Push Day"
-              required=""
-              type="text"
-              value="Push Day"
-            />
-          </div>
-          <div>
-            <label
-              class="label"
-              for="description"
-            >
-              Description
-            </label>
-            <textarea
-              class="textarea"
-              id="description"
-              placeholder="Chest, shoulders, triceps"
-              rows="2"
-            >
-              Chest focus
-            </textarea>
-          </div>
-        </div>
-        <div
-          class="section section_withoutGap"
+        <fieldset
+          class="fields"
         >
           <div
-            class="sectionHeader"
+            class="section"
           >
-            <h2>
-              Exercises
-            </h2>
-            <button
-              class="button primary sm"
-              data-headlessui-state=""
-              type="button"
-            >
-              + Add Exercise
-            </button>
+            <div>
+              <label
+                class="label"
+                for="name"
+              >
+                List Name *
+              </label>
+              <input
+                class="input"
+                id="name"
+                placeholder="e.g., Push Day"
+                required=""
+                type="text"
+                value="Push Day"
+              />
+            </div>
+            <div>
+              <label
+                class="label"
+                for="description"
+              >
+                Description
+              </label>
+              <textarea
+                class="textarea"
+                id="description"
+                placeholder="Chest, shoulders, triceps"
+                rows="2"
+              >
+                Chest focus
+              </textarea>
+            </div>
           </div>
           <div
-            class="exerciseList"
+            class="section section_withoutGap"
           >
             <div
-              class="exerciseCard"
+              class="sectionHeader"
             >
-              <div
-                class="exerciseHeader"
+              <h2>
+                Exercises
+              </h2>
+              <button
+                class="button primary sm"
+                data-headlessui-state=""
+                type="button"
               >
                 <span
-                  class="exerciseNumber"
+                  class="label"
                 >
-                  1
+                  + Add Exercise
                 </span>
-                <button
-                  aria-label="Remove exercise"
-                  class="removeButton"
-                  type="button"
-                >
-                  ✕
-                </button>
-              </div>
-              <div>
-                <label
-                  class="label"
-                >
-                  Name *
-                </label>
-                <input
-                  class="input"
-                  placeholder="Bench Press"
-                  required=""
-                  type="text"
-                  value="Bench Press"
-                />
-              </div>
-              <div>
-                <label
-                  class="label"
-                >
-                  Muscle Group
-                </label>
-                <div
-                  class="listboxWrapper"
-                  data-headlessui-state=""
-                >
-                  <button
-                    aria-expanded="false"
-                    aria-haspopup="listbox"
-                    class="listboxButton"
-                    data-headlessui-state=""
-                    id="headlessui-listbox-button-:rh:"
-                    type="button"
-                  >
-                    Chest
-                  </button>
-                </div>
-              </div>
+              </button>
+            </div>
+            <div
+              class="exerciseList"
+            >
               <div
-                class="fieldRow"
+                class="exerciseCard"
               >
                 <div
-                  class="field"
-                  data-headlessui-state=""
+                  class="exerciseHeader"
                 >
+                  <span
+                    class="exerciseNumber"
+                  >
+                    1
+                  </span>
+                  <button
+                    aria-label="Remove exercise"
+                    class="removeButton"
+                    type="button"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div>
                   <label
                     class="label"
-                    data-headlessui-state=""
-                    for="weight-ex-1"
-                    id="headlessui-label-:rm:"
                   >
-                    Weight (kg)
+                    Name *
                   </label>
                   <input
-                    aria-labelledby="headlessui-label-:rm:"
-                    class="input inputSm "
-                    data-headlessui-state=""
-                    id="weight-ex-1"
-                    inputmode="decimal"
+                    class="input"
+                    placeholder="Bench Press"
+                    required=""
                     type="text"
-                    value="80"
-                  />
-                  <span
-                    hidden=""
-                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    value="Bench Press"
                   />
                 </div>
-                <div
-                  class="field"
-                  data-headlessui-state=""
-                >
+                <div>
                   <label
                     class="label"
-                    data-headlessui-state=""
-                    for="reps-ex-1"
-                    id="headlessui-label-:rp:"
                   >
-                    Reps
+                    Muscle Group
                   </label>
-                  <input
-                    aria-labelledby="headlessui-label-:rp:"
-                    class="input inputSm "
+                  <div
+                    class="listboxWrapper"
                     data-headlessui-state=""
-                    id="reps-ex-1"
-                    inputmode="numeric"
-                    type="text"
-                    value="10"
-                  />
-                  <span
-                    hidden=""
-                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
-                  />
+                  >
+                    <button
+                      aria-expanded="false"
+                      aria-haspopup="listbox"
+                      class="listboxButton"
+                      data-headlessui-state=""
+                      id="headlessui-listbox-button-:rh:"
+                      type="button"
+                    >
+                      Chest
+                    </button>
+                  </div>
                 </div>
                 <div
-                  class="field"
-                  data-headlessui-state=""
+                  class="fieldRow"
                 >
-                  <label
-                    class="label"
+                  <div
+                    class="field"
                     data-headlessui-state=""
-                    for="sets-ex-1"
-                    id="headlessui-label-:rs:"
                   >
-                    Sets
-                  </label>
-                  <input
-                    aria-labelledby="headlessui-label-:rs:"
-                    class="input inputSm "
+                    <label
+                      class="label"
+                      data-headlessui-state=""
+                      for="weight-ex-1"
+                      id="headlessui-label-:rm:"
+                    >
+                      Weight (kg)
+                    </label>
+                    <input
+                      aria-labelledby="headlessui-label-:rm:"
+                      class="input inputSm "
+                      data-headlessui-state=""
+                      id="weight-ex-1"
+                      inputmode="decimal"
+                      type="text"
+                      value="80"
+                    />
+                    <span
+                      hidden=""
+                      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    />
+                  </div>
+                  <div
+                    class="field"
                     data-headlessui-state=""
-                    id="sets-ex-1"
-                    inputmode="numeric"
-                    type="text"
-                    value="3"
-                  />
-                  <span
-                    hidden=""
-                    style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
-                  />
+                  >
+                    <label
+                      class="label"
+                      data-headlessui-state=""
+                      for="reps-ex-1"
+                      id="headlessui-label-:rp:"
+                    >
+                      Reps
+                    </label>
+                    <input
+                      aria-labelledby="headlessui-label-:rp:"
+                      class="input inputSm "
+                      data-headlessui-state=""
+                      id="reps-ex-1"
+                      inputmode="numeric"
+                      type="text"
+                      value="10"
+                    />
+                    <span
+                      hidden=""
+                      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    />
+                  </div>
+                  <div
+                    class="field"
+                    data-headlessui-state=""
+                  >
+                    <label
+                      class="label"
+                      data-headlessui-state=""
+                      for="sets-ex-1"
+                      id="headlessui-label-:rs:"
+                    >
+                      Sets
+                    </label>
+                    <input
+                      aria-labelledby="headlessui-label-:rs:"
+                      class="input inputSm "
+                      data-headlessui-state=""
+                      id="sets-ex-1"
+                      inputmode="numeric"
+                      type="text"
+                      value="3"
+                    />
+                    <span
+                      hidden=""
+                      style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px; display: none;"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </fieldset>
         <div
           class="actions"
         >
@@ -935,14 +991,22 @@ exports[`WorkoutListForm matches snapshot for edit mode (single exercise) 1`] = 
             data-headlessui-state=""
             type="button"
           >
-            Cancel
+            <span
+              class="label"
+            >
+              Cancel
+            </span>
           </button>
           <button
             class="button primary md"
             data-headlessui-state=""
             type="submit"
           >
-            Save
+            <span
+              class="label"
+            >
+              Save
+            </span>
           </button>
         </div>
       </form>
@@ -973,7 +1037,11 @@ exports[`WorkoutListForm matches snapshot for edit mode without initialData 1`] 
           data-headlessui-state=""
           type="button"
         >
-          Back to Home
+          <span
+            class="label"
+          >
+            Back to Home
+          </span>
         </button>
       </a>
     </div>

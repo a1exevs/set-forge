@@ -1,28 +1,21 @@
 import type { FC } from 'react';
 import { useCallback } from 'react';
 
-import type { ConfirmOptions, ConfirmResult } from '@shared/lib';
+import type { ConfirmOptions, ConfirmResult, Progress } from '@shared/lib';
 
 import ConfirmDialog from './confirm-dialog';
 
 type Props = {
   open: boolean;
   options: ConfirmOptions | null;
-  onClose: (value: boolean | ConfirmResult) => void;
+  onAnswer: (answer: ConfirmResult) => void;
+  progressOf: (answer: ConfirmResult) => Progress;
 };
 
-const ConfirmDialogLogicLayer: FC<Props> = ({ open, options, onClose }) => {
-  const handleConfirm = useCallback((): void => {
-    onClose(options?.alternateText != null ? 'confirm' : true);
-  }, [onClose, options?.alternateText]);
-
-  const handleAlternate = useCallback((): void => {
-    onClose('alternate');
-  }, [onClose]);
-
-  const handleDismiss = useCallback((): void => {
-    onClose(options?.alternateText != null ? 'cancel' : false);
-  }, [onClose, options?.alternateText]);
+const ConfirmDialogLogicLayer: FC<Props> = ({ open, options, onAnswer, progressOf }) => {
+  const handleConfirm = useCallback((): void => onAnswer('confirm'), [onAnswer]);
+  const handleAlternate = useCallback((): void => onAnswer('alternate'), [onAnswer]);
+  const handleDismiss = useCallback((): void => onAnswer('cancel'), [onAnswer]);
 
   if (!open || options == null) {
     return null;
@@ -42,6 +35,9 @@ const ConfirmDialogLogicLayer: FC<Props> = ({ open, options, onClose }) => {
       cancellationText={cancellationText}
       alternateText={options.alternateText}
       hideCancelButton={hideCancelButton}
+      confirmProgress={progressOf('confirm')}
+      alternateProgress={progressOf('alternate')}
+      cancelProgress={progressOf('cancel')}
       onConfirm={handleConfirm}
       onAlternate={handleAlternate}
       onCancel={handleDismiss}

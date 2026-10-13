@@ -8,6 +8,7 @@ import {
   validateRegisterPassword,
 } from '@entities/session';
 import { ApiRequestError } from '@shared/api';
+import { useProgress } from '@shared/lib';
 
 import AuthPage from './auth-page';
 import type { LoginInput, RegisterInput } from '../model/auth-input';
@@ -16,18 +17,19 @@ import type { AuthTab } from '../model/auth-tab';
 type Props = {
   activeTab: AuthTab;
   redirectSearch: Record<string, string | undefined>;
-  isSubmitting: boolean;
   onLogin: (input: LoginInput) => Promise<void>;
   onRegister: (input: RegisterInput) => Promise<void>;
+  /** The next step after a successful login or registration. */
+  onAuthenticated: (redirectTo: string | undefined) => Promise<void>;
   loadCaptchaUrl: () => Promise<string>;
 };
 
 const AuthPageLogicLayer: FC<Props> = ({
   activeTab,
   redirectSearch,
-  isSubmitting,
   onLogin,
   onRegister,
+  onAuthenticated,
   loadCaptchaUrl,
 }) => {
   const [email, setEmail] = useState('');
@@ -45,6 +47,7 @@ const AuthPageLogicLayer: FC<Props> = ({
   const [termsError, setTermsError] = useState<string | null>(null);
   const [captchaError, setCaptchaError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const { run, progressOf, busy } = useProgress<'submit'>();
 
   const redirectTo = typeof redirectSearch.redirect === 'string' ? redirectSearch.redirect : undefined;
 
@@ -78,7 +81,9 @@ const AuthPageLogicLayer: FC<Props> = ({
           return;
         }
         try {
-          await onRegister({ email: email.trim(), password, consent, termsAccepted, redirectTo });
+          if (await run('submit', () => onRegister({ email: email.trim(), password, consent, termsAccepted }))) {
+            await onAuthenticated(redirectTo);
+          }
         } catch (err) {
           if (err instanceof ApiRequestError) {
             setFormError(err.envelope.messages.join(' ') || 'Registration failed');
@@ -104,12 +109,13 @@ const AuthPageLogicLayer: FC<Props> = ({
       }
 
       try {
-        await onLogin({
-          email: email.trim(),
-          password,
-          captcha: showCaptcha ? captcha.trim() : undefined,
-          redirectTo,
-        });
+        const done = await run('submit', () =>
+          onLogin({ email: email.trim(), password, captcha: showCaptcha ? captcha.trim() : undefined }),
+        );
+        if (!done) {
+          return;
+        }
+        await onAuthenticated(redirectTo);
         setShowCaptcha(false);
         setCaptcha('');
         setCaptchaImageUrl(null);
@@ -141,11 +147,13 @@ const AuthPageLogicLayer: FC<Props> = ({
       termsAccepted,
       email,
       loadCaptchaUrl,
+      onAuthenticated,
       onLogin,
       onRegister,
       password,
       redirectTo,
       resetFieldErrors,
+      run,
       showCaptcha,
     ],
   );
@@ -168,7 +176,8 @@ const AuthPageLogicLayer: FC<Props> = ({
       termsError={termsError}
       captchaError={captchaError}
       formError={formError}
-      isSubmitting={isSubmitting}
+      locked={busy}
+      submitProgress={progressOf('submit')}
       onEmailChange={setEmail}
       onPasswordChange={setPassword}
       onConfirmPasswordChange={setConfirmPassword}

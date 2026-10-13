@@ -35,6 +35,16 @@ role.
   logic layer; no logic layer → export the presentation.
 - **Skip layers:** no server/client async state → no data layer; no state → no logic layer; simple → presentation only.
 
+## Actions in flight
+
+A control that sends a request shows it one way across the app; the logic layer owns it.
+
+- The request goes through `useProgress` (`@shared/lib`), a confirmed one through the `onConfirm` / `onAlternate`
+  of `useConfirm()`, a loading screen through `useLoadingPhase` — never an ad-hoc `isPending` from a data layer:
+  the timing and the locks live in those hooks.
+- The flow goes on — navigates, closes, toasts success — only after `run` resolves, so the indicator is never
+  cut short.
+
 ## File naming
 
 `component-name-data-layer.tsx`, `component-name-logic-layer.tsx`, `component-name.tsx`, `component-name.module.scss`
@@ -49,4 +59,5 @@ role.
 | React Query only in `model` / `api`, never in a `ui` segment | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
 | Components are `const X: FC<Props>` with a default export | `npm run client:lint` · ESLint `no-restricted-syntax` · `client/linter/rules/ui-segment-rule.ts` |
 | A data layer holds no business logic | ❌ review |
+| Requests in flight go through `useProgress` / `useConfirm` actions / `useLoadingPhase`, not an ad-hoc `isPending` | ❌ review |
 | The split into layers fits the component (not just renamed files) | ❌ review |

@@ -90,6 +90,7 @@ describe('WorkoutListForm', () => {
         <WorkoutListFormPresentation
           title="New Workout List"
           submitButtonText="Create List"
+          submitProgress="idle"
           name="Push Day"
           description="Chest focus"
           exercises={exercisesWithData}

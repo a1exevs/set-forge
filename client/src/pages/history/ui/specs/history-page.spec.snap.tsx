@@ -42,9 +42,9 @@ describe('HistoryPage', () => {
         swipeRef={createRef<HTMLDivElement>()}
         sessions={[SESSION]}
         total={1}
-        isLoading={false}
+        loadingPhase="content"
         isError={false}
-        isFetchingNextPage={false}
+        showNextPageSkeleton={false}
         expandedIds={{ 'sess-1': true }}
         onToggle={(): void => undefined}
         sentinelRef={createRef<HTMLDivElement>()}

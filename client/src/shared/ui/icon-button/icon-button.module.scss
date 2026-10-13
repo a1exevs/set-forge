@@ -11,16 +11,19 @@
     opacity 0.2s ease,
     transform 0.2s ease;
 
+  @include action-progress;
+
   svg {
     display: block;
   }
 
-  &[data-disabled] {
+  &[data-disabled],
+  &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
-  &[data-active]:not([data-disabled]) {
+  &[data-active]:not([data-disabled]):not(:disabled):not([data-progress='locked']) {
     transform: scale(0.97);
   }
 
@@ -30,7 +33,7 @@
     background-color: transparent;
     color: $text-primary;
 
-    &[data-hover]:not([data-disabled]) {
+    &[data-hover]:not([data-disabled]):not(:disabled):not([data-progress='locked']) {
       background-color: $bg-hover;
     }
   }
@@ -40,7 +43,7 @@
     color: $bg-primary;
     box-shadow: $shadow-lg;
 
-    &[data-hover]:not([data-disabled]) {
+    &[data-hover]:not([data-disabled]):not(:disabled):not([data-progress='locked']) {
       opacity: 0.9;
       box-shadow: $shadow-lg;
     }

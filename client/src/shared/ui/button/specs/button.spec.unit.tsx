@@ -98,4 +98,79 @@ describe('Button', () => {
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('progress', () => {
+    it('ignores a press while its request is pending, keeping the label as the name', async () => {
+      const handleClick = jest.fn();
+      const user = userEvent.setup();
+      render(
+        <Button progress="pending" onClick={handleClick}>
+          Save
+        </Button>,
+      );
+
+      const button = screen.getByRole('button', { name: 'Save' });
+      await user.click(button);
+
+      expect(handleClick).not.toHaveBeenCalled();
+      expect(button).toHaveAttribute('aria-busy', 'true');
+      expect(button).toHaveAttribute('aria-disabled', 'true');
+      expect(button).not.toBeDisabled();
+      expect(screen.queryByText('Loading')).not.toBeInTheDocument();
+    });
+
+    it('shows an indicator announced as loading when shown', () => {
+      render(<Button progress="shown">Save</Button>);
+
+      const button = screen.getByRole('button', { name: /Save/ });
+      expect(button).toHaveAttribute('data-progress', 'shown');
+      expect(screen.getByText('Loading')).toBeInTheDocument();
+    });
+
+    it('does not submit its form while in flight', async () => {
+      const handleSubmit = jest.fn((event: { preventDefault: () => void }): void => event.preventDefault());
+      const user = userEvent.setup();
+      render(
+        <form onSubmit={handleSubmit}>
+          <Button type="submit" progress="shown">
+            Log in
+          </Button>
+        </form>,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Log in/ }));
+
+      expect(handleSubmit).not.toHaveBeenCalled();
+    });
+
+    it('ignores a press and is marked as held by another action when locked', async () => {
+      const handleClick = jest.fn();
+      const user = userEvent.setup();
+      render(
+        <Button variant="secondary" progress="locked" onClick={handleClick}>
+          Cancel
+        </Button>,
+      );
+
+      const button = screen.getByRole('button', { name: 'Cancel' });
+      await user.click(button);
+
+      expect(handleClick).not.toHaveBeenCalled();
+      expect(button).toHaveAttribute('data-progress', 'locked');
+      expect(button).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('is a plain button when idle', async () => {
+      const handleClick = jest.fn();
+      const user = userEvent.setup();
+      render(<Button onClick={handleClick}>Save</Button>);
+
+      const button = screen.getByRole('button', { name: 'Save' });
+      await user.click(button);
+
+      expect(handleClick).toHaveBeenCalledTimes(1);
+      expect(button).not.toHaveAttribute('aria-busy');
+      expect(button).not.toHaveAttribute('data-progress');
+    });
+  });
 });

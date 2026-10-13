@@ -39,7 +39,8 @@ const meta = {
     termsError: null,
     captchaError: null,
     formError: null,
-    isSubmitting: false,
+    locked: false,
+    submitProgress: 'idle',
     onEmailChange: fn(),
     onPasswordChange: fn(),
     onConfirmPasswordChange: fn(),
@@ -87,6 +88,11 @@ export const RegisterMobile = buildMobileStoryObj<typeof meta>({ args: registerA
 
 /** A typo in the confirmation stops the registration on submit. */
 export const RegisterMismatchMobile = buildMobileStoryObj<typeof meta>({ args: registerMismatchArgs });
+
+/** Log in in flight: the fields are locked, the button shows its progress. */
+export const SubmittingMobile = buildMobileStoryObj<typeof meta>({
+  args: { email: 'jane@example.com', password: 'correct-horse', locked: true, submitProgress: 'shown' },
+});
 
 /** After too many attempts the server sends a captcha image and a form error. */
 export const WithCaptchaMobile = buildMobileStoryObj<typeof meta>({ args: captchaArgs });

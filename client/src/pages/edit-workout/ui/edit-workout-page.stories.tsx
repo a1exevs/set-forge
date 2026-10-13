@@ -9,6 +9,8 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
+import { WorkoutListFormSkeleton } from '@widgets/workout-list-form';
+
 import EditWorkoutPageLogicLayer from './edit-workout-page-logic-layer';
 
 const editWithDataProps = {
@@ -59,7 +61,8 @@ export const EditNotFoundMobile = buildMobileStoryObj<typeof meta>({ render: ren
 const renderEditLoading = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
     initialEntries: [`/edit/${mockWorkoutList.id}`],
-    component: (): JSX.Element => <EditWorkoutPageLogicLayer {...editWithDataProps} workout={undefined} />,
+    // The skeleton itself: the page shows it after a delay, and a story never waits on a timer.
+    component: (): JSX.Element => <WorkoutListFormSkeleton />,
   });
 
 /** The list is still loading: the form as a skeleton. */

@@ -60,7 +60,7 @@ const baseProps = {
   totalExercises: 1,
   completedExercises: 0,
   overallProgress: 0,
-  isStarting: false,
+  startProgress: 'idle' as const,
   onTap: jest.fn(),
   onStart: jest.fn(),
   onFinish: jest.fn(),

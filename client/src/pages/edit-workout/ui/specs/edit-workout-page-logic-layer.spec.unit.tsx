@@ -1,5 +1,7 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+import { answerWith } from 'tests/common/answer-confirm';
 
 import type { WorkoutList } from '@entities/workout-list';
 
@@ -85,7 +87,8 @@ describe('EditWorkoutPageLogicLayer', () => {
     confirmDialogMock.mockResolvedValue('cancel');
   });
 
-  it('shows the form skeleton while the list loads', () => {
+  it('shows nothing for 300 ms, then the form skeleton while the list loads', () => {
+    jest.useFakeTimers();
     render(
       <EditWorkoutPageLogicLayer
         id="list-1"
@@ -96,8 +99,13 @@ describe('EditWorkoutPageLogicLayer', () => {
       />,
     );
 
+    expect(screen.queryByRole('status', { name: 'Loading workout list' })).not.toBeInTheDocument();
+    act(() => {
+      jest.advanceTimersByTime(300);
+    });
     expect(screen.getByRole('status', { name: 'Loading workout list' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument();
+    jest.useRealTimers();
   });
 
   it('saves immediately when there is no active session', async () => {
@@ -151,7 +159,7 @@ describe('EditWorkoutPageLogicLayer', () => {
 
   it('saves without resync when Keep session is chosen', async () => {
     const user = userEvent.setup();
-    confirmDialogMock.mockResolvedValue('alternate');
+    confirmDialogMock.mockImplementation(answerWith('alternate'));
     const updateWorkoutList = jest.fn().mockResolvedValue(undefined);
     const resyncSession = jest.fn();
 
@@ -177,7 +185,7 @@ describe('EditWorkoutPageLogicLayer', () => {
 
   it('saves and resyncs when Update session is chosen', async () => {
     const user = userEvent.setup();
-    confirmDialogMock.mockResolvedValue('confirm');
+    confirmDialogMock.mockImplementation(answerWith('confirm'));
     const updateWorkoutList = jest.fn().mockResolvedValue(undefined);
     const resyncSession = jest.fn().mockResolvedValue(undefined);
 
@@ -229,7 +237,7 @@ describe('EditWorkoutPageLogicLayer', () => {
 
   it('shows resync error toast and does not navigate when resync fails after update', async () => {
     const user = userEvent.setup();
-    confirmDialogMock.mockResolvedValue('confirm');
+    confirmDialogMock.mockImplementation(answerWith('confirm'));
     const updateWorkoutList = jest.fn().mockResolvedValue(undefined);
     const error = new Error('Session sync failed');
     const resyncSession = jest.fn().mockRejectedValue(error);

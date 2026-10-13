@@ -183,4 +183,23 @@ describe('IconButton', () => {
       expect(handleClick).not.toHaveBeenCalled();
     });
   });
+
+  describe('progress', () => {
+    it('ignores a press while in flight and shows the indicator when shown', async () => {
+      const handleClick = jest.fn();
+      const user = userEvent.setup();
+      render(
+        <IconButton aria-label="Export workout lists" progress="shown" onClick={handleClick}>
+          <span>icon</span>
+        </IconButton>,
+      );
+
+      const button = screen.getByRole('button', { name: 'Export workout lists' });
+      await user.click(button);
+
+      expect(handleClick).not.toHaveBeenCalled();
+      expect(button).toHaveAttribute('aria-busy', 'true');
+      expect(button).toHaveAttribute('data-progress', 'shown');
+    });
+  });
 });

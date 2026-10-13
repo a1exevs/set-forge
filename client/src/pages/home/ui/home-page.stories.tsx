@@ -1,5 +1,6 @@
 import type { Meta } from '@storybook/react';
 import { fn } from '@storybook/test';
+import { createRef } from 'react';
 
 import { mockWorkoutLists } from 'storybook-dir/fixtures/workout-lists';
 import {
@@ -13,6 +14,7 @@ import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 import type { WorkoutListsExportFile } from '@entities/workout-list';
 import { formatDate } from '@shared/lib';
 
+import HomePage from './home-page';
 import HomePageLogicLayer from './home-page-logic-layer';
 
 const renderHomePage = (): ReturnType<typeof renderWithPageRouter> =>
@@ -53,19 +55,17 @@ const renderHomePageLoading = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({
     initialEntries: ['/'],
     component: (): JSX.Element => (
-      <HomePageLogicLayer
+      <HomePage
+        swipeRef={createRef<HTMLDivElement>()}
         workoutLists={[]}
-        isLoading
-        deleteWorkoutList={async (): Promise<void> => undefined}
-        clearWorkoutSessionCachesForDeletedList={(): void => undefined}
-        exportAllWorkoutLists={async (): Promise<WorkoutListsExportFile> => ({
-          formatVersion: 1,
-          app: 'set-forge',
-          exportedAt: new Date().toISOString(),
-          workoutLists: [],
-        })}
-        importWorkoutLists={async (): Promise<void> => undefined}
+        loadingPhase="skeleton"
+        exportProgress="idle"
         onEdit={fn()}
+        onDelete={fn()}
+        onExport={fn()}
+        onImportClick={fn()}
+        onImportFile={fn()}
+        importInputRef={createRef<HTMLInputElement>()}
         formatDate={formatDate}
       />
     ),

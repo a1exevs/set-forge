@@ -19,3 +19,76 @@
     pointer-events: none;
   }
 }
+
+// A disabled field — by its own prop or by a disabled fieldset around it — reads as unavailable
+@mixin field-disabled {
+  &:disabled,
+  &[data-disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// The progress of an action control (`data-progress` = `pending` | `shown` | `locked`): the label fades out but keeps
+// the size, an indicator spins in the center. `.label`, `.indicator`, `.indicatorText` are the parts it renders.
+@mixin action-progress {
+  position: relative;
+
+  .label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: inherit;
+    transition: opacity 0.15s ease-in-out;
+  }
+
+  .indicator {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+
+    svg {
+      width: 1.125rem;
+      height: 1.125rem;
+      animation: action-progress-spin 0.8s linear infinite;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+  }
+
+  // Read by screen readers, invisible on screen
+  .indicatorText {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  &[data-progress='pending'],
+  &[data-progress='shown'] {
+    cursor: progress;
+  }
+
+  // Held by another action of its group: looks as disabled as it is
+  &[data-progress='locked'] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &[data-progress='shown'] .label {
+    opacity: 0;
+  }
+
+  @keyframes action-progress-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}

@@ -38,7 +38,6 @@ const WorkoutModePageDataLayer: FC<Props> = ({ id }) => {
     <WorkoutModePageLogicLayer
       workoutList={isLoading ? undefined : (workoutList ?? null)}
       session={session}
-      isStarting={startWorkoutSessionMutation.isPending}
       startSession={async (workoutListId: string): Promise<void> => {
         await startWorkoutSessionMutation.mutateAsync(workoutListId);
       }}

@@ -2,7 +2,7 @@ import { FC, FormEvent, useEffect, useState } from 'react';
 
 import type { MuscleGroup } from '@entities/workout-exercise';
 import type { CreateWorkoutListDto, UpdateWorkoutListDto, WorkoutList } from '@entities/workout-list';
-import { useConfirm } from '@shared/lib';
+import { type Progress, useConfirm } from '@shared/lib';
 import { NotFoundMessage } from '@shared/ui';
 
 import WorkoutListForm from './workout-list-form';
@@ -17,6 +17,8 @@ import {
 
 type BaseProps = {
   onCancel: () => void;
+  /** The save in flight, run by the caller: the form locks its fields meanwhile. */
+  submitProgress?: Progress;
 };
 
 type CreateProps = BaseProps & {
@@ -33,7 +35,7 @@ type EditProps = BaseProps & {
 type Props = CreateProps | EditProps;
 
 const WorkoutListFormLogicLayer: FC<Props> = props => {
-  const { mode, onCancel } = props;
+  const { mode, onCancel, submitProgress = 'idle' } = props;
   const initialData = props.mode === 'edit' ? props.initialData : undefined;
   const confirmDialog = useConfirm();
 
@@ -186,6 +188,7 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
     <WorkoutListForm
       title={title}
       submitButtonText={submitButtonText}
+      submitProgress={submitProgress}
       name={name}
       description={description}
       exercises={exercises}
