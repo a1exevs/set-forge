@@ -1,11 +1,11 @@
+import { createSingleFlight } from '@shared/lib';
+
 import { clearAccessToken, setAccessToken } from './access-token-store';
 import { getApiBaseUrl } from './api-base-url';
 import type { CommonResponseEnvelope } from './common-response';
 import { ResultCodes } from './result-codes';
 
 type AuthPayload = { userId: number; accessToken: string };
-
-let refreshInFlight: Promise<boolean> | null = null;
 
 async function postRefresh(): Promise<boolean> {
   try {
@@ -34,14 +34,5 @@ async function postRefresh(): Promise<boolean> {
   }
 }
 
-/**
- * Single-flight refresh: concurrent 401s await the same refresh attempt.
- */
-export function refreshAccessToken(): Promise<boolean> {
-  if (!refreshInFlight) {
-    refreshInFlight = postRefresh().finally(() => {
-      refreshInFlight = null;
-    });
-  }
-  return refreshInFlight;
-}
+/** Concurrent 401s await the same refresh attempt (session/refresh-single-flight). */
+export const refreshAccessToken = createSingleFlight(postRefresh);
