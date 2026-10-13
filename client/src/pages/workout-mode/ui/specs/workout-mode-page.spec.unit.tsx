@@ -55,6 +55,7 @@ const SESSION: WorkoutSession = {
 };
 
 const baseProps = {
+  loadingPhase: 'content' as const,
   justCompleted: null,
   isFinished: false,
   totalExercises: 1,
@@ -69,6 +70,24 @@ const baseProps = {
 describe('WorkoutModePage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it('shows the skeleton with the way back while the workout loads', () => {
+    render(
+      <WorkoutModePage {...baseProps} loadingPhase="skeleton" phase="preview" workoutList={null} session={null} />,
+    );
+
+    expect(screen.getByRole('status', { name: 'Loading workout' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '← Back' })).toBeInTheDocument();
+    expect(screen.queryByText('Workout list not found')).not.toBeInTheDocument();
+  });
+
+  it('shows nothing during the first 300 ms of loading', () => {
+    const { container } = render(
+      <WorkoutModePage {...baseProps} loadingPhase="blank" phase="preview" workoutList={null} session={null} />,
+    );
+
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('shows not found when the workout list is missing', () => {

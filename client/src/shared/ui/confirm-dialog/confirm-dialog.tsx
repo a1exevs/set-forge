@@ -41,6 +41,10 @@ const ConfirmDialog: FC<Props> = ({
   onClose,
   ariaLabel,
 }) => {
+  if (!open) {
+    return null;
+  }
+
   const hasAlternate = alternateText != null && alternateText.length > 0;
 
   return (

@@ -4,6 +4,7 @@ import { FC } from 'react';
 
 import { useConfirm } from '@shared/lib';
 
+import ConfirmDialog from '../confirm-dialog';
 import ConfirmDialogProvider from '../confirm-dialog-provider';
 
 const TestConsumer: FC<{ onConfirmResult?: (result: boolean) => void }> = ({ onConfirmResult }) => {
@@ -374,5 +375,30 @@ describe('useConfirm', () => {
         render(<TestConsumerNoProvider />);
       }).toThrow('useConfirm must be used within ConfirmDialogProvider');
     });
+  });
+});
+
+describe('ConfirmDialog', () => {
+  it('renders nothing while closed', () => {
+    const { container } = render(
+      <ConfirmDialog
+        open={false}
+        title="Delete list?"
+        confirmationText="Delete"
+        cancellationText="Cancel"
+        hideCancelButton={false}
+        confirmProgress="idle"
+        alternateProgress="idle"
+        cancelProgress="idle"
+        onConfirm={jest.fn()}
+        onAlternate={jest.fn()}
+        onCancel={jest.fn()}
+        onClose={jest.fn()}
+        ariaLabel="Delete list?"
+      />,
+    );
+
+    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

@@ -88,6 +88,7 @@ describe('WorkoutListForm', () => {
     const { container } = render(
       <ConfirmDialogProvider>
         <WorkoutListFormPresentation
+          notFound={false}
           title="New Workout List"
           submitButtonText="Create List"
           submitProgress="idle"
