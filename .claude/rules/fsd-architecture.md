@@ -64,6 +64,9 @@ Our examples:
 | `Button`, `Select`, `NotFoundMessage`, `Toaster` | `shared/ui` | UI kit |
 | `useConfirm`, `toastError`, `formatDate`, `useThemeStore` | `shared/lib` | generic helpers and hooks |
 | screen widths | `shared/config` | constants |
+| `useT`, the language store, the language list | `shared/lib/i18n` | the mechanism knows no texts, so it is domain-agnostic |
+| the dictionaries `en.json`, `ru.json` | `app/i18n` | the texts of every screen: wiring of the whole app, not of one slice |
+| `LanguageSelect` | `shared/ui/language-select` | one control on a page, a widget and another page |
 | `LegalDocument` (knows `/privacy`, `/terms`, `/login`, the brand) | `widgets/legal-document` | used by two pages; not domain-agnostic, so not `shared` |
 | export file name `set-forge-workout-lists-<day>.json` | `pages/home/lib` | domain naming, one consumer |
 | `useLogout` (sign out + go to `/login`) | `features/logout/model` | one user action used by two slices (profile page, re-consent gate) |
@@ -96,9 +99,10 @@ Five standard segments in slices. Names describe the **purpose**, never the esse
 `app` and `shared` use their own segments, named by purpose, from a fixed list (`client/scripts/check-structure.ts`):
 
 - `app/`: `entrypoint/` (`main.tsx`, referenced from `index.html`), `routes/` (TanStack file routes), `router/`
-  (router + generated route tree), `api/` (query client), `styles/` (global styles). The FSD docs name `store/` for
-  the query client and put the router into `routes/`, but Steiger bans `store`, and TanStack Router treats every file
-  in `routes/` as a route — hence `api/` and a separate `router/`.
+  (router + generated route tree), `api/` (query client), `styles/` (global styles), `i18n/` (the dictionaries and
+  the typing of their keys — interface texts of every screen, so neither `shared` nor one slice; see i18n). The FSD
+  docs name `store/` for the query client and put the router into `routes/`, but Steiger bans `store`, and TanStack
+  Router treats every file in `routes/` as a route — hence `api/` and a separate `router/`.
 - `shared/`: `ui/`, `model/`, `api/`, `lib/`, `config/` (FSD allows a `model` in shared for domain-agnostic state;
   there is none yet). Grouping inside a segment is fine (`shared/lib/swipe/`,
   `shared/ui/button/`).
@@ -241,6 +245,8 @@ internals (`jest.mock('src/entities/session/model/bootstrap-session')`), and pre
 - `@headlessui/react` and `sonner` are imported **only** inside `src/shared/**`: every primitive is wrapped in
   `shared/ui/<name>/` (`Button`, `Select`, `Transition`, `Toaster`) or `shared/lib` (`toastError`). A wrapper is
   missing? Add it to `shared/ui` first.
+- `i18next` and `react-i18next` likewise: slices translate through `useT` / `Translate` and `LanguageSelect` from
+  `@shared/lib` / `@shared/ui` (see i18n).
 - `@tanstack/react-query` is not imported in `ui` segments of slices: server state comes through entity hooks
   (`useWorkoutListsQuery`, `useClearWorkoutSessionCachesForDeletedList`). Data layers call those hooks.
 
@@ -261,9 +267,10 @@ src/
 │   ├── entrypoint/     main.tsx (referenced from index.html)
 │   ├── api/            query-client
 │   ├── router/         router, route-tree.gen (generated), specs/ (whole-app tests, test-utils)
+│   ├── i18n/           en.json, ru.json, dictionaries (typed keys)
 │   ├── routes/         TanStack file routes (__root, index, create, edit/$id, workout/$id, …)
 │   └── styles/         global.scss
-├── pages/              auth, create-workout, edit-workout, history, home, privacy, profile, terms, workout-mode
+├── pages/              auth, create-workout, edit-workout, history, home, privacy, profile, settings, terms, workout-mode
 ├── widgets/            document-reconsent, legal-document, legal-footer, main-tabs-bar, workout-list-form
 ├── features/           logout
 ├── entities/
@@ -275,14 +282,14 @@ src/
 └── shared/
     ├── api/            index.ts, http-client, access-token-store, refresh-access-token, …
     ├── config/         index.ts, screen-widths
-    ├── lib/            index.ts, confirm/, swipe/, theme/, toast, format-date, numeric-input, …
-    └── ui/             index.ts, button/, select/, transition/, not-found-message/, styles/, …
+    ├── lib/            index.ts, confirm/, i18n/, swipe/, theme/, toast, format-date, numeric-input, …
+    └── ui/             index.ts, button/, select/, language-select/, transition/, not-found-message/, styles/, …
 ```
 
 ## Enforcement
 
 All client checks run in `npm run client:lint`: structure script → stories check → rules check → linter config and script types →
-ESLint → Steiger → knip. The domain docs check is `npm run lint:root` (`scripts/check-domain-docs.ts`).
+ESLint → Steiger → dictionary checks → knip. The domain docs check is `npm run lint:root` (`scripts/check-domain-docs.ts`).
 
 | Rule | Checked by |
 |---|---|
@@ -295,7 +302,7 @@ ESLint → Steiger → knip. The domain docs check is `npm run lint:root` (`scri
 | `api` / `lib` / `config` take only types from their `model` | `npm run client:lint` · ESLint `@typescript-eslint/no-restricted-imports` · `client/linter/rules/segment-direction-rule.ts` |
 | `ui` holds components and props types only | `npm run client:lint` · ESLint `no-restricted-syntax` · `client/linter/rules/ui-segment-rule.ts` |
 | `interface` only for domain entities in `entities/*/model` | `npm run client:lint` · ESLint `@typescript-eslint/consistent-type-definitions` · `client/eslint.config.ts` |
-| Headless UI / sonner only in `shared`; React Query not in `ui` | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
+| Headless UI / sonner / i18next only in `shared`; React Query not in `ui` | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
 | `shared` imports no other layer; other `shared` segments only via `@shared/<segment>` | `npm run client:lint` · ESLint `no-restricted-imports` · Steiger `fsd/forbidden-imports` |
 | `index.ts` placement, `@x` file names, allowed segments, nothing but `index.ts` in a slice root | `npm run client:lint` · `client/scripts/check-structure.ts` · Steiger `fsd/public-api` · Steiger `fsd/no-layer-public-api` · Steiger `fsd/no-segmentless-slices` |
 | No `export *`; no `eslint-disable` of FSD rules | `npm run client:lint` · `client/scripts/check-structure.ts` |

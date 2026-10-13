@@ -1,4 +1,5 @@
-import type { LegalContent, LegalLang } from '@widgets/legal-document';
+import type { Language } from '@shared/lib';
+import type { LegalContent } from '@widgets/legal-document';
 
 /**
  * Operator identity shown in the policy and used as the contact point for data-subject requests.
@@ -27,7 +28,7 @@ const contactEmail =
   (typeof __PRIVACY_CONTACT_EMAIL__ !== 'undefined' && __PRIVACY_CONTACT_EMAIL__) || 'privacy@set-forge.example';
 
 const PRIVACY_OPERATOR = {
-  name: { ru: operatorNameRu, en: operatorNameEn } as Record<LegalLang, string>,
+  name: { ru: operatorNameRu, en: operatorNameEn } as Record<Language, string>,
   contactEmail,
 } as const;
 
@@ -285,4 +286,4 @@ const en: LegalContent = {
   ],
 };
 
-export const privacyContent: Record<LegalLang, LegalContent> = { ru, en };
+export const privacyContent: Record<Language, LegalContent> = { ru, en };

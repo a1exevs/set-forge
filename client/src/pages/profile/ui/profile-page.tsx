@@ -1,13 +1,16 @@
+import { Link } from '@tanstack/react-router';
+import { Settings } from 'lucide-react';
 import { FC, RefObject } from 'react';
 
-import type { Progress } from '@shared/lib';
-import { BrandWordmark, Button, UserAvatar } from '@shared/ui';
+import type { Progress, Translate } from '@shared/lib';
+import { BrandWordmark, Button, IconButton, UserAvatar } from '@shared/ui';
 import { LegalFooter } from '@widgets/legal-footer';
 import { MainTabsBar } from '@widgets/main-tabs-bar';
 
 import classes from './profile-page.module.scss';
 
 type Props = {
+  t: Translate;
   swipeRef: RefObject<HTMLDivElement>;
   email: string;
   avatarLetter: string;
@@ -18,6 +21,7 @@ type Props = {
 };
 
 const ProfilePage: FC<Props> = ({
+  t,
   swipeRef,
   email,
   avatarLetter,
@@ -31,6 +35,9 @@ const ProfilePage: FC<Props> = ({
       <header className={classes.header}>
         <div className={classes.headerTop}>
           <BrandWordmark title="Profile" />
+          <IconButton as={Link} to="/settings" aria-label={t('profile.openSettings')} title={t('profile.openSettings')}>
+            <Settings size={20} strokeWidth={1.75} aria-hidden />
+          </IconButton>
         </div>
       </header>
 

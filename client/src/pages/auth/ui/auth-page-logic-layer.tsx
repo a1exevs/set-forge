@@ -8,7 +8,7 @@ import {
   validateRegisterPassword,
 } from '@entities/session';
 import { ApiRequestError } from '@shared/api';
-import { useProgress } from '@shared/lib';
+import { useProgress, useT } from '@shared/lib';
 
 import AuthPage from './auth-page';
 import type { LoginInput, RegisterInput } from '../model/auth-input';
@@ -48,6 +48,7 @@ const AuthPageLogicLayer: FC<Props> = ({
   const [captchaError, setCaptchaError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const { run, progressOf, busy } = useProgress<'submit'>();
+  const { t } = useT();
 
   const redirectTo = typeof redirectSearch.redirect === 'string' ? redirectSearch.redirect : undefined;
 
@@ -160,6 +161,7 @@ const AuthPageLogicLayer: FC<Props> = ({
 
   return (
     <AuthPage
+      t={t}
       activeTab={activeTab}
       email={email}
       password={password}

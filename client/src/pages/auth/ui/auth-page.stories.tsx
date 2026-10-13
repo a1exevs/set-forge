@@ -9,8 +9,11 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 import { renderWithAuthRouter } from 'storybook-dir/render-with-page-router';
+import { withTranslate } from 'storybook-dir/with-translate';
 
-import AuthPage from './auth-page';
+import AuthPagePresentation from './auth-page';
+
+const AuthPage = withTranslate(AuthPagePresentation);
 
 const meta = {
   title: 'Pages/AuthPage',

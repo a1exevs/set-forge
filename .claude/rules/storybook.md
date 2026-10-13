@@ -24,7 +24,9 @@ Chromatic. Few stories per component, each showing one axis or one state, not on
 - Helpers shared by stories live in `client/.storybook/`: `showcase.tsx` (`Frame`, `Row`, `Grid`, `Stack`, `Panel`,
   `Caption`, the `withFrame` decorator), `render-with-router.tsx` (a `shared` component around router `Link`s),
   `render-with-page-router.tsx` (a page: query client, confirm provider, routes), `helpers.ts` (viewport stories),
-  `fixtures/` (mock entities).
+  `with-translate.tsx` (a presentation that takes `t`), `fixtures/` (mock entities).
+- The toolbar language (`preview.tsx`) renders every story in the chosen language; a story never fixes the language
+  itself.
 
 ## Shape of a `shared` story
 

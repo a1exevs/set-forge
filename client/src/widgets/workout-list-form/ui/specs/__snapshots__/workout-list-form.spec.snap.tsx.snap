@@ -247,7 +247,28 @@ exports[`WorkoutListForm matches snapshot for create mode (with exercises) 1`] =
                       id="headlessui-listbox-button-:r2:"
                       type="button"
                     >
-                      Chest
+                      <span
+                        class="buttonLabel"
+                      >
+                        Chest
+                      </span>
+                      <svg
+                        aria-hidden="true"
+                        class="lucide lucide-chevron-down chevron"
+                        fill="none"
+                        height="18"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.75"
+                        viewBox="0 0 24 24"
+                        width="18"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="m6 9 6 6 6-6"
+                        />
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -501,7 +522,28 @@ exports[`WorkoutListForm matches snapshot for edit mode (multiple exercises) 1`]
                       id="headlessui-listbox-button-:r10:"
                       type="button"
                     >
-                      Chest
+                      <span
+                        class="buttonLabel"
+                      >
+                        Chest
+                      </span>
+                      <svg
+                        aria-hidden="true"
+                        class="lucide lucide-chevron-down chevron"
+                        fill="none"
+                        height="18"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.75"
+                        viewBox="0 0 24 24"
+                        width="18"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="m6 9 6 6 6-6"
+                        />
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -639,7 +681,28 @@ exports[`WorkoutListForm matches snapshot for edit mode (multiple exercises) 1`]
                       id="headlessui-listbox-button-:r1f:"
                       type="button"
                     >
-                      Shoulders
+                      <span
+                        class="buttonLabel"
+                      >
+                        Shoulders
+                      </span>
+                      <svg
+                        aria-hidden="true"
+                        class="lucide lucide-chevron-down chevron"
+                        fill="none"
+                        height="18"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.75"
+                        viewBox="0 0 24 24"
+                        width="18"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="m6 9 6 6 6-6"
+                        />
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -893,7 +956,28 @@ exports[`WorkoutListForm matches snapshot for edit mode (single exercise) 1`] = 
                       id="headlessui-listbox-button-:rh:"
                       type="button"
                     >
-                      Chest
+                      <span
+                        class="buttonLabel"
+                      >
+                        Chest
+                      </span>
+                      <svg
+                        aria-hidden="true"
+                        class="lucide lucide-chevron-down chevron"
+                        fill="none"
+                        height="18"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.75"
+                        viewBox="0 0 24 24"
+                        width="18"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="m6 9 6 6 6-6"
+                        />
+                      </svg>
                     </button>
                   </div>
                 </div>

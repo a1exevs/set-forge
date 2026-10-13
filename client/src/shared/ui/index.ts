@@ -3,6 +3,7 @@ export { default as Button } from './button/button';
 export { default as ConfirmDialogProvider } from './confirm-dialog/confirm-dialog-provider';
 export { default as Dialog } from './dialog/dialog';
 export { default as IconButton } from './icon-button/icon-button';
+export { default as LanguageSelect } from './language-select/language-select-data-layer';
 export { default as MenuButton } from './menu-button/menu-button';
 export { default as NotFoundMessage } from './not-found-message/not-found-message';
 export { default as NumericField } from './numeric-field/numeric-field-logic-layer';

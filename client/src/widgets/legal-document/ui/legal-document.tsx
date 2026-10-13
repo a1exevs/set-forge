@@ -2,11 +2,11 @@ import { Link } from '@tanstack/react-router';
 import { ArrowLeft } from 'lucide-react';
 import { FC, Fragment } from 'react';
 
-import { BrandWordmark } from '@shared/ui';
+import type { Translate } from '@shared/lib';
+import { BrandWordmark, LanguageSelect } from '@shared/ui';
 
 import classes from './legal-document.module.scss';
-import { LEGAL_BACK_LABELS, LEGAL_LANG_LABELS } from '../config/legal-labels';
-import type { LegalBlock, LegalContent, LegalLang, LegalLink, LegalSection, LegalText } from '../model/legal-content';
+import type { LegalBlock, LegalContent, LegalLink, LegalSection, LegalText } from '../model/legal-content';
 
 type LegalRichTextProps = { text: LegalText };
 
@@ -38,14 +38,13 @@ const LegalRichText: FC<LegalRichTextProps> = ({ text }) => {
 };
 
 type Props = {
+  t: Translate;
   doc: LegalContent;
-  lang: LegalLang;
   effectiveDate: string;
-  onLangChange: (lang: LegalLang) => void;
   onBack: () => void;
 };
 
-const LegalDocument: FC<Props> = ({ doc, lang, effectiveDate, onLangChange, onBack }) => {
+const LegalDocument: FC<Props> = ({ t, doc, effectiveDate, onBack }) => {
   return (
     <div className={classes.page}>
       <div className={classes.card}>
@@ -53,21 +52,9 @@ const LegalDocument: FC<Props> = ({ doc, lang, effectiveDate, onLangChange, onBa
           <div className={classes.topBar}>
             <button type="button" className={classes.backLink} onClick={onBack}>
               <ArrowLeft size={18} strokeWidth={1.75} aria-hidden />
-              {LEGAL_BACK_LABELS[lang]}
+              {t('common.back')}
             </button>
-            <div className={classes.langSwitch} role="group" aria-label="Language">
-              {(Object.keys(LEGAL_LANG_LABELS) as LegalLang[]).map((code: LegalLang) => (
-                <button
-                  key={code}
-                  type="button"
-                  className={code === lang ? `${classes.langButton} ${classes.langButtonActive}` : classes.langButton}
-                  aria-pressed={code === lang}
-                  onClick={(): void => onLangChange(code)}
-                >
-                  {LEGAL_LANG_LABELS[code]}
-                </button>
-              ))}
-            </div>
+            <LanguageSelect variant="compact" ariaLabel={t('language.label')} />
           </div>
           <BrandWordmark title="Set Forge" titleAs="h1" className={classes.wordmark} />
           <h2 className={classes.title}>{doc.title}</h2>
