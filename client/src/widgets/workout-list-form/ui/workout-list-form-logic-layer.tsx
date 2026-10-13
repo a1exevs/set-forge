@@ -3,10 +3,8 @@ import { FC, FormEvent, useEffect, useState } from 'react';
 import type { MuscleGroup } from '@entities/workout-exercise';
 import type { CreateWorkoutListDto, UpdateWorkoutListDto, WorkoutList } from '@entities/workout-list';
 import { type Progress, useConfirm } from '@shared/lib';
-import { NotFoundMessage } from '@shared/ui';
 
 import WorkoutListForm from './workout-list-form';
-import classes from './workout-list-form.module.scss';
 import type { ExerciseFormData } from '../model/exercise-form-data';
 import {
   getExerciseNumericFieldError,
@@ -176,16 +174,9 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
   const title = mode === 'create' ? 'New Workout List' : `Editing ${name || initialData?.name || 'Untitled'}`;
   const submitButtonText = mode === 'create' ? 'Create List' : 'Save';
 
-  if (mode === 'edit' && !initialData) {
-    return (
-      <div className={classes.container}>
-        <NotFoundMessage title="Workout list not found" backToLink="/" />
-      </div>
-    );
-  }
-
   return (
     <WorkoutListForm
+      notFound={mode === 'edit' && !initialData}
       title={title}
       submitButtonText={submitButtonText}
       submitProgress={submitProgress}

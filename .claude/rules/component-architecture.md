@@ -23,7 +23,11 @@ role.
 | Presentation | `*.tsx` | markup from props | call or import any hook — router, swipe and DOM hooks included: the logic layer calls them and passes the result (`swipeRef`, `activeItemId`) |
 
 - Context providers (`*-provider.tsx`) own state like a data layer.
-- A logic layer may render something other than its presentation (`null` while loading, a `NotFoundMessage`).
+- The presentation renders every state of the component — blank, skeleton, empty, not found, error, closed — from
+  props (`loadingPhase`, nullable data, `open`); the logic layer computes them and its render returns only its
+  presentation, with no other return. So the states of a screen live in one place and every screen reads the same.
+  A page with no markup of its own: its logic layer returns the one widget it composes the same way,
+  unconditionally (`create-workout`).
 
 ```typescript
 // Data: useWorkoutListsQuery(); return <LogicLayer workoutLists={data ?? []} ... />;
@@ -41,7 +45,8 @@ A control that sends a request shows it one way across the app; the logic layer 
 
 - The request goes through `useProgress` (`@shared/lib`), a confirmed one through the `onConfirm` / `onAlternate`
   of `useConfirm()`, a loading screen through `useLoadingPhase` — never an ad-hoc `isPending` from a data layer:
-  the timing and the locks live in those hooks.
+  the timing and the locks live in those hooks. The logic layer calls `useLoadingPhase`; the presentation draws the
+  phase it passes.
 - The flow goes on — navigates, closes, toasts success — only after `run` resolves, so the indicator is never
   cut short.
 
@@ -61,3 +66,4 @@ A control that sends a request shows it one way across the app; the logic layer 
 | A data layer holds no business logic | ❌ review |
 | Requests in flight go through `useProgress` / `useConfirm` actions / `useLoadingPhase`, not an ad-hoc `isPending` | ❌ review |
 | The split into layers fits the component (not just renamed files) | ❌ review |
+| A logic layer returns only its presentation; the states are drawn by the presentation | ❌ review |

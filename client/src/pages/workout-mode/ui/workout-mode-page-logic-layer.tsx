@@ -6,7 +6,6 @@ import { hasRemainingSets } from '@entities/workout-session-exercise';
 import { toastError, useConfirm, useLoadingPhase, useProgress } from '@shared/lib';
 
 import WorkoutModePage from './workout-mode-page';
-import WorkoutModePageSkeleton from './workout-mode-page-skeleton';
 import { fireWorkoutCompleteConfetti } from '../lib/fire-workout-complete-confetti';
 
 type Props = {
@@ -192,18 +191,11 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     })();
   }, [session, phase, finishSession]);
 
-  if (loadingPhase === 'skeleton') {
-    return <WorkoutModePageSkeleton />;
-  }
-  // Before the skeleton is due: a list that comes sooner shows with no skeleton
-  if (workoutList === undefined) {
-    return null;
-  }
-
   return (
     <WorkoutModePage
+      loadingPhase={loadingPhase}
       phase={phase}
-      workoutList={workoutList}
+      workoutList={workoutList ?? null}
       session={session}
       justCompleted={justCompleted}
       isFinished={isFinished}

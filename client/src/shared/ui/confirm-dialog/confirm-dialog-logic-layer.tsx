@@ -17,23 +17,19 @@ const ConfirmDialogLogicLayer: FC<Props> = ({ open, options, onAnswer, progressO
   const handleAlternate = useCallback((): void => onAnswer('alternate'), [onAnswer]);
   const handleDismiss = useCallback((): void => onAnswer('cancel'), [onAnswer]);
 
-  if (!open || options == null) {
-    return null;
-  }
-
-  const confirmationText = options.confirmationText ?? 'Confirm';
-  const cancellationText = options.cancellationText ?? 'Cancel';
-  const hideCancelButton = options.hideCancelButton ?? false;
-  const ariaLabel = typeof options.title === 'string' ? options.title : 'Confirmation dialog';
+  const confirmationText = options?.confirmationText ?? 'Confirm';
+  const cancellationText = options?.cancellationText ?? 'Cancel';
+  const hideCancelButton = options?.hideCancelButton ?? false;
+  const ariaLabel = typeof options?.title === 'string' ? options.title : 'Confirmation dialog';
 
   return (
     <ConfirmDialog
-      open={open}
-      title={options.title}
-      description={options.description}
+      open={open && options != null}
+      title={options?.title}
+      description={options?.description}
       confirmationText={confirmationText}
       cancellationText={cancellationText}
-      alternateText={options.alternateText}
+      alternateText={options?.alternateText}
       hideCancelButton={hideCancelButton}
       confirmProgress={progressOf('confirm')}
       alternateProgress={progressOf('alternate')}

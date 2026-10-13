@@ -5,14 +5,16 @@ import { type WorkoutExercise, WorkoutExerciseCard } from '@entities/workout-exe
 import type { WorkoutList } from '@entities/workout-list';
 import type { WorkoutSession } from '@entities/workout-session';
 import { type WorkoutSessionExercise, WorkoutSessionExerciseCard } from '@entities/workout-session-exercise';
-import { cssVars, type Progress } from '@shared/lib';
+import { cssVars, type LoadingPhase, type Progress } from '@shared/lib';
 import { Button, NotFoundMessage } from '@shared/ui';
 
+import WorkoutModePageSkeleton from './workout-mode-page-skeleton';
 import classes from './workout-mode-page.module.scss';
 import { PREVIEW_HINT } from '../config/preview-hint';
 import type { WorkoutPhase } from '../model/workout-phase';
 
 type Props = {
+  loadingPhase: LoadingPhase;
   phase: WorkoutPhase;
   workoutList: WorkoutList | null;
   session: WorkoutSession | null;
@@ -28,6 +30,7 @@ type Props = {
 };
 
 const WorkoutModePage: FC<Props> = ({
+  loadingPhase,
   phase,
   workoutList,
   session,
@@ -41,6 +44,14 @@ const WorkoutModePage: FC<Props> = ({
   onStart,
   onFinish,
 }) => {
+  if (loadingPhase === 'skeleton') {
+    return <WorkoutModePageSkeleton />;
+  }
+  // Before the skeleton is due: a list that comes sooner shows with no skeleton
+  if (loadingPhase === 'blank') {
+    return null;
+  }
+
   if (!workoutList) {
     // TODO: Distinguish query errors from a missing list — not only "Workout list not found" (see data layer)
     return (

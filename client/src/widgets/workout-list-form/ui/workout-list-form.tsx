@@ -2,13 +2,15 @@ import { ChangeEvent, FC, FormEvent } from 'react';
 
 import { type MuscleGroup, muscleGroups } from '@entities/workout-exercise';
 import type { Progress } from '@shared/lib';
-import { Button, NumericField, Select } from '@shared/ui';
+import { Button, NotFoundMessage, NumericField, Select } from '@shared/ui';
 
 import classes from './workout-list-form.module.scss';
 import { muscleGroupOptions } from '../config/muscle-group-options';
 import type { ExerciseFormData } from '../model/exercise-form-data';
 
 type Props = {
+  /** No list to edit: the not-found message instead of the form. */
+  notFound: boolean;
   title: string;
   submitButtonText: string;
   /** The save in flight: the fields and Cancel wait for its answer. */
@@ -35,6 +37,7 @@ type Props = {
 };
 
 const WorkoutListForm: FC<Props> = ({
+  notFound,
   title,
   submitButtonText,
   submitProgress,
@@ -51,6 +54,14 @@ const WorkoutListForm: FC<Props> = ({
   submitAttempted,
   getExerciseNumericFieldError,
 }) => {
+  if (notFound) {
+    return (
+      <div className={classes.container}>
+        <NotFoundMessage title="Workout list not found" backToLink="/" />
+      </div>
+    );
+  }
+
   return (
     <div className={classes.container}>
       <header className={classes.header}>

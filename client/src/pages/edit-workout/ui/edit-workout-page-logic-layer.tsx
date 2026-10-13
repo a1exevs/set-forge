@@ -3,8 +3,8 @@ import { FC } from 'react';
 
 import type { UpdateWorkoutListDto, WorkoutList } from '@entities/workout-list';
 import { toastError, toastSuccess, useConfirm, useLoadingPhase, useProgress } from '@shared/lib';
-import { NotFoundMessage } from '@shared/ui';
-import { WorkoutListForm, WorkoutListFormSkeleton } from '@widgets/workout-list-form';
+
+import EditWorkoutPage from './edit-workout-page';
 
 type Props = {
   id: string;
@@ -19,19 +19,6 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
   const confirmDialog = useConfirm();
   const { run, progressOf } = useProgress<'save'>();
   const loadingPhase = useLoadingPhase(workout === undefined);
-
-  if (loadingPhase === 'skeleton') {
-    return <WorkoutListFormSkeleton />;
-  }
-  // Before the skeleton is due: a list that comes sooner shows with no skeleton
-  if (workout === undefined) {
-    return null;
-  }
-
-  // TODO: Distinguish query errors from a missing list — not only "Workout list not found" (see data layer)
-  if (workout === null) {
-    return <NotFoundMessage title="Workout list not found" />;
-  }
 
   // Rejects after its toast, so the button or the dialog that runs it goes back to normal and the user stays.
   const save = async (dto: UpdateWorkoutListDto, resyncSessionId: string | null): Promise<void> => {
@@ -83,9 +70,9 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
   };
 
   return (
-    <WorkoutListForm
-      mode="edit"
-      initialData={workout}
+    <EditWorkoutPage
+      loadingPhase={loadingPhase}
+      workout={workout ?? null}
       submitProgress={progressOf('save')}
       onSubmit={(dto: UpdateWorkoutListDto): void => void onSubmit(dto)}
       onCancel={(): void => {
