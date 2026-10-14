@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Create a GitHub Pull Request for the current branch with the repository's title, description and label conventions, linked to its task (issue) with the acceptance criteria as checkboxes — or refresh the description of the branch's open PR from the task folder. Use when the user asks to open / create / refresh a PR or runs /pr.
+description: Create a GitHub Pull Request for the current branch (into develop, the parent branch of a sub-issue or the shared branch of a part) with the repository's title, description and label conventions, linked to its task (issue) with the acceptance criteria as checkboxes — or refresh the description of the branch's open PR from the task folder. Use when the user asks to open / create / refresh a PR or runs /pr.
 ---
 
 # pr
@@ -9,14 +9,16 @@ Act as a Git Automation Agent. Your goal is to create a GitHub Pull Request foll
 
 1. BRANCH & ENVIRONMENT CHECK
 The branch rules live in `.claude/skills/branches/SKILL.md` (`/branches`); follow it, including its gate.
-Identify the current branch and its base, given by the branch name (branches §3): `develop`, or the shared branch of a `--<n>` sub-branch.
+Identify the current branch and its base (branches §3): `develop`, the shared branch of a `--<n>` sub-branch, or the parent branch of a sub-issue.
 Safety Lock: If the current branch is protected (branches §1), STOP and warn the user that PRs cannot be created from it — promotion PRs belong to `/release`.
 Prefix Check: Ensure the branch name is `<type>/<name>` with a work type from branches §2.
 If it is not, STOP and propose a rename; renaming (and pushing the renamed branch) waits for the user's yes (branches §4).
 If the branch is not on `origin` yet, its first push (branches §5) is part of the confirmation in step 6.
 Task Check: a branch of a task carries the issue number (branches §2: `feature/12-workout-export--2` → `12`). Read it
 with `gh issue view <N> --json state,title,url,body`; a missing or closed issue → STOP and ask. The task model lives
-in `.claude/skills/analyst/SKILL.md` §1 (`/analyst`).
+in `.claude/skills/analyst/SKILL.md` §1 (`/analyst`). The ticket's place, from its body (`/analyst` §1 The issue):
+`## Parent` #P → a sub-issue PR, its base the parent branch; `## Sub-issues` → the PR of a parent branch into
+`develop`, its sub-issues listed there (step 3).
 Open PR Check, last: `gh pr view --json number,state` — the branch already has an open PR → this is a refresh, go
 to step 7; never a second PR.
 
@@ -36,9 +38,27 @@ Only for a branch of a task (step 1); without one, skip this step.
 The description starts with one line that links the task, by the base:
 - base `develop` (a task branch or its shared branch): `Closes #<N>` — the PR is linked to the issue, and merging it
   closes the issue and moves the card to Done;
+- base `develop`, a parent branch: `Closes #<P>, closes #<a>, closes #<b>, …` — the parent and every sub-issue
+  (`## Sub-issues` of step 1), the keyword repeated for each: GitHub closes only the numbers a keyword stands
+  before. The merge moves every card to Done;
+- base a parent branch (a sub-issue): `Part of #<P> · requirements: #<N>` — plain references: a closing keyword
+  does nothing in a PR into a branch other than `develop`, the default one;
 - base a shared branch (a sub-branch): `Part of #<N>` — a plain reference; the status stays In progress.
 
-A PR into `develop` also carries the acceptance criteria, after the key changes and before `## Code review`. Copy
+The PR of a parent branch into `develop` lists its sub-issue PRs after the key changes, instead of acceptance
+criteria — every sub-issue was accepted on its own PR:
+```
+## Sub-issues
+
+- #110 Language choice … — #131 merged
+- #111 Server errors identified by code — #<n> open
+```
+`gh pr list --base <parent branch> --state all --json number,state,headRefName,title`, matched to the sub-issues by
+the number in the branch name. A sub-issue without a merged PR, or still open → say so when presenting: merging the
+parent now would close it unfinished.
+
+A PR of a task into `develop` and a sub-issue PR into its parent branch carry the issue's acceptance criteria, after
+the key changes and before `## Code review` — acceptance is per sub-issue. Copy
 every `- **AC-<n>** …` line of the issue's `## Acceptance criteria` section (`/analyst` §1 The issue) verbatim as an
 unticked checkbox:
 ```
@@ -50,8 +70,8 @@ From #<N> — ticked by the user on acceptance.
 - [ ] **AC-2** …
 ```
 The issue has no such section (filed by hand) → the section says `_Issue #<N> has no acceptance criteria._`; tell the
-user when presenting the description. Never tick a box: acceptance is the user's. A PR of a sub-branch has no such
-section.
+user when presenting the description. Never tick a box: acceptance is the user's. A PR of a sub-branch and the PR
+of a parent branch have no such section.
 
 Then the developer's own check, before `## Code review` (after the acceptance criteria, or after the key changes
 when there are none): `/developer` keeps it in `stand-check.md` of the branch's task folder (branches §2). The file
@@ -96,11 +116,15 @@ Upon approval, push the branch if needed and use `gh pr create --base <base>` to
 Called by `/developer` in its autonomous PR horizon (developer step 8): the yes was given at its LLD gate and
 named the push and this PR — skip the question, push and create.
 A PR of a task into `develop`: then read the task's status (`/analyst` §1 Setting a field); unless the board
-workflow already moved it, set `Status` = In review. A sub-branch PR leaves the status alone.
+workflow already moved it, set `Status` = In review. A sub-issue PR into its parent branch: set the sub-issue's
+`Status` = In review yourself — the board workflow does not see a PR without a closing keyword; it stays there until
+the parent's merge (`/analyst` §1 Statuses). The PR of a parent branch: the parent → In review, the sub-issues as
+they are. A sub-branch PR leaves the status alone.
 
 7. REFRESH
 Reached from step 1 when the branch already has an open PR (`gh pr view --json number,body`). Rebuild the
-description by steps 2–4 from the current state — the commits, `stand-check.md` (its `## Hand check` included)
-and `code-review.md` — keep the acceptance boxes exactly as ticked, and apply it with
+description by steps 2–4 from the current state — the commits, `stand-check.md` (its `## Hand check` included),
+`code-review.md` and, for a parent branch, its sub-issue PRs — keep the acceptance boxes exactly as ticked, and
+apply it with
 `gh pr edit <n> --body-file <file>`. Called by `/developer` after a CI fix or the hand check (its step 8), or by
 the user as `/pr` on the same branch; show the diff of the description in one line before applying.
