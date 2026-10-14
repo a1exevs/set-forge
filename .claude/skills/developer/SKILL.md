@@ -191,10 +191,11 @@ Run the HLD consistency check (§3). At the same gate ask three things:
 
 - the mode: **manual** (default) or **autonomous**;
 - for autonomous, the **horizon** (step 8): **commit** (default) — one commit, no push; or **PR** — the commit, the
-  first push of the task branch, `/pr` without its own confirmation, then the CI fixed until it is green, every fix
-  its own commit and push. The yes to the PR horizon is the explicit yes `/branches` §4 wants for those pushes and
-  that PR — the gate line lists them (`git push -u origin <branch>`, `/pr` into its base — `develop` or, for a
-  sub-issue, the parent branch — the fix pushes), so the yes names them;
+  first push of the task branch, `/pr` without its own confirmation, then the CI — or, into a parent or a shared branch,
+  its steps run locally (`/pr` §6) — fixed until it is green, every fix its own commit and push. The yes to the PR
+  horizon is the explicit yes `/branches` §4 wants for those pushes and that PR — the gate line lists them (`git push -u
+  origin <branch>`, `/pr` into its base — `develop` or, for a sub-issue, the parent branch — the fix pushes), so the yes
+  names them;
 - **the stand check** (step 8) — name what it will walk (the acceptance criteria, or for a task without them the
   flows from the reach of step 4) and with which preset (§7):
   - yes by default for any change of how the running app behaves — in the client or in the API alone (a validation,
@@ -254,14 +255,15 @@ A decision the LLD did not foresee → the HLD consistency check (§3), in both 
    The stand stays up after the walk — the user checks on it (p. 6); never stop it here.
 3. One commit with the `/commit` template. Manual: `/commit` asks for its approval as usual. Autonomous: choosing the
    mode was that approval — commit without asking. No push — except the PR horizon (p. 4).
-4. **The PR horizon** (autonomous → PR only). Push the branch (`git push -u origin <branch>`) and run `/pr` into
-   the base of `/branches` §3 — `develop`, or the parent branch for a sub-issue, as the gate line of step 6 named
-   it — its confirmation was the yes of step 6 (`/pr` §6). Then the CI: the app binds the PR and reports its
-   checks — never poll them yourself (no `gh` loops). The turn ends with one line, not the report: "PR #<n> is
-   open, CI is running, the stand is up at <url>". A red check → read its log, fix it as an iteration (verify, one
-   `/code-review` round), one commit through `/commit`, push; a change in `server/` also restarts the stand (§7),
-   so the stand shows the code of the PR. Up to 3 fix rounds; still red → stop and report it as open. A change of
-   `stand-check.md` while the PR exists → refresh its description (`/pr` §7).
+4. **The PR horizon** (autonomous → PR only). Run `/pr` into the base of `/branches` §3 — `develop`, or the parent
+   branch for a sub-issue, as the gate line of step 6 named it; it pushes the branch (`git push -u origin <branch>`),
+   and its confirmation was the yes of step 6 (`/pr` §6). Into a parent or a shared branch there is no CI: `/pr` runs
+   its steps locally before the push (`/pr` §6), a red step is fixed like a red check below. Into `develop`, the CI: the
+   app binds the PR and reports its checks — never poll them yourself (no `gh` loops). The turn ends with one line, not
+   the report: "PR #<n> is open, CI is running, the stand is up at <url>". A red check → read its log, fix it as an
+   iteration (verify, one `/code-review` round), one commit through `/commit`, push; a change in `server/` also restarts
+   the stand (§7), so the stand shows the code of the PR. Up to 3 fix rounds; still red → stop and report it as open. A
+   change of `stand-check.md` while the PR exists → refresh its description (`/pr` §7).
 5. Report, in the chat — after the commit; in the PR horizon after the CI is green or the rounds are spent: the
    iterations, the review rounds and what is still open, the stand check, the commit hashes, the PR link. Then the
    hand check: the acceptance criteria are the user's to walk. When step 6 chose the stand, it is still up — give

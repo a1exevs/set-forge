@@ -112,6 +112,10 @@ Labels: Add the label of the branch type (branches §2: `feature/login` → `fea
 6. CONFIRMATION & EXECUTION
 Present the final Base, Title, Description, Labels and the task (number, title, link) to the user.
 Ask: "Ready to create the Pull Request with these details?"
+The CI runs only on PRs into `develop`, `testing` and `main` (`.github/workflows/`), so a big feature never waits
+for it part by part. A base other than those (a parent or a shared branch) → before the push, run the steps of
+`project-build.yml` and `project-test.yml` locally; a red one → STOP and report it, the PR waits for the fix.
+The e2e suites run on the PR of that branch into `develop`.
 Upon approval, push the branch if needed and use `gh pr create --base <base>` to submit it.
 Called by `/developer` in its autonomous PR horizon (developer step 8): the yes was given at its LLD gate and
 named the push and this PR — skip the question, push and create.

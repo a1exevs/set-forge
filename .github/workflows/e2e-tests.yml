@@ -1,9 +1,8 @@
 name: E2E Tests
 
 on:
-  # PRs into any base: develop / testing / main, and the parent branch of sub-issues
-  # or the shared branch of parts (/branches §1).
   pull_request:
+    branches: [ develop, testing, main ]
 
 jobs:
   client-e2e:
