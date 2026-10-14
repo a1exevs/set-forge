@@ -6,7 +6,8 @@ paths:
 
 # Feature-Sliced Design
 
-`client/src` follows standard [Feature-Sliced Design](https://feature-sliced.design/docs/get-started/overview).
+`client/src` follows standard
+[Feature-Sliced Design](https://feature-sliced.design/docs/get-started/overview).
 `npm run client:lint` enforces almost all of it — see [Enforcement](#enforcement). What no tool can check is
 marked there.
 
@@ -49,7 +50,7 @@ Our examples:
 
 | Code | Place | Why |
 |---|---|---|
-| `HomePage` (data / logic / view layers) | `pages/home/ui` | a screen |
+| `HomePage` (data / logic / presentation layers) | `pages/home/ui` | a screen |
 | `WorkoutPhase`, `AuthTab` | `pages/<slice>/model` | page-local types, out of components |
 | `isExerciseComplete`, `isSessionFullyComplete`, `countCompletedExercises` | `entities/workout-session-exercise/model`, `entities/workout-session/model` | a business rule used by several pages and the entity card — one definition in the entity |
 | history date/duration formatters, confetti | `pages/history/lib`, `pages/workout-mode/lib` | helpers of one page |
@@ -69,7 +70,8 @@ Our examples:
 | `useLogout` (sign out + go to `/login`) | `features/logout/model` | one user action used by two slices (profile page, re-consent gate) |
 | redirect after sign-in (`resolveRedirectTarget`, `useRedirectAfterAuth`) | `pages/auth/lib`, `pages/auth/model` | a flow of one page; entities never navigate |
 
-`shared` never knows about the domain: no workouts or sessions there, and it never imports from other layers.
+`shared` never knows about the domain: no workout lists or workout sessions there, and it never imports from other
+layers.
 
 ## 3. Slices
 
@@ -99,17 +101,16 @@ Five standard segments in slices. Names describe the **purpose**, never the esse
   (router + generated route tree), `api/` (query client), `styles/` (global styles). The FSD docs name `store/` for
   the query client and put the router into `routes/`, but Steiger bans `store`, and TanStack Router treats every file
   in `routes/` as a route — hence `api/` and a separate `router/`.
-- `shared/`: `ui/`, `model/`, `api/`, `lib/`, `config/` (FSD allows a `model` in shared for domain-agnostic state;
-  there is none yet). Grouping inside a segment is fine (`shared/lib/swipe/`,
-  `shared/ui/button/`).
+- `shared/`: `ui/`, `model/`, `api/`, `lib/`, `config/` (FSD allows a `model` in shared for domain-agnostic state).
+  Grouping inside a segment is fine (`shared/lib/swipe/`, `shared/ui/button/`).
 
-**`ui/` holds components only.** A constant, type or function found next to a component moves to its FSD home in the
-same slice — `config/`, `model/` or `lib/`, named by purpose (`config/muscle-group-options.ts`,
+**`ui/` holds components only.** A constant, type or function found next to a component moves to its FSD home in
+the same slice — `config/`, `model/` or `lib/`, named by purpose (`config/muscle-group-options.ts`,
 `model/workout-phase.ts`). Allowed at the top level of a ui file:
 
 - components: `const X: FC<Props> = ...`;
 - props types: `type Props`, `type EditProps` (`*Props`);
-- in `shared/ui` only: exported types of the component's contract (`MenuButtonItem`, `SelectOption`, `LegalContent`).
+- in `shared/ui` only: exported types of the component's contract (`MenuButtonItem`, `SelectOption`).
   `shared/model` is for domain-agnostic state and types shared by several consumers, not for the shape of one
   component's props — that contract stays next to the component.
 
@@ -157,8 +158,10 @@ the router live in `app/router/specs/`.
 
 - Explicit named re-exports only (`export { X }`, `export { default as X }`, `export type { Y }`), never `export *`.
 - Export **only what other slices use** — knip fails on unused exports. Nothing is exported "for tests": a test
-  mocks the module file and takes its mocks with `jest.requireMock` (see `app/router/specs/edit-workout-page.spec.unit.tsx`).
-- Requests (`api/`) are internal to the entity model: pages and widgets use query hooks, not `fetch*` functions.
+  mocks the module file and takes its mocks with `jest.requireMock`
+  (see `app/router/specs/edit-workout-page.spec.unit.tsx`).
+- Requests (`api/`) are internal to the entity model, never exported from the slice `index.ts`: pages and widgets
+  use query hooks, not `fetch*` functions.
 - Index files re-export with relative paths.
 
 ```typescript
@@ -173,7 +176,8 @@ export { default as Select, type SelectOption } from './select/select';
 
 ## 6. Cross-imports between entities (`@x`)
 
-Entities may reference each other only through the [`@x` notation](https://feature-sliced.design/docs/reference/public-api#public-api-for-cross-imports):
+Entities may reference each other only through the
+[`@x` notation](https://feature-sliced.design/docs/reference/public-api#public-api-for-cross-imports):
 a narrow public API that slice A publishes **for** slice B, read "A crossed with B".
 
 ```
@@ -231,7 +235,7 @@ import { useQueryClient } from '@tanstack/react-query';                 // ❌ i
 ```
 
 **When two slices of one layer need each other:** the thing that uses both belongs one layer up; if it is
-domain-agnostic, it belongs in `shared` (`NotFoundMessage` moved from widgets to `shared/ui` for that reason).
+domain-agnostic, it belongs in `shared` (`NotFoundMessage` lives in `shared/ui` for that reason).
 
 Files outside `src` (`tests/`, `.storybook/`) are not part of the FSD graph: they may use `src/...` paths to reach
 internals (`jest.mock('src/entities/session/model/bootstrap-session')`), and prefer the public API otherwise.
@@ -241,13 +245,13 @@ internals (`jest.mock('src/entities/session/model/bootstrap-session')`), and pre
 - `@headlessui/react` and `sonner` are imported **only** inside `src/shared/**`: every primitive is wrapped in
   `shared/ui/<name>/` (`Button`, `Select`, `Transition`, `Toaster`) or `shared/lib` (`toastError`). A wrapper is
   missing? Add it to `shared/ui` first.
-- `@tanstack/react-query` is not imported in `ui` segments of slices: server state comes through entity hooks
-  (`useWorkoutListsQuery`, `useClearWorkoutSessionCachesForDeletedList`). Data layers call those hooks.
+- `@tanstack/react-query` stays out of `ui` segments: see state-management.
 
 ## 9. Checklist for new code
 
 1. Pick the place with §2 (pages first).
-2. Create the slice folder (kebab-case) and only the segments you need (§4); constants, types and logic outside `ui/`.
+2. Create the slice folder (kebab-case) and only the segments you need (§4); constants, types and logic outside
+   `ui/`.
 3. Add the slice `index.ts` (re-export straight from files; no `index.ts` in its segments); export only what other
    slices use (§5).
 4. Imports: relative inside the slice, `@layer/slice` / `@shared/segment` across, `@x` between entities (§6, §7).
@@ -281,8 +285,9 @@ src/
 
 ## Enforcement
 
-All client checks run in `npm run client:lint`: structure script → stories check → rules check → linter config and script types →
-ESLint → Steiger → knip. The domain docs check is `npm run lint:root` (`scripts/check-domain-docs.ts`).
+All client checks run in `npm run client:lint`: structure script → stories check → rules check → linter config and
+script types → ESLint → Steiger → knip. The domain docs check is `npm run lint:root`
+(`scripts/check-domain-docs.ts`).
 
 | Rule | Checked by |
 |---|---|
@@ -294,13 +299,13 @@ ESLint → Steiger → knip. The domain docs check is `npm run lint:root` (`scri
 | Segment direction `ui → model → api → lib, config` (slices and `shared`) | `npm run client:lint` · ESLint `import/no-restricted-paths` · `client/linter/rules/segment-direction-rule.ts` |
 | `api` / `lib` / `config` take only types from their `model` | `npm run client:lint` · ESLint `@typescript-eslint/no-restricted-imports` · `client/linter/rules/segment-direction-rule.ts` |
 | `ui` holds components and props types only | `npm run client:lint` · ESLint `no-restricted-syntax` · `client/linter/rules/ui-segment-rule.ts` |
-| `interface` only for domain entities in `entities/*/model` | `npm run client:lint` · ESLint `@typescript-eslint/consistent-type-definitions` · `client/eslint.config.ts` |
-| Headless UI / sonner only in `shared`; React Query not in `ui` | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
+| Headless UI / sonner only in `shared` | `npm run client:lint` · ESLint `no-restricted-imports` · `client/linter/rules/fsd-imports-rule.ts` |
 | `shared` imports no other layer; other `shared` segments only via `@shared/<segment>` | `npm run client:lint` · ESLint `no-restricted-imports` · Steiger `fsd/forbidden-imports` |
 | `index.ts` placement, `@x` file names, allowed segments, nothing but `index.ts` in a slice root | `npm run client:lint` · `client/scripts/check-structure.ts` · Steiger `fsd/public-api` · Steiger `fsd/no-layer-public-api` · Steiger `fsd/no-segmentless-slices` |
 | No `export *`; no `eslint-disable` of FSD rules | `npm run client:lint` · `client/scripts/check-structure.ts` |
 | Names by purpose, tests in `specs/`, kebab-case | `npm run client:lint` · `client/scripts/check-structure.ts` · Steiger `fsd/segments-by-purpose` |
 | No unused exports, files or dependencies | `npm run client:lint` · knip · `client/knip.jsonc` |
+| Requests (`api/`) are not exported from a slice's `index.ts` | ❌ review |
 | Pages first | `npm run client:lint` · Steiger `fsd/insignificant-slice` (warning only) |
 | `shared` knows nothing about the domain | ❌ review (upward imports are caught, domain concepts are not) |
 | Which layer new code belongs to (§2) | ❌ review — a design decision |

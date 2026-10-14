@@ -6,7 +6,10 @@ documents, logout and account deletion. Legal duties behind this domain: `.claud
 
 ## Glossary
 
-- **Session** — the signed-in state on the client: an access token in memory plus the current user in the query cache.
+- **Auth session** — the signed-in state on the client: an access token in memory plus the current user in the query
+  cache.
+- **Bootstrap** — verifying the auth session when no user is cached (an app open, or after the session-expired
+  handler cleared the cache): refresh the access token and load the current user.
 - **Consent** — agreement to personal-data processing; **terms acceptance** — agreement to the Terms of Use. Two
   separate, explicit acts at registration.
 - **Document versions** — the required Privacy Policy / Terms versions (server env); the user's accepted versions are
@@ -32,15 +35,15 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lin
 | logout-ends-on-login | Logout and account deletion end on `/login` also when the request fails |
 | user-scoped | All workout data is scoped to the signed-in user |
 | route-guards | Guest-only (`/login`, `/register`), always-public (`/privacy`, `/terms`) and protected routes |
-| bootstrap-once | The session is verified once per app open; navigation between screens and link intent (hover, touch, focus) never request the current user again — a session that ended on the server is discovered by the next data request |
-| hooks-dont-navigate | Session hooks never navigate — the calling flow does — ❌ review |
+| bootstrap-once | The auth session is verified once per app open; navigation between screens and link intent (hover, touch, focus) never request the current user again — a cleared refresh cookie is discovered by the next data request, a refresh token revoked on the server by the first refresh after the access token expires |
+| hooks-dont-navigate | Auth session hooks never navigate — the calling flow does — ❌ review |
 
 ## Flows
 
 ### Opening the app
 
-The root route bootstraps the session once per app open, on the first protected route: refresh the access token,
-load the current user, retry once; no user → clear every cached query and redirect to `/login?redirect=<path>`.
+The root route bootstraps the auth session once per app open, on the first protected route, and retries once; no
+user → clear every cached query and redirect to `/login?redirect=<path>`.
 From then on every navigation reads the cached user and a screen starts loading its own data at once; hovering,
 touching or focusing a link sends nothing. The next bootstrap happens on the next app open, or after the
 session-expired handler cleared the cache. Signed-in users are sent home from the auth pages; the legal pages are open
@@ -54,14 +57,15 @@ or goes home. A login answered with "captcha required" shows a captcha image and
 ### Re-accepting documents
 
 When the required versions go up, a signed-in user sees the gate on every app route: accepting stamps the new
-versions, logging out ends the session.
+versions, logging out ends the auth session.
 
 ### Logout and account deletion
 
 Both clear every cached query and end on `/login` once the request answers, also when it fails. Deleting the account
-asks for confirmation and runs inside it; while logout is in flight, deletion waits, and the other way round. The session ends for every open tab at once: a request without the session cookie is answered
-as unauthenticated — the same answer as for an expired access token — so another tab ends on `/login` with its
-next data request, without waiting for its access token to expire.
+asks for confirmation and runs inside it; while logout is in flight, deletion waits, and the other way round. Both
+revoke the refresh token on the server and clear the refresh cookie, which every open tab shares: a request without
+it is answered as unauthenticated — the same answer as for an expired access token — so another tab ends on `/login`
+with its next data request, without waiting for its access token to expire.
 
 ## Map
 

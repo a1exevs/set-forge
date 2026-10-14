@@ -10,9 +10,17 @@ How React components, their props and their inline callbacks are typed.
 
 ## Components
 
-- **All** components use `FC<Props>` (or `FC<PropsWithChildren>` for children); import `FC` from `react`.
-- Props: `type Props = { ... }` — never `interface`, never an inline object in `FC<{ ... }>`. A second component in
-  the file gets its own `type XProps`.
+- Every app component (`client/src`, outside `specs/` and `*.stories.tsx`) is an arrow function typed
+  `const X: FC<Props>` (`FC` without props, `FC<PropsWithChildren>` for children); import `FC` from `react`.
+- In `app/routes`, a file-route component that its `Route` references before it is defined
+  (`component: LoginRoutePage`) is a `function` declaration below `Route`, typed by its return type (`ReactElement`)
+  — a `const` there would be read before its initialization; an inline `component: (): JSX.Element =>` is fine
+  too.
+- Test and story code (`specs/`, `*.stories.tsx`, `client/.storybook/`) is outside this section, as the lint has it:
+  its helpers — test components, `jest.mock` stubs, `render` / decorator / docs functions — are typed as they fit
+  (stories: storybook).
+- Props: `type Props = { ... }` (`type`, not `interface`: typescript-guidelines), never an inline object in
+  `FC<{ ... }>`. A second component in the file gets its own `type XProps`.
 
 ```typescript
 // ✅
@@ -42,5 +50,5 @@ onClick={(): void => doSomething()}
 |---|---|
 | Inline JSX callbacks type parameters and return; list render callbacks type parameters | `npm run client:lint` · ESLint `no-restricted-syntax` · `client/linter/rules/return-type-rule.ts` |
 | Props are a named type, not `FC<{ ... }>` (in `ui` segments) | `npm run client:lint` · ESLint `no-restricted-syntax` · `client/linter/rules/return-type-rule.ts` |
-| Props are `type`, not `interface` | `npm run client:lint` · ESLint `@typescript-eslint/consistent-type-definitions` · `client/eslint.config.ts` |
-| Every component is typed `FC<...>` | ❌ review (`ui` files reject untyped top-level consts, other files are not checked) |
+| In `ui` segments every top-level `const` is typed `FC` / `FunctionComponent` and no function is declared | `npm run client:lint` · ESLint `no-restricted-syntax` · `client/linter/rules/ui-segment-rule.ts` |
+| App components are `const X: FC` arrows with a named props type, a second component its own `type XProps`: in `ui` segments the arrow, the second type and an inline object nested in a generic (`FC<PropsWithChildren<{ … }>>` — the lint catches only `FC<{ … }>`), elsewhere all of it — except the `app/routes` file-route form | ❌ review |
