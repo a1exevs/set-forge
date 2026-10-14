@@ -10,7 +10,8 @@ Component styles are SCSS modules next to the component; global styles live in `
 
 ## SCSS modules
 
-- `component-name.module.scss` sits in the same directory as the component; components in `shared/ui/` have their own.
+- `component-name.module.scss` sits in the same directory as the component; components in `shared/ui/` have their
+  own.
 - Import as `classes` by relative path: `import classes from './component-name.module.scss';` (never `src/...`).
 - `variables.scss` (tokens) and `mixins.scss` (shared style blocks such as `loading-screen`) are injected into every
   stylesheet by Vite (`css.preprocessorOptions.scss.additionalData`) — don't `@use` them. `@use` between files of
@@ -34,8 +35,7 @@ Use the variables of `client/src/shared/ui/styles/variables.scss` (`$spacing-*`,
 
 ## No inline styles
 
-- No `style` attribute. Stories use the wrappers of `client/.storybook/showcase.tsx` or a `*.stories.module.scss`
-  (see storybook).
+- No `style` attribute (stories: see storybook).
 - A runtime value (a progress width, a caller-given colour) reaches the stylesheet as a CSS custom property through
   `cssVars` from `@shared/lib`: `style={cssVars({ '--progress': `${n}%` })}` + `width: var(--progress, 0%);`.
 

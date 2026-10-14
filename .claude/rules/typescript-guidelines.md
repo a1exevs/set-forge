@@ -41,8 +41,7 @@ function calculateTotal(items: Item[]): number {
   `*.d.ts` such as `vite-env.d.ts`) is the exception.
 - `type` — everything else: DTOs and payloads, unions, intersections, props, view models, anything in `shared`.
   Doubt? It's a `type`.
-- Public API files re-export types with `export type { X }` or inline `type X`; files are named by purpose, never
-  `types.ts`.
+- Public API files re-export types with `export type { X }` or inline `type X`; file names: see fsd-architecture §4.
 
 ## General practices
 
@@ -62,8 +61,9 @@ if (!value) {
 ## Node built-ins
 
 Node's own modules are imported with the `node:` scheme — `import { join } from 'node:path'`,
-`const { existsSync } = require('node:fs')` — in TypeScript, CommonJS configs and inline `node -e` alike. They are part of Node, never
-npm dependencies; the scheme says so at the import and no package of the same name can stand in for them.
+`const { existsSync } = require('node:fs')` — in TypeScript, CommonJS configs and inline `node -e` alike. They are
+part of Node, never npm dependencies; the scheme says so at the import and no package of the same name can stand in
+for them.
 
 Take what the file uses by name — `import { existsSync, readFileSync } from 'node:fs'`,
 `const { join } = require('node:path')` — not the whole module (`import path from`, `import * as fs from`). A name
@@ -93,7 +93,7 @@ Node does not type-check either, so every script folder is covered by a `tsc` pr
 | Curly braces | `npm run client:lint` · `npm run server:lint` · ESLint `curly` |
 | Explicit return types (client) | `npm run client:lint` · ESLint `@typescript-eslint/explicit-function-return-type` · `client/linter/rules/return-type-rule.ts` |
 | `interface` only in `entities/*/model` (client) | `npm run client:lint` · ESLint `@typescript-eslint/consistent-type-definitions` · `client/eslint.config.ts` |
-| No `any`, explicit return types, `interface` vs `type` (server) | ❌ review (`no-explicit-any` is off in `server/eslint.config.ts` until the typing clean-up) |
+| No `any`, explicit return types, `interface` vs `type` (server) | ❌ review (`no-explicit-any` is off in `server/eslint.config.ts`) |
 | Minimal `as`, DTOs as `type` inside entity models | ❌ review |
 | Node built-ins via `node:` | `npm run lint:root` · `npm run client:lint` · `npm run server:lint` · ESLint `import/enforce-node-protocol-usage` |
 | Node built-ins imported by name, `* as` only for `jest.spyOn` | ❌ review |

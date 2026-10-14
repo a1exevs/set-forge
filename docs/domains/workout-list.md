@@ -16,10 +16,10 @@ Each id is proven by the tests tagged `// @invariant workout-list/<id>`; `npm ru
 
 | Id | Invariant |
 |---|---|
-| owner-only | Lists are visible only to their owner; a foreign list is "not found" |
+| owner-only | A foreign list is "not found" (the scoping itself: `session/user-scoped`) |
 | at-least-one-exercise | A list has at least one exercise on create and update |
 | update-keeps-ids | Update keeps exercise ids (resync matches them), adds new ones, drops removed ones; order follows the array |
-| delete-cascades | Deleting a list deletes its exercises and discards its active session in one transaction |
+| delete-cascades | Deleting a list deletes its exercises in one transaction (the active workout session: `workout-session/list-delete-discards-active`) |
 | export-import | Export carries no ids and no progress; import creates all lists in one transaction |
 | form-validation | The client form stops a submit with an empty name, no exercises or invalid numbers |
 
@@ -28,7 +28,7 @@ Each id is proven by the tests tagged `// @invariant workout-list/<id>`; `npm ru
 ### Manage lists (Home)
 
 1. Home shows the user's lists; **Edit** opens the editor, **Delete** asks for confirmation and deletes the list from
-   inside it, then drops the cached sessions of that list.
+   inside it, then drops the cached workout sessions of that list.
 2. **Export** downloads all lists; **Import** reads a file, asks for confirmation and adds the lists from inside it.
    Bad files and API errors show a toast, the page stays.
 3. A confirmation stays open until its request answers, and on an error too — a retry or Cancel, never a second
@@ -36,9 +36,9 @@ Each id is proven by the tests tagged `// @invariant workout-list/<id>`; `npm ru
 
 ### Create / edit
 
-The same form creates and edits a list; while it is saved the form is locked. Editing a list with an active session
-asks about resync — see
-[workout session](workout-session.md#editing-a-list-during-a-session).
+The same form creates and edits a list; while it is saved the form is locked. Editing a list with an active workout
+session asks about resync — see
+[workout session](workout-session.md#editing-a-list-during-a-workout-session).
 
 ## Map
 

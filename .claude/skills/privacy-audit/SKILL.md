@@ -1,28 +1,45 @@
 ---
 name: privacy-audit
 description: Audit the current changes for personal-data / privacy compliance (152-ФЗ): policy and terms text, document versions, consent invariants. Use when a change touches user data, consents or the legal pages, or when the user runs /privacy-audit.
+argument-hint: "[<base> | <base>..<head>]"
 ---
 
 # privacy-audit
 
-Act as a data-protection engineer. Audit the current changes for personal-data / privacy compliance, following [.claude/rules/personal-data-compliance.md](../../rules/personal-data-compliance.md) (Set Forge is operated under 152-ФЗ).
+Act as a data-protection engineer. Audit a change set for personal-data / privacy compliance against
+[personal-data-compliance](../../rules/personal-data-compliance.md) (Set Forge is operated under 152-ФЗ): the rule
+owns what counts as personal data, the triggers, the files to change and the conventions; this skill checks them.
 
-**First**, gather the diff without touching the index (no `git add`, no `git stash`, no edits):
-- Run `git diff HEAD` for the staged and unstaged changes since the last commit, plus
-  `git ls-files --others --exclude-standard` for the untracked files (read them whole — they are all new lines).
-  If the user names a base branch/commit, use `git diff <base>` instead (the base vs the working tree). Review only the changed lines.
+## 1. Scope
 
-**Then**, decide whether the change is compliance-relevant. Flag it if it does any of the following:
-1. Collects, stores, logs, exposes, or transmits any new/changed **personal data** (new `users` column, new field on `CurrentUser` / `GetCurrentUserResponse`, new log of user data, new DTO field, new migration touching user-linked tables).
-2. Adds a third party / sub-processor, analytics, tracker, ad network, new cookie, or sends user data outside the RF.
-3. Changes retention, deletion, export, or data-subject rights (e.g. the account-deletion flow, cascade FKs).
-4. Changes user obligations, service scope, liability/health disclaimer, governing law, or contact (Terms of Use).
-5. Touches consent at registration, the re-consent gate, or `documentsPendingAcceptance` logic.
+Scope as `/code-review` §1 (the same argument). The audit writes no file, not even a log.
 
-**For each relevant change**, verify and report:
-- **Docs updated?** Is the Privacy Policy (`client/src/pages/privacy/config/privacy-policy-content.ts`) and/or Terms (`client/src/pages/terms/config/terms-content.ts`) updated in **both** RU and EN to match the new behaviour (data described, purpose, legal basis)?
-- **Version bumped?** Is `PRIVACY_VERSION` / `TERMS_VERSION` incremented (`server/.production.env.example` + deploy guide) **and** the matching `*_EFFECTIVE_DATE` updated, together? A text change without a version bump (or vice versa) is a finding.
-- **Invariants intact?** Separate `consent` + `termsAccepted` (non-defaulted `@Equals(true)`); `documentsPendingAcceptance` stays derived, not persisted; account-deletion cascade still removes all user-owned data (new user-owned table → cascading FK + `account-deletion-cascade.e2e-spec.ts` coverage); operator identity stays in build-time env, not hardcoded; no newly-collected data that the policy claims is not collected.
-- **Domain doc updated?** `docs/domains/session.md` reflects the change (invariants, flows, Map).
+## 2. Relevance
 
-**Output** a concise, actionable checklist grouped as: `❌ Must fix before merge`, `⚠️ Should address`, `✅ OK`. For each `❌`, name the exact file(s) to change and the version(s)/date(s) to bump. If the change is not compliance-relevant, say so explicitly and note that no bump is required. If everything is in order, give a "Privacy: ready to merge" signal.
+The change is compliance-relevant when it touches a path of the rule's frontmatter `paths`, matches a row of its
+"Trigger → required action" table (judged by its "What counts as personal data" — a new DTO field or a migration
+of a user-linked table counts), or touches an item of its "Hard invariants". Not relevant → §4.
+
+## 3. Checks
+
+For each relevant change:
+
+1. **Documents updated** — the section that the trigger row names is updated in both RU and EN, in the files of the
+   rule's "Where to change things", with the purpose and legal basis of new data, inside the audited change itself;
+   a document update left for a later PR is a finding.
+2. **Versions bumped** — the row's version and effective date move together, in the places "Where to change things"
+   lists; a text change without a bump, or a bump without a text / date change, is a finding.
+3. **Invariants intact** — the rule's "Hard invariants" 1–5: for 1–3 every `session/*` id they link that the
+   change touches (consent, pending acceptance, the gate with its `/privacy` / `/terms` exception, user-owned data)
+   still holds with its `@invariant` test and the code convention of its item; 4–5 as the rule states them.
+   `docs/domains/session.md` reflects the change (invariants, flows, Map).
+4. **New PD-bearing entity** — on top of §3.1, §3.2 (the first trigger row) and invariant 3 (the cascading FK, the
+   cascade e2e spec extended): the Map and invariants of the doc of the entity's own domain updated.
+
+## 4. Output
+
+A concise, actionable checklist grouped as `❌ Must fix before merge`, `⚠️ Should address`, `✅ OK`. For each
+`❌`, name the exact file(s) to change and the version(s) / date(s) to bump. A change that is not
+compliance-relevant, or is relevant but matches no trigger row and passes every check of §3, gets one line saying
+so, why (refactor, rename, test) and that no bump is required — ready for the PR description. If everything is in
+order, end with "Privacy: ready to merge".

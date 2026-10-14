@@ -11,9 +11,12 @@ Conventions for the NestJS API: response envelope, Swagger, DTOs, thin controlle
 ## Response envelope
 
 - Global prefix: `api/1.0`.
-- Success responses are wrapped by `ResponseInterceptor` into `CommonResponse`: `{ data, messages, fieldsErrors, resultCode }`.
-- Document success in Swagger with `@ApiResult` (`server/src/common/decorators/api-result.decorator.ts`) — `CommonResponse` schema + typed `data`.
-- Errors go through `HttpExceptionFilter`; every endpoint must declare relevant `@ApiBadRequestResponse`, `@ApiNotFoundResponse`, `@ApiUnauthorizedResponse`, etc. with text from `Docs.*`.
+- Success responses are wrapped by `ResponseInterceptor` into `CommonResponse`:
+  `{ data, messages, fieldsErrors, resultCode }`.
+- Document success in Swagger with `@ApiResult` (`server/src/common/decorators/api-result.decorator.ts`) —
+  `CommonResponse` schema + typed `data`.
+- Errors go through `HttpExceptionFilter`; every endpoint must declare relevant `@ApiBadRequestResponse`,
+  `@ApiNotFoundResponse`, `@ApiUnauthorizedResponse`, etc. with text from `Docs.*`.
 
 ## Swagger per endpoint
 
@@ -22,7 +25,8 @@ Reference: `server/src/workout-lists/workout-lists.controller.ts`.
 1. `@ApiTags(Docs.<CONTROLLER>)` on the class
 2. `@ApiOperation({ summary: Docs.<ENDPOINT> })`
 3. `@ApiBody({ type: X.Swagger.XDto })` for request body
-4. `@ApiResult({ status, type: X.Swagger.XDto, description: Docs.<SUCCESS> })` for each success status (200 and 201 when both apply)
+4. `@ApiResult({ status, type: X.Swagger.XDto, description: Docs.<SUCCESS> })` for each success status (200 and 201
+   when both apply)
 5. `@ApiResult({ nullable: true })` when `data` can be `null`
 6. All relevant error decorators with `Docs.<ERROR>` — list every possible response, not only success
 7. Copy only from `server/src/common/constants/docs.ts`, no inline strings
@@ -35,7 +39,8 @@ Reference: `server/src/workout-lists/workout-lists.controller.ts`.
 | `.response.ts` / `*Response` | Payload in `data` | `WorkoutListResponse` |
 | `.query.ts` / `*Query` | Query params (`@Query()`) | `GetWorkoutHistoryQuery` |
 
-When export response and import body share one JSON schema: canonical fields in `*.response.ts`; import `*.request.ts` extends it (`ImportWorkoutListsRequest extends WorkoutListsExportFileResponse`).
+When export response and import body share one JSON schema: canonical fields in `*.response.ts`; import
+`*.request.ts` extends it (`ImportWorkoutListsRequest extends WorkoutListsExportFileResponse`).
 
 Required namespace pattern:
 
@@ -53,7 +58,6 @@ export namespace FooRequest {
 - Every field: `@ApiProperty` / `@ApiPropertyOptional` with `example` (and `enum`, `nullable` where needed).
 - Request/Query DTO: `class-validator` + `ErrorMessages` from `@common/constants`.
 - Response DTO: constructor for mapping; nested DTOs as inner classes.
-- Shared export/import schema: full definition in `*.response.ts`; thin `*.request.ts` extends response `Dto` for import body (no duplicated fields).
 
 ## DTO tests
 
@@ -63,7 +67,8 @@ export namespace FooRequest {
 
 ## Controller — thin
 
-- Only: guards/filters/interceptors, `request.user.id`, service call, status code mapping when needed (`response.status(created ? 201 : 200)`).
+- Only: guards/filters/interceptors, `request.user.id`, service call, status code mapping when needed
+  (`response.status(created ? 201 : 200)`).
 - Business logic lives in the service only.
 - Register static routes (`export`, `import`, `active`) before `/:id`.
 - Every controller: `*.controller.spec.ts` — mock service, assert delegation and `userId` scoping.
@@ -87,7 +92,8 @@ When adding or changing an endpoint, update `server/_stub/postman/set-forge-serv
 - One request per endpoint variant (happy path, key error cases); name requests in kebab-case like existing entries.
 - URL: `{{protocol}}://{{dev-url}}/1.0/{{<module>-end-point}}/...` — add a collection variable for new modules.
 - Auth: `Authorization: Bearer {{api/access_token}}` where the route is protected.
-- Body/query examples: match DTO `@ApiProperty` examples; chain IDs via `pm.collectionVariables.set` in test scripts when a later request depends on the response.
+- Body/query examples: match DTO `@ApiProperty` examples; chain IDs via `pm.collectionVariables.set` in test scripts
+  when a later request depends on the response.
 - Tests: assert status code and essential fields in `data` (see existing requests in the collection).
 
 ## New endpoint checklist
@@ -96,7 +102,8 @@ When adding or changing an endpoint, update `server/_stub/postman/set-forge-serv
 2. Service method + spec
 3. Controller method + Swagger (success + all errors) + controller spec
 4. Strings in `docs.ts` and `routes.ts`
-5. Changed a business rule or flow? Update `docs/domains/<domain>.md` (invariant + its test) — the HTTP contract itself lives in the controller and Swagger
+5. Changed a business rule or flow? Update `docs/domains/<domain>.md` (invariant + its test) — the HTTP contract
+   itself lives in the controller and Swagger
 6. Update Postman collection (`server/_stub/postman/set-forge-server.postman_collection.json`)
 7. E2E when needed
 

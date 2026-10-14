@@ -39,7 +39,7 @@ Fixed sections, in this order:
 Everything the code or its tooling already states: DB columns (models, migrations), file lists (the folder), props
 (components, Storybook), DTOs and endpoints (controllers, Swagger), hook lists (the slice `index.ts`), component
 catalogs (`client/src/shared/ui/index.ts`, Storybook). Point to a folder or a file — never to lines or symbols that
-get renamed. No change logs or task plans: plans live in the PR, history in git.
+get renamed. No change logs or task plans (`CLAUDE.md` Principles).
 
 ## Enforcement
 

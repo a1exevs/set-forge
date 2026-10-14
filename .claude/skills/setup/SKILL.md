@@ -76,8 +76,7 @@ Then, in order:
    `gh auth refresh -h github.com -s user:email`. Propose `git config --global user.email <verified email>` when
    they differ.
 4. **Labels** the `/pr` and `/release` skills attach must exist: `gh label list --repo a1exevs/set-forge` should
-   include `feature`, `bugfix`, `common`, `improvement`, `storybook`, `tests`, `documentation`, `refactoring`,
-   `testing`, `release`. Report missing ones; do not create them (the repo owner decides).
+   include the labels of `/branches` §2. Report missing ones; do not create them (the repo owner decides).
 5. **Task board** — `gh project view 9 --owner a1exevs` must succeed. A scope error → the developer runs
    `gh auth refresh -h github.com -s project`; "not found" → the board is private and the developer is not on it:
    report it — the owner adds them. Until then the board steps fail: `/analyst` cannot create an issue (it adds it
@@ -103,8 +102,9 @@ Pre-pull the image both compose and Testcontainers use: `docker pull mysql:8.4`.
 
 ## 4. Node through nvm
 
-The version is pinned in `.nvmrc` and in `engines` of the three `package.json` files (Node **22.23.2**,
-npm **10.9.8**). npm only warns on a mismatch, so check explicitly.
+The versions are pinned in the repository, not here: Node in `.nvmrc`, Node and npm in `engines` of the three
+`package.json` files. Read them before the checks (`cat .nvmrc`, `grep -A3 '"engines"' package.json`); `<npm>`
+below is `engines.npm`. npm only warns on a mismatch, so check explicitly.
 
 `nvm` is a shell function, so it does not exist in the non-interactive shell the agent runs: look for its script
 and source it before every `nvm` call. Homebrew keeps it under its own prefix, the install script under `~/.nvm`.
@@ -112,20 +112,20 @@ and source it before every `nvm` call. Homebrew keeps it under its own prefix, t
 ```bash
 NVM_SH="$(brew --prefix nvm 2>/dev/null)/nvm.sh"; [ -s "$NVM_SH" ] || NVM_SH="${NVM_DIR:-$HOME/.nvm}/nvm.sh"
 [ -s "$NVM_SH" ] && echo "nvm: $NVM_SH" || echo "nvm: not installed"
-node --version    # v22.23.2
-npm --version     # 10.9.8
+node --version    # v + .nvmrc
+npm --version     # engines.npm
 ```
 
 - macOS / Linux: `brew install nvm` (follow the printed shell-profile snippet) or the
   [nvm install script](https://github.com/nvm-sh/nvm#installing-and-updating); then in the repo root
-  `. "$NVM_SH" && nvm install && nvm use` (`nvm install` reads `.nvmrc`). Suggest `nvm alias default 22.23.2`
+  `. "$NVM_SH" && nvm install && nvm use` (`nvm install` reads `.nvmrc`). Suggest `nvm alias default "$(cat .nvmrc)"`
   so new shells match, and offer the shell hook that runs `nvm use` on `cd` into a folder with `.nvmrc`
   ([nvm README → Deeper Shell Integration](https://github.com/nvm-sh/nvm#deeper-shell-integration)) — the
   developer pastes it into `~/.zshrc` / `~/.bashrc` themselves. Every later `node` / `npm` command in this
   skill runs in a shell where `. "$NVM_SH" && nvm use` has been executed, otherwise the system Node is used.
-- Windows: `winget install CoreyButler.NVMforWindows`, new terminal, `nvm install 22.23.2 && nvm use 22.23.2`
-  (nvm-windows ignores `.nvmrc` — pass the version).
-- npm: `npm install -g npm@10.9.8` when `npm --version` differs.
+- Windows: `winget install CoreyButler.NVMforWindows`, new terminal,
+  `nvm install "$(cat .nvmrc)" && nvm use "$(cat .nvmrc)"` (nvm-windows ignores `.nvmrc` — pass the version).
+- npm: `npm install -g npm@<npm>` when `npm --version` differs.
 
 ## 5. Dependencies and git hooks
 
@@ -162,7 +162,7 @@ npm run db:up                  # mysql-dev on 127.0.0.1:3306
 
 Before the migrations, wait until MySQL is healthy — the container needs ~20 s to initialize on the first run,
 and `sequelize-cli` fails with a connection error before that. Match the status exactly: `unhealthy` contains
-`healthy`. Give up after a minute and read `npm run db:logs`:
+`healthy`. Give up after a minute and read `docker compose logs --tail 50 mysql-dev`:
 
 ```bash
 MYSQL_ID="$(docker compose --profile dev ps -q mysql-dev)"
@@ -214,7 +214,7 @@ Finish with one table and nothing else beyond it:
 | Package manager | ✅ / ❌ | |
 | git + gh (auth, repo access, identity, labels, task board) | | e.g. `gh auth login` |
 | Docker (daemon, mysql:8.4) | | |
-| Node 22.23.2 / npm 10.9.8 via nvm | | |
+| Node / npm of `.nvmrc` / `engines` via nvm | | |
 | `npm install` + Husky hooks | | |
 | Env files | | |
 | Client build / dev server | | |

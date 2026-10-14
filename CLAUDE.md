@@ -4,29 +4,21 @@
 
 - The code is the source of truth. Docs hold only what the code can't say — intent, business rules with their
   reasons, cross-slice flows — and point to the code for everything concrete.
-- Rules in `.claude/rules/` are immutable conventions with one structure: frontmatter `description` / `paths` (the
-  globs that load the rule when a matching file is read), `# Title`, topic sections, optional `## Related`, and
-  `## Enforcement` last (what checks each rule, or `❌ review`). `npm run client:lint`
-  (`client/scripts/check-rules.ts`) keeps that structure and every reference in Enforcement valid.
+- Rules in `.claude/rules/` are immutable conventions in the shape of [agent-docs](.claude/rules/agent-docs.md),
+  checked by `npm run client:lint`.
 - Skills in `.claude/skills/<name>/SKILL.md` are the repository workflows (`/setup`, `/analyst`, `/developer`,
   `/branches`, `/commit`, `/pr`, `/code-review`, `/privacy-audit`, `/release`); Claude also picks them up from a plain
   request ("write up this feature", "take #12 into work", "commit this", "make a release", "set up my machine").
   The stages of the pipeline are named by role (`/analyst`, `/developer`), the tools they use by action.
-- Branch operations (create, switch, push, reset, …) wait for the user's yes, one by one — see `/branches`;
-  `/developer`'s PR horizon collects that yes in advance, at its LLD gate, by naming the pushes and the PR.
+- Branch operations wait for the user's yes — `/branches` §4.
 - Secrets (`.env*`, `secrets/`, `*.pem`, `*.key`) are denied to the agent in `.claude/settings.json`.
 - No change logs or task plans in the repo: requirements live in GitHub issues on the Set-forge board (written by
-  `/analyst`), plans and acceptance in the PR, history in git. Agent artifacts that must survive between runs
-  (the `/developer` steps, the `/code-review` log and the stand check that `/pr` attaches to the description) live
-  in the task folder `.runtime/tasks/<issue or branch>/` of the main checkout, shared by every worktree
-  (`/branches` §2); `.runtime/` is gitignored.
+  `/analyst`), plans and acceptance in the PR, history in git. Agent artifacts that must survive between runs live
+  in the task folder (`/branches` §2); `.runtime/` is gitignored.
 
 ## Domain docs
 
-`docs/domains/*.md` — glossary, invariants (proven by tests tagged `// @invariant <domain>/<id>`, or marked
-`❌ review`), flows and a map to the code.
-Format: [domain-docs](.claude/rules/domain-docs.md); `npm run lint:root` (`scripts/check-domain-docs.ts`)
-fails on a broken path, a missing section or an unmapped slice / module.
+`docs/domains/*.md`, one per business domain, in the format of [domain-docs](.claude/rules/domain-docs.md).
 
 | Domain | Doc |
 |--------|-----|
@@ -50,11 +42,14 @@ fails on a broken path, a missing section or an unmapped slice / module.
 | [i18n](.claude/rules/i18n.md) | Interface language, dictionaries, the `t` prop, literal-text lint |
 | [storybook](.claude/rules/storybook.md) | Stories next to components, titles by FSD layer, showcase, Chromatic |
 | [personal-data-compliance](.claude/rules/personal-data-compliance.md) | User PD, privacy policy, terms, doc versioning |
+| [agent-docs](.claude/rules/agent-docs.md) | Agent markdown: who owns what, one source, one term, the rule-file shape |
+| [agent-skills](.claude/rules/agent-skills.md) | `.claude/skills/`: decisions by stage, gated actions, frontmatter |
 
 ## Adding new artifacts
 
-- New entity slice, feature, page or server module → add it to the Map of its domain doc (the lint fails otherwise).
-- New domain → `docs/domains/<domain>.md` + a row in the table above.
-- Changed business rule → update the invariant and its test in the same change.
-- New rule → `.claude/rules/<name>.md` in the shape above + a row in the Rules table. New workflow →
-  `.claude/skills/<name>/SKILL.md`.
+- New slice, page, widget, server module or model → its domain doc's Map, see
+  [domain-docs](.claude/rules/domain-docs.md).
+- New domain → `docs/domains/<domain>.md` + a row in the Domain docs table.
+- Changed business rule → its invariant and test, see [domain-docs](.claude/rules/domain-docs.md).
+- New rule → `.claude/rules/<name>.md` + a row in the Rules table. New workflow → `.claude/skills/<name>/SKILL.md`
+  ([agent-skills](.claude/rules/agent-skills.md)).

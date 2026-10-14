@@ -32,15 +32,10 @@ import { Route as workoutIdRoute } from '../routes/workout/$id';
 
 ## Client: names by purpose
 
-In `client/src` a file or folder is named after **what it is for**, not what kind of code it holds (fsd-architecture §4):
+In `client/src` a file or folder is named after **what it is for**, not what kind of code it holds
+(`workout-list.ts`, `format-date.ts`, `access-token-store.ts`, `swipe/`); the banned names: fsd-architecture §4.
 
-```
-❌ types.ts, consts.ts, utils.ts, helpers.ts, menu-button.types.ts, access-token.store.ts
-❌ hooks/, types/, utils/, helpers/, consts/, contexts/, components/, store/, providers/
-✅ workout-list.ts, screen-widths.ts, format-date.ts, access-token-store.ts, swipe/, confirm/
-```
-
-- Tests: `*.spec.unit.tsx` / `*.spec.snap.tsx` inside a `specs/` folder next to the tested code.
+- Tests: in a `specs/` folder, see fsd-architecture §4.
 - Imports and public APIs: see fsd-architecture §5–§7.
 
 ## Enforcement
@@ -48,7 +43,5 @@ In `client/src` a file or folder is named after **what it is for**, not what kin
 | Rule | Checked by |
 |---|---|
 | kebab-case in `client/src`, `client/tests`, `client/linter`, `client/scripts` (route files excepted) | `npm run client:lint` · `client/scripts/check-structure.ts` |
-| Client names by purpose (folders and file suffixes) | `npm run client:lint` · `client/scripts/check-structure.ts` · Steiger `fsd/segments-by-purpose` |
-| Client tests in `specs/` | `npm run client:lint` · `client/scripts/check-structure.ts` |
 | kebab-case in `server/` | ❌ review |
 | Route import names | ❌ review (the route tree is generated) |

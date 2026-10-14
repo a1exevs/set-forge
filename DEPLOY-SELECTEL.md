@@ -297,7 +297,8 @@ npm run prod:up   # rebuilds images (client-prod picks up the new build args)
 2. Increment the matching `TERMS_VERSION` / `PRIVACY_VERSION` in `server/.production.env`.
 3. Restart `server-prod` (`npm run prod:up`). Users who accepted an older version are shown a blocking re-consent gate on their next visit and must re-accept or log out.
 
-See the [personal-data-compliance rule](.claude/rules/personal-data-compliance.md) for the full checklist.
+See the [personal-data-compliance rule](.claude/rules/personal-data-compliance.md) for what triggers a version bump and the
+[`/privacy-audit` skill](.claude/skills/privacy-audit/SKILL.md) for the full checklist.
 
 ---
 
