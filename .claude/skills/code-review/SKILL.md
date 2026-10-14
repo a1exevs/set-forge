@@ -24,10 +24,12 @@ stash`, no edits during the review. The only file the review writes is its own l
 
 Untracked files come from `git ls-files --others --exclude-standard`; read them whole — they are all new lines.
 
-Resolving a single ref: `git merge-base --is-ancestor <ref> HEAD` succeeds and `<ref>` is not `HEAD` itself →
-it is a base. Otherwise (`HEAD`, a commit off this branch, a typo) → stop and say the ref is not an ancestor of
-`HEAD`; one commit is reviewed as `<hash>^..<hash>`. Never fall back to `git show <ref>` — for a branch name that
-would review the base's last commit, i.e. someone else's change.
+Resolving a single ref: `git merge-base --is-ancestor <ref> HEAD` succeeds and `<ref>` is not `HEAD` itself → it is a
+base. A branch that moved on after this one forked from it (`origin/<parent branch>` once a sibling is merged) → the
+base is the fork point, `git merge-base <ref> HEAD`, named in the scope; a plain diff against the moved branch would
+show the sibling's work as deleted. Otherwise (`HEAD`, a commit off this branch, a typo) → stop and say the ref is not
+an ancestor of `HEAD`; one commit is reviewed as `<hash>^..<hash>`. Never fall back to `git show <ref>` — for a branch
+name that would review the base's last commit, i.e. someone else's change.
 
 The working tree is **dirty** when `git status --porcelain` prints anything; record it in the scope (§5, §6) so a
 log entry made before the commit is not mistaken for one made after it.
@@ -76,16 +78,14 @@ Fences between the categories:
 - If you cannot name the **concrete input or state** that triggers the failure, it is not a 🔴.
 - If you cannot say **who is hurt and when**, it is a 🟡.
 - "Might", "could", "in theory" without a reproduction is 🟠 at best; without a plausible input it is nothing.
-- A 🔴 candidate you failed to reproduce is 🟠 with `unverified`, not 🔴 "to be safe".
 
 ## 5. Review log — `code-review.md` in the task folder
 
 One file per branch, outside git (`.runtime/` is in `.gitignore`), keeps every finding of every round with a stable
 number and a status. `/pr` copies it into the PR description.
 
-- Path: `code-review.md` in the task folder of the current branch (`/branches` §2): `feature/12-workout-export` →
-  `.runtime/tasks/12/code-review.md`, `common/setup-skill` → `.runtime/tasks/common--setup-skill/code-review.md`, a
-  sub-branch → its `part-<n>/`. Get the branch with `git rev-parse --abbrev-ref HEAD`.
+- Path: `code-review.md` in the task folder of the current branch, of the main checkout (`/branches` §2). Get the
+  branch with `git rev-parse --abbrev-ref HEAD`.
 - Create the directory and the file on the first round. On later rounds **read it first**: it tells you what was
   already found and what is still open.
 
@@ -109,7 +109,8 @@ Rounds: 2 · last: 2026-09-29 14:05 · scope: develop (77b0a62, 7 files)
 ```
 
 The scope string is `<what> (<HEAD short hash>[+dirty], <N> files)`: `<what>` is the argument as given (`develop`,
-`develop..HEAD`) or `working tree` for the empty argument; `+dirty` is present when the review included
+`develop..HEAD`), `<ref> → fork <short hash>` for a moved branch reviewed from its fork point (§1), or
+`working tree` for the empty argument; `+dirty` is present when the review included
 uncommitted changes (empty argument, or a `<base>` run with a dirty tree). Round 1 in the example was made
 before the commit, round 2 after it.
 
@@ -124,7 +125,7 @@ Statuses — one per row:
 Rules for every round after the first:
 
 1. For each `open` row, re-check the current code: re-run the proof or look at the location. Fixed → `fixed (rN)`.
-   Still there → keep `open (rN-1)` (the round it was found in), update `Where` if the line moved.
+   Still there → keep `open (rK)`, K the round it was found in; update `Where` if the line moved.
 2. New findings get the next free numbers; never renumber or delete rows.
 3. Update the header line and append a `## Rounds` entry.
 

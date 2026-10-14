@@ -1,6 +1,6 @@
 ---
 name: analyst
-description: Turn a feature request into a GitHub issue with acceptance criteria on the Set-forge project board, clarifying the requirements first, and update the requirements of an open issue (a closed one is frozen — a rework is a new issue). Also the single source of the task model (board, statuses, sizes, issue format, parent issues and sub-issues) that /branches, /commit and /pr refer to. Use when the user describes what they want to see in the product, asks to file / write up a task ("оформи задачу"), changes the requirements of an issue, or runs /analyst.
+description: Turn a feature request into a GitHub issue with acceptance criteria on the Set-forge project board, clarifying the requirements first, and update the requirements of an open issue (a closed one is frozen — a rework is a new issue). Also the single source of the task model (board, statuses, sizes, issue format, parent issues and sub-issues) that /branches, /developer and /pr refer to. Use when the user describes what they want to see in the product, asks to file / write up a task ("оформи задачу"), changes the requirements of an issue, or runs /analyst.
 argument-hint: "[<request> | #<issue> <change>]"
 ---
 
@@ -19,10 +19,10 @@ Two modes, by `$ARGUMENTS`:
 
 ## 1. The task model
 
-The single source of the task rules: `/branches`, `/commit` and `/pr` refer here instead of repeating them.
+The single source of the task rules: `/branches`, `/developer` and `/pr` refer here instead of repeating them.
 
-- **Task** = a GitHub issue of `a1exevs/set-forge`. A task is optional for every work type for now; a branch of a
-  task carries its number (`/branches` §2).
+- **Task** = a GitHub issue of `a1exevs/set-forge`. A task is optional for every work type; a branch of a task
+  carries its number (`/branches` §2).
 - **An issue is a change request, not the spec.** It records what had to change and why at that time and is frozen
   once closed. The current requirements are the code and `docs/domains/*.md` (invariants proven by tests); a later
   change of the same feature is a new issue that links the old one (`Reworks #<N>`), never an edit of it.
@@ -41,16 +41,11 @@ The single source of the task rules: `/branches`, `/commit` and `/pr` refer here
 | Backlog | requirements written, not yet agreed to be taken | `/analyst` on create (§3) |
 | Ready | requirements agreed, the task can be picked up | the user on the board |
 | In progress | a branch of the task exists | `/branches` §5, when it creates a branch whose name carries the number (`/developer` step 2) |
-| In review | a PR of the task into `develop` is open — for a sub-issue, its PR into the parent branch | `/pr` (and the board workflow "Pull request linked to issue" for a PR into `develop`) |
-| Done | that PR is merged, the issue is closed — for a parent and its sub-issues, the parent branch's PR into `develop` | the board workflow "Item closed" (`Closes #N` closes the issue on merge) |
+| In review | a PR of the task is open — into `develop`, or for a sub-issue into the parent branch, where it stays after the merge | `/pr` (and the board workflow "Pull request linked to issue" for a PR into `develop`) |
+| Done | the PR into `develop` is merged and closes the issue — for a sub-issue, the PR of its parent branch | the board workflow "Item closed" (`Closes #N` closes the issue on merge) |
 
 A sub-branch and its PR into the shared branch never change the status. A branch made by hand outside the skills
 does not move the card either.
-
-A parent issue and its sub-issues (below) move on their own branches: the parent goes In progress when its parent
-branch is created, each sub-issue when its own branch is, and In review when its PR into the parent branch is open —
-there it stays after the merge: a PR into a branch other than `develop` closes nothing. The parent goes In review
-with its PR into `develop`, and that PR's merge closes the parent and every sub-issue at once — all of them Done.
 
 The board workflows (set in the board's UI — the API cannot change them) are on: "Item added to project" → Backlog,
 "Pull request linked to issue" → In review, "Item closed" → Done. Off: "Auto-add to project", "Auto-add sub-issues to
@@ -65,30 +60,19 @@ not on the board. A card that stays behind after a merge → check these first
 | XS | about an hour |
 | S | up to half a day |
 | M | 1–2 days |
-| L | up to a week — big work: one ticket, or a parent with sub-issues (below) |
+| L | up to a week — big work: one issue, or a parent with sub-issues (below) |
 | XL | too big to go as one piece — big work (below) |
 
-### Big work: one ticket or a parent with sub-issues
+### Big work: one issue or a parent with sub-issues
 
-A big request (L or XL) is shaped by acceptance — can the customer accept it piece by piece? `/analyst` proposes
-one of the two with the reason, the user confirms (§3 step 3):
+A big request (L or XL) is shaped by acceptance — can the customer accept it piece by piece?
 
-- **A parent ticket with sub-tickets** — the request falls into outcomes the customer can check and accept one by
-  one, each with criteria of its own. A parent issue (`## Sub-issues`) holds the whole goal; each sub-issue is a
-  ticket of its own (`## Parent`) — the full template with its own criteria, branch, PR and review. The work collects
-  on the parent branch and reaches `develop` only when every sub-issue is in (`/branches` §1).
-- **One ticket** — the outcome means something to the customer only as a whole: one issue, one PR into `develop`,
-  one acceptance at the end.
+- **A parent with sub-issues** — outcomes the customer can accept one by one: a parent issue holds the whole goal,
+  each sub-issue is a full issue with its own criteria, branch, PR and review (`/branches` §1).
+- **One issue** — an outcome that means something only as a whole: one issue, one PR, one acceptance.
 
-How the work is cut technically — a big ticket or sub-issue in `--<n>` parts, the order of the parts, what runs in
-parallel — is not a requirement: `/developer` decides it at its step 3 Scope, and proposes a reshape into
-sub-issues through `/analyst #<N>` when it finds pieces worth accepting apart. The order between sub-issues here is
-the order of the requirements only (`#112 builds on the language choice of #110`).
-
-Depth: a sub-issue never gets sub-issues of its own.
-
-The ticket is the plan of the branches: its `## Parent` and `## Sub-issues` give the parent branch and the base of
-every sub-issue branch (`/branches` §3, §5 Branches at the start).
+How the work is cut technically — `--<n>` parts, their order, what runs in parallel — is not a requirement:
+`/developer` decides it (its step 3). A sub-issue never gets sub-issues of its own.
 
 ### Setting a field
 
@@ -111,7 +95,7 @@ Title — the outcome, in English, no `[Type]` prefix, sentence case: `Exercise 
 Body — one of two templates; the section names are fixed (`/pr` copies `## Acceptance criteria`, `/branches` §3
 reads `## Parent`).
 
-**The ticket** — a task, a sub-issue included:
+**The issue** — a task, a sub-issue included:
 
 ```markdown
 ## Parent
@@ -144,45 +128,22 @@ Privacy: <the personal data touched> → /privacy-audit | none
 <XS|S|M|L|XL> — <one-line reason>
 ```
 
-**The parent** — the whole goal of a parent ticket; it has no code and no criteria of its own:
+**The parent** — the same template without `## Parent`, holding the whole goal, size L or XL; `## Sub-issues`
+after `## Scope`, and no criteria of its own:
 
 ```markdown
-## Goal
-<who> wants <what> so that <why>.
-
-## Context
-…
-
-## Scope
-In:
-- …
-Out:
-- …
-
 ## Sub-issues
 - #<a> <title> — first
 - #<b> <title> — after #<a>
 
 ## Acceptance criteria
 See the sub-issues; the parent is done when every sub-issue is done.
-
-## Domain impact
-…
-
-## Assumptions
-…
-
-## Size
-<L|XL> — <one-line reason>
 ```
 
-- `## Parent` names the parent of a sub-issue — the link every skill reads it from; the same link is set on GitHub
-  (`gh issue create --parent <P>`), so the board shows the parent's progress. A task that is not a sub-issue says
-  `none`.
-- `## Sub-issues` makes an issue a parent: it lists every sub-issue with the order of the requirements — `first`,
-  `after #<n>` (one builds on what the other delivers) — and nothing about how the work is split technically.
-- Reading an older issue without these: the parent — `gh issue view <N> --json parent --jq .parent.number`; the
-  sub-issues — `## Parts` or `gh issue view <P> --json subIssues`.
+- `## Parent` and `## Sub-issues` are where every skill reads the parent and the sub-issues from (`/branches` §3);
+  the same link is set on GitHub (`gh issue create --parent <P>`) for the board. `## Sub-issues` gives only the
+  order of the requirements (`after #<n>`: one builds on what the other delivers). An older issue without them:
+  `gh issue view <N> --json parent` / `gh issue view <P> --json subIssues`.
 - Every criterion is observable by the customer and checkable at acceptance; one behavior per criterion.
 - Criterion ids are stable: a changed criterion keeps its id, a removed one leaves its id unused, a new one takes the
   next free number. Never renumber — a PR ticks criteria by id.
@@ -217,18 +178,15 @@ Before any question:
 
    A default the user accepts becomes an assumption (`A-n`). Repeat rounds until no gap blocks the criteria; if
    there is no gap, ask nothing.
-3. **Size.** Estimate by §1 Sizes. L or XL → propose the shape of §1 Big work by acceptance: outcomes the customer
-   can accept one by one → a parent with sub-issues, in the order of the requirements; an outcome that means
-   something only as a whole → one ticket. One question, the proposal as its default with its reason:
+3. **Size.** Estimate by §1 Sizes. L or XL → propose the shape of §1 Big work as one question, its reason in it:
    `Shape — a parent with 3 sub-issues: the language choice, the server errors and the screens can each be accepted
-   on their own? Default: yes.` How a big ticket is cut into parts is `/developer`'s, never asked here. A sub-issue
-   that is still too big to accept as one outcome → reshape the request: a sub-issue has no sub-issues of its own.
-4. **Draft.** Show the title, the label, the size and the whole body, and the branch the task will get:
-   `<label>/<N>-<3–4 kebab-case words>` (`/branches` §2; the number is known after creation). A parent shows
-   itself and every sub-issue, each with its own label, and the branches: the parent branch from `develop`, every
-   sub-issue branch from the parent branch (`/branches` §5 Branches at the start).
-5. **Gate.** Ask: "Create the issue with these details?" Wait for an explicit yes; a change request → back to the
-   draft.
+   on their own? Default: yes.`
+4. **Draft.** Show the title, the label, the size and the whole body, and the branch the task will get
+   (`/branches` §2; the number is known after creation) — for a parent, itself and every sub-issue with its label and
+   branch (`/branches` §5 Branches at the start).
+5. **Gate.** Ask: "Create the issue with these details?" — for a parent: "Create the parent and its <n> sub-issues,
+   then fill their numbers into the parent's `## Sub-issues`?" Wait for an explicit yes; a change request → back to
+   the draft.
 6. **Create.** Write the body to a file in the scratchpad directory (never into the repository), then:
    ```bash
    gh issue create --repo a1exevs/set-forge --title "<title>" --body-file <file> --label <type> \
@@ -241,8 +199,7 @@ Before any question:
    issue.
 7. **Report** the issue link and number, its status and size, and the branch name with the number — for a parent,
    itself and every sub-issue, with their branches. Next steps: the user moves the card to Ready when the
-   requirements are agreed; the work starts with `/developer #<N>` — for a parent, with a sub-issue
-   (`/developer #<sub-issue>` creates the parent branch first when there is none).
+   requirements are agreed; the work starts with `/developer #<N>` — for a parent, with a sub-issue.
 
 ## 4. Changing requirements
 
@@ -251,12 +208,12 @@ Before any question:
 2. **Clarify** the change only, as in §3 step 2, against the current body and §2 context.
 3. **Draft** the new body: show only the changed sections, before → after, and the criteria by id (kept, changed,
    added, removed — §1 The issue). Update `Size` when the change moves it.
-4. **Open PR.** An open PR among `closedByPullRequestsReferences` (a PR with `Closes #N`) carries the criteria as
-   checkboxes (`/pr` step 3). A sub-issue's PR goes into its parent branch and closes nothing, so it is not in that
-   list: find it by its branch — `gh pr list --state open --json number,headRefName --jq '.[] |
-   select(.headRefName | test("^[a-z]+/<N>-") and (test("--[0-9]+$") | not))'`. Propose its update in the
-   same draft: unchanged criteria keep their tick, a changed one is unticked, a new one is added unticked, a
-   removed one is dropped.
+4. **Open PR.** The open PR of the issue's own branch carries the criteria as checkboxes (`/pr` step 3). For a task it
+   is among `closedByPullRequestsReferences` (a PR with `Closes #N`). For a sub-issue that list holds only its parent's
+   PR, which has no criteria — its own PR closes nothing (`/pr` step 3), so find it by its branch — `gh pr list --state
+   open --json number,headRefName --jq '.[] | select(.headRefName | test("^[a-z]+/<N>-") and (test("--[0-9]+$") |
+   not))'`. Propose its update in the same draft: unchanged criteria keep their tick, a changed one is unticked, a new
+   one is added unticked, a removed one is dropped.
 5. **Gate.** List what will be written: the issue body, the comment, the size, the PR body. Wait for a yes; the user
    may decline the PR update alone.
 6. **Write.**

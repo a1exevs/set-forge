@@ -28,21 +28,20 @@ Talk in the user's language; artifacts, code, commits and the PR are in English.
 
 ## 1. The task workspace
 
-The artifacts live in the task folder of `/branches` §2 — `.runtime/tasks/<N>/` **of the main checkout**,
-`part-<n>/` for a sub-branch, the branch slug for a branch without a task — gitignored, kept between sessions and
-shared by every worktree. The same folder holds the `/code-review` log and the stand check.
+The artifacts live in the task folder of `/branches` §2 (`<key>`, `part-<n>/` for a sub-branch), next to the
+`/code-review` log and the stand check.
 
 ```
-.runtime/tasks/<N>/
+.runtime/tasks/<key>/
   status.md          # the single source of where the task is
   understanding.md
-  breakdown.md       # only when split
+  breakdown.md       # only when cut into parts
   reuse.md
   hld.md
   lld.md
   code-review.md     # written by /code-review
   stand-check.md     # the check on the verification stand (step 8), when chosen
-  part-<n>/          # one part of a split task = one sub-branch; the same files
+  part-<n>/          # one part = one sub-branch; the same files
 ```
 
 `status.md`:
@@ -50,7 +49,7 @@ shared by every worktree. The same folder holds the `/code-review` log and the s
 ```
 # <N> <issue title>
 Status: <step N: name> | <in progress | done> · mode: <manual | autonomous → commit | autonomous → PR | —> · stand: <no | planned | running: slot <k> | stopped | —>
-Branch: <branch> · Worktree: <.claude/worktrees/<key> | main checkout> · Parent: <../ for a part | #<P> <parent branch> for a sub-issue | —>
+Branch: <branch> · Worktree: <<main>/.claude/worktrees/<key> | main checkout> · Parent: <../ for a part | #<P> <parent branch> for a sub-issue | —>
 
 ## Steps
 - [x] 2 Understanding
@@ -64,14 +63,14 @@ Branch: <branch> · Worktree: <.claude/worktrees/<key> | main checkout> · Paren
 ## Iterations
 - [ ] 1 <name>
 
-## Parts (when split)
+## Parts (when cut into parts)
 - [ ] part-1 — <goal> — <status>
 ```
 
-A task split into parts tracks steps 2, 3 and Parts only; steps 4–8 live in its parts.
+A task cut into parts tracks steps 2, 3 and Parts only; steps 4–8 live in its parts.
 
-A parent issue (`/analyst` §1 Big work) is not implemented itself: its sub-issues are, each in its own
-folder `.runtime/tasks/<sub-issue>/` with the files above. The parent's folder holds only `status.md`:
+A parent issue is not implemented itself — its sub-issues are, each in its own folder. The parent's folder holds
+only `status.md`:
 
 ```
 # <P> <parent title>
@@ -82,8 +81,8 @@ Status: parent · Branch: <parent branch> | — · PR into develop: #<n> | —
 - [x] #111 <title> — … — merged
 ```
 
-It is written when the parent branch is created (step 2) and updated whenever a sub-issue's branch is created, its
-PR opens or merges (housekeeping), so `/developer #<P>` sees the whole parent at once.
+Written by a sub-issue's step 2 when missing (a parent branch made by hand has none) and updated with its line;
+`/developer #<P>` (step 1) rebuilds the list from `gh pr list --base <parent branch> --state all`.
 
 ## 2. Steps
 
@@ -100,8 +99,7 @@ PR opens or merges (housekeeping), so `/developer #<P>` sees the whole parent at
 
 **Housekeeping, at every start.** For each worktree under `.claude/worktrees/` (`git worktree list`) look up the PR
 of its branch (`gh pr list --head <branch> --state merged`). Merged ones → one line: "the PRs of X and Y are
-merged — remove their worktrees?" and remove them on yes (`/branches` §5); their task folders stay. A merged PR of
-a sub-issue also ticks it in the parent's `status.md`.
+merged — remove their worktrees?" and remove them on yes (`/branches` §5); their task folders stay.
 
 **1 Intake.** `/developer #N` or a branch of a task (`/branches` §2) → `gh issue view <N> --json
 title,body,state,labels,comments,projectItems`: Goal, Scope, the acceptance criteria, Domain impact, and every
@@ -109,15 +107,11 @@ title,body,state,labels,comments,projectItems`: Goal, Scope, the acceptance crit
 Ready yet and ask whether to go on. No issue → agree in the chat where the requirements come from; do not go on
 without a source. An existing `status.md` in the task folder → this is a resume (§5).
 
-The ticket also gives its place — `## Parent` and `## Sub-issues` (`/analyst` §1 The issue; an older issue — the
-fallbacks listed there):
-
-- **A sub-issue** (`## Parent` #P) → read the parent too (`gh issue view <P> --json title,body,state`): its Goal and
-  `## Sub-issues` are the context, the siblings are what may be worked at the same time. A closed parent → stop and
-  ask. Its branch on `origin` (`/branches` §3) is the base of this task; none yet → step 2 creates it first.
-- **A parent** (`## Sub-issues`) → it has no code of its own: report its `status.md` (or the
-  sub-issues and their PRs) and ask which sub-issue to take — `/developer #<sub-issue>`. Every sub-issue merged
-  into the parent branch → propose `/pr` from the parent branch into `develop` (`/pr` step 3) instead.
+- **A sub-issue** (`## Parent` #P, `/analyst` §1 The issue) → read the parent too: its Goal and `## Sub-issues` are
+  the context. Its branch is the base of this task (`/branches` §3); none yet → step 2 creates it first.
+- **A parent** (`## Sub-issues`) → rebuild its `status.md` (§1), report it and ask which sub-issue to take. Every
+  sub-issue merged into the parent branch → its PR instead: the parent branch in its worktree (`/branches` §5 Shared
+  or parent branch to its PR, gated), then `/pr`.
 
 **2 Understanding.** Restate the task for development:
 
@@ -133,31 +127,27 @@ For a bug add `Root cause:` — the hypothesis with its evidence (a reproduction
 lives: client, server, env / configuration, or data. A second defect found on the way is not carried along: propose
 a new task through `/analyst`.
 
-GATE. The same question names the branches of the task (`/branches` §5 Branches at the start, the column "At the
-start") — every creation and push, the cards moved to In progress — and where the work lives: the task branch, in
-**a worktree** `.claude/worktrees/<key>` (the default: your main checkout and other tasks stay untouched, several
-tasks run at once) or the current checkout. One yes for all of it. On yes: create the branches (the work branch in a
-worktree: `git worktree add`, `npm ci`, `npm run setup:env`, then move the session into it with `EnterWorktree`),
-the task folder, `understanding.md` and `status.md`. A task without an issue gets its branch the same way, without
+GATE. The same question names the branches of the task (`/branches` §5 Branches at the start, the column "At the start")
+— every creation and push, the cards moved to In progress — and where the work lives: the task branch, in **a worktree**
+`.claude/worktrees/<key>` (the default: your main checkout and other tasks stay untouched, several tasks run at once) or
+the current checkout. One yes for all of it. On yes: create the branches (the work branch in a worktree — `/branches`
+§5), the task folder, `understanding.md` and `status.md`. A task without an issue gets its branch the same way, without
 the card.
 
-- A sub-issue: also write the parent's `status.md` (§1) if it is missing — a parent branch made by hand has none —
-  and this sub-issue's line in it; the sub-issue's `understanding.md` starts with `## Parent context` — a link to
-  `#<P>` and a 2–3 line digest of the parent and the sibling sub-issues.
+A sub-issue also gets its line in the parent's `status.md` (§1), and its `understanding.md` starts with
+`## Parent context` — a link to `#<P>` and a 2–3 line digest of the parent and the sibling sub-issues.
 
-**3 Scope.** Small → say so in one line, GATE, go to step 4. Large → a table `# | Part | Goal`, in execution order.
-Each part is one sub-branch `<branch>--<n>` (`/branches` §1) with its folder `part-<n>/`; the task branch becomes
-their shared branch and takes no commits of its own, so the work starts in part 1 at once. The cut is yours, not
-the ticket's: the order of the parts, what builds on what, what may run at the same time. The same gate names the
-first push of the task branch and `--1` from it, with the session moved into it (`/branches` §5 Branches at the
-start, the column "Cut into parts") — one yes for the breakdown and those. GATE. On yes save `breakdown.md`, push
-the branch, create `--1`, seed each `part-<n>/status.md` and go on with part 1; steps 2–3 of the whole task stay in
-the task folder. A part runs steps 2 and 4–8 on its own sub-branch (part 1 on `--1`; every next one created through
-`/branches` §5 at its step 2, gated); its `understanding.md` starts with `## Parent context` — a link to `../` and a
-2–3 line digest of the task, so a fresh session has the context. A sub-issue splits the same way: its branch becomes
-the shared branch of its parts, and their PRs go into it, not into the parent branch. Parts the customer could
-accept one by one are sub-issues rather than parts — say so and propose the reshape through `/analyst #<N>` instead
-(`/analyst` §1 Big work).
+**3 Scope.** Small → say so in one line, GATE, go to step 4. Large → a table `# | Part | Goal`, in execution order. Each
+part is one sub-branch `<branch>--<n>` (`/branches` §1) with its folder `part-<n>/`; the task branch becomes their
+shared branch, and the work starts in part 1 at once. The cut is yours, not the issue's. The same gate names the first
+push of the task branch and `--1` from it, with the session moved into it (`/branches` §5 Branches at the start, the
+column "Cut into parts") — one yes for the breakdown and those. GATE. On yes save `breakdown.md`, push the branch,
+create `--1`, seed each `part-<n>/status.md` and go on with part 1; steps 2–3 of the whole task stay in the task folder.
+A part runs steps 2 and 4–8 on its own sub-branch (part 1 on `--1`; every next one created through `/branches` §5 at its
+step 2, gated); its `understanding.md` starts with `## Parent context` — a link to `../` and a 2–3 line digest of the
+task, so a fresh session has the context. A sub-issue is cut the same way: its branch becomes the shared branch of its
+parts. Parts the customer could accept one by one are sub-issues rather than parts — propose the reshape through
+`/analyst #<N>` instead (`/analyst` §1 Big work).
 
 **4 Reuse & reach.** A table, six rows, no prose:
 
@@ -191,11 +181,9 @@ Run the HLD consistency check (§3). At the same gate ask three things:
 
 - the mode: **manual** (default) or **autonomous**;
 - for autonomous, the **horizon** (step 8): **commit** (default) — one commit, no push; or **PR** — the commit, the
-  first push of the task branch, `/pr` without its own confirmation, then the CI — or, into a parent or a shared branch,
-  its steps run locally (`/pr` §6) — fixed until it is green, every fix its own commit and push. The yes to the PR
-  horizon is the explicit yes `/branches` §4 wants for those pushes and that PR — the gate line lists them (`git push -u
-  origin <branch>`, `/pr` into its base — `develop` or, for a sub-issue, the parent branch — the fix pushes), so the yes
-  names them;
+  first push of the task branch, `/pr` without its own confirmation, then the checks (`/pr` §6) fixed until they are
+  green, every fix its own commit and push. The gate line lists them — `git push -u origin <branch>`, `/pr` into its
+  base (`/branches` §3), the fix pushes, the description refreshes — so the yes is the one `/branches` §4 wants;
 - **the stand check** (step 8) — name what it will walk (the acceptance criteria, or for a task without them the
   flows from the reach of step 4) and with which preset (§7):
   - yes by default for any change of how the running app behaves — in the client or in the API alone (a validation,
@@ -230,8 +218,8 @@ A decision the LLD did not foresee → the HLD consistency check (§3), in both 
 
 **8 Finish.**
 
-1. `/code-review <base>` over the whole task, the base by `/branches` §3, before the commit. Manual: one round, then
-   the user picks what to fix (the fixes are re-verified and reviewed again). Autonomous: rounds of review → fix
+1. `/code-review origin/<base>` over the whole task, the base by `/branches` §3, before the commit. Manual: one round,
+   then the user picks what to fix (the fixes are re-verified and reviewed again). Autonomous: rounds of review → fix
    everything 🔴 and 🟠 → review again, until a round is clean or 5 rounds are spent.
 2. **The stand check**, when step 6 chose it — after the review, so the code checked is the code committed:
    start the stand (§7), walk everything it was chosen for, watch the console, the network and the server log.
@@ -255,22 +243,21 @@ A decision the LLD did not foresee → the HLD consistency check (§3), in both 
    The stand stays up after the walk — the user checks on it (p. 6); never stop it here.
 3. One commit with the `/commit` template. Manual: `/commit` asks for its approval as usual. Autonomous: choosing the
    mode was that approval — commit without asking. No push — except the PR horizon (p. 4).
-4. **The PR horizon** (autonomous → PR only). Run `/pr` into the base of `/branches` §3 — `develop`, or the parent
-   branch for a sub-issue, as the gate line of step 6 named it; it pushes the branch (`git push -u origin <branch>`),
-   and its confirmation was the yes of step 6 (`/pr` §6). Into a parent or a shared branch there is no CI: `/pr` runs
-   its steps locally before the push (`/pr` §6), a red step is fixed like a red check below. Into `develop`, the CI: the
-   app binds the PR and reports its checks — never poll them yourself (no `gh` loops). The turn ends with one line, not
-   the report: "PR #<n> is open, CI is running, the stand is up at <url>". A red check → read its log, fix it as an
-   iteration (verify, one `/code-review` round), one commit through `/commit`, push; a change in `server/` also restarts
-   the stand (§7), so the stand shows the code of the PR. Up to 3 fix rounds; still red → stop and report it as open. A
-   change of `stand-check.md` while the PR exists → refresh its description (`/pr` §7).
-5. Report, in the chat — after the commit; in the PR horizon after the CI is green or the rounds are spent: the
-   iterations, the review rounds and what is still open, the stand check, the commit hashes, the PR link. Then the
-   hand check: the acceptance criteria are the user's to walk. When step 6 chose the stand, it is still up — give
-   its client URL, slot and the preset's login and end with "say *stop the stand* when you are done"; without a
-   stand, say so in one line. Set `status.md` to done (`stand: running: slot <k>`, or as it was) and, unless a PR
-   exists, offer `/pr` — it links the task, carries the acceptance criteria and the stand check, and moves the
-   card to In review.
+4. **The PR horizon** (autonomous → PR only). Run `/pr` into the base of `/branches` §3, as the gate line of step 6
+   named it; it pushes the branch (`git push -u origin <branch>`), and its confirmation was the yes of step 6 (`/pr`
+   §6). A red local step (`/pr` §6) is fixed like a red check below. Into `develop`, the CI: the app binds the PR and
+   reports its checks — never poll them yourself (no `gh` loops). The turn ends with one line, not the report: "PR #<n>
+   is open, CI is running, the stand is up at <url>". A red check → read its log, fix it as an iteration (verify, one
+   `/code-review` round), one commit through `/commit`, push; a change in `server/` also restarts the stand (§7), so the
+   stand shows the code of the PR. Up to 3 fix rounds; still red → stop and report it as open. A change of
+   `stand-check.md` while the PR exists → refresh its description (`/pr` §7).
+5. Report, in the chat — after the commit; in the PR horizon after the checks are green (the CI, or the local steps of
+   `/pr` §6) or the rounds are spent: the iterations, the review rounds and what is still open, the stand check, the
+   commit hashes, the PR link. Then the hand check: the acceptance criteria are the user's to walk. When step 6 chose
+   the stand, it is still up — give its client URL, slot and the preset's login and end with "say *stop the stand* when
+   you are done"; without a stand, say so in one line. Set `status.md` to done (`stand: running: slot <k>`, or as it
+   was) and, unless a PR exists, offer `/pr` — it links the task, carries the acceptance criteria and the stand check,
+   and moves the card to In review.
 6. **The hand check.** Only the user's word stops the stand (§7). A defect the user finds → fix it as an iteration
    (verify, one `/code-review` round, that criterion again on the stand when there is one) and **its own commit**
    through `/commit` (approved by the rule of p. 3) — never folded into the first one: the gap between your walk
@@ -289,13 +276,10 @@ A decision the LLD did not foresee → the HLD consistency check (§3), in both 
    (an iteration, `/pr`, a branch operation) ask once: "is the stand still needed?". On the user's stop →
    `npm run client:stand:stop -- --slot=<k>` and `stand: stopped` in `status.md`.
 
-A split task: a part finishes on its sub-branch the same way (its PR goes into the shared branch); after the last
-part, the shared branch goes to `/pr` into its own base — `develop`, or the parent branch when the task is a
-sub-issue.
-
-A sub-issue finishes the same way, with its PR into the parent branch (its card → In review, `/pr` step 6) and its
-line in the parent's `status.md` updated. After the last sub-issue is merged, the parent branch goes to `/pr` into
-`develop` (`/developer #<P>` proposes it, step 1) — that PR closes the parent and every sub-issue.
+A part finishes on its sub-branch the same way (its PR goes into the shared branch); after the last part, the shared
+branch, brought up to date (`/branches` §5 Shared or parent branch to its PR), goes to `/pr` into its own base. A
+sub-issue's PR goes into the parent branch; after the last one is merged, `/developer #<P>` proposes the parent branch's
+`/pr` into `develop` (step 1).
 
 ## 3. HLD consistency check
 
@@ -338,7 +322,7 @@ The steps are the same; the weight moves.
 | Type | Emphasis |
 |---|---|
 | `bugfix` | step 2 — the root cause with evidence before any design; a test that fails before the fix |
-| `feature` | step 3 often splits it; HLD and LLD per part |
+| `feature` | step 3 often cuts it into parts; HLD and LLD per part |
 | `improvement` | usually small (step 3 is one line); the weight is on steps 4–5 |
 | `refactoring` | behavior must not change: step 4's reach is the whole risk assessment, every iteration ends with a no-behavior-change check (the same tests pass unchanged); a large or risky one also walks its reach on the stand (step 6) |
 | `common`, `documentation`, `storybook`, `tests` | often without an issue — steps 1–2 agree the source and the goal in the chat; HLD may have fewer real options — say so instead of inventing them |
@@ -356,8 +340,8 @@ another session's stand. Code: `client/tests/stand/`.
   slot <k>` in `status.md`.
 - Presets — the state the stand starts in, built through the public API (`client/tests/stand/stand-presets.ts`):
   `empty` (no users — for flows that start at registration), `user` (a registered user without data), `data` (a
-  registered user with two lists and one completed session), `history` (`data` plus enough completed sessions for
-  a second page of history). A criterion that needs more (an active session, …)
+  registered user with two lists and one completed workout session), `history` (`data` plus enough completed workout
+  sessions for a second page of history). A criterion that needs more (an active workout session, …)
   gets a new preset there, in the same task — never a hand-made state.
 - Stop — `npm run client:stand:stop` (every stand of this checkout) or `-- --slot=<k>`; `-- --list` shows every
   running stand. The stand stops Nest, Vite and its MySQL itself; one that died or was killed is cleaned up by the

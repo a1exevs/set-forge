@@ -214,8 +214,8 @@ task, branch and title rules are in the skills under
 
 ## Release
 
-Run `/release <patch|minor|major>` in Claude Code. The phases, PR titles and labels are in
-[`.claude/skills/release/SKILL.md`](.claude/skills/release/SKILL.md), the branch model in
+Run `/release <patch|minor|major>` in Claude Code. The phases and PR titles are in
+[`.claude/skills/release/SKILL.md`](.claude/skills/release/SKILL.md), the branch model and the labels in
 [`.claude/skills/branches/SKILL.md`](.claude/skills/branches/SKILL.md).
 
 ## Deploy
