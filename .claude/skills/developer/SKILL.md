@@ -140,14 +140,15 @@ A sub-issue also gets its line in the parent's `status.md` (§1), and its `under
 **3 Scope.** Small → say so in one line, GATE, go to step 4. Large → a table `# | Part | Goal`, in execution order. Each
 part is one sub-branch `<branch>--<n>` (`/branches` §1) with its folder `part-<n>/`; the task branch becomes their
 shared branch, and the work starts in part 1 at once. The cut is yours, not the issue's. The same gate names the first
-push of the task branch and `--1` from it, with the session moved into it (`/branches` §5 Branches at the start, the
-column "Cut into parts") — one yes for the breakdown and those. GATE. On yes save `breakdown.md`, push the branch,
-create `--1`, seed each `part-<n>/status.md` and go on with part 1; steps 2–3 of the whole task stay in the task folder.
-A part runs steps 2 and 4–8 on its own sub-branch (part 1 on `--1`; every next one created through `/branches` §5 at its
-step 2, gated); its `understanding.md` starts with `## Parent context` — a link to `../` and a 2–3 line digest of the
-task, so a fresh session has the context. A sub-issue is cut the same way: its branch becomes the shared branch of its
-parts. Parts the customer could accept one by one are sub-issues rather than parts — propose the reshape through
-`/analyst #<N>` instead (`/analyst` §1 Big work).
+push of the task branch and `--1` from it in its worktree, the task's checkout from then on (`/branches` §2; §5
+Branches at the start, the column "Cut into parts") — one yes for the breakdown and those. GATE. On yes save
+`breakdown.md`, push the branch, create `--1`, seed each `part-<n>/status.md` and go on with part 1; steps 2–3 of
+the whole task stay in the task folder. A part runs steps 2 and 4–8 on its own sub-branch (part 1 on `--1`; every
+next one created through `/branches` §5 at its step 2, gated); its `understanding.md` starts with
+`## Parent context` — a link to `../` and a 2–3 line digest of the task, so a fresh session has the context. A
+sub-issue is cut the same way: its branch becomes the shared branch of its parts. Parts the customer could accept one
+by one are sub-issues rather than parts — propose the reshape through `/analyst #<N>` instead (`/analyst` §1 Big
+work).
 
 **4 Reuse & reach.** A table, six rows, no prose:
 
@@ -311,7 +312,8 @@ Read before proposing, in this order:
 `/developer` on a branch of a task, or "continue #N": read `status.md` of the task folder (and the parent's
 `understanding.md` for a part, the parent issue's `status.md` for a sub-issue), report the current step in one line
 and go on from there — every save still waits
-for its gate. `status.md` names a worktree → move the session into it first (`EnterWorktree` with `path`).
+for its gate. `status.md` names a worktree → that is the task's checkout; the session stays in the main checkout
+(`/branches` §2).
 `stand: running: slot <k>` → `npm run client:stand:stop -- --list`: still running → ask first whether to stop it or
 keep it for the hand check; gone → `stand: stopped`.
 

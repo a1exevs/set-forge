@@ -9,6 +9,7 @@ argument-hint: "[feature|bugfix|common|improvement|storybook|tests|documentation
 Act as a Git Assistant. You accept one optional parameter: `[type]` (`$1`).
 Available types: the work branch types of `.claude/skills/branches/SKILL.md` §2 (`/branches`) — the rows marked
 "work branch" in its label table.
+Every git command runs in the task's checkout (`/branches` §2); "the current branch" is its branch.
 
 1. TYPE RESOLUTION
    If `$1` is given but NOT in the list above, STOP and say:
