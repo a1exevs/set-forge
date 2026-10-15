@@ -9,6 +9,7 @@ Act as a Git Automation Agent. Your goal is to create a GitHub Pull Request foll
 
 1. BRANCH & ENVIRONMENT CHECK
 The branch rules live in `.claude/skills/branches/SKILL.md` (`/branches`); follow it, including its gate.
+Every command runs in the task's checkout (branches §2); its branch is the current branch.
 Identify the current branch and its base (branches §3).
 Safety Lock: If the current branch is protected (branches §1), STOP and warn the user that PRs cannot be created from
 it — promotion PRs belong to `/release`.
