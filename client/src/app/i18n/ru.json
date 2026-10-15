@@ -1,0 +1,14 @@
+{
+  "common": {
+    "back": "Назад"
+  },
+  "language": {
+    "label": "Язык"
+  },
+  "profile": {
+    "openSettings": "Настройки"
+  },
+  "settings": {
+    "title": "Настройки"
+  }
+}

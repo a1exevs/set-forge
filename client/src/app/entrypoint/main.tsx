@@ -4,11 +4,15 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { clearAccessToken, setSessionExpiredHandler } from '@shared/api';
+import { initI18n } from '@shared/lib';
 import { ConfirmDialogProvider, Toaster } from '@shared/ui';
 
 import { queryClient } from '../api/query-client';
+import { dictionaries } from '../i18n/dictionaries';
 import { router } from '../router/router';
 import '../styles/global.scss';
+
+initI18n(dictionaries);
 
 setSessionExpiredHandler(() => {
   clearAccessToken();

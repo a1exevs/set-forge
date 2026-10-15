@@ -3,6 +3,16 @@
   position: relative;
 }
 
+// Names the listbox for screen readers only.
+.hiddenLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .listboxButton {
   width: 100%;
   padding: $spacing-sm $spacing-md;
@@ -17,6 +27,15 @@
   min-height: 44px;
   display: flex;
   align-items: center;
+  gap: $spacing-sm;
+
+  .buttonLabel {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
   &:focus {
     outline: none;
@@ -39,6 +58,58 @@
   max-height: 200px;
   overflow-y: auto;
   padding: $spacing-xs;
+
+  // The list takes focus when it opens; the active option shows where the keyboard is.
+  &:focus {
+    outline: none;
+  }
+}
+
+// A quiet trigger for a corner or a footer: no field chrome until hovered or focused.
+.compactButton {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  min-height: 44px;
+  padding: 0 $spacing-sm;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  background: none;
+  color: $text-secondary;
+  font-family: inherit;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: $text-primary;
+    background-color: $bg-hover;
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: $primary-color;
+  }
+
+  @include field-disabled;
+}
+
+// Points down while closed and up while the list is open (Headless UI marks the open button `data-open`).
+.chevron {
+  flex-shrink: 0;
+  color: $text-secondary;
+  transition: transform 0.2s ease;
+
+  [data-open] > & {
+    transform: rotate(180deg);
+  }
+}
+
+// Anchored to the trigger (Floating UI places it and flips it when there is no room below).
+.compactOptions {
+  width: max-content;
+  min-width: max(var(--button-width), 9rem);
+  margin-top: 0;
 }
 
 .listboxOption {

@@ -1,4 +1,5 @@
-import type { LegalContent, LegalLang } from '@widgets/legal-document';
+import type { Language } from '@shared/lib';
+import type { LegalContent } from '@widgets/legal-document';
 
 /** Effective date of the current version. Bump when the terms text changes. */
 export const TERMS_EFFECTIVE_DATE = '2026-07-18';
@@ -238,4 +239,4 @@ const en: LegalContent = {
   ],
 };
 
-export const termsContent: Record<LegalLang, LegalContent> = { ru, en };
+export const termsContent: Record<Language, LegalContent> = { ru, en };

@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './../routes/login'
 import { Route as PrivacyRouteImport } from './../routes/privacy'
 import { Route as ProfileRouteImport } from './../routes/profile'
 import { Route as RegisterRouteImport } from './../routes/register'
+import { Route as SettingsRouteImport } from './../routes/settings'
 import { Route as TermsRouteImport } from './../routes/terms'
 import { Route as EditIdRouteImport } from './../routes/edit/$id'
 import { Route as WorkoutIdRouteImport } from './../routes/workout/$id'
@@ -55,6 +56,11 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
   '/edit/$id': typeof EditIdRoute
   '/workout/$id': typeof WorkoutIdRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
   '/edit/$id': typeof EditIdRoute
   '/workout/$id': typeof WorkoutIdRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
   '/edit/$id': typeof EditIdRoute
   '/workout/$id': typeof WorkoutIdRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/register'
+    | '/settings'
     | '/terms'
     | '/edit/$id'
     | '/workout/$id'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/register'
+    | '/settings'
     | '/terms'
     | '/edit/$id'
     | '/workout/$id'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/register'
+    | '/settings'
     | '/terms'
     | '/edit/$id'
     | '/workout/$id'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
+  SettingsRoute: typeof SettingsRoute
   TermsRoute: typeof TermsRoute
   EditIdRoute: typeof EditIdRoute
   WorkoutIdRoute: typeof WorkoutIdRoute
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
+  SettingsRoute: SettingsRoute,
   TermsRoute: TermsRoute,
   EditIdRoute: EditIdRoute,
   WorkoutIdRoute: WorkoutIdRoute,

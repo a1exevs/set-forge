@@ -42,6 +42,12 @@ export function renderWithPageRouter({ component, initialEntries }: RenderWithPa
     component,
   });
 
+  const settingsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/settings',
+    component,
+  });
+
   const historyRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/history',
@@ -81,6 +87,7 @@ export function renderWithPageRouter({ component, initialEntries }: RenderWithPa
   const routeTree = rootRoute.addChildren([
     indexRoute,
     profileRoute,
+    settingsRoute,
     historyRoute,
     createRouteNode,
     editRoute,

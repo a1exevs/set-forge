@@ -28,7 +28,7 @@ const srcDir = join(clientDir, 'src');
 
 const SLICE_SEGMENTS = new Set(['ui', 'model', 'api', 'lib', 'config']);
 const SHARED_SEGMENTS = new Set(['ui', 'model', 'api', 'lib', 'config']);
-const APP_SEGMENTS = new Set(['api', 'entrypoint', 'router', 'routes', 'styles']);
+const APP_SEGMENTS = new Set(['api', 'entrypoint', 'i18n', 'router', 'routes', 'styles']);
 const SLICED_LAYERS = ['pages', 'widgets', 'features', 'entities'];
 const LAYERS = new Set(['app', ...SLICED_LAYERS, 'shared']);
 const SRC_ROOT_FILES = new Set(['vite-env.d.ts']);

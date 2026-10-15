@@ -40,6 +40,7 @@
     "client:lint:eslint": "npm run lint:eslint -w @set-forge/client",
     "client:lint:eslint:fix": "npm run lint:eslint:fix -w @set-forge/client",
     "client:lint:fsd": "npm run lint:fsd -w @set-forge/client",
+    "client:lint:i18n": "npm run lint:i18n -w @set-forge/client",
     "client:lint:unused": "npm run lint:unused -w @set-forge/client",
     "client:test:unit": "npm run test:unit -w @set-forge/client",
     "client:test:unit-cov": "npm run test:unit-cov -w @set-forge/client",

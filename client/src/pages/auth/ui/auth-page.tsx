@@ -3,14 +3,15 @@ import { LogIn, UserPlus } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { ChangeEvent, FC, FormEvent } from 'react';
 
-import type { Progress } from '@shared/lib';
-import { BrandWordmark, Button, PasswordField } from '@shared/ui';
+import type { Progress, Translate } from '@shared/lib';
+import { BrandWordmark, Button, LanguageSelect, PasswordField } from '@shared/ui';
 import { LegalFooter } from '@widgets/legal-footer';
 
 import classes from './auth-page.module.scss';
 import type { AuthTab } from '../model/auth-tab';
 
 type Props = {
+  t: Translate;
   activeTab: AuthTab;
   email: string;
   password: string;
@@ -63,6 +64,7 @@ const TabLink: FC<TabLinkProps> = ({ to, active, children, icon, search }) => (
 );
 
 const AuthPage: FC<Props> = ({
+  t,
   activeTab,
   email,
   password,
@@ -235,7 +237,10 @@ const AuthPage: FC<Props> = ({
           </Button>
         </form>
 
-        <LegalFooter className={classes.legal} />
+        <div className={classes.footer}>
+          <LegalFooter />
+          <LanguageSelect variant="compact" ariaLabel={t('language.label')} />
+        </div>
       </div>
     </div>
   );

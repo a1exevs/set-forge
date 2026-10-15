@@ -1,17 +1,20 @@
 import { useRouter } from '@tanstack/react-router';
-import { FC, useState } from 'react';
+import { FC } from 'react';
+
+import { type Language, useT } from '@shared/lib';
 
 import LegalDocument from './legal-document';
-import type { LegalContent, LegalLang } from '../model/legal-content';
+import type { LegalContent } from '../model/legal-content';
 
 type Props = {
-  content: Record<LegalLang, LegalContent>;
+  content: Record<Language, LegalContent>;
   effectiveDate: string;
   backTo?: '/login' | '/register';
 };
 
 const LegalDocumentLogicLayer: FC<Props> = ({ content, effectiveDate, backTo = '/login' }) => {
-  const [lang, setLang] = useState<LegalLang>('ru');
+  // The document follows the app language; its language control changes the whole app.
+  const { t, language } = useT();
   const router = useRouter();
 
   // Return to wherever the user came from (e.g. Profile), falling back to `backTo` for direct
@@ -24,15 +27,7 @@ const LegalDocumentLogicLayer: FC<Props> = ({ content, effectiveDate, backTo = '
     }
   };
 
-  return (
-    <LegalDocument
-      doc={content[lang]}
-      lang={lang}
-      effectiveDate={effectiveDate}
-      onLangChange={setLang}
-      onBack={handleBack}
-    />
-  );
+  return <LegalDocument t={t} doc={content[language]} effectiveDate={effectiveDate} onBack={handleBack} />;
 };
 
 export default LegalDocumentLogicLayer;

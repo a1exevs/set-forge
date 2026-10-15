@@ -9,6 +9,18 @@ jest.mock('src/entities/session/model/bootstrap-session', () => ({
   ),
 }));
 
+import { dictionaries } from 'src/app/i18n/dictionaries';
+// The i18n files themselves, not the `shared/lib` index: loading the index here would load its other modules before
+// a test's `jest.mock` of them.
+import { initI18n } from 'src/shared/lib/i18n/init-i18n';
+import { useLanguageStore } from 'src/shared/lib/i18n/language-store';
+
+// Tests read the English texts unless they switch the language themselves.
+initI18n(dictionaries);
+beforeEach(() => {
+  useLanguageStore.getState().setLanguage('en');
+});
+
 // jest-dom adds custom jest matchers for asserting on DOM nodes.
 // allows you to do things like:
 // expect(element).toHaveTextContent(/react/i)

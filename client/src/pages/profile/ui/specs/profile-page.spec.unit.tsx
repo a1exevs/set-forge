@@ -2,12 +2,25 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, type ReactNode } from 'react';
 
+import { t } from 'tests/common/translate';
+
 import ProfilePage from '../profile-page';
 
 jest.mock('@tanstack/react-router', () => ({
   useRouterState: ({ select }: { select: (state: { location: { pathname: string } }) => string }) =>
     select({ location: { pathname: '/profile' } }),
-  Link: ({ to, children }: { to: string; children: ReactNode }) => <a href={to}>{children}</a>,
+  // Only the attributes the real link renders for an IconButton (its link snapshot has no `type`).
+  Link: ({
+    to,
+    children,
+    'aria-label': ariaLabel,
+    title,
+    className,
+  }: Record<string, string> & { children: ReactNode }) => (
+    <a href={to} aria-label={ariaLabel} title={title} className={className}>
+      {children}
+    </a>
+  ),
 }));
 
 jest.mock('@widgets/main-tabs-bar', () => ({
@@ -25,6 +38,7 @@ describe('ProfilePage', () => {
   it('renders account info, logout and delete-account buttons', () => {
     render(
       <ProfilePage
+        t={t}
         swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
@@ -43,12 +57,30 @@ describe('ProfilePage', () => {
     expect(screen.getByTestId('main-tabs-bar')).toBeInTheDocument();
   });
 
+  it('opens Settings from the header', () => {
+    render(
+      <ProfilePage
+        t={t}
+        swipeRef={createRef<HTMLDivElement>()}
+        email="jane@example.com"
+        avatarLetter="J"
+        logoutProgress="idle"
+        deleteAccountProgress="idle"
+        onLogout={noop}
+        onDeleteAccount={asyncNoop}
+      />,
+    );
+
+    expect(screen.getByRole('link', { name: 'Settings' })).toHaveAttribute('href', '/settings');
+  });
+
   it('calls onLogout when button clicked', async () => {
     const onLogout = jest.fn();
     const user = userEvent.setup();
 
     render(
       <ProfilePage
+        t={t}
         swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
@@ -70,6 +102,7 @@ describe('ProfilePage', () => {
 
     render(
       <ProfilePage
+        t={t}
         swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"
@@ -88,6 +121,7 @@ describe('ProfilePage', () => {
   it('shows the logout progress and locks Delete account while logging out', () => {
     render(
       <ProfilePage
+        t={t}
         swipeRef={createRef<HTMLDivElement>()}
         email="jane@example.com"
         avatarLetter="J"

@@ -2,6 +2,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
+import { useLanguageStore } from '@shared/lib';
+
 import type { AuthTab } from '../../model/auth-tab';
 import AuthPageLogicLayer from '../auth-page-logic-layer';
 
@@ -117,6 +119,20 @@ describe('AuthPageLogicLayer', () => {
       expect(screen.getByLabelText('Password')).toHaveAttribute('autocomplete', 'current-password');
       expect(screen.queryByLabelText('Confirm password')).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Show password' })).toBeInTheDocument();
+    });
+  });
+
+  describe('language', () => {
+    it('lets a guest switch the language on the sign-in screen and keeps the choice', async () => {
+      const user = userEvent.setup();
+      renderTab('login');
+
+      await user.click(screen.getByRole('button', { name: /^Language/ }));
+      await user.click(screen.getByRole('option', { name: 'Русский' }));
+
+      expect(useLanguageStore.getState().language).toBe('ru');
+      expect(JSON.parse(localStorage.getItem('language-storage') ?? '{}')).toMatchObject({ state: { language: 'ru' } });
+      expect(screen.getByRole('button', { name: /^Язык/ })).toHaveTextContent('Русский');
     });
   });
 

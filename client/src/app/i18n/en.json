@@ -1,0 +1,14 @@
+{
+  "common": {
+    "back": "Back"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "profile": {
+    "openSettings": "Settings"
+  },
+  "settings": {
+    "title": "Settings"
+  }
+}

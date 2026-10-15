@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { useConfirm, useProgress } from '@shared/lib';
+import { useConfirm, useProgress, useT } from '@shared/lib';
 import { useMainTabSwipe } from '@widgets/main-tabs-bar';
 
 import ProfilePage from './profile-page';
@@ -17,6 +17,7 @@ type Props = {
 };
 
 const ProfilePageLogicLayer: FC<Props> = ({ email, avatarLetter, onLogout, onDeleteAccount, onLeave }) => {
+  const { t } = useT();
   const swipeRef = useMainTabSwipe();
   const confirmDialog = useConfirm();
   // Deletion runs in its dialog, which covers the page; only logout needs to lock the other button.
@@ -44,6 +45,7 @@ const ProfilePageLogicLayer: FC<Props> = ({ email, avatarLetter, onLogout, onDel
 
   return (
     <ProfilePage
+      t={t}
       swipeRef={swipeRef}
       email={email}
       avatarLetter={avatarLetter}

@@ -73,13 +73,14 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 | `npm run client:build` | Production build (`tsc && vite build`) |
 | `npm run client:preview` | Preview production build (`client/dist`) |
 | `npm run client:format` / `npm run client:format:check` | Prettier |
-| `npm run client:lint` | Structure, stories, rules, linter config types, ESLint, Steiger, knip (what CI runs) |
+| `npm run client:lint` | Structure, stories, rules, linter config types, ESLint, Steiger, dictionaries, knip (what CI runs) |
 | `npm run client:lint:structure` | FSD layers, slices, segments, public API, names by purpose, kebab-case |
 | `npm run client:lint:stories` | A stories file next to every component, titles by FSD layer, pages in every viewport |
 | `npm run client:lint:rules` | Claude Code rules in `.claude/rules` have one shape and their Enforcement references resolve |
 | `npm run client:lint:config` | Types of `eslint.config.ts` and `linter/` (`tsconfig.linter.json`) |
 | `npm run client:lint:eslint` / `npm run client:lint:eslint:fix` | ESLint (`:fix` applies its autofixes) |
 | `npm run client:lint:fsd` | Steiger (FSD boundaries) |
+| `npm run client:lint:i18n` | Dictionaries: every key used in code is in every language, none unused, none empty |
 | `npm run client:lint:unused` | knip (unused files, exports, dependencies) |
 | `npm run client:test:unit` / `npm run client:test:unit-cov` | Jest unit tests |
 | `npm run client:test:snap` / `npm run client:test:snap-cov` / `npm run client:test:snap-update` | Snapshot tests |

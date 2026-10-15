@@ -1,6 +1,3 @@
-// TODO Support language switcher across the site
-export type LegalLang = 'ru' | 'en';
-
 /** An inline link inside paragraph text: `to` for an in-app route, `href` for external (e.g. mailto:). */
 export type LegalLink = { text: string; to?: '/privacy' | '/terms'; href?: string };
 

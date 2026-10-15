@@ -9,8 +9,10 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 
+import type { Language } from '@shared/lib';
+
 import LegalDocument from './legal-document-logic-layer';
-import type { LegalContent, LegalLang } from '../model/legal-content';
+import type { LegalContent } from '../model/legal-content';
 
 const meta = {
   title: 'Widgets/LegalDocument',
@@ -19,7 +21,7 @@ const meta = {
 
 export default meta;
 
-const sampleContent: Record<LegalLang, LegalContent> = {
+const sampleContent: Record<Language, LegalContent> = {
   ru: {
     title: 'Политика обработки персональных данных',
     effectiveLabel: 'Действует с',
