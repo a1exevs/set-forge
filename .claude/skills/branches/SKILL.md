@@ -88,8 +88,7 @@ The same key names the branch's **task folder** and its **worktree**:
   The session stays in the main checkout and works in the task's checkout from there: git as
   `git -C <checkout> …`, other commands in a subshell `(cd <checkout> && …)` so the shell stays in the main
   checkout, files by their path under it. A session moved into a worktree (`EnterWorktree`) may write only inside it
-  and so cannot save the task folder. "The current branch" of `/commit`, `/pr` and `/code-review` is the branch of
-  the task's checkout.
+  and so cannot save the task folder.
 
 | Branch | Title prefix | Task folder (main checkout) | Worktree |
 |---|---|---|---|
@@ -189,7 +188,7 @@ its gate line lists — they run without a second question.
   `git fetch origin <base>`, then `git worktree add --no-track -b <branch> <main>/.claude/worktrees/<key> origin/<base>`
   (the folder by §2); a sub-issue's branch is created by «New sub-issue branch» and only checked out here,
   `git worktree add <main>/.claude/worktrees/<key> <branch>`. The worktree has no `node_modules` and no env files:
-  run `npm ci` and `npm run setup:env` in it. It becomes the task's checkout (§2); the session stays where it is.
+  run `npm ci` and `npm run setup:env` in it. It becomes the task's checkout (§2).
   Removing it after its PR is merged — `git worktree remove <main>/.claude/worktrees/<key>` — is gated like any branch
   operation; the task folder stays.
 - **Branches at the start** — `/developer` creates them in two steps, one gate line for each column; a branch

@@ -312,8 +312,7 @@ Read before proposing, in this order:
 `/developer` on a branch of a task, or "continue #N": read `status.md` of the task folder (and the parent's
 `understanding.md` for a part, the parent issue's `status.md` for a sub-issue), report the current step in one line
 and go on from there — every save still waits
-for its gate. `status.md` names a worktree → that is the task's checkout; the session stays in the main checkout
-(`/branches` §2).
+for its gate. `status.md` names a worktree → it is the task's checkout (`/branches` §2).
 `stand: running: slot <k>` → `npm run client:stand:stop -- --list`: still running → ask first whether to stop it or
 keep it for the hand check; gone → `stand: stopped`.
 

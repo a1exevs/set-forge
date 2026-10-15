@@ -13,8 +13,9 @@ solid code.** Never add a finding to look thorough.
 
 ## 1. Scope
 
-Optional argument `$1` picks what to review; every command runs in the task's checkout (`/branches` §2). Never
-modify tracked files or the index: no `git add`, no `git stash`, no edits during the review.
+Optional argument `$1` picks what to review. Every command runs in the task's checkout (`/branches` §2); its branch
+is the current branch. Never modify tracked files or the index: no `git add`, no `git stash`, no edits during the
+review.
 The only file the review writes is its own log under `.runtime/` (§5).
 
 | `$1` | Review | Commands |
