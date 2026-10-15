@@ -43,7 +43,8 @@ The description starts with one line that links the task, by the base:
 - base `develop`, a parent branch: `Closes #<P>, closes #<a>, closes #<b>, …` — the parent and every sub-issue,
   the keyword repeated for each (GitHub closes only the number right after a keyword);
 - base a parent branch (a sub-issue): `Part of #<P> · requirements: #<N>` — a closing keyword does nothing in a PR
-  into a branch other than the default `develop`;
+  into a branch other than the default `develop`; the PR shows in the issue's Development through its branch, linked
+  at creation (`/branches` §5 New sub-issue branch);
 - base a shared branch (a sub-branch): `Part of #<N>` — a plain reference.
 
 The PR of a parent branch lists its sub-issue PRs after the key changes, instead of acceptance criteria:

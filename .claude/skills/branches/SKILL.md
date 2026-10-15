@@ -143,8 +143,8 @@ from the fork point with `origin/<base>` after `git fetch origin <base>` (`git m
 Every operation that creates, moves or removes a branch, or rewrites what it points to, waits for the user's
 explicit yes **for that operation**:
 
-- create (`git checkout -b`, `git switch -c`, `git branch <name>`), switch (`checkout` / `switch`), rename, delete
-  (local or remote);
+- create (`git checkout -b`, `git switch -c`, `git branch <name>`, `gh issue develop` — it creates the branch on
+  `origin`), switch (`checkout` / `switch`), rename, delete (local or remote);
 - `git push` of any kind (first push, `--force-with-lease`), setting or changing an upstream;
 - `reset`, `rebase`, `merge` / `pull` into a branch, `cherry-pick`;
 - `git stash` / `stash pop` done to switch branches;
@@ -167,19 +167,25 @@ its gate line lists — they run without a second question.
 
 - **Dirty tree before a switch:** stop and ask — commit (`/commit`) or stash (`git stash push -u -m "<what>"`, so
   untracked files go too). Never discard changes, never `checkout -- .` / `reset --hard` someone's work.
-- **New work branch:** `git fetch origin <base>`, then `git switch --no-track -c <branch> origin/<base>` with the
-  base from §3:
+- **New work branch** (a sub-issue's: the next item): `git fetch origin <base>`, then
+  `git switch --no-track -c <branch> origin/<base>` with the base from §3:
   - `git switch --no-track -c feature/new-ui-component origin/develop`
   - `git switch --no-track -c feature/new-ui-component--1 origin/feature/new-ui-component`
-  - `git switch --no-track -c feature/110-language-choice origin/feature/109-multi-language`
 
   `--no-track` goes **before** `-c` (`-c` takes the next word as the branch name). Without it the branch tracks
   `origin/<base>`, and a bare `git push` would push the work into the base.
+- **New sub-issue branch** — created on GitHub linked to its issue, then fetched:
+  `gh issue develop <N> --base <parent branch> --name <branch>`, `git fetch origin <branch>`, then
+  `git switch <branch>` (in a worktree: the next item) — it tracks `origin/<branch>`, its own branch. The link
+  lists the branch and its PR in the issue's Development; a closing keyword cannot do that in a PR into the parent
+  branch (`/pr` §3).
 - **New work branch in a worktree** — the main checkout stays where it is, and several branches are worked on at once:
   `git fetch origin <base>`, then `git worktree add --no-track -b <branch> <main>/.claude/worktrees/<key> origin/<base>`
-  (the folder by §2). The worktree has no `node_modules` and no env files: run `npm ci` and `npm run setup:env` in it. A
-  session moves into it with `EnterWorktree` (`path`). Removing it after its PR is merged — `git worktree remove
-  <main>/.claude/worktrees/<key>` — is gated like any branch operation; the task folder stays.
+  (the folder by §2); a sub-issue's branch is created by «New sub-issue branch» and only checked out here,
+  `git worktree add <main>/.claude/worktrees/<key> <branch>`. The worktree has no `node_modules` and no env files:
+  run `npm ci` and `npm run setup:env` in it. A session moves into it with `EnterWorktree` (`path`). Removing it
+  after its PR is merged — `git worktree remove <main>/.claude/worktrees/<key>` — is gated like any branch
+  operation; the task folder stays.
 - **Branches at the start** — `/developer` creates them in two steps, one gate line for each column; a branch
   already on `origin` is reused (the parent branch exists after its first sub-issue). The parent issue itself is not
   taken into work: its branch comes with its first sub-issue, created without switching
@@ -188,7 +194,7 @@ its gate line lists — they run without a second question.
   | Task (`## Parent`) | At the start (`/developer` step 2) | Cut into parts (`/developer` step 3) |
   |---|---|---|
   | a task | `feature/1-some-task` from `develop` | `feature/1-some-task` pushed → `feature/1-some-task--1` from it |
-  | a sub-issue of #1 | `feature/1-some-parent` from `develop`, pushed → `feature/2-some-sub-issue` from it | `feature/2-some-sub-issue` pushed → `feature/2-some-sub-issue--1` from it |
+  | a sub-issue of #1 | `feature/1-some-parent` from `develop`, pushed → `feature/2-some-sub-issue` from it, linked to #2 | `feature/2-some-sub-issue` pushed → `feature/2-some-sub-issue--1` from it |
   | no task | `common/some-changes` from `develop` | `common/some-changes` pushed → `common/some-changes--1` from it |
 - **Branch of a task** (`<type>/<N>-<name>`, not a sub-branch): this is where the task goes into work.
   - Before: `gh issue view <N> --json state,title,labels,body` must show an open issue; a closed or missing one →
@@ -198,9 +204,10 @@ its gate line lists — they run without a second question.
     - a task: `git switch --no-track -c feature/12-workout-export origin/develop — a branch for #12 "Workout export
       to CSV", then #12 → In progress`;
     - a sub-issue, the parent branch not on `origin` yet: `git branch --no-track feature/109-multi-language
-      origin/develop, git push -u origin feature/109-multi-language, git switch --no-track -c
-      feature/110-language-choice origin/feature/109-multi-language — the parent branch of #109 and a branch for
-      #110 "Language choice", then #109 and #110 → In progress`.
+      origin/develop, git push -u origin feature/109-multi-language, gh issue develop 110 --base
+      feature/109-multi-language --name feature/110-language-choice, git fetch origin feature/110-language-choice,
+      git switch feature/110-language-choice — the parent branch of #109 and a branch linked to #110 "Language
+      choice", then #109 and #110 → In progress`.
   - After the branches are created: the cards by `/analyst` §1 Statuses (`/analyst` §1 Setting a field).
 - **Shared or parent branch to its PR** — every part or sub-issue merged into it: its local branch never moved (the
   merges happened on GitHub), so it is brought to the remote state where it is checked out, one gate line:
