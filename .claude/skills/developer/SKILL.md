@@ -1,6 +1,6 @@
 ---
 name: developer
-description: Gated implementation of a task from its issue to a reviewed commit — intake → understanding (root cause for a bug) → scope / breakdown into sub-branches → reuse & reach → HLD with 3 options → LLD iterations → manual or autonomous implementation → /code-review → an optional check on the verification stand → one commit (autonomous mode may go on to the PR with a green CI) → the hand check by the user on the stand that stays up, with an approval gate after every step, the work in its own worktree by default and artifacts kept per task in .runtime/tasks/ of the main checkout. Use when the user wants to implement / take into work / fix an issue ("берём #12", "implement #12"), resumes a task on its branch, or runs /developer.
+description: Gated implementation of a task from its issue to a reviewed commit — intake → understanding (root cause for a bug) → scope / breakdown into sub-branches → reuse & reach → HLD with 3 options → LLD iterations → manual or autonomous implementation → /code-review → an optional check on the verification stand → one commit (autonomous mode may stop before it with the diff left for the user, or go on to the PR with a green CI) → the hand check by the user on the stand that stays up, with an approval gate after every step, the work in its own worktree by default and artifacts kept per task in .runtime/tasks/ of the main checkout. Use when the user wants to implement / take into work / fix an issue ("берём #12", "implement #12"), resumes a task on its branch, or runs /developer.
 argument-hint: "[#<issue> | <task without an issue>]"
 ---
 
@@ -48,7 +48,7 @@ The artifacts live in the task folder of `/branches` §2 (`<key>`, `part-<n>/` f
 
 ```
 # <N> <issue title>
-Status: <step N: name> | <in progress | done> · mode: <manual | autonomous → commit | autonomous → PR | —> · stand: <no | planned | running: slot <k> | stopped | —>
+Status: <step N: name> | <in progress | diff ready | done> · mode: <manual | autonomous → diff | autonomous → commit | autonomous → PR | —> · stand: <no | planned | running: slot <k> | stopped | —>
 Branch: <branch> · Worktree: <<main>/.claude/worktrees/<key> | main checkout> · Parent: <../ for a part | #<P> <parent branch> for a sub-issue | —>
 
 ## Steps
@@ -95,7 +95,7 @@ Written by a sub-issue's step 2 when missing (a parent branch made by hand has n
 | 5 | HLD | 3 options, one recommended | `hld.md` |
 | 6 | LLD | iterations, HLD consistency check, the mode | `lld.md` |
 | 7 | Implement | the iterations, verified | `status.md` per iteration |
-| 8 | Finish | review, the stand check, one commit (the PR horizon: the PR with a green CI), the report, the hand check by the user on the stand | `stand-check.md`, `status.md` → done |
+| 8 | Finish | review, the stand check, one commit (the diff horizon: on the user's word; the PR horizon: the PR with a green CI), the report, the hand check by the user on the stand | `stand-check.md`, `status.md` → done |
 
 **Housekeeping, at every start.** For each worktree under `.claude/worktrees/` (`git worktree list`) look up the PR
 of its branch (`gh pr list --head <branch> --state merged`). Merged ones → one line: "the PRs of X and Y are
@@ -140,14 +140,15 @@ A sub-issue also gets its line in the parent's `status.md` (§1), and its `under
 **3 Scope.** Small → say so in one line, GATE, go to step 4. Large → a table `# | Part | Goal`, in execution order. Each
 part is one sub-branch `<branch>--<n>` (`/branches` §1) with its folder `part-<n>/`; the task branch becomes their
 shared branch, and the work starts in part 1 at once. The cut is yours, not the issue's. The same gate names the first
-push of the task branch and `--1` from it, with the session moved into it (`/branches` §5 Branches at the start, the
-column "Cut into parts") — one yes for the breakdown and those. GATE. On yes save `breakdown.md`, push the branch,
-create `--1`, seed each `part-<n>/status.md` and go on with part 1; steps 2–3 of the whole task stay in the task folder.
-A part runs steps 2 and 4–8 on its own sub-branch (part 1 on `--1`; every next one created through `/branches` §5 at its
-step 2, gated); its `understanding.md` starts with `## Parent context` — a link to `../` and a 2–3 line digest of the
-task, so a fresh session has the context. A sub-issue is cut the same way: its branch becomes the shared branch of its
-parts. Parts the customer could accept one by one are sub-issues rather than parts — propose the reshape through
-`/analyst #<N>` instead (`/analyst` §1 Big work).
+push of the task branch and `--1` from it in its worktree, the task's checkout from then on (`/branches` §2; §5
+Branches at the start, the column "Cut into parts") — one yes for the breakdown and those. GATE. On yes save
+`breakdown.md`, push the branch, create `--1`, seed each `part-<n>/status.md` and go on with part 1; steps 2–3 of
+the whole task stay in the task folder. A part runs steps 2 and 4–8 on its own sub-branch (part 1 on `--1`; every
+next one created through `/branches` §5 at its step 2, gated); its `understanding.md` starts with
+`## Parent context` — a link to `../` and a 2–3 line digest of the task, so a fresh session has the context. A
+sub-issue is cut the same way: its branch becomes the shared branch of its parts. Parts the customer could accept one
+by one are sub-issues rather than parts — propose the reshape through `/analyst #<N>` instead (`/analyst` §1 Big
+work).
 
 **4 Reuse & reach.** A table, six rows, no prose:
 
@@ -180,10 +181,12 @@ inventing a straw option. GATE for the pick. On yes save `hld.md` with the choic
 Run the HLD consistency check (§3). At the same gate ask three things:
 
 - the mode: **manual** (default) or **autonomous**;
-- for autonomous, the **horizon** (step 8): **commit** (default) — one commit, no push; or **PR** — the commit, the
-  first push of the task branch, `/pr` without its own confirmation, then the checks (`/pr` §6) fixed until they are
-  green, every fix its own commit and push. The gate line lists them — `git push -u origin <branch>`, `/pr` into its
-  base (`/branches` §3), the fix pushes, the description refreshes — so the yes is the one `/branches` §4 wants;
+- for autonomous, the **horizon** (step 8): **diff** — everything up to the commit (the review rounds, the stand
+  check), the changes left uncommitted for the user to read in their editor; **commit** (default) — one commit, no
+  push; or **PR** — the commit, the first push of the task branch, `/pr` without its own confirmation, then the
+  checks (`/pr` §6) fixed until they are green, every fix its own commit and push. The gate line lists them —
+  `git push -u origin <branch>`, `/pr` into its base (`/branches` §3), the fix pushes, the description refreshes —
+  so the yes is the one `/branches` §4 wants;
 - **the stand check** (step 8) — name what it will walk (the acceptance criteria, or for a task without them the
   flows from the reach of step 4) and with which preset (§7):
   - yes by default for any change of how the running app behaves — in the client or in the API alone (a validation,
@@ -242,7 +245,10 @@ A decision the LLD did not foresee → the HLD consistency check (§3), in both 
    commit. Docker is not running → say so; the user starts it or the check is skipped and noted in the report.
    The stand stays up after the walk — the user checks on it (p. 6); never stop it here.
 3. One commit with the `/commit` template. Manual: `/commit` asks for its approval as usual. Autonomous: choosing the
-   mode was that approval — commit without asking. No push — except the PR horizon (p. 4).
+   mode was that approval — commit without asking. No push — except the PR horizon (p. 4). The diff horizon: no
+   commit here — the report (p. 5) comes first, `status.md` becomes `step 8: Finish | diff ready`, and the commit waits
+   for the user's word, through `/commit` with its own approval; edits the user made in the diff are verified by the
+   table of step 7 before it.
 4. **The PR horizon** (autonomous → PR only). Run `/pr` into the base of `/branches` §3, as the gate line of step 6
    named it; it pushes the branch (`git push -u origin <branch>`), and its confirmation was the yes of step 6 (`/pr`
    §6). A red local step (`/pr` §6) is fixed like a red check below. Into `develop`, the CI: the app binds the PR and
@@ -251,17 +257,20 @@ A decision the LLD did not foresee → the HLD consistency check (§3), in both 
    `/code-review` round), one commit through `/commit`, push; a change in `server/` also restarts the stand (§7), so the
    stand shows the code of the PR. Up to 3 fix rounds; still red → stop and report it as open. A change of
    `stand-check.md` while the PR exists → refresh its description (`/pr` §7).
-5. Report, in the chat — after the commit; in the PR horizon after the checks are green (the CI, or the local steps of
-   `/pr` §6) or the rounds are spent: the iterations, the review rounds and what is still open, the stand check, the
-   commit hashes, the PR link. Then the hand check: the acceptance criteria are the user's to walk. When step 6 chose
-   the stand, it is still up — give its client URL, slot and the preset's login and end with "say *stop the stand* when
-   you are done"; without a stand, say so in one line. Set `status.md` to done (`stand: running: slot <k>`, or as it
-   was) and, unless a PR exists, offer `/pr` — it links the task, carries the acceptance criteria and the stand check,
-   and moves the card to In review.
+5. Report, in the chat — after the commit; in the diff horizon after the review and the stand check (when chosen),
+   with the checkout path of the uncommitted changes in place of the hashes; in the PR horizon after the checks are
+   green (the CI, or the local steps of `/pr` §6) or the rounds are spent: the iterations, the review rounds and what
+   is still open, the stand check, the commit hashes, the PR link. Then the hand check: the acceptance criteria are the
+   user's to walk. When step 6 chose the stand, it is still up — give its client URL, slot and the preset's login and
+   end with "say *stop the stand* when you are done"; without a stand, say so in one line. Set `status.md` to done
+   (`stand: running: slot <k>`, or as it was) and, unless a PR exists, offer `/pr` — it links the task, carries the
+   acceptance criteria and the stand check, and moves the card to In review. The diff horizon offers `/commit`
+   instead; `/pr` and done follow the commit.
 6. **The hand check.** Only the user's word stops the stand (§7). A defect the user finds → fix it as an iteration
    (verify, one `/code-review` round, that criterion again on the stand when there is one) and **its own commit**
    through `/commit` (approved by the rule of p. 3) — never folded into the first one: the gap between your walk
-   and the user's is the signal that improves this skill and its presets, keep it visible. Add it to
+   and the user's is the signal that improves this skill and its presets, keep it visible; in the diff horizon the
+   reviewed work is committed first (p. 3), then the fix. Add it to
    `stand-check.md`:
 
    ```
@@ -310,8 +319,8 @@ Read before proposing, in this order:
 
 `/developer` on a branch of a task, or "continue #N": read `status.md` of the task folder (and the parent's
 `understanding.md` for a part, the parent issue's `status.md` for a sub-issue), report the current step in one line
-and go on from there — every save still waits
-for its gate. `status.md` names a worktree → move the session into it first (`EnterWorktree` with `path`).
+and go on from there — every save still waits for its gate. `diff ready` → the review and the stand check are done:
+offer `/commit` (step 8 p. 3). `status.md` names a worktree → it is the task's checkout (`/branches` §2).
 `stand: running: slot <k>` → `npm run client:stand:stop -- --list`: still running → ask first whether to stop it or
 keep it for the hand check; gone → `stand: stopped`.
 

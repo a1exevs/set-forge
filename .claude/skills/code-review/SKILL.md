@@ -13,8 +13,10 @@ solid code.** Never add a finding to look thorough.
 
 ## 1. Scope
 
-Optional argument `$1` picks what to review. Never modify tracked files or the index: no `git add`, no `git
-stash`, no edits during the review. The only file the review writes is its own log under `.runtime/` (§5).
+Optional argument `$1` picks what to review. Every command runs in the task's checkout (`/branches` §2); its branch
+is the current branch. Never modify tracked files or the index: no `git add`, no `git stash`, no edits during the
+review.
+The only file the review writes is its own log under `.runtime/` (§5).
 
 | `$1` | Review | Commands |
 |---|---|---|
@@ -132,9 +134,9 @@ Rules for every round after the first:
 ## 6. Output in the chat
 
 Print the scope line, a one-line delta since the previous round (skip it on round 1), **one table with the open
-rows only** — new and carried-over — sorted 🔴 → 🟠 → 🟡 (by impact within a group), then the verdict and, when
-something is open above 🟡, the re-run hint. Nothing else — no prose summary before or after, no repeating the
-findings in text. Fixed and `wontfix` rows live in the log, not in the chat.
+rows only** — new and carried-over — sorted 🔴 → 🟠 → 🟡 (by impact within a group), the rules line, then the
+verdict and, when something is open above 🟡, the re-run hint. Nothing else — no prose summary before or after, no
+repeating the findings in text. Fixed and `wontfix` rows live in the log, not in the chat.
 
 ```
 Reviewed: develop (77b0a62, 7 files) · round 2 · log: .runtime/tasks/common--setup-skill/code-review.md
@@ -145,6 +147,8 @@ Since round 1: 1 fixed (#1), 1 still open (#2), 1 wontfix (#3)
 | 4 | 🔴 | scripts/setup-env.ts:57 | … | … | … | new (r2) |
 | 2 | 🟠 | .claude/skills/setup/SKILL.md:88 | … | unverified: … | … | open (r1) |
 
+Rules: agent-docs ✓ · agent-skills ✓ · typescript-guidelines ✓
+
 Verdict: Not ready — 1 blocker, 1 important.
 Fix what you choose to, then run /code-review again: the log gets the fixed marks, the chat gets the fresh table.
 ```
@@ -154,6 +158,8 @@ Fix what you choose to, then run /code-review again: the log gets the fixed mark
 - **Proof:** the command and its output, the test name, the rule / doc reference, or `unverified: …`; `—` for a nit.
 - **Fix:** the concrete change in a few words. Do **not** apply it — the user decides.
 - **Status** in the chat: `new (rN)` for this round's findings, `open (rK)` for carried-over ones.
+- **Rules:** every rule whose `paths` match a changed file — ✓ when its `❌ review` rows (§2) hold, else the numbers
+  of its findings.
 
 Verdict, one line:
 
