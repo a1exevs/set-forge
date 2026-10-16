@@ -1,8 +1,11 @@
 import { INestApplication } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
 import { Sequelize } from 'sequelize';
 
+import { HttpExceptionFilter } from '@common/exception-filters';
+import { ResponseInterceptor } from '@common/interceptors';
 import { ValidationPipe } from '@common/pipes';
 import { LoggerService } from '@src/logger';
 import { SequelizeSessionStore } from '@src/security/sequelize-session.store';
@@ -58,6 +61,8 @@ export async function configureApp(app: INestApplication): Promise<void> {
 
   setupLogger(app);
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalInterceptors(new ResponseInterceptor(app.get(Reflector)));
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.use(cookieParser());
   app.setGlobalPrefix('api/1.0');
   setupCORS(app, [clientUrl]);

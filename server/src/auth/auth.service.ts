@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
@@ -6,7 +6,7 @@ import { GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto
 import { IAuthenticationResult } from '@auth/interfaces';
 import { TokensService } from '@auth/tokens.service';
 import { DocumentVersions } from '@common/constants';
-import { ErrorMessages } from '@common/constants/error-messages';
+import { AppException } from '@common/exceptions';
 import { CreateUserRequest } from '@users/dto';
 import { User } from '@users/users.model';
 import { UsersService } from '@users/users.service';
@@ -22,7 +22,7 @@ export class AuthService {
   public async registration(dto: RegisterRequest.Dto): Promise<IAuthenticationResult> {
     const candidate = await this.userService.getUserByEmail(dto.email);
     if (candidate) {
-      throw new BadRequestException(ErrorMessages.USER_ALREADY_EXISTS);
+      throw AppException.of(HttpStatus.BAD_REQUEST, 'USER_ALREADY_EXISTS');
     }
 
     const hashPassword = await bcrypt.hash(dto.password, 5);
@@ -57,7 +57,7 @@ export class AuthService {
   public async me(userId: number): Promise<GetCurrentUserResponse.Dto> {
     const user = await this.userService.getUserById(userId);
     if (!user) {
-      throw new UnauthorizedException({ message: ErrorMessages.UNAUTHORIZED });
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'UNAUTHORIZED');
     }
 
     return new GetCurrentUserResponse.Dto({
@@ -70,7 +70,7 @@ export class AuthService {
   public async acceptDocuments(userId: number): Promise<GetCurrentUserResponse.Dto> {
     const user = await this.userService.getUserById(userId);
     if (!user) {
-      throw new UnauthorizedException({ message: ErrorMessages.UNAUTHORIZED });
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'UNAUTHORIZED');
     }
     await this.userService.updateDocumentAcceptance(userId);
     return this.me(userId);
@@ -95,7 +95,7 @@ export class AuthService {
   public async deleteAccount(userId: number): Promise<boolean> {
     const user = await this.userService.getUserById(userId);
     if (!user) {
-      throw new UnauthorizedException({ message: ErrorMessages.UNAUTHORIZED });
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'UNAUTHORIZED');
     }
     return this.userService.deleteUser(userId);
   }
@@ -108,7 +108,7 @@ export class AuthService {
         return user;
       }
     }
-    throw new UnauthorizedException({ message: ErrorMessages.INVALID_EMAIL_OR_PASSWORD });
+    throw AppException.of(HttpStatus.UNAUTHORIZED, 'INVALID_EMAIL_OR_PASSWORD');
   }
 
   private static buildResponsePayload(

@@ -1,1 +1,2 @@
-export { sendResponse } from '@common/functions/exception-filters.functions';
+export { sendErrorResponse, toErrorResult } from '@common/functions/exception-filters.functions';
+export type { ErrorResult } from '@common/functions/exception-filters.functions';

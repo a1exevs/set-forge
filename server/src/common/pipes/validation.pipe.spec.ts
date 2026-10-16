@@ -1,8 +1,11 @@
 import { ArgumentMetadata, HttpStatus } from '@nestjs/common';
 import { Type } from 'class-transformer';
-import { IsBoolean, isInstance, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
 
+import { ErrorItemResponse } from '@common/dto';
+import { AppException } from '@common/exceptions';
 import { ValidationPipe } from '@common/pipes';
+import { validationError } from '@common/utils';
 import { sendPseudoError } from '@test/unit/helpers';
 
 class TestNestedClass {
@@ -35,6 +38,17 @@ class TestClass {
     this.booleanProp = booleanProp;
     this.objectProp = objectProp;
   }
+}
+
+class CodedItem {
+  @Min(1, validationError('NUMERIC_MUST_NOT_BE_LESS_THAN_N', { min: 1 }))
+  sets: number;
+}
+
+class CodedClass {
+  @ValidateNested({ each: true })
+  @Type(() => CodedItem)
+  items: CodedItem[];
 }
 
 describe('ValidationPipe', () => {
@@ -96,43 +110,59 @@ describe('ValidationPipe', () => {
       const result = await target.transform(testObject, metadata);
       expect(result).toEqual(testObject);
     });
-    it('should throw error with array of messages', async () => {
-      expect.assertions(5);
+    it('should throw one item per failed constraint, with the field', async () => {
+      expect.assertions(3);
       const target = new ValidationPipe();
       const metadata: ArgumentMetadata = { type: 'param', metatype: TestClass };
-      const testObject = new TestClass(1, 'stringToo', 'andStringToo');
       try {
-        await target.transform(testObject, metadata);
+        await target.transform(new TestClass(1, 'stringToo', 'andStringToo'), metadata);
         sendPseudoError();
       } catch (error) {
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message.length).toBe(3);
-        Object.keys(testObject).forEach(key => {
-          if (key !== 'objectProp') {
-            expect(error.message.some(message => message.includes(key))).toBeTruthy();
-          }
-        });
+        expect(error).toBeInstanceOf(AppException);
+        expect(error.getStatus()).toBe(HttpStatus.BAD_REQUEST);
+        expect(error.errors.map(item => item.field)).toEqual(['stringProp', 'numberProp', 'booleanProp']);
       }
     });
-    it('should throw error with array of errors. For nested object array should has separate array', async () => {
-      expect.assertions(7);
+    it('should give a nested field as a dotted path', async () => {
+      expect.assertions(1);
       const target = new ValidationPipe();
       const metadata: ArgumentMetadata = { type: 'param', metatype: TestClass };
-      const testNestedObject = new TestNestedClass(1);
-      const testObject = new TestClass(1, 'stringToo', 'andStringToo', testNestedObject);
       try {
-        await target.transform(testObject, metadata);
+        await target.transform(new TestClass('string', 1, true, new TestNestedClass(1)), metadata);
         sendPseudoError();
       } catch (error) {
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message.length).toBe(4);
-        Object.keys(testObject).forEach(key => {
-          if (key !== 'objectProp') {
-            expect(error.message.some(message => message.includes(key))).toBeTruthy();
-          }
-        });
-        expect(isInstance(error.message[3], Array)).toBeTruthy();
-        expect(error.message[3].length).toBe(1);
+        expect(error.errors.map(item => item.field)).toEqual(['objectProp.stringProp']);
+      }
+    });
+    it('should take the code and params of a decorator with validationError, the path through an array', async () => {
+      expect.assertions(1);
+      const target = new ValidationPipe();
+      const metadata: ArgumentMetadata = { type: 'body', metatype: CodedClass };
+      try {
+        await target.transform({ items: [{ sets: 1 }, { sets: 0 }] }, metadata);
+        sendPseudoError();
+      } catch (error) {
+        expect(error.errors).toEqual([
+          new ErrorItemResponse.Dto('NUMERIC_MUST_NOT_BE_LESS_THAN_N', { min: 1 }, 'items.1.sets'),
+        ]);
+      }
+    });
+    it('should give a decorator without validationError under the generic code with its own text', async () => {
+      expect.assertions(1);
+      const target = new ValidationPipe();
+      const metadata: ArgumentMetadata = { type: 'param', metatype: TestClass };
+      try {
+        await target.transform(new TestClass('string', 'one', true), metadata);
+        sendPseudoError();
+      } catch (error) {
+        expect(error.errors).toEqual([
+          new ErrorItemResponse.Dto(
+            'BAD_REQUEST',
+            {},
+            'numberProp',
+            'numberProp must be a number conforming to the specified constraints',
+          ),
+        ]);
       }
     });
   });

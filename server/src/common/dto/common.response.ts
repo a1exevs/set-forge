@@ -1,19 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { ResultCodes } from '@common/constants';
+import { ErrorItemResponse } from '@common/dto/error-item.response';
 
 export namespace CommonResponse {
   export class Dto {
-    @ApiProperty()
-    readonly data: any = null;
+    @ApiProperty({ description: 'The payload; null on an error' })
+    readonly data: unknown = null;
 
-    @ApiProperty()
+    @ApiProperty({ description: 'The English texts of the errors, a field error as "field - text"' })
     readonly messages: string[] = [];
 
-    @ApiProperty()
-    readonly fieldsErrors: string[] = [];
+    @ApiProperty({ type: [ErrorItemResponse.Swagger.ErrorItemResponseDto], description: 'The errors by code' })
+    readonly fieldsErrors: ErrorItemResponse.Dto[] = [];
 
-    @ApiProperty()
+    @ApiProperty({ description: '0 OK, 1 an error, 10 the captcha is required' })
     readonly resultCode: number = ResultCodes.OK;
 
     constructor(dto: Partial<Dto> = null) {

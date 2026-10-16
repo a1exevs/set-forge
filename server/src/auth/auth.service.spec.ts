@@ -1,4 +1,4 @@
-import { UnprocessableEntityException } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcryptjs';
@@ -6,7 +6,8 @@ import * as bcrypt from 'bcryptjs';
 import { AuthService } from '@auth/auth.service';
 import { LoginRequest, RegisterRequest } from '@auth/dto';
 import { TokensService } from '@auth/tokens.service';
-import { ErrorMessages } from '@common/constants';
+import { ErrorItemResponse } from '@common/dto';
+import { AppException } from '@common/exceptions';
 import { sendPseudoError } from '@test/unit/helpers';
 import { User } from '@users/users.model';
 import { UsersService } from '@users/users.service';
@@ -218,7 +219,7 @@ describe('AuthService', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(401);
-        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.INVALID_EMAIL_OR_PASSWORD });
+        expect(error.errors).toEqual([new ErrorItemResponse.Dto('INVALID_EMAIL_OR_PASSWORD')]);
         expect(userService.getUserByEmail).toBeCalledTimes(1);
         expect(userService.getUserByEmail).toBeCalledWith(email, true);
         expect(tokenService.generateAccessToken).toBeCalledTimes(0);
@@ -246,7 +247,7 @@ describe('AuthService', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(401);
-        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.INVALID_EMAIL_OR_PASSWORD });
+        expect(error.errors).toEqual([new ErrorItemResponse.Dto('INVALID_EMAIL_OR_PASSWORD')]);
         expect(userService.getUserByEmail).toBeCalledTimes(1);
         expect(userService.getUserByEmail).toBeCalledWith(email, true);
         expect(tokenService.generateAccessToken).toBeCalledTimes(0);
@@ -287,7 +288,7 @@ describe('AuthService', () => {
     it('Refresh method: should throw exception (token not found)', async () => {
       const currentRefreshToken = 'adfsdfsadfsdf';
       jest.spyOn(tokenService, 'updateAccessRefreshTokensFromRefreshToken').mockImplementation(async () => {
-        throw new UnprocessableEntityException(ErrorMessages.REFRESH_TOKEN_NOT_FOUND);
+        throw AppException.of(HttpStatus.UNPROCESSABLE_ENTITY, 'REFRESH_TOKEN_NOT_FOUND');
       });
 
       try {
@@ -295,7 +296,7 @@ describe('AuthService', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(422);
-        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.REFRESH_TOKEN_NOT_FOUND });
+        expect(error.errors).toEqual([new ErrorItemResponse.Dto('REFRESH_TOKEN_NOT_FOUND')]);
         expect(tokenService.updateAccessRefreshTokensFromRefreshToken).toBeCalledTimes(1);
         expect(tokenService.updateAccessRefreshTokensFromRefreshToken).toBeCalledWith(currentRefreshToken);
       }
@@ -342,7 +343,7 @@ describe('AuthService', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(401);
-        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.UNAUTHORIZED });
+        expect(error.errors).toEqual([new ErrorItemResponse.Dto('UNAUTHORIZED')]);
         expect(userService.getUserById).toBeCalledTimes(1);
         expect(userService.getUserById).toBeCalledWith(userId);
       }
@@ -377,7 +378,7 @@ describe('AuthService', () => {
     it('Logout method: should throw exception (token expired)', async () => {
       const refreshToken = 'sdfsdfsdafsdf';
       jest.spyOn(tokenService, 'removeRefreshToken').mockImplementation(async () => {
-        throw new UnprocessableEntityException(ErrorMessages.REFRESH_TOKEN_EXPIRED);
+        throw AppException.of(HttpStatus.UNPROCESSABLE_ENTITY, 'REFRESH_TOKEN_EXPIRED');
       });
 
       try {
@@ -385,7 +386,7 @@ describe('AuthService', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(422);
-        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.REFRESH_TOKEN_EXPIRED });
+        expect(error.errors).toEqual([new ErrorItemResponse.Dto('REFRESH_TOKEN_EXPIRED')]);
         expect(tokenService.removeRefreshToken).toBeCalledTimes(1);
         expect(tokenService.removeRefreshToken).toBeCalledWith(refreshToken);
       }
@@ -416,7 +417,7 @@ describe('AuthService', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(401);
-        expect(error.getResponse()).toMatchObject({ message: ErrorMessages.UNAUTHORIZED });
+        expect(error.errors).toEqual([new ErrorItemResponse.Dto('UNAUTHORIZED')]);
         expect(userService.getUserById).toBeCalledTimes(1);
         expect(userService.deleteUser).toBeCalledTimes(0);
       }

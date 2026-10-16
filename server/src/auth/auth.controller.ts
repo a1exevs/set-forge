@@ -1,20 +1,7 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Patch,
-  Post,
-  Req,
-  Res,
-  UseFilters,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
-  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -29,10 +16,8 @@ import { SvgCaptchaGuard } from '@auth/guards';
 import { IAuthenticationResult } from '@auth/interfaces';
 import { Docs, Routes } from '@common/constants';
 import { ApiResult } from '@common/decorators';
-import { OperationResultResponse } from '@common/dto';
-import { HttpExceptionFilter } from '@common/exception-filters';
+import { CommonResponse, OperationResultResponse } from '@common/dto';
 import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
-import { ResponseInterceptor } from '@common/interceptors';
 
 @ApiTags(Docs.AUTHORIZATION_CONTROLLER)
 @Controller(Routes.ENDPOINT_AUTH)
@@ -46,9 +31,7 @@ export class AuthController {
     type: AuthenticationResponse.Swagger.AuthenticationResponseDto,
     description: Docs.REGISTRATION_SUCCESSFUL_RESULT,
   })
-  @ApiBadRequestResponse({ description: Docs.REGISTRATION_BAD_REQUEST })
-  @UseInterceptors(ResponseInterceptor)
-  @UseFilters(HttpExceptionFilter)
+  @ApiBadRequestResponse({ type: CommonResponse.Swagger.CommonResponseDto, description: Docs.REGISTRATION_BAD_REQUEST })
   @Post('/registration')
   async registration(@Body() dto: RegisterRequest.Dto, @Res({ passthrough: true }) response: Response) {
     const registerResult = await this.authService.registration(dto);
@@ -66,10 +49,12 @@ export class AuthController {
     type: AuthenticationResponse.Swagger.AuthenticationResponseDto,
     description: Docs.AUTHORIZATION_SUCCESSFUL_RESULT,
   })
-  @ApiUnauthorizedResponse({ description: Docs.AUTHORIZATION_UNAUTHORIZED })
+  @ApiUnauthorizedResponse({
+    type: CommonResponse.Swagger.CommonResponseDto,
+    description: Docs.AUTHORIZATION_UNAUTHORIZED,
+  })
   @UseGuards(SvgCaptchaGuard)
-  @UseFilters(HttpExceptionFilter, UnauthorizedExceptionFilter)
-  @UseInterceptors(ResponseInterceptor)
+  @UseFilters(UnauthorizedExceptionFilter)
   @Post('/login')
   async login(@Body() dto: LoginRequest.Dto, @Res({ passthrough: true }) response: Response, @Req() request) {
     const loginResult: IAuthenticationResult = await this.authService.login(dto);
@@ -87,10 +72,15 @@ export class AuthController {
     type: AuthenticationResponse.Swagger.AuthenticationResponseDto,
     description: Docs.REFRESH_TOKENS_SUCCESSFUL_RESULT,
   })
-  @ApiUnprocessableEntityResponse({ description: Docs.REFRESH_TOKENS_UNPROCESSABLE_ENTITY })
-  @ApiUnauthorizedResponse({ description: Docs.REFRESH_TOKENS_UNAUTHORIZED })
+  @ApiUnprocessableEntityResponse({
+    type: CommonResponse.Swagger.CommonResponseDto,
+    description: Docs.REFRESH_TOKENS_UNPROCESSABLE_ENTITY,
+  })
+  @ApiUnauthorizedResponse({
+    type: CommonResponse.Swagger.CommonResponseDto,
+    description: Docs.REFRESH_TOKENS_UNAUTHORIZED,
+  })
   @UseGuards(RefreshTokenGuard)
-  @UseInterceptors(ResponseInterceptor)
   @Post('/refresh')
   async refresh(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
     const refreshResult = await this.authService.refresh(request.cookies.refreshToken);
@@ -107,9 +97,11 @@ export class AuthController {
     type: GetCurrentUserResponse.Swagger.GetCurrentUserResponseDto,
     description: Docs.GET_CURRENT_USER_SUCCESSFUL_RESULT,
   })
-  @ApiUnauthorizedResponse({ description: Docs.GET_CURRENT_USER_UNAUTHORIZED })
+  @ApiUnauthorizedResponse({
+    type: CommonResponse.Swagger.CommonResponseDto,
+    description: Docs.GET_CURRENT_USER_UNAUTHORIZED,
+  })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
-  @UseInterceptors(ResponseInterceptor)
   @Get('/me')
   me(@Req() request): Promise<GetCurrentUserResponse.Dto> {
     const userId = request.user.id;
@@ -122,21 +114,27 @@ export class AuthController {
     type: GetCurrentUserResponse.Swagger.GetCurrentUserResponseDto,
     description: Docs.ACCEPT_DOCUMENTS_SUCCESSFUL_RESULT,
   })
-  @ApiUnauthorizedResponse({ description: Docs.ACCEPT_DOCUMENTS_UNAUTHORIZED })
+  @ApiUnauthorizedResponse({
+    type: CommonResponse.Swagger.CommonResponseDto,
+    description: Docs.ACCEPT_DOCUMENTS_UNAUTHORIZED,
+  })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
-  @UseInterceptors(ResponseInterceptor)
   @Patch('/documents-acceptance')
   acceptDocuments(@Req() request): Promise<GetCurrentUserResponse.Dto> {
     return this.authService.acceptDocuments(request.user.id);
   }
 
   @ApiOperation({ summary: Docs.LOGOUT_ENDPOINT })
-  @ApiOkResponse({
+  @ApiResult({
+    status: 200,
     type: OperationResultResponse.Swagger.OperationResultResponseDto,
     description: Docs.LOGOUT_SUCCESSFUL_RESULT,
   })
-  @ApiUnprocessableEntityResponse({ description: Docs.LOGOUT_UNPROCESSABLE_ENTITY })
-  @ApiUnauthorizedResponse({ description: Docs.LOGOUT_UNAUTHORIZED })
+  @ApiUnprocessableEntityResponse({
+    type: CommonResponse.Swagger.CommonResponseDto,
+    description: Docs.LOGOUT_UNPROCESSABLE_ENTITY,
+  })
+  @ApiUnauthorizedResponse({ type: CommonResponse.Swagger.CommonResponseDto, description: Docs.LOGOUT_UNAUTHORIZED })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @Delete('/logout')
   async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
@@ -146,13 +144,16 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: Docs.DELETE_ACCOUNT_ENDPOINT })
-  @ApiOkResponse({
+  @ApiResult({
+    status: 200,
     type: OperationResultResponse.Swagger.OperationResultResponseDto,
     description: Docs.DELETE_ACCOUNT_SUCCESSFUL_RESULT,
   })
-  @ApiUnauthorizedResponse({ description: Docs.DELETE_ACCOUNT_UNAUTHORIZED })
+  @ApiUnauthorizedResponse({
+    type: CommonResponse.Swagger.CommonResponseDto,
+    description: Docs.DELETE_ACCOUNT_UNAUTHORIZED,
+  })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
-  @UseInterceptors(ResponseInterceptor)
   @Delete('/account')
   async deleteAccount(@Req() request, @Res({ passthrough: true }) response: Response) {
     const result = await this.authService.deleteAccount(request.user.id);

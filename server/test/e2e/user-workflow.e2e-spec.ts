@@ -1,5 +1,3 @@
-import '@root/string.extensions';
-
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 
@@ -293,7 +291,7 @@ describe('User workflow', () => {
           .set('Cookie', cookies)
           .expect(HttpStatus.OK)
           .expect(response => {
-            expect(response.body.result).toBe(true);
+            expect(response.body.data.result).toBe(true);
             cookies = response.get('Set-Cookie');
             expect(cookies[0]).toBeDefined();
             expect(cookies[0].includes('refreshToken=;')).toBeTruthy();

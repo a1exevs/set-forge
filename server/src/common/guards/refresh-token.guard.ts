@@ -1,7 +1,7 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
-import { ErrorMessages } from '@common/constants';
+import { AppException } from '@common/exceptions';
 
 /**
  * Requires the session cookie (the refresh token). Without it the request carries no session credential, so the
@@ -14,7 +14,7 @@ export class RefreshTokenGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const cookies: Record<string, unknown> = request.cookies ?? {};
     if (!('refreshToken' in cookies)) {
-      throw new UnauthorizedException({ message: ErrorMessages.UNAUTHORIZED });
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'UNAUTHORIZED');
     }
 
     return true;

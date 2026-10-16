@@ -58,3 +58,56 @@ jobs:
 
       - name: Server e2e tests
         run: npm run server:test:e2e
+
+  server-api:
+    name: Server API (Postman collection)
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.4.0
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version: 22.23.2
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          HUSKY: 0
+
+      - name: Prepare e2e env
+        run: cp server/.e2e.env.example server/.e2e.env
+
+      - name: Pull MySQL image
+        run: docker pull mysql:8.4
+
+      # A fresh server on an empty database: the stand of `/developer` §7, kept running for the next step.
+      - name: Start the stand
+        run: |
+          npm run client:stand -- --preset=empty > stand.log 2>&1 &
+          for attempt in $(seq 1 150); do
+            if grep -q '\[stand\] Ready:' stand.log; then
+              api=$(grep -o '(API http://[^,]*' stand.log | head -n 1 | cut -c 6-)
+              echo "API_BASE_URL=${api}/api/1.0" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            if grep -q '\[stand\] Failed to start' stand.log; then
+              break
+            fi
+            sleep 2
+          done
+          cat stand.log
+          exit 1
+
+      - name: API collection
+        run: npm run server:test:api -- --env-var "baseUrl=${API_BASE_URL}"
+
+      - name: Stop the stand
+        if: ${{ always() }}
+        run: npm run client:stand:stop
+
+      - uses: actions/upload-artifact@v4.6.2
+        if: ${{ !cancelled() }}
+        with:
+          name: stand-log
+          path: stand.log
+          retention-days: 30
