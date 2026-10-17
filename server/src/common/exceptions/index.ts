@@ -1,1 +1,1 @@
-export { ValidationException } from '@common/exceptions/validation.exception';
+export { AppException } from '@common/exceptions/app.exception';

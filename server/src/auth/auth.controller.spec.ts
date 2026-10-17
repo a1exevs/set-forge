@@ -1,5 +1,3 @@
-import '@root/string.extensions';
-
 import { ArgumentMetadata, HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -13,10 +11,9 @@ import { SvgCaptchaGuard } from '@auth/guards';
 import { IAuthenticationResult } from '@auth/interfaces';
 import { TokensService } from '@auth/tokens.service';
 import { ErrorMessages } from '@common/constants';
-import { HttpExceptionFilter } from '@common/exception-filters';
 import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
-import { ResponseInterceptor } from '@common/interceptors';
 import { ValidationPipe } from '@common/pipes';
+import { formatMessage } from '@common/utils';
 import { sendPseudoError } from '@test/unit/helpers';
 import { UsersService } from '@users/users.service';
 
@@ -53,11 +50,9 @@ describe('AuthController', () => {
   let authController: AuthController;
   let authService: AuthService;
   let unauthorizedExceptionFilter: UnauthorizedExceptionFilter;
-  let httpExceptionFilter: HttpExceptionFilter;
   let jwtAuthGuard: JwtAuthGuard;
   let refreshTokenGuard: RefreshTokenGuard;
   let svgCaptchaGuard: SvgCaptchaGuard;
-  let responseInterceptor: ResponseInterceptor<any>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -88,11 +83,9 @@ describe('AuthController', () => {
     authController = moduleRef.get<AuthController>(AuthController);
     authService = moduleRef.get<AuthService>(AuthService);
     unauthorizedExceptionFilter = moduleRef.get<UnauthorizedExceptionFilter>(UnauthorizedExceptionFilter);
-    httpExceptionFilter = moduleRef.get<HttpExceptionFilter>(HttpExceptionFilter);
     jwtAuthGuard = moduleRef.get<JwtAuthGuard>(JwtAuthGuard);
     refreshTokenGuard = moduleRef.get<RefreshTokenGuard>(RefreshTokenGuard);
     svgCaptchaGuard = moduleRef.get<SvgCaptchaGuard>(SvgCaptchaGuard);
-    responseInterceptor = moduleRef.get<ResponseInterceptor<any>>(ResponseInterceptor);
   });
 
   describe('AuthController - definition', () => {
@@ -105,9 +98,6 @@ describe('AuthController', () => {
     it('UnauthorizedExceptionFilter - should be defined', () => {
       expect(unauthorizedExceptionFilter).toBeDefined();
     });
-    it('HttpExceptionFilter - should be defined', () => {
-      expect(httpExceptionFilter).toBeDefined();
-    });
     it('JwtAuthGuard - should be defined', () => {
       expect(jwtAuthGuard).toBeDefined();
     });
@@ -116,9 +106,6 @@ describe('AuthController', () => {
     });
     it('SvgCaptchaGuard - should be defined', () => {
       expect(svgCaptchaGuard).toBeDefined();
-    });
-    it('ResponseInterceptor - should be defined', () => {
-      expect(responseInterceptor).toBeDefined();
     });
   });
 
@@ -130,7 +117,9 @@ describe('AuthController', () => {
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(400);
-        expect(err.getResponse()).toContainEqual(`email - ${ErrorMessages.MUST_HAS_EMAIL_FORMAT}`);
+        expect(err.errors).toContainEqual(
+          expect.objectContaining({ field: 'email', message: ErrorMessages.MUST_HAS_EMAIL_FORMAT }),
+        );
       }
     });
     it('Input params validation: should return bad request (incorrect small password)', async () => {
@@ -140,8 +129,14 @@ describe('AuthController', () => {
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(400);
-        expect(err.getResponse()).toContainEqual(
-          `password - ${ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(8, 50)}`,
+        expect(err.errors).toContainEqual(
+          expect.objectContaining({
+            field: 'password',
+            message: formatMessage(ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N, {
+              min: 8,
+              max: 50,
+            }),
+          }),
         );
       }
     });
@@ -155,8 +150,14 @@ describe('AuthController', () => {
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(400);
-        expect(err.getResponse()).toContainEqual(
-          `password - ${ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(8, 50)}`,
+        expect(err.errors).toContainEqual(
+          expect.objectContaining({
+            field: 'password',
+            message: formatMessage(ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N, {
+              min: 8,
+              max: 50,
+            }),
+          }),
         );
       }
     });
@@ -172,8 +173,11 @@ describe('AuthController', () => {
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(400);
-        expect(err.getResponse()).toContainEqual(
-          `consent - ${ErrorMessages.CONSENT_TO_PERSONAL_DATA_PROCESSING_IS_REQUIRED}`,
+        expect(err.errors).toContainEqual(
+          expect.objectContaining({
+            field: 'consent',
+            message: ErrorMessages.CONSENT_TO_PERSONAL_DATA_PROCESSING_IS_REQUIRED,
+          }),
         );
       }
     });
@@ -189,7 +193,9 @@ describe('AuthController', () => {
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(400);
-        expect(err.getResponse()).toContainEqual(`termsAccepted - ${ErrorMessages.TERMS_ACCEPTANCE_IS_REQUIRED}`);
+        expect(err.errors).toContainEqual(
+          expect.objectContaining({ field: 'termsAccepted', message: ErrorMessages.TERMS_ACCEPTANCE_IS_REQUIRED }),
+        );
       }
     });
     it('Input params validation: should be successful', async () => {

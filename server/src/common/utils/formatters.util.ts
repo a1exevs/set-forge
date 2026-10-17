@@ -1,15 +1,8 @@
-export function formatString(...rest) {
-  const args = rest;
+import type { ErrorParams } from '@common/constants/error-messages';
 
-  if (Array.isArray(args[0])) {
-    const parameters = args[0];
-
-    for (let i = 0; i < parameters.length; ++i) {
-      args[i] = parameters[i];
-    }
-  }
-
-  return this.replace(/{(\d+)}/g, function (match, matchIndex) {
-    return typeof args[matchIndex] !== 'undefined' ? args[matchIndex] : match;
-  });
+/** Fills the named `{param}` placeholders of a template; a placeholder without its param stays as it is. */
+export function formatMessage(template: string, params: ErrorParams = {}): string {
+  return template.replace(/{(\w+)}/g, (placeholder: string, name: string) =>
+    name in params ? String(params[name]) : placeholder,
+  );
 }

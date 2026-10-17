@@ -3,6 +3,7 @@ import { getModelToken } from '@nestjs/sequelize';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { ErrorMessages } from '@common/constants';
+import { ErrorItemResponse } from '@common/dto';
 import { CreateRoleRequest } from '@roles/dto';
 import { Role } from '@roles/roles.model';
 import { RolesService } from '@roles/roles.service';
@@ -63,7 +64,9 @@ describe('RolesService', () => {
         await rolesService.createRole(dto);
       } catch (error) {
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(`${ErrorMessages.FAILED_TO_CREATE_ROLE}. ${errorMessage}`);
+        expect(error.errors).toEqual([new ErrorItemResponse.Dto('FAILED_TO_CREATE_ROLE')]);
+        expect(error.message).toBe(ErrorMessages.FAILED_TO_CREATE_ROLE);
+        expect(error.cause.message).toBe(errorMessage);
         expect(model.create).toBeCalledTimes(1);
         expect(model.create).toBeCalledWith(dto);
       }

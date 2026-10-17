@@ -9,6 +9,5 @@ yarn-error.log*
 .gitignore
 .idea
 *.md
-_stub
 assets
 test

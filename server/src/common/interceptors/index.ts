@@ -1,1 +1,1 @@
-export { ResponseInterceptor } from '@common/interceptors/response.Interceptor';
+export { ResponseInterceptor } from '@common/interceptors/response.interceptor';

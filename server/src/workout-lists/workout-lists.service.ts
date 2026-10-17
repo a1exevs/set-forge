@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { Sequelize } from 'sequelize-typescript';
 
+import { AppException } from '@common/exceptions';
 import {
   CreateWorkoutListRequest,
   ImportWorkoutListsRequest,
@@ -194,18 +195,18 @@ export class WorkoutListsService {
       return body as WorkoutListsExportFileResponse.Dto;
     }
 
-    throw new BadRequestException('Invalid import file format');
+    throw AppException.of(HttpStatus.BAD_REQUEST, 'INVALID_IMPORT_FILE_FORMAT');
   }
 
   private static legacyListToResponse(item: unknown): WorkoutListResponse.Dto {
     if (typeof item !== 'object' || item === null) {
-      throw new BadRequestException('Invalid import file format');
+      throw AppException.of(HttpStatus.BAD_REQUEST, 'INVALID_IMPORT_FILE_FORMAT');
     }
 
     const record = item as Record<string, unknown>;
     const exercises = record.exercises;
     if (!Array.isArray(exercises) || exercises.length === 0) {
-      throw new BadRequestException('Invalid import file format');
+      throw AppException.of(HttpStatus.BAD_REQUEST, 'INVALID_IMPORT_FILE_FORMAT');
     }
 
     return new WorkoutListResponse.Dto({
@@ -214,7 +215,7 @@ export class WorkoutListsService {
       description: typeof record.description === 'string' ? record.description : '',
       exercises: exercises.map((exercise, index) => {
         if (typeof exercise !== 'object' || exercise === null) {
-          throw new BadRequestException('Invalid import file format');
+          throw AppException.of(HttpStatus.BAD_REQUEST, 'INVALID_IMPORT_FILE_FORMAT');
         }
         const ex = exercise as Record<string, unknown>;
         return {
@@ -237,10 +238,10 @@ export class WorkoutListsService {
     const instance = plainToInstance(ImportWorkoutListsRequest.Dto, file);
     const errors = await validate(instance);
     if (errors.length > 0) {
-      throw new BadRequestException('Invalid import file format');
+      throw AppException.of(HttpStatus.BAD_REQUEST, 'INVALID_IMPORT_FILE_FORMAT');
     }
     if (instance.formatVersion !== WORKOUT_LISTS_EXPORT_FORMAT_VERSION) {
-      throw new BadRequestException('Unsupported export file version');
+      throw AppException.of(HttpStatus.BAD_REQUEST, 'UNSUPPORTED_EXPORT_FILE_VERSION');
     }
     return instance;
   }

@@ -1,16 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
-import { ErrorMessages } from '@common/constants';
+import { validationError } from '@common/utils';
 
 export namespace CreateRoleRequest {
   export class Dto {
     @ApiProperty()
-    @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
+    @IsString(validationError('MUST_BE_A_STRING'))
     readonly value: string;
 
     @ApiProperty()
-    @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
+    @IsString(validationError('MUST_BE_A_STRING'))
     readonly description: string;
 
     constructor(value, description) {

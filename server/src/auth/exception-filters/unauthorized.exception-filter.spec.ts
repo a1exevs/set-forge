@@ -1,57 +1,73 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
 
 import { UnauthorizedExceptionFilter } from '@auth/exception-filters';
 import { ErrorMessages, ResultCodes } from '@common/constants';
+import { AppException } from '@common/exceptions';
 import { getMockArgumentsHostData } from '@test/unit/helpers';
 
 describe('UnauthorizedExceptionFilter', () => {
+  const invalidCredentials = (): AppException => AppException.of(HttpStatus.UNAUTHORIZED, 'INVALID_EMAIL_OR_PASSWORD');
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('UnauthorizedExceptionFilter - catch', () => {
-    it('should send response with NEED_CAPTCHA_AUTHORIZATION code', async () => {
-      const authFailedCount = '4';
-      const { mockArgumentsHost, mockGetRequest, mockGetResponse, request, response } = getMockArgumentsHostData({
-        sessionVariables: [{ key: 'authFailedCount', value: authFailedCount }],
-      });
-
-      const exceptionMessage = ErrorMessages.INVALID_EMAIL_OR_PASSWORD;
-      const errorObject = { message: exceptionMessage };
-
-      const unauthorizedExceptionFilter = new UnauthorizedExceptionFilter();
-      unauthorizedExceptionFilter.catch(new UnauthorizedException(errorObject), mockArgumentsHost);
-      const body = JSON.parse(response._getData());
-
-      expect(response._getStatusCode()).toBe(401);
-      expect(mockGetResponse).toBeCalledTimes(1);
-      expect(mockGetRequest).toBeCalledTimes(1);
-      expect(request.session['authFailedCount']).toBe(+authFailedCount + 1);
-      expect(body.resultCode).toBe(ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
-      expect(body.messages.length).toBe(2);
-      expect(body.messages[0]).toBe(exceptionMessage);
-      expect(body.messages[1]).toBe(ErrorMessages.NEED_AUTHORIZATION_WITH_CAPTCHA);
+  it('should demand the captcha when the failed sign-ins reach the limit', () => {
+    const { mockArgumentsHost, request, response } = getMockArgumentsHostData({
+      sessionVariables: [{ key: 'authFailedCount', value: '4' }],
     });
-    it('should not send response with NEED_CAPTCHA_AUTHORIZATION code', async () => {
-      const authFailedCount = '3';
-      const { mockArgumentsHost, mockGetRequest, mockGetResponse, request, response } = getMockArgumentsHostData({
-        sessionVariables: [{ key: 'authFailedCount', value: authFailedCount }],
-      });
+    new UnauthorizedExceptionFilter().catch(invalidCredentials(), mockArgumentsHost);
+    const body = JSON.parse(response._getData());
 
-      const exceptionMessage = ErrorMessages.INVALID_EMAIL_OR_PASSWORD;
-      const errorObject = { message: exceptionMessage };
+    expect(response._getStatusCode()).toBe(HttpStatus.UNAUTHORIZED);
+    expect(request.session['authFailedCount']).toBe(5);
+    expect(body.resultCode).toBe(ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
+    expect(body.messages).toEqual([
+      ErrorMessages.INVALID_EMAIL_OR_PASSWORD,
+      ErrorMessages.NEED_AUTHORIZATION_WITH_CAPTCHA,
+    ]);
+    expect(body.fieldsErrors.map(error => error.code)).toEqual([
+      'INVALID_EMAIL_OR_PASSWORD',
+      'NEED_AUTHORIZATION_WITH_CAPTCHA',
+    ]);
+  });
 
-      const unauthorizedExceptionFilter = new UnauthorizedExceptionFilter();
-      unauthorizedExceptionFilter.catch(new UnauthorizedException(errorObject), mockArgumentsHost);
-      const body = JSON.parse(response._getData());
-
-      expect(response._getStatusCode()).toBe(401);
-      expect(mockGetResponse).toBeCalledTimes(1);
-      expect(mockGetRequest).toBeCalledTimes(1);
-      expect(request.session['authFailedCount']).toBe(+authFailedCount + 1);
-      expect(body.resultCode).toBe(1);
-      expect(body.messages.length).toBe(1);
-      expect(body.messages[0]).toBe(exceptionMessage);
+  it('should count a failed sign-in below the limit without the captcha', () => {
+    const { mockArgumentsHost, request, response } = getMockArgumentsHostData({
+      sessionVariables: [{ key: 'authFailedCount', value: '3' }],
     });
+    new UnauthorizedExceptionFilter().catch(invalidCredentials(), mockArgumentsHost);
+    const body = JSON.parse(response._getData());
+
+    expect(request.session['authFailedCount']).toBe(4);
+    expect(body.resultCode).toBe(ResultCodes.ERROR);
+    expect(body.messages).toEqual([ErrorMessages.INVALID_EMAIL_OR_PASSWORD]);
+  });
+
+  it('should not repeat the captcha item of a wrong captcha', () => {
+    const { mockArgumentsHost, response } = getMockArgumentsHostData({
+      sessionVariables: [{ key: 'authFailedCount', value: '5' }],
+    });
+    const wrongCaptcha = AppException.of(HttpStatus.UNAUTHORIZED, 'NEED_AUTHORIZATION_WITH_CAPTCHA');
+    new UnauthorizedExceptionFilter().catch(wrongCaptcha, mockArgumentsHost);
+    const body = JSON.parse(response._getData());
+
+    expect(body.resultCode).toBe(ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
+    expect(body.messages).toEqual([ErrorMessages.NEED_AUTHORIZATION_WITH_CAPTCHA]);
+  });
+
+  it('should not count an error other than 401', () => {
+    const { mockArgumentsHost, request, response } = getMockArgumentsHostData({
+      sessionVariables: [{ key: 'authFailedCount', value: '4' }],
+    });
+    new UnauthorizedExceptionFilter().catch(
+      AppException.of(HttpStatus.BAD_REQUEST, 'MUST_BE_A_STRING'),
+      mockArgumentsHost,
+    );
+    const body = JSON.parse(response._getData());
+
+    expect(response._getStatusCode()).toBe(HttpStatus.BAD_REQUEST);
+    expect(request.session['authFailedCount']).toBe('4');
+    expect(body.resultCode).toBe(ResultCodes.ERROR);
   });
 });

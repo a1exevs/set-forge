@@ -4,6 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FindOptions } from 'sequelize';
 
 import { ErrorMessages } from '@common/constants';
+import { ErrorItemResponse } from '@common/dto';
 import { Role } from '@roles/roles.model';
 import { RolesService } from '@roles/roles.service';
 import { mockUsers } from '@test/unit/helpers';
@@ -93,9 +94,7 @@ describe('UsersService', () => {
         await usersService.createUser(dto);
       } catch (error) {
         expect(error.status).toBe(HttpStatus.FORBIDDEN);
-        expect(error.message).toBe(
-          `${ErrorMessages.SERVICE_IS_UNAVAILABLE}: ${ErrorMessages.USER_ROLE_CONFIGURATION_IS_MISSING.toLowerCase()}`,
-        );
+        expect(error.errors).toEqual([new ErrorItemResponse.Dto('USER_ROLE_CONFIGURATION_IS_MISSING')]);
         expect(rolesService.getRoleByValue).toBeCalledTimes(1);
         expect(rolesService.getRoleByValue).toBeCalledWith('user');
         expect(model.create).toBeCalledTimes(0);
@@ -116,7 +115,9 @@ describe('UsersService', () => {
         await usersService.createUser(dto);
       } catch (error) {
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(`${ErrorMessages.FAILED_TO_CREATE_USER}. ${errorMessage}`);
+        expect(error.errors).toEqual([new ErrorItemResponse.Dto('FAILED_TO_CREATE_USER')]);
+        expect(error.message).toBe(ErrorMessages.FAILED_TO_CREATE_USER);
+        expect(error.cause.message).toBe(errorMessage);
         expect(rolesService.getRoleByValue).toBeCalledTimes(1);
         expect(rolesService.getRoleByValue).toBeCalledWith('user');
         expect(model.create).toBeCalledTimes(1);
