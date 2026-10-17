@@ -8,13 +8,18 @@ export namespace CommonResponse {
     @ApiProperty({ description: 'The payload; null on an error' })
     readonly data: unknown = null;
 
-    @ApiProperty({ description: 'The English texts of the errors, a field error as "field - text"' })
+    // The schema examples show a success: an error response documents its own (`@ApiErrorResult`).
+    @ApiProperty({ description: 'The English texts of the errors, a field error as "field - text"', example: [] })
     readonly messages: string[] = [];
 
-    @ApiProperty({ type: [ErrorItemResponse.Swagger.ErrorItemResponseDto], description: 'The errors by code' })
+    @ApiProperty({
+      type: [ErrorItemResponse.Swagger.ErrorItemResponseDto],
+      description: 'The errors by code',
+      example: [],
+    })
     readonly fieldsErrors: ErrorItemResponse.Dto[] = [];
 
-    @ApiProperty({ description: '0 OK, 1 an error, 10 the captcha is required' })
+    @ApiProperty({ description: '0 OK, 1 an error, 10 the captcha is required', example: ResultCodes.OK })
     readonly resultCode: number = ResultCodes.OK;
 
     constructor(dto: Partial<Dto> = null) {
