@@ -1,12 +1,17 @@
-import { Body, Controller, Delete, Get, Patch, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
 import {
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiOperation,
-  ApiTags,
-  ApiUnauthorizedResponse,
-  ApiUnprocessableEntityResponse,
-} from '@nestjs/swagger';
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CookieOptions, Request, Response } from 'express';
 
 import { AuthService } from '@auth/auth.service';
@@ -14,9 +19,9 @@ import { AuthenticationResponse, GetCurrentUserResponse, LoginRequest, RegisterR
 import { UnauthorizedExceptionFilter } from '@auth/exception-filters';
 import { SvgCaptchaGuard } from '@auth/guards';
 import { IAuthenticationResult } from '@auth/interfaces';
-import { Docs, Routes } from '@common/constants';
-import { ApiResult } from '@common/decorators';
-import { CommonResponse, OperationResultResponse } from '@common/dto';
+import { Docs, ResultCodes, Routes } from '@common/constants';
+import { ApiErrorCases, ApiErrorResult, ApiResult } from '@common/decorators';
+import { OperationResultResponse } from '@common/dto';
 import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
 
 @ApiTags(Docs.AUTHORIZATION_CONTROLLER)
@@ -31,7 +36,29 @@ export class AuthController {
     type: AuthenticationResponse.Swagger.AuthenticationResponseDto,
     description: Docs.REGISTRATION_SUCCESSFUL_RESULT,
   })
-  @ApiBadRequestResponse({ type: CommonResponse.Swagger.CommonResponseDto, description: Docs.REGISTRATION_BAD_REQUEST })
+  @ApiErrorResult({
+    status: HttpStatus.BAD_REQUEST,
+    description: Docs.REGISTRATION_BAD_REQUEST,
+    cases: {
+      invalidFields: [
+        { code: 'MUST_HAS_EMAIL_FORMAT', field: 'email' },
+        {
+          code: 'STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N',
+          params: { min: 8, max: 50 },
+          field: 'password',
+        },
+        { code: 'CONSENT_TO_PERSONAL_DATA_PROCESSING_IS_REQUIRED', field: 'consent' },
+        { code: 'TERMS_ACCEPTANCE_IS_REQUIRED', field: 'termsAccepted' },
+      ],
+      userExists: [{ code: 'USER_ALREADY_EXISTS' }],
+      creationFailed: [{ code: 'FAILED_TO_CREATE_USER' }],
+    },
+  })
+  @ApiErrorResult({
+    status: HttpStatus.FORBIDDEN,
+    description: Docs.REGISTRATION_FORBIDDEN,
+    cases: { roleMissing: [{ code: 'USER_ROLE_CONFIGURATION_IS_MISSING' }] },
+  })
   @Post('/registration')
   async registration(@Body() dto: RegisterRequest.Dto, @Res({ passthrough: true }) response: Response) {
     const registerResult = await this.authService.registration(dto);
@@ -49,9 +76,25 @@ export class AuthController {
     type: AuthenticationResponse.Swagger.AuthenticationResponseDto,
     description: Docs.AUTHORIZATION_SUCCESSFUL_RESULT,
   })
-  @ApiUnauthorizedResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
     description: Docs.AUTHORIZATION_UNAUTHORIZED,
+    cases: {
+      invalidCredentials: [{ code: 'INVALID_EMAIL_OR_PASSWORD' }],
+      captchaRequired: {
+        errors: [{ code: 'INVALID_EMAIL_OR_PASSWORD' }, { code: 'NEED_AUTHORIZATION_WITH_CAPTCHA' }],
+        resultCode: ResultCodes.NEED_CAPTCHA_AUTHORIZATION,
+      },
+      wrongCaptcha: {
+        errors: [{ code: 'NEED_AUTHORIZATION_WITH_CAPTCHA' }],
+        resultCode: ResultCodes.NEED_CAPTCHA_AUTHORIZATION,
+      },
+    },
+  })
+  @ApiErrorResult({
+    status: HttpStatus.BAD_REQUEST,
+    description: Docs.AUTHORIZATION_BAD_REQUEST,
+    cases: { invalidFields: [{ code: 'MUST_BE_A_STRING', field: 'email' }] },
   })
   @UseGuards(SvgCaptchaGuard)
   @UseFilters(UnauthorizedExceptionFilter)
@@ -72,13 +115,20 @@ export class AuthController {
     type: AuthenticationResponse.Swagger.AuthenticationResponseDto,
     description: Docs.REFRESH_TOKENS_SUCCESSFUL_RESULT,
   })
-  @ApiUnprocessableEntityResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
     description: Docs.REFRESH_TOKENS_UNPROCESSABLE_ENTITY,
+    cases: {
+      malformed: [{ code: 'REFRESH_TOKEN_IS_MALFORMED' }],
+      expired: [{ code: 'REFRESH_TOKEN_EXPIRED' }],
+      notFound: [{ code: 'REFRESH_TOKEN_NOT_FOUND' }],
+      revoked: [{ code: 'REFRESH_TOKEN_REVOKED' }],
+    },
   })
-  @ApiUnauthorizedResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
     description: Docs.REFRESH_TOKENS_UNAUTHORIZED,
+    cases: ApiErrorCases.UNAUTHORIZED,
   })
   @UseGuards(RefreshTokenGuard)
   @Post('/refresh')
@@ -97,9 +147,10 @@ export class AuthController {
     type: GetCurrentUserResponse.Swagger.GetCurrentUserResponseDto,
     description: Docs.GET_CURRENT_USER_SUCCESSFUL_RESULT,
   })
-  @ApiUnauthorizedResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
     description: Docs.GET_CURRENT_USER_UNAUTHORIZED,
+    cases: ApiErrorCases.UNAUTHORIZED,
   })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @Get('/me')
@@ -114,9 +165,10 @@ export class AuthController {
     type: GetCurrentUserResponse.Swagger.GetCurrentUserResponseDto,
     description: Docs.ACCEPT_DOCUMENTS_SUCCESSFUL_RESULT,
   })
-  @ApiUnauthorizedResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
     description: Docs.ACCEPT_DOCUMENTS_UNAUTHORIZED,
+    cases: ApiErrorCases.UNAUTHORIZED,
   })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @Patch('/documents-acceptance')
@@ -130,11 +182,19 @@ export class AuthController {
     type: OperationResultResponse.Swagger.OperationResultResponseDto,
     description: Docs.LOGOUT_SUCCESSFUL_RESULT,
   })
-  @ApiUnprocessableEntityResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
     description: Docs.LOGOUT_UNPROCESSABLE_ENTITY,
+    cases: {
+      malformed: [{ code: 'REFRESH_TOKEN_IS_MALFORMED' }],
+      expired: [{ code: 'REFRESH_TOKEN_EXPIRED' }],
+    },
   })
-  @ApiUnauthorizedResponse({ type: CommonResponse.Swagger.CommonResponseDto, description: Docs.LOGOUT_UNAUTHORIZED })
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
+    description: Docs.LOGOUT_UNAUTHORIZED,
+    cases: ApiErrorCases.UNAUTHORIZED,
+  })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @Delete('/logout')
   async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
@@ -149,9 +209,10 @@ export class AuthController {
     type: OperationResultResponse.Swagger.OperationResultResponseDto,
     description: Docs.DELETE_ACCOUNT_SUCCESSFUL_RESULT,
   })
-  @ApiUnauthorizedResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
     description: Docs.DELETE_ACCOUNT_UNAUTHORIZED,
+    cases: ApiErrorCases.UNAUTHORIZED,
   })
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @Delete('/account')

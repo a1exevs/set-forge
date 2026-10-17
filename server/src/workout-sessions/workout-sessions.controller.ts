@@ -12,19 +12,12 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiNotFoundResponse,
-  ApiOperation,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
 import { Docs, Routes } from '@common/constants';
-import { ApiResult } from '@common/decorators';
-import { CommonResponse, OperationResultResponse } from '@common/dto';
+import { ApiErrorCases, ApiErrorResult, ApiResult } from '@common/decorators';
+import { OperationResultResponse } from '@common/dto';
 import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
 import {
   GetActiveWorkoutSessionQuery,
@@ -53,17 +46,23 @@ export class WorkoutSessionsController {
     type: WorkoutSessionResponse.Swagger.WorkoutSessionResponseDto,
     description: Docs.START_WORKOUT_SESSION_SUCCESSFUL_RESULT,
   })
-  @ApiBadRequestResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.BAD_REQUEST,
     description: Docs.START_WORKOUT_SESSION_BAD_REQUEST,
+    cases: {
+      notUuid: [{ code: 'MUST_BE_A_UUID', field: 'workoutListId' }],
+      emptyList: [{ code: 'BAD_REQUEST' }],
+    },
   })
-  @ApiNotFoundResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.NOT_FOUND,
     description: Docs.START_WORKOUT_SESSION_NOT_FOUND,
+    cases: ApiErrorCases.NOT_FOUND,
   })
-  @ApiUnauthorizedResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
     description: Docs.START_WORKOUT_SESSION_UNAUTHORIZED,
+    cases: ApiErrorCases.UNAUTHORIZED,
   })
   @Post()
   async start(
@@ -82,13 +81,18 @@ export class WorkoutSessionsController {
     type: WorkoutHistoryResponse.Swagger.WorkoutHistoryResponseDto,
     description: Docs.GET_WORKOUT_HISTORY_SUCCESSFUL_RESULT,
   })
-  @ApiBadRequestResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.BAD_REQUEST,
     description: Docs.GET_WORKOUT_HISTORY_BAD_REQUEST,
+    cases: {
+      limitTooLarge: [{ code: 'NUMERIC_MUST_NOT_BE_GREATER_THAN_N', params: { max: 50 }, field: 'limit' }],
+      negativeOffset: [{ code: 'NUMERIC_MUST_NOT_BE_LESS_THAN_N', params: { min: 0 }, field: 'offset' }],
+    },
   })
-  @ApiUnauthorizedResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
     description: Docs.GET_WORKOUT_HISTORY_UNAUTHORIZED,
+    cases: ApiErrorCases.UNAUTHORIZED,
   })
   @Get()
   getHistory(@Query() query: GetWorkoutHistoryQuery.Dto, @Req() request): Promise<WorkoutHistoryResponse.Dto> {
@@ -102,13 +106,15 @@ export class WorkoutSessionsController {
     type: WorkoutSessionResponse.Swagger.WorkoutSessionResponseDto,
     description: Docs.GET_ACTIVE_WORKOUT_SESSION_SUCCESSFUL_RESULT,
   })
-  @ApiBadRequestResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.BAD_REQUEST,
     description: Docs.GET_ACTIVE_WORKOUT_SESSION_BAD_REQUEST,
+    cases: { notUuid: [{ code: 'MUST_BE_A_UUID', field: 'workoutListId' }] },
   })
-  @ApiUnauthorizedResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
     description: Docs.GET_ACTIVE_WORKOUT_SESSION_UNAUTHORIZED,
+    cases: ApiErrorCases.UNAUTHORIZED,
   })
   @Get('active')
   getActive(
@@ -124,17 +130,20 @@ export class WorkoutSessionsController {
     type: WorkoutSessionResponse.Swagger.WorkoutSessionResponseDto,
     description: Docs.UPDATE_WORKOUT_SESSION_PROGRESS_SUCCESSFUL_RESULT,
   })
-  @ApiBadRequestResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.BAD_REQUEST,
     description: Docs.UPDATE_WORKOUT_SESSION_PROGRESS_BAD_REQUEST,
+    cases: { notActive: [{ code: 'BAD_REQUEST' }] },
   })
-  @ApiNotFoundResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.NOT_FOUND,
     description: Docs.UPDATE_WORKOUT_SESSION_PROGRESS_NOT_FOUND,
+    cases: ApiErrorCases.NOT_FOUND,
   })
-  @ApiUnauthorizedResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
     description: Docs.UPDATE_WORKOUT_SESSION_PROGRESS_UNAUTHORIZED,
+    cases: ApiErrorCases.UNAUTHORIZED,
   })
   @Patch('/:id/exercises/:exerciseId/progress')
   incrementProgress(
@@ -151,13 +160,15 @@ export class WorkoutSessionsController {
     type: WorkoutSessionResponse.Swagger.WorkoutSessionResponseDto,
     description: Docs.FINISH_WORKOUT_SESSION_SUCCESSFUL_RESULT,
   })
-  @ApiNotFoundResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.NOT_FOUND,
     description: Docs.FINISH_WORKOUT_SESSION_NOT_FOUND,
+    cases: ApiErrorCases.NOT_FOUND,
   })
-  @ApiUnauthorizedResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
     description: Docs.FINISH_WORKOUT_SESSION_UNAUTHORIZED,
+    cases: ApiErrorCases.UNAUTHORIZED,
   })
   @Post('/:id/finish')
   finish(@Param('id') id: string, @Req() request): Promise<WorkoutSessionResponse.Dto> {
@@ -170,17 +181,20 @@ export class WorkoutSessionsController {
     type: WorkoutSessionResponse.Swagger.WorkoutSessionResponseDto,
     description: Docs.RESYNC_WORKOUT_SESSION_SUCCESSFUL_RESULT,
   })
-  @ApiBadRequestResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.BAD_REQUEST,
     description: Docs.RESYNC_WORKOUT_SESSION_BAD_REQUEST,
+    cases: { notActiveOrNoList: [{ code: 'BAD_REQUEST' }] },
   })
-  @ApiNotFoundResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.NOT_FOUND,
     description: Docs.RESYNC_WORKOUT_SESSION_NOT_FOUND,
+    cases: ApiErrorCases.NOT_FOUND,
   })
-  @ApiUnauthorizedResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
     description: Docs.RESYNC_WORKOUT_SESSION_UNAUTHORIZED,
+    cases: ApiErrorCases.UNAUTHORIZED,
   })
   @Post('/:id/resync')
   resync(@Param('id') id: string, @Req() request): Promise<WorkoutSessionResponse.Dto> {
@@ -193,17 +207,20 @@ export class WorkoutSessionsController {
     type: OperationResultResponse.Swagger.OperationResultResponseDto,
     description: Docs.DISCARD_WORKOUT_SESSION_SUCCESSFUL_RESULT,
   })
-  @ApiBadRequestResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.BAD_REQUEST,
     description: Docs.DISCARD_WORKOUT_SESSION_BAD_REQUEST,
+    cases: { notActive: [{ code: 'BAD_REQUEST' }] },
   })
-  @ApiNotFoundResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.NOT_FOUND,
     description: Docs.DISCARD_WORKOUT_SESSION_NOT_FOUND,
+    cases: ApiErrorCases.NOT_FOUND,
   })
-  @ApiUnauthorizedResponse({
-    type: CommonResponse.Swagger.CommonResponseDto,
+  @ApiErrorResult({
+    status: HttpStatus.UNAUTHORIZED,
     description: Docs.DISCARD_WORKOUT_SESSION_UNAUTHORIZED,
+    cases: ApiErrorCases.UNAUTHORIZED,
   })
   @Delete('/:id')
   async discard(@Param('id') id: string, @Req() request): Promise<OperationResultResponse.Dto> {

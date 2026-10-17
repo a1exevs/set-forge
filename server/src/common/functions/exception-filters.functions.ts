@@ -56,17 +56,18 @@ export function toErrorResult(exception: unknown): ErrorResult {
 const toMessage = (error: ErrorItemResponse.Dto): string =>
   error.field ? `${error.field} - ${error.message}` : error.message;
 
-/** Sends an error in the envelope: the items in `fieldsErrors`, their texts in `messages`. */
+/** The envelope of an error: the items in `fieldsErrors`, their texts in `messages`. */
+export function toErrorBody(
+  errors: ErrorItemResponse.Dto[],
+  resultCode: number = ResultCodes.ERROR,
+): CommonResponse.Dto {
+  return new CommonResponse.Dto({ messages: errors.map(toMessage), fieldsErrors: errors, resultCode });
+}
+
 export function sendErrorResponse(
   response: Response,
   { status, errors }: ErrorResult,
   resultCode: number = ResultCodes.ERROR,
 ): void {
-  response.status(status).json(
-    new CommonResponse.Dto({
-      messages: errors.map(toMessage),
-      fieldsErrors: errors,
-      resultCode,
-    }),
-  );
+  response.status(status).json(toErrorBody(errors, resultCode));
 }

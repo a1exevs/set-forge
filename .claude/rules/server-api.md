@@ -17,8 +17,9 @@ the API collection.
   Only the health check answers its own body (`@SkipEnvelope()`).
 - Document success in Swagger with `@ApiResult` (`server/src/common/decorators/api-result.decorator.ts`) —
   `CommonResponse` schema + typed `data`.
-- Every endpoint declares its relevant `@ApiBadRequestResponse`, `@ApiNotFoundResponse`, `@ApiUnauthorizedResponse`,
-  etc. with `type: CommonResponse.Swagger.CommonResponseDto` and text from `Docs.*`.
+- Document each error status with `@ApiErrorResult` (`server/src/common/decorators/api-error-result.decorator.ts`):
+  text from `Docs.*` and the named cases the endpoint really answers, each a list of codes (with params and field) —
+  the example is built from the catalogue. `ApiErrorCases` holds the shared ones (401 of the guards, 404).
 
 ## Errors by code
 
@@ -44,7 +45,8 @@ Reference: `server/src/workout-lists/workout-lists.controller.ts`.
 4. `@ApiResult({ status, type: X.Swagger.XDto, description: Docs.<SUCCESS> })` for each success status (200 and 201
    when both apply)
 5. `@ApiResult({ nullable: true })` when `data` can be `null`
-6. All relevant error decorators with `Docs.<ERROR>` — list every possible response, not only success
+6. `@ApiErrorResult` per error status with `Docs.<ERROR>` — every status the endpoint answers (guards, validation,
+   service), not only success
 7. Copy only from `server/src/common/constants/docs.ts`, no inline strings
 
 ## DTO naming and structure
