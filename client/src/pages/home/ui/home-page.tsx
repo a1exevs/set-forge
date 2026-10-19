@@ -21,7 +21,7 @@ type Props = {
   onImportClick: () => void;
   onImportFile: (event: ChangeEvent<HTMLInputElement>) => void | Promise<void>;
   importInputRef: RefObject<HTMLInputElement>;
-  formatDate: (date: string | null) => string;
+  formatDate: (iso: string) => string;
 };
 
 const HomePage: FC<Props> = ({

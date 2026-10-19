@@ -140,6 +140,8 @@ const AuthPage: FC<Props> = ({
             Password
           </label>
           <PasswordField
+            showPasswordLabel="Show password"
+            hidePasswordLabel="Hide password"
             id="auth-password"
             name="password"
             value={password}
@@ -156,6 +158,8 @@ const AuthPage: FC<Props> = ({
                 Confirm password
               </label>
               <PasswordField
+                showPasswordLabel="Show password"
+                hidePasswordLabel="Hide password"
                 id="auth-password-confirm"
                 name="password-confirm"
                 value={confirmPassword}

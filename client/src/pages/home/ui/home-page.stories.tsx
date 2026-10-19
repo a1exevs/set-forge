@@ -66,7 +66,7 @@ const renderHomePageLoading = (): ReturnType<typeof renderWithPageRouter> =>
         onImportClick={fn()}
         onImportFile={fn()}
         importInputRef={createRef<HTMLInputElement>()}
-        formatDate={formatDate}
+        formatDate={(iso: string): string => formatDate(iso, 'en')}
       />
     ),
   });

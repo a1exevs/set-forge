@@ -42,6 +42,12 @@
   "language": {
     "label": "Language"
   },
+  "mainTabs": {
+    "history": "History",
+    "home": "Home",
+    "navigation": "Main navigation",
+    "profile": "Profile"
+  },
   "profile": {
     "openSettings": "Settings"
   },

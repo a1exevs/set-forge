@@ -79,7 +79,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -108,7 +108,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -135,7 +135,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -164,7 +164,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={exportAllWorkoutLists}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -191,7 +191,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={exportAllWorkoutLists}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -214,7 +214,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -241,7 +241,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={exportAllWorkoutLists}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -266,7 +266,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={importWorkoutLists}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -299,7 +299,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={importWorkoutLists}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 

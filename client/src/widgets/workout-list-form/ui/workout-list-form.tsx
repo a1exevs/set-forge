@@ -61,7 +61,7 @@ const WorkoutListForm: FC<Props> = ({
   if (notFound) {
     return (
       <div className={classes.container}>
-        <NotFoundMessage title="Workout list not found" backToLink="/" />
+        <NotFoundMessage title="Workout list not found" backToLabel="Back to Home" backToLink="/" />
       </div>
     );
   }

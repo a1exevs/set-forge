@@ -31,14 +31,14 @@ const twoTabs: TabsBarItem[] = [
 
 describe('TabsBar', () => {
   it('renders all tab links', () => {
-    render(<TabsBar items={twoTabs} activeItemId="home" />);
+    render(<TabsBar ariaLabel="Main navigation" items={twoTabs} activeItemId="home" />);
 
     expect(screen.getByRole('tab', { name: /home/i })).toHaveAttribute('href', '/');
     expect(screen.getByRole('tab', { name: /profile/i })).toHaveAttribute('href', '/profile');
   });
 
   it('marks active tab with aria-current', () => {
-    render(<TabsBar items={twoTabs} activeItemId="profile" />);
+    render(<TabsBar ariaLabel="Main navigation" items={twoTabs} activeItemId="profile" />);
 
     expect(screen.getByRole('tab', { name: /home/i })).not.toHaveAttribute('aria-current');
     expect(screen.getByRole('tab', { name: /profile/i })).toHaveAttribute('aria-current', 'page');
@@ -50,7 +50,7 @@ describe('TabsBar', () => {
       { id: 'messages', label: 'Messages', to: '/messages', icon: MessageCircle, badgeCount: 10 },
     ];
 
-    render(<TabsBar items={items} activeItemId="home" />);
+    render(<TabsBar ariaLabel="Main navigation" items={items} activeItemId="home" />);
 
     expect(screen.getByText('10')).toBeInTheDocument();
   });
@@ -60,7 +60,7 @@ describe('TabsBar', () => {
       { id: 'notifications', label: 'Notifications', to: '/notifications', icon: Bell, badgeCount: 140 },
     ];
 
-    render(<TabsBar items={items} activeItemId="notifications" />);
+    render(<TabsBar ariaLabel="Main navigation" items={items} activeItemId="notifications" />);
 
     expect(screen.getByText('99+')).toBeInTheDocument();
   });
@@ -74,7 +74,7 @@ describe('TabsBar', () => {
       { id: 'more', label: 'More', to: '/more', icon: MoreHorizontal },
     ];
 
-    render(<TabsBar items={items} activeItemId="home" />);
+    render(<TabsBar ariaLabel="Main navigation" items={items} activeItemId="home" />);
 
     expect(screen.getAllByRole('tab')).toHaveLength(5);
   });

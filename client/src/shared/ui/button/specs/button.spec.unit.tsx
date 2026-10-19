@@ -116,15 +116,14 @@ describe('Button', () => {
       expect(button).toHaveAttribute('aria-busy', 'true');
       expect(button).toHaveAttribute('aria-disabled', 'true');
       expect(button).not.toBeDisabled();
-      expect(screen.queryByText('Loading')).not.toBeInTheDocument();
     });
 
-    it('shows an indicator announced as loading when shown', () => {
+    it('shows an indicator when shown and keeps its name, marked busy', () => {
       render(<Button progress="shown">Save</Button>);
 
-      const button = screen.getByRole('button', { name: /Save/ });
+      const button = screen.getByRole('button', { name: 'Save' });
       expect(button).toHaveAttribute('data-progress', 'shown');
-      expect(screen.getByText('Loading')).toBeInTheDocument();
+      expect(button).toHaveAttribute('aria-busy', 'true');
     });
 
     it('does not submit its form while in flight', async () => {

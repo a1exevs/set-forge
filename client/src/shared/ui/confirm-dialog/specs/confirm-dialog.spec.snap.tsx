@@ -43,9 +43,11 @@ const openAndSnapshot = async (
 };
 
 describe('ConfirmDialog', () => {
-  it('matches snapshot with default options', async () => {
+  it('matches snapshot with the two buttons', async () => {
     const { baseElement } = await openAndSnapshot({
       title: 'Confirm action',
+      confirmationText: 'Confirm',
+      cancellationText: 'Cancel',
     });
     expect(baseElement).toMatchSnapshot();
   });
@@ -54,6 +56,8 @@ describe('ConfirmDialog', () => {
     const { baseElement } = await openAndSnapshot({
       title: 'Delete item?',
       description: 'This action cannot be undone.',
+      confirmationText: 'Confirm',
+      cancellationText: 'Cancel',
     });
     expect(baseElement).toMatchSnapshot();
   });

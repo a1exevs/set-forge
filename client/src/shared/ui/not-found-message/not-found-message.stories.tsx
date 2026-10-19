@@ -9,14 +9,14 @@ import NotFoundMessage from './not-found-message';
 const meta = {
   title: 'Shared/NotFoundMessage',
   component: NotFoundMessage,
-  args: { title: 'Workout list not found' },
+  args: { title: 'Workout list not found', backToLabel: 'Back to Home' },
   decorators: [withFrame],
   parameters: {
     docs: {
       description: {
         component:
           'The empty state of a page whose entity is gone: a title and a button that links back. `backToLink` ' +
-          'defaults to home, `backToLabel` to "Back to Home".',
+          'defaults to home; `backToLabel` is the caller’s.',
       },
     },
   },

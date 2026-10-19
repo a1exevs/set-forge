@@ -7,7 +7,7 @@ import Button from '../button/button';
 type Props = {
   title: string;
   backToLink?: string;
-  backToLabel?: string;
+  backToLabel: string;
 };
 
 const NotFoundMessage: FC<Props> = ({ title, backToLink = '/', backToLabel }) => {
@@ -15,7 +15,7 @@ const NotFoundMessage: FC<Props> = ({ title, backToLink = '/', backToLabel }) =>
     <div className={classes.container}>
       <h2 className={classes.title}>{title}</h2>
       <Link to={backToLink} className={classes.link}>
-        <Button>{backToLabel ?? 'Back to Home'}</Button>
+        <Button>{backToLabel}</Button>
       </Link>
     </div>
   );
