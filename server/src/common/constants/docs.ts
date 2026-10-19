@@ -4,11 +4,13 @@ export const Docs = {
   REGISTRATION_ENDPOINT: 'Register a user',
   REGISTRATION_SUCCESSFUL_RESULT: 'User registered successfully',
   REGISTRATION_BAD_REQUEST: 'Bad request',
+  REGISTRATION_FORBIDDEN: 'Service is unavailable: the user role is not configured',
   EMAIL_FORMAT: 'login@domain',
 
   AUTHORIZATION_ENDPOINT: 'Log in',
   AUTHORIZATION_SUCCESSFUL_RESULT: 'User authenticated successfully',
-  AUTHORIZATION_UNAUTHORIZED: 'Unauthorized',
+  AUTHORIZATION_BAD_REQUEST: 'Bad request',
+  AUTHORIZATION_UNAUTHORIZED: 'Wrong email or password, or the captcha is required or wrong',
 
   REFRESH_TOKENS_ENDPOINT: 'Refresh access tokens',
   REFRESH_TOKENS_SUCCESSFUL_RESULT: 'Tokens refreshed successfully',

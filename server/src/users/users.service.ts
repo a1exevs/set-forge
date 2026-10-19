@@ -1,8 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { FindOptions } from 'sequelize';
 
-import { DocumentVersions, ErrorMessages } from '@common/constants';
+import { DocumentVersions } from '@common/constants';
+import { AppException } from '@common/exceptions';
 import { RolesService } from '@roles/roles.service';
 import { CreateUserRequest } from '@users/dto';
 import { User } from '@users/users.model';
@@ -17,10 +18,7 @@ export class UsersService {
   async createUser(dto: CreateUserRequest.Dto): Promise<User> {
     const role = await this.roleService.getRoleByValue('user');
     if (!role) {
-      throw new HttpException(
-        `${ErrorMessages.SERVICE_IS_UNAVAILABLE}: ${ErrorMessages.USER_ROLE_CONFIGURATION_IS_MISSING.toLowerCase()}`,
-        HttpStatus.FORBIDDEN,
-      );
+      throw AppException.of(HttpStatus.FORBIDDEN, 'USER_ROLE_CONFIGURATION_IS_MISSING');
     }
     let user: User;
     try {
@@ -32,7 +30,7 @@ export class UsersService {
         acceptedAt: new Date(),
       });
     } catch (e) {
-      throw new HttpException(`${ErrorMessages.FAILED_TO_CREATE_USER}. ${e.message}`, HttpStatus.BAD_REQUEST);
+      throw AppException.of(HttpStatus.BAD_REQUEST, 'FAILED_TO_CREATE_USER', {}, e);
     }
     await user.$set('roles', [role.id]);
     user.roles = [role];

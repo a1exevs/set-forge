@@ -1,8 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
 import { LoginRequest } from '@auth/dto';
 import { Isession } from '@auth/interfaces';
+import { AppException } from '@common/exceptions';
 
 export const MAX_AUTH_FAILED_COUNT = 5;
 
@@ -20,7 +21,7 @@ export class SvgCaptchaGuard implements CanActivate {
         return true;
       }
 
-      throw new UnauthorizedException({ message: '' });
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'NEED_AUTHORIZATION_WITH_CAPTCHA');
     }
 
     return true;

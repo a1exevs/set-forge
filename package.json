@@ -78,6 +78,7 @@
     "server:test:unit-cov": "npm run test:unit-cov -w @set-forge/server",
     "server:test:unit-debug": "npm run test:unit-debug -w @set-forge/server",
     "server:test:e2e": "npm run test:e2e -w @set-forge/server",
+    "server:test:api": "npm run test:api -w @set-forge/server --",
     "server:db:migrate": "npm run db:migrate -w @set-forge/server",
     "server:db:migrate:undo": "npm run db:migrate:undo -w @set-forge/server",
     "server:db:migrate:undo:all": "npm run db:migrate:undo:all -w @set-forge/server",

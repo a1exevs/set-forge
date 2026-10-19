@@ -116,7 +116,7 @@ describe('HomePageLogicLayer', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
 
     await waitFor(() => {
-      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to delete workout list');
+      expect(toastErrorMock).toHaveBeenCalledWith('Failed to delete workout list');
       expect(toastSuccessMock).not.toHaveBeenCalled();
       expect(clearWorkoutSessionCachesForDeletedList).not.toHaveBeenCalled();
     });
@@ -198,7 +198,7 @@ describe('HomePageLogicLayer', () => {
     await user.click(screen.getByRole('button', { name: 'Export workout lists' }));
 
     await waitFor(() => {
-      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to export workout lists');
+      expect(toastErrorMock).toHaveBeenCalledWith('Failed to export workout lists');
       expect(toastSuccessMock).not.toHaveBeenCalled();
     });
   });
@@ -309,7 +309,7 @@ describe('HomePageLogicLayer', () => {
     }
     await user.upload(input, file);
 
-    await waitFor((): void => expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to import workout lists'));
+    await waitFor((): void => expect(toastErrorMock).toHaveBeenCalledWith('Failed to import workout lists'));
     expect(toastSuccessMock).not.toHaveBeenCalled();
   });
 });

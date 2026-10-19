@@ -1,8 +1,10 @@
 import { useNavigate } from '@tanstack/react-router';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 
 import type { UpdateWorkoutListDto, WorkoutList } from '@entities/workout-list';
-import { toastError, toastSuccess, useConfirm, useLoadingPhase, useProgress } from '@shared/lib';
+import { apiErrorText } from '@shared/api';
+import { toastError, toastSuccess, useConfirm, useLoadingPhase, useProgress, useT } from '@shared/lib';
+import { formServerErrors } from '@widgets/workout-list-form';
 
 import EditWorkoutPage from './edit-workout-page';
 
@@ -18,6 +20,8 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
   const navigate = useNavigate();
   const confirmDialog = useConfirm();
   const { run, progressOf } = useProgress<'save'>();
+  const { t } = useT();
+  const [serverFieldErrors, setServerFieldErrors] = useState<Record<string, string>>();
   const loadingPhase = useLoadingPhase(workout === undefined);
 
   // Rejects after its toast, so the button or the dialog that runs it goes back to normal and the user stays.
@@ -25,7 +29,14 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
     try {
       await updateWorkoutList(id, dto);
     } catch (error: unknown) {
-      toastError(error, 'Failed to update workout list');
+      // The form shows what it has a field for; the rest, or a failure without errors, goes to the toast.
+      const { fields, others } = formServerErrors(error, t);
+      setServerFieldErrors(fields);
+      if (others.length > 0) {
+        toastError(others.join(' '));
+      } else if (Object.keys(fields).length === 0) {
+        toastError('Failed to update workout list');
+      }
       throw error;
     }
 
@@ -33,7 +44,7 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
       try {
         await resyncSession(resyncSessionId);
       } catch (error: unknown) {
-        toastError(error, 'Failed to update the current session');
+        toastError(apiErrorText(error, t) ?? 'Failed to update the current session');
         throw error;
       }
     }
@@ -74,6 +85,7 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
       loadingPhase={loadingPhase}
       workout={workout ?? null}
       submitProgress={progressOf('save')}
+      serverFieldErrors={serverFieldErrors}
       onSubmit={(dto: UpdateWorkoutListDto): void => void onSubmit(dto)}
       onCancel={(): void => {
         navigate({ to: '/' });

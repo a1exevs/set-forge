@@ -1,5 +1,7 @@
 export { clearAccessToken, getAccessToken, setAccessToken } from './access-token-store';
 export { getApiBaseUrl } from './api-base-url';
+export type { ApiErrorItem } from './api-error';
+export { apiErrorText, apiErrorTexts } from './api-error-texts';
 export type { CommonResponseEnvelope } from './common-response';
 export { apiRequest, ApiRequestError } from './http-client';
 export { refreshAccessToken } from './refresh-access-token';

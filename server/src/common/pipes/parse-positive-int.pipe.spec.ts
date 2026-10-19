@@ -1,9 +1,8 @@
-import '@root/string.extensions';
-
 import { ArgumentMetadata, HttpStatus } from '@nestjs/common';
 
 import { ErrorMessages } from '@common/constants';
 import { ParsePositiveIntPipe } from '@common/pipes';
+import { formatMessage } from '@common/utils';
 import { sendPseudoError } from '@test/unit/helpers';
 
 describe('ParsePositiveIntPipe', () => {
@@ -36,7 +35,7 @@ describe('ParsePositiveIntPipe', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(ErrorMessages.NUMERIC_MUST_NOT_BE_LESS_THAN_N.format(0));
+        expect(error.message).toBe(formatMessage(ErrorMessages.NUMERIC_MUST_NOT_BE_LESS_THAN_N, { min: 0 }));
       }
     });
     it('should throw exception (value is string)', async () => {
@@ -47,7 +46,7 @@ describe('ParsePositiveIntPipe', () => {
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe('Validation failed (numeric string is expected)');
+        expect(error.errors.map(item => item.code)).toEqual(['MUST_BE_AN_INTEGER_NUMBER']);
       }
     });
   });

@@ -1,10 +1,10 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 
-import { ErrorMessages } from '@common/constants';
 import { ROLES_KEY } from '@common/decorators';
+import { AppException } from '@common/exceptions';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -20,7 +20,7 @@ export class RolesGuard implements CanActivate {
       const bearer = authHeader.split(' ')[0];
       const token = authHeader.split(' ')[1];
       if (bearer !== 'Bearer' || !token) {
-        throw new UnauthorizedException(ErrorMessages.UNAUTHORIZED);
+        throw AppException.of(HttpStatus.UNAUTHORIZED, 'UNAUTHORIZED');
       }
 
       const user = this.jstService.verify(token);
@@ -36,12 +36,12 @@ export class RolesGuard implements CanActivate {
           haveRoles = haveRoles && user.roles.some(userRole => userRole.value === requiredRole);
         });
         if (!haveRoles) {
-          throw new ForbiddenException(ErrorMessages.NOT_ENOUGH_PERMISSIONS);
+          throw AppException.of(HttpStatus.FORBIDDEN, 'NOT_ENOUGH_PERMISSIONS');
         }
       }
       return true;
     } catch {
-      throw new ForbiddenException(ErrorMessages.FORBIDDEN);
+      throw AppException.of(HttpStatus.FORBIDDEN, 'FORBIDDEN');
     }
   }
 }

@@ -6,6 +6,8 @@ import { answerWith } from 'tests/common/answer-confirm';
 
 import type { WorkoutList } from '@entities/workout-list';
 import type { WorkoutSession } from '@entities/workout-session';
+import { ApiRequestError } from '@shared/api';
+import { useLanguageStore } from '@shared/lib';
 
 import WorkoutModePageLogicLayer from '../workout-mode-page-logic-layer';
 
@@ -153,7 +155,37 @@ describe('WorkoutModePageLogicLayer', () => {
     await user.click(screen.getByRole('button', { name: 'Start workout' }));
 
     await waitFor((): void => {
-      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to start workout session');
+      expect(toastErrorMock).toHaveBeenCalledWith('Failed to start workout session');
+    });
+  });
+
+  it('toasts the server error of a failed start in the chosen language', async () => {
+    const user = userEvent.setup();
+    act((): void => useLanguageStore.getState().setLanguage('ru'));
+    const startSession = jest.fn().mockRejectedValue(
+      new ApiRequestError(400, {
+        data: null,
+        messages: ['Bad request'],
+        fieldsErrors: [{ code: 'BAD_REQUEST', params: {}, message: 'Bad request' }],
+        resultCode: 1,
+      }),
+    );
+
+    render(
+      <WorkoutModePageLogicLayer
+        workoutList={WORKOUT_LIST}
+        session={null}
+        startSession={startSession}
+        incrementProgress={jest.fn()}
+        finishSession={jest.fn()}
+        discardSession={jest.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Start workout' }));
+
+    await waitFor((): void => {
+      expect(toastErrorMock).toHaveBeenCalledWith('Некорректный запрос');
     });
   });
 
@@ -209,7 +241,7 @@ describe('WorkoutModePageLogicLayer', () => {
     await user.click(screen.getByRole('button', { name: 'Finish workout' }));
 
     await waitFor((): void => {
-      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to finish workout session');
+      expect(toastErrorMock).toHaveBeenCalledWith('Failed to finish workout session');
     });
   });
 

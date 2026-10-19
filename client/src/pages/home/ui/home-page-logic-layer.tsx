@@ -1,7 +1,16 @@
 import { ChangeEvent, FC, useRef } from 'react';
 
 import type { WorkoutList, WorkoutListsExportFile } from '@entities/workout-list';
-import { downloadJsonFile, toastError, toastSuccess, useConfirm, useLoadingPhase, useProgress } from '@shared/lib';
+import { apiErrorText } from '@shared/api';
+import {
+  downloadJsonFile,
+  toastError,
+  toastSuccess,
+  useConfirm,
+  useLoadingPhase,
+  useProgress,
+  useT,
+} from '@shared/lib';
 import { useMainTabSwipe } from '@widgets/main-tabs-bar';
 
 import HomePage from './home-page';
@@ -32,6 +41,7 @@ const HomePageLogicLayer: FC<Props> = ({
   const confirmDialog = useConfirm();
   const importInputRef = useRef<HTMLInputElement>(null);
   const { run, progressOf } = useProgress<'export'>();
+  const { t } = useT();
   const loadingPhase = useLoadingPhase(isLoading);
 
   const handleDelete = async (id: string, name: string): Promise<void> => {
@@ -44,7 +54,7 @@ const HomePageLogicLayer: FC<Props> = ({
         try {
           await deleteWorkoutList(id);
         } catch (error: unknown) {
-          toastError(error, 'Failed to delete workout list');
+          toastError(apiErrorText(error, t) ?? 'Failed to delete workout list');
           throw error;
         }
       },
@@ -64,7 +74,7 @@ const HomePageLogicLayer: FC<Props> = ({
         toastSuccess('Workout lists exported');
       }
     } catch (error: unknown) {
-      toastError(error, 'Failed to export workout lists');
+      toastError(apiErrorText(error, t) ?? 'Failed to export workout lists');
     }
   };
 
@@ -83,7 +93,7 @@ const HomePageLogicLayer: FC<Props> = ({
     try {
       parsed = JSON.parse(await file.text());
     } catch {
-      toastError(null, 'The selected file is not valid JSON.');
+      toastError('The selected file is not valid JSON.');
       return;
     }
 
@@ -94,7 +104,7 @@ const HomePageLogicLayer: FC<Props> = ({
         : 0;
 
     if (count === 0) {
-      toastError(null, 'The file does not contain any workout lists to import.');
+      toastError('The file does not contain any workout lists to import.');
       return;
     }
 
@@ -107,7 +117,7 @@ const HomePageLogicLayer: FC<Props> = ({
         try {
           await importWorkoutLists(parsed as WorkoutListsExportFile);
         } catch (error: unknown) {
-          toastError(error, 'Failed to import workout lists');
+          toastError(apiErrorText(error, t) ?? 'Failed to import workout lists');
           throw error;
         }
       },

@@ -12,11 +12,14 @@ import {
   hasInvalidExerciseNumericFields,
   toExerciseSubmitPayload,
 } from '../model/exercise-numeric-validation';
+import { exerciseFieldPath, isExerciseField } from '../model/form-fields';
 
 type BaseProps = {
   onCancel: () => void;
   /** The save in flight, run by the caller: the form locks its fields meanwhile. */
   submitProgress?: Progress;
+  /** The server's errors of the last save by request path (`formServerErrors`), each shown under its field. */
+  serverFieldErrors?: Record<string, string>;
 };
 
 type CreateProps = BaseProps & {
@@ -33,7 +36,7 @@ type EditProps = BaseProps & {
 type Props = CreateProps | EditProps;
 
 const WorkoutListFormLogicLayer: FC<Props> = props => {
-  const { mode, onCancel, submitProgress = 'idle' } = props;
+  const { mode, onCancel, submitProgress = 'idle', serverFieldErrors } = props;
   const initialData = props.mode === 'edit' ? props.initialData : undefined;
   const confirmDialog = useConfirm();
 
@@ -50,6 +53,31 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
       sets: ex.sets,
     })),
   );
+
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>(() => serverFieldErrors ?? {});
+
+  useEffect((): void => {
+    setServerErrors(serverFieldErrors ?? {});
+  }, [serverFieldErrors]);
+
+  // An edited field drops its server error; adding or removing an exercise shifts the positions the errors point to.
+  const dropServerErrors = (matches: (field: string) => boolean): void => {
+    setServerErrors(prev =>
+      Object.keys(prev).some(matches)
+        ? Object.fromEntries(Object.entries(prev).filter(([field]: [string, string]) => !matches(field)))
+        : prev,
+    );
+  };
+
+  const changeName = (value: string): void => {
+    setName(value);
+    dropServerErrors(field => field === 'name');
+  };
+
+  const changeDescription = (value: string): void => {
+    setDescription(value);
+    dropServerErrors(field => field === 'description');
+  };
 
   useEffect((): void => {
     if (mode === 'edit' && initialData) {
@@ -69,6 +97,7 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
   }, [mode, initialData]);
 
   const addExercise = (): void => {
+    dropServerErrors(field => field.startsWith('exercises.'));
     setExercises(prev => [
       ...prev,
       {
@@ -83,6 +112,7 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
   };
 
   const removeExercise = (tempId: string): void => {
+    dropServerErrors(field => field.startsWith('exercises.'));
     setExercises(prev => prev.filter(ex => ex.tempId !== tempId));
   };
 
@@ -91,6 +121,10 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
     field: keyof ExerciseFormData,
     value: ExerciseFormData[keyof ExerciseFormData],
   ): void => {
+    const index = exercises.findIndex(ex => ex.tempId === tempId);
+    if (isExerciseField(field)) {
+      dropServerErrors(path => path === exerciseFieldPath(index, field));
+    }
     setExercises(prev => prev.map(ex => (ex.tempId === tempId ? { ...ex, [field]: value } : ex)));
   };
 
@@ -183,8 +217,8 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
       name={name}
       description={description}
       exercises={exercises}
-      onNameChange={setName}
-      onDescriptionChange={setDescription}
+      onNameChange={changeName}
+      onDescriptionChange={changeDescription}
       onAddExercise={addExercise}
       onRemoveExercise={removeExercise}
       onUpdateExercise={updateExercise}
@@ -192,6 +226,7 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
       onCancel={onCancel}
       submitAttempted={submitAttempted}
       getExerciseNumericFieldError={getExerciseNumericFieldError}
+      getServerFieldError={(path: string): string | undefined => serverErrors[path]}
     />
   );
 };

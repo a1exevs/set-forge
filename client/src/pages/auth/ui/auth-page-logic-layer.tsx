@@ -7,7 +7,7 @@ import {
   validateRegisterEmail,
   validateRegisterPassword,
 } from '@entities/session';
-import { ApiRequestError } from '@shared/api';
+import { apiErrorTexts, ApiRequestError } from '@shared/api';
 import { useProgress, useT } from '@shared/lib';
 
 import AuthPage from './auth-page';
@@ -62,6 +62,34 @@ const AuthPageLogicLayer: FC<Props> = ({
     setFormError(null);
   }, []);
 
+  // The server's errors in the chosen language: each under its field when the form has it, the rest at the form level.
+  const showServerErrors = useCallback(
+    (err: unknown, fieldSetters: Record<string, (text: string) => void>, fallback: string): void => {
+      if (!(err instanceof ApiRequestError)) {
+        setFormError('Something went wrong');
+        return;
+      }
+      const { byField, general } = apiErrorTexts(err, t);
+      const formLevel = [...general];
+      let underFields = 0;
+      for (const [field, text] of Object.entries(byField)) {
+        const setFieldError = fieldSetters[field];
+        if (setFieldError) {
+          setFieldError(text);
+          underFields += 1;
+        } else {
+          formLevel.push(text);
+        }
+      }
+      if (formLevel.length > 0) {
+        setFormError(formLevel.join(' '));
+      } else if (underFields === 0) {
+        setFormError(fallback);
+      }
+    },
+    [t],
+  );
+
   const handleSubmit = useCallback(
     async (e: FormEvent<HTMLFormElement>): Promise<void> => {
       e.preventDefault();
@@ -86,11 +114,16 @@ const AuthPageLogicLayer: FC<Props> = ({
             await onAuthenticated(redirectTo);
           }
         } catch (err) {
-          if (err instanceof ApiRequestError) {
-            setFormError(err.envelope.messages.join(' ') || 'Registration failed');
-          } else {
-            setFormError('Something went wrong');
-          }
+          showServerErrors(
+            err,
+            {
+              email: setEmailError,
+              password: setPasswordError,
+              consent: setConsentError,
+              termsAccepted: setTermsError,
+            },
+            'Registration failed',
+          );
         }
         return;
       }
@@ -121,23 +154,20 @@ const AuthPageLogicLayer: FC<Props> = ({
         setCaptcha('');
         setCaptchaImageUrl(null);
       } catch (err) {
-        if (err instanceof ApiRequestError) {
-          if (isNeedCaptchaEnvelope(err.envelope)) {
-            setShowCaptcha(true);
-            setCaptcha('');
-            try {
-              const url = await loadCaptchaUrl();
-              setCaptchaImageUrl(url);
-            } catch {
-              setCaptchaImageUrl(null);
-            }
-            setFormError(err.envelope.messages.join(' ') || 'Captcha required');
-            return;
+        const loginFields = { email: setEmailError, password: setPasswordError, captcha: setCaptchaError };
+        if (err instanceof ApiRequestError && isNeedCaptchaEnvelope(err.envelope)) {
+          setShowCaptcha(true);
+          setCaptcha('');
+          try {
+            const url = await loadCaptchaUrl();
+            setCaptchaImageUrl(url);
+          } catch {
+            setCaptchaImageUrl(null);
           }
-          setFormError(err.envelope.messages.join(' ') || 'Login failed');
+          showServerErrors(err, loginFields, 'Captcha required');
           return;
         }
-        setFormError('Something went wrong');
+        showServerErrors(err, loginFields, 'Login failed');
       }
     },
     [
@@ -156,6 +186,7 @@ const AuthPageLogicLayer: FC<Props> = ({
       resetFieldErrors,
       run,
       showCaptcha,
+      showServerErrors,
     ],
   );
 
