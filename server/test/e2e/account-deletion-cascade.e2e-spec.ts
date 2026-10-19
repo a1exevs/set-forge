@@ -1,5 +1,3 @@
-import '@root/string.extensions';
-
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { getModelToken } from '@nestjs/sequelize';
 import * as request from 'supertest';

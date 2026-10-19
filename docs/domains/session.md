@@ -34,6 +34,7 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lin
 | deletion-cascade | Account deletion removes every user-owned row (DB cascade) |
 | refresh-single-flight | Concurrent token refreshes share one request |
 | no-open-redirect | After sign-in only an in-app `redirect` target is followed (no open redirect) |
+| captcha-counts-login-only | Only failed sign-ins lead to the captcha: after 5 in a session the login demands it, a wrong captcha keeps demanding it, a successful login starts over; a failed request elsewhere (an expired session) never counts |
 | logout-ends-on-login | Logout and account deletion end on `/login` also when the request fails |
 | user-scoped | All workout data is scoped to the signed-in user |
 | route-guards | Guest-only (`/login`, `/register`), always-public (`/privacy`, `/terms`) and protected routes |

@@ -1,0 +1,2766 @@
+{
+  "info": {
+    "name": "set-forge-server",
+    "description": "Set Forge API v1.0. `api` runs in CI (`npm run server:test:api`, against the stand started with\n`--preset=empty`) and passes against an empty database; `manual` holds what needs a person.\nVariables: `baseUrl` (the API root, `/api/1.0` included), `password`; `email` is generated per run.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Every response but the health check comes in the envelope, and every error in it carries a code.",
+          "if (!pm.request.url.getPath().endsWith(\"/health\")) {",
+          "    pm.test(\"Envelope: data, messages, fieldsErrors, resultCode\", function () {",
+          "        pm.expect(pm.response.json()).to.have.all.keys(\"data\", \"messages\", \"fieldsErrors\", \"resultCode\");",
+          "    });",
+          "    if (pm.response.code >= 400) {",
+          "        pm.test(\"Every error has a code, params and its text in messages\", function () {",
+          "            var body = pm.response.json();",
+          "            pm.expect(body.fieldsErrors).to.not.be.empty;",
+          "            body.fieldsErrors.forEach(function (error, index) {",
+          "                pm.expect(error.code).to.be.a(\"string\");",
+          "                pm.expect(error.params).to.be.an(\"object\");",
+          "                var text = error.field ? error.field + \" - \" + error.message : error.message;",
+          "                pm.expect(body.messages[index]).to.eql(text);",
+          "            });",
+          "        });",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "api",
+      "item": [
+        {
+          "name": "health",
+          "item": [
+            {
+              "name": "health check",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/health",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Health: 200 outside the envelope\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json()).to.eql({ status: \"ok\" });",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "unknown route (not found)",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/nowhere",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "nowhere"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"404 with the error codes\", function () {",
+                      "    pm.response.to.have.status(404);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"NOT_FOUND\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "auth",
+          "item": [
+            {
+              "name": "registration (invalid fields - bad request)",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/registration",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "registration"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"not-an-email\",\n  \"password\": \"short\",\n  \"consent\": false,\n  \"termsAccepted\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"400 with the error codes\", function () {",
+                      "    pm.response.to.have.status(400);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"MUST_HAS_EMAIL_FORMAT\",\"params\":{},\"field\":\"email\"},{\"code\":\"STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N\",\"params\":{\"min\":8,\"max\":50},\"field\":\"password\"},{\"code\":\"CONSENT_TO_PERSONAL_DATA_PROCESSING_IS_REQUIRED\",\"params\":{},\"field\":\"consent\"}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "registration",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/registration",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "registration"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"consent\": true,\n  \"termsAccepted\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "// A fresh user per run: the collection runs against an empty database and any number of times against dev.",
+                      "pm.collectionVariables.set(\"email\", \"api-\" + Date.now() + \"-\" + Math.floor(Math.random() * 1e6) + \"@example.test\");"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Registration: 201\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    pm.expect(pm.response.json().data.accessToken).to.be.a(\"string\");",
+                      "    pm.expect(pm.cookies.has(\"refreshToken\")).to.be.true;",
+                      "});",
+                      "var data = pm.response.json().data;",
+                      "pm.collectionVariables.set(\"access_token\", data.accessToken);",
+                      "pm.collectionVariables.set(\"current_user_id\", data.userId);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "registration (user exists - bad request)",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/registration",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "registration"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"consent\": true,\n  \"termsAccepted\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"400 with the error codes\", function () {",
+                      "    pm.response.to.have.status(400);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"USER_ALREADY_EXISTS\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "login (wrong password - unauthorized)",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"WrongPass123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"401 with the error codes\", function () {",
+                      "    pm.response.to.have.status(401);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"INVALID_EMAIL_OR_PASSWORD\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "login",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Login: 201\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    pm.expect(pm.response.json().data.accessToken).to.be.a(\"string\");",
+                      "    pm.expect(pm.cookies.has(\"refreshToken\")).to.be.true;",
+                      "});",
+                      "var data = pm.response.json().data;",
+                      "pm.collectionVariables.set(\"access_token\", data.accessToken);",
+                      "pm.collectionVariables.set(\"current_user_id\", data.userId);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get current user (no token - unauthorized)",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"401 with the error codes\", function () {",
+                      "    pm.response.to.have.status(401);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"UNAUTHORIZED\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "refresh access token",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/refresh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "refresh"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Refresh: 201\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    pm.expect(pm.response.json().data.accessToken).to.be.a(\"string\");",
+                      "});",
+                      "pm.collectionVariables.set(\"access_token\", pm.response.json().data.accessToken);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "refresh access token (no cookie - unauthorized)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/refresh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "refresh"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"401 with the error codes\", function () {",
+                      "    pm.response.to.have.status(401);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"UNAUTHORIZED\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableCookies": true
+              }
+            },
+            {
+              "name": "get current user",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Get current user: 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    var data = pm.response.json().data;",
+                      "    pm.expect(data.id).to.eql(Number(pm.collectionVariables.get(\"current_user_id\")));",
+                      "    pm.expect(data.email).to.eql(pm.collectionVariables.get(\"email\"));",
+                      "    pm.expect(data.documentsPendingAcceptance).to.be.a(\"boolean\");",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "accept documents",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/documents-acceptance",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "documents-acceptance"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Accept documents: 200, nothing pending\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.documentsPendingAcceptance).to.eql(false);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "security",
+          "item": [
+            {
+              "name": "get captcha URL",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/security/get-captcha-url",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "security",
+                    "get-captcha-url"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Get captcha URL: 200 with an SVG\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.captchaURL.startsWith(\"data:image/svg+xml\")).to.be.true;",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "workout-lists",
+          "item": [
+            {
+              "name": "get workout lists",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Get workout lists: 200 with an array\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data).to.be.an(\"array\");",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "create workout list (empty exercises - bad request)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Empty Day\",\n  \"description\": \"\",\n  \"exercises\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"400 with the error codes\", function () {",
+                      "    pm.response.to.have.status(400);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"ARRAY_MUST_NOT_BE_SHORTER_THAN_N\",\"params\":{\"min\":1},\"field\":\"exercises\"}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "create workout list (invalid exercise - bad request)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Push Day\",\n  \"description\": \"Chest, shoulders, triceps\",\n  \"exercises\": [\n    {\n      \"name\": 1,\n      \"muscleGroup\": \"wings\",\n      \"weight\": 60,\n      \"reps\": 10,\n      \"sets\": 0\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"400 with the error codes\", function () {",
+                      "    pm.response.to.have.status(400);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"MUST_BE_A_STRING\",\"params\":{},\"field\":\"exercises.0.name\"},{\"code\":\"MUST_BE_ONE_OF\",\"params\":{\"values\":\"chest, back, legs, shoulders, arms, core, cardio\"},\"field\":\"exercises.0.muscleGroup\"},{\"code\":\"NUMERIC_MUST_NOT_BE_LESS_THAN_N\",\"params\":{\"min\":1},\"field\":\"exercises.0.sets\"}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "create workout list",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Push Day\",\n  \"description\": \"Chest, shoulders, triceps\",\n  \"exercises\": [\n    {\n      \"name\": \"Bench Press\",\n      \"muscleGroup\": \"chest\",\n      \"weight\": 60,\n      \"reps\": 10,\n      \"sets\": 3\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Create workout list: 201\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "var data = pm.response.json().data;",
+                      "pm.collectionVariables.set(\"workout_list_id\", data.id);",
+                      "pm.collectionVariables.set(\"exercise_id\", data.exercises[0].id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get workout list by id",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists/{{workout_list_id}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists",
+                    "{{workout_list_id}}"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Get workout list: 200, the same id\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.id).to.eql(pm.collectionVariables.get(\"workout_list_id\"));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get workout list by id (unknown - not found)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists/00000000-0000-0000-0000-000000000000",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists",
+                    "00000000-0000-0000-0000-000000000000"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"404 with the error codes\", function () {",
+                      "    pm.response.to.have.status(404);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"NOT_FOUND\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "update workout list",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists/{{workout_list_id}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists",
+                    "{{workout_list_id}}"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Push Day\",\n  \"description\": \"Chest, shoulders, triceps\",\n  \"exercises\": [\n    {\n      \"id\": \"{{exercise_id}}\",\n      \"name\": \"Bench Press\",\n      \"muscleGroup\": \"chest\",\n      \"weight\": 65,\n      \"reps\": 10,\n      \"sets\": 3\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Update workout list: 200, renamed\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.name).to.eql(\"Updated Push Day\");",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "update workout list (empty exercises - bad request)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists/{{workout_list_id}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists",
+                    "{{workout_list_id}}"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Push Day\",\n  \"description\": \"Chest, shoulders, triceps\",\n  \"exercises\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"400 with the error codes\", function () {",
+                      "    pm.response.to.have.status(400);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"ARRAY_MUST_NOT_BE_SHORTER_THAN_N\",\"params\":{\"min\":1},\"field\":\"exercises\"}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "export all workout lists",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists/export",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists",
+                    "export"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Export: 200 with an export file\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    var data = pm.response.json().data;",
+                      "    pm.expect(data.formatVersion).to.eql(1);",
+                      "    pm.expect(data.app).to.eql(\"set-forge\");",
+                      "    pm.expect(data.workoutLists).to.be.an(\"array\");",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "import workout lists",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists/import",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists",
+                    "import"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"formatVersion\": 1,\n  \"app\": \"set-forge\",\n  \"exportedAt\": \"2026-06-03T12:00:00.000Z\",\n  \"workoutLists\": [\n    {\n      \"name\": \"Imported Push Day\",\n      \"description\": \"Chest, shoulders, triceps\",\n      \"exercises\": [\n        {\n          \"name\": \"Bench Press\",\n          \"muscleGroup\": \"chest\",\n          \"weight\": 60,\n          \"reps\": 10,\n          \"sets\": 3\n        }\n      ]\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Import: 201 with the imported lists\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    var data = pm.response.json().data;",
+                      "    pm.expect(data.importedCount).to.eql(1);",
+                      "    pm.expect(data.lists).to.have.length(1);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "import workout lists (unknown version - bad request)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists/import",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists",
+                    "import"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"formatVersion\": 2,\n  \"app\": \"set-forge\",\n  \"exportedAt\": \"2026-06-03T12:00:00.000Z\",\n  \"workoutLists\": [\n    {\n      \"name\": \"Imported Push Day\",\n      \"description\": \"Chest, shoulders, triceps\",\n      \"exercises\": [\n        {\n          \"name\": \"Bench Press\",\n          \"muscleGroup\": \"chest\",\n          \"weight\": 60,\n          \"reps\": 10,\n          \"sets\": 3\n        }\n      ]\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"400 with the error codes\", function () {",
+                      "    pm.response.to.have.status(400);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"UNSUPPORTED_EXPORT_FILE_VERSION\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "import workout lists (not an export file - bad request)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists/import",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists",
+                    "import"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"lists\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"400 with the error codes\", function () {",
+                      "    pm.response.to.have.status(400);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"INVALID_IMPORT_FILE_FORMAT\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "delete workout list",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists/{{workout_list_id}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists",
+                    "{{workout_list_id}}"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Delete workout list: 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.result).to.eql(true);",
+                      "});",
+                      "pm.collectionVariables.unset(\"workout_list_id\");",
+                      "pm.collectionVariables.unset(\"exercise_id\");"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "workout-sessions",
+          "item": [
+            {
+              "name": "create session test list",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-lists",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-lists"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Session Day\",\n  \"description\": \"Chest, shoulders, triceps\",\n  \"exercises\": [\n    {\n      \"name\": \"Bench Press\",\n      \"muscleGroup\": \"chest\",\n      \"weight\": 60,\n      \"reps\": 10,\n      \"sets\": 3\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Create session test list: 201\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "pm.collectionVariables.set(\"session_list_id\", pm.response.json().data.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "start workout session (not a UUID - bad request)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"workoutListId\": \"not-a-uuid\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"400 with the error codes\", function () {",
+                      "    pm.response.to.have.status(400);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"MUST_BE_A_UUID\",\"params\":{},\"field\":\"workoutListId\"}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "start workout session (unknown list - not found)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"workoutListId\": \"00000000-0000-4000-8000-000000000000\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"404 with the error codes\", function () {",
+                      "    pm.response.to.have.status(404);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"NOT_FOUND\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "start workout session",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"workoutListId\": \"{{session_list_id}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Start: 201 with an active session\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    pm.expect(pm.response.json().data.status).to.eql(\"active\");",
+                      "});",
+                      "var data = pm.response.json().data;",
+                      "pm.collectionVariables.set(\"session_id\", data.id);",
+                      "pm.collectionVariables.set(\"session_exercise_id\", data.exercises[0].id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "resume workout session",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"workoutListId\": \"{{session_list_id}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Resume: 200, the same session\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.id).to.eql(pm.collectionVariables.get(\"session_id\"));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get active workout session",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions/active?workoutListId={{session_list_id}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions",
+                    "active"
+                  ],
+                  "query": [
+                    {
+                      "key": "workoutListId",
+                      "value": "{{session_list_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Get active: 200, the same session\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.id).to.eql(pm.collectionVariables.get(\"session_id\"));",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get workout history",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions?limit=20&offset=0",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"History: 200 with items, total and hasMore\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    var data = pm.response.json().data;",
+                      "    pm.expect(data.items).to.be.an(\"array\");",
+                      "    pm.expect(data).to.have.property(\"total\");",
+                      "    pm.expect(data).to.have.property(\"hasMore\");",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get workout history (limit over the max - bad request)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions?limit=51&offset=0",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "51"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"400 with the error codes\", function () {",
+                      "    pm.response.to.have.status(400);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"NUMERIC_MUST_NOT_BE_GREATER_THAN_N\",\"params\":{\"max\":50},\"field\":\"limit\"}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "increment session exercise progress",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions/{{session_id}}/exercises/{{session_exercise_id}}/progress",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions",
+                    "{{session_id}}",
+                    "exercises",
+                    "{{session_exercise_id}}",
+                    "progress"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Increment progress: 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.exercises[0].completedSets).to.eql(1);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "resync workout session",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions/{{session_id}}/resync",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions",
+                    "{{session_id}}",
+                    "resync"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Resync: 201\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    pm.expect(pm.response.json().data.exercises).to.be.an(\"array\");",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "finish workout session",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions/{{session_id}}/finish",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions",
+                    "{{session_id}}",
+                    "finish"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Finish: 201, completed\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    pm.expect(pm.response.json().data.status).to.eql(\"completed\");",
+                      "    pm.expect(pm.response.json().data.finishedAt).to.be.a(\"string\");",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "discard workout session (finished - bad request)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions/{{session_id}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions",
+                    "{{session_id}}"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"400 with the error codes\", function () {",
+                      "    pm.response.to.have.status(400);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"BAD_REQUEST\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "start another workout session",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"workoutListId\": \"{{session_list_id}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Start after finish: 201, a new session\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    pm.expect(pm.response.json().data.id).to.not.eql(pm.collectionVariables.get(\"session_id\"));",
+                      "});",
+                      "var data = pm.response.json().data;",
+                      "pm.collectionVariables.set(\"session_id\", data.id);",
+                      "pm.collectionVariables.set(\"session_exercise_id\", data.exercises[0].id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "discard workout session",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/workout-sessions/{{session_id}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "workout-sessions",
+                    "{{session_id}}"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Discard: 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.result).to.eql(true);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "resync stays active when sets reduced",
+              "item": [
+                {
+                  "name": "create resync test list",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/workout-lists",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "workout-lists"
+                      ]
+                    },
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"name\": \"Resync Auto Finish Day\",\n  \"description\": \"Sets reduced on resync\",\n  \"exercises\": [\n    {\n      \"name\": \"Bench Press\",\n      \"muscleGroup\": \"chest\",\n      \"weight\": 60,\n      \"reps\": 10,\n      \"sets\": 4\n    }\n  ]\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                          "pm.test(\"Create resync test list: 201\", function () {",
+                          "    pm.response.to.have.status(201);",
+                          "});",
+                          "var data = pm.response.json().data;",
+                          "pm.collectionVariables.set(\"resync_list_id\", data.id);",
+                          "pm.collectionVariables.set(\"resync_template_exercise_id\", data.exercises[0].id);"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "start resync test session",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/workout-sessions",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "workout-sessions"
+                      ]
+                    },
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"workoutListId\": \"{{resync_list_id}}\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                          "pm.test(\"Start resync test session: 201\", function () {",
+                          "    pm.response.to.have.status(201);",
+                          "});",
+                          "var data = pm.response.json().data;",
+                          "pm.collectionVariables.set(\"resync_session_id\", data.id);",
+                          "pm.collectionVariables.set(\"resync_session_exercise_id\", data.exercises[0].id);"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "increment resync session progress (1/3)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PATCH",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/workout-sessions/{{resync_session_id}}/exercises/{{resync_session_exercise_id}}/progress",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "workout-sessions",
+                        "{{resync_session_id}}",
+                        "exercises",
+                        "{{resync_session_exercise_id}}",
+                        "progress"
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                          "pm.test(\"Increment resync progress 1/3: 200\", function () {",
+                          "    pm.response.to.have.status(200);",
+                          "    pm.expect(pm.response.json().data.exercises[0].completedSets).to.eql(1);",
+                          "});"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "increment resync session progress (2/3)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PATCH",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/workout-sessions/{{resync_session_id}}/exercises/{{resync_session_exercise_id}}/progress",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "workout-sessions",
+                        "{{resync_session_id}}",
+                        "exercises",
+                        "{{resync_session_exercise_id}}",
+                        "progress"
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                          "pm.test(\"Increment resync progress 2/3: 200\", function () {",
+                          "    pm.response.to.have.status(200);",
+                          "    pm.expect(pm.response.json().data.exercises[0].completedSets).to.eql(2);",
+                          "});"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "increment resync session progress (3/3)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PATCH",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/workout-sessions/{{resync_session_id}}/exercises/{{resync_session_exercise_id}}/progress",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "workout-sessions",
+                        "{{resync_session_id}}",
+                        "exercises",
+                        "{{resync_session_exercise_id}}",
+                        "progress"
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                          "pm.test(\"Increment resync progress 3/3: 200\", function () {",
+                          "    pm.response.to.have.status(200);",
+                          "    pm.expect(pm.response.json().data.exercises[0].completedSets).to.eql(3);",
+                          "});"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "reduce template sets to 2",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/workout-lists/{{resync_list_id}}",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "workout-lists",
+                        "{{resync_list_id}}"
+                      ]
+                    },
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"name\": \"Resync Auto Finish Day\",\n  \"description\": \"Sets reduced on resync\",\n  \"exercises\": [\n    {\n      \"id\": \"{{resync_template_exercise_id}}\",\n      \"name\": \"Bench Press\",\n      \"muscleGroup\": \"chest\",\n      \"weight\": 60,\n      \"reps\": 10,\n      \"sets\": 2\n    }\n  ]\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                          "pm.test(\"Reduce template sets: 200\", function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "resync stays active when sets reduced",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/workout-sessions/{{resync_session_id}}/resync",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "workout-sessions",
+                        "{{resync_session_id}}",
+                        "resync"
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                          "pm.test(\"Resync: 201, still active, progress clamped to the new sets\", function () {",
+                          "    pm.response.to.have.status(201);",
+                          "    var data = pm.response.json().data;",
+                          "    pm.expect(data.status).to.eql(\"active\");",
+                          "    pm.expect(data.finishedAt).to.eql(null);",
+                          "    pm.expect(data.exercises[0].completedSets).to.eql(2);",
+                          "    pm.expect(data.exercises[0].sets).to.eql(2);",
+                          "});"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "auth (end of session)",
+          "item": [
+            {
+              "name": "logout",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "logout"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Logout: 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.result).to.eql(true);",
+                      "});",
+                      "pm.collectionVariables.unset(\"access_token\");"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "login again",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Login: 201\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "var data = pm.response.json().data;",
+                      "pm.collectionVariables.set(\"access_token\", data.accessToken);",
+                      "pm.collectionVariables.set(\"current_user_id\", data.userId);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "delete account",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "account"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Delete account: 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.result).to.eql(true);",
+                      "});",
+                      "// The account is gone — the chained variables must not leak into a next run.",
+                      "[\"access_token\", \"current_user_id\", \"session_list_id\", \"session_id\", \"session_exercise_id\", \"resync_list_id\",",
+                      "    \"resync_template_exercise_id\", \"resync_session_id\", \"resync_session_exercise_id\"].forEach(function (name) {",
+                      "    pm.collectionVariables.unset(name);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "manual",
+      "description": "Requests that need a person; CI never runs this folder. Each subfolder describes its walk.",
+      "item": [
+        {
+          "name": "captcha",
+          "description": "Requests that need a person: the captcha text is only in the SVG image, so CI never runs this folder\n(`newman run … --folder api`). Walk it by hand in Postman against a running server:\n\n1. Run `api` → `auth` → `registration` once (it sets `email`), or set `email` to an existing user.\n2. Run `login (wrong password)` five times: the 1st–4th answer 401 with `INVALID_EMAIL_OR_PASSWORD` and\n   `resultCode` 1, the 5th adds `NEED_AUTHORIZATION_WITH_CAPTCHA` with `resultCode` 10.\n3. Run `login (wrong captcha)`: 401, `resultCode` 10, the only error `NEED_AUTHORIZATION_WITH_CAPTCHA`.\n4. Run `get captcha URL`, open `data.captchaURL` in a browser, type the text into the `captcha_text` variable.\n5. Run `login (with captcha)`: 201 — the counter is reset, the next failed login is plain again.\n\nPostman keeps the session cookie between the requests; the counter lives in that session.",
+          "item": [
+            {
+              "name": "login (wrong password)",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"WrongPass123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"401 with INVALID_EMAIL_OR_PASSWORD first\", function () {",
+                      "    pm.response.to.have.status(401);",
+                      "    pm.expect(pm.response.json().fieldsErrors[0].code).to.eql(\"INVALID_EMAIL_OR_PASSWORD\");",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "login (wrong captcha)",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"captcha\": \"wrong\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"401 with the error codes\", function () {",
+                      "    pm.response.to.have.status(401);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(10);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"NEED_AUTHORIZATION_WITH_CAPTCHA\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get captcha URL",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/security/get-captcha-url",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "security",
+                    "get-captcha-url"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Get captcha URL: 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "login (with captcha)",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"captcha\": \"{{captcha_text}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Login with captcha: 201\", function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "var data = pm.response.json().data;",
+                      "pm.collectionVariables.set(\"access_token\", data.accessToken);",
+                      "pm.collectionVariables.set(\"current_user_id\", data.userId);"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/1.0"
+    },
+    {
+      "key": "password",
+      "value": "StrongPass123!"
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "captcha_text",
+      "value": ""
+    }
+  ]
+}

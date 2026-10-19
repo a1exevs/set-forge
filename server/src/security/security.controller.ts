@@ -1,10 +1,9 @@
-import { Controller, Get, Req, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Req } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { Isession } from '@auth/interfaces';
 import { Docs, Routes } from '@common/constants';
 import { CommonResponse } from '@common/dto';
-import { ResponseInterceptor } from '@common/interceptors';
 import { SecurityService } from '@security/security.service';
 
 @ApiTags(Docs.SECURITY_CONTROLLER)
@@ -14,7 +13,6 @@ export class SecurityController {
 
   @ApiOperation({ summary: Docs.GET_CAPTCHA_URL_ENDPOINT })
   @ApiOkResponse({ type: CommonResponse.Swagger.CommonResponseDto })
-  @UseInterceptors(ResponseInterceptor)
   @Get('get-captcha-url')
   async getCaptchaURL(@Req() request) {
     const { captchaURL, captchaText } = await this.securityService.getCaptchaURL();

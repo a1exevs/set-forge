@@ -1,7 +1,6 @@
-import '@root/string.extensions';
-
 import { RegisterRequest } from '@auth/dto';
 import { ErrorMessages } from '@common/constants';
+import { formatMessage } from '@common/utils';
 import { validateDto } from '@test/unit/helpers';
 
 describe('RegisterRequest', () => {
@@ -35,7 +34,7 @@ describe('RegisterRequest', () => {
       expect(errors[1].property).toBe('password');
       expect(errors[1].constraints.isString).toBe(ErrorMessages.MUST_BE_A_STRING);
       expect(errors[1].constraints.isLength).toBe(
-        ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(8, 50),
+        formatMessage(ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N, { min: 8, max: 50 }),
       );
     });
     it('should has error (incorrect email)', async () => {
@@ -53,7 +52,7 @@ describe('RegisterRequest', () => {
       expect(errors[0].property).toBe('password');
       expect(errors[0].constraints.isString).toBeUndefined();
       expect(errors[0].constraints.isLength).toBe(
-        ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(8, 50),
+        formatMessage(ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N, { min: 8, max: 50 }),
       );
     });
     it('should has error (password has greater symbols than 50)', async () => {
@@ -68,7 +67,7 @@ describe('RegisterRequest', () => {
       expect(errors[0].property).toBe('password');
       expect(errors[0].constraints.isString).toBeUndefined();
       expect(errors[0].constraints.isLength).toBe(
-        ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N.format(8, 50),
+        formatMessage(ErrorMessages.STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N, { min: 8, max: 50 }),
       );
     });
     // @invariant session/separate-consent

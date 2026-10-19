@@ -1,52 +1,17 @@
-import '@root/string.extensions';
+import { formatMessage } from '@common/utils';
 
-import { formatString } from '@common/utils';
-
-describe('FormattersUtil', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+describe('formatMessage', () => {
+  it('should fill the named placeholders', () => {
+    expect(formatMessage('Length must be greater than {min} and less than {max}', { min: 8, max: 50 })).toBe(
+      'Length must be greater than 8 and less than 50',
+    );
   });
 
-  describe('formatString', () => {
-    it('should be successful result (3 different parameters)', () => {
-      const testStr = 'test {0} {1} {2}';
-      const firstValue = testStr;
-      const expectedStr = 'test 1 2 3';
-      const result = formatString.call(testStr, '1', '2', '3');
-      expect(result).toBe(expectedStr);
-      expect(testStr).toBe(firstValue);
-    });
-    it('should be successful result (with the same parameters)', () => {
-      const testStr = 'test {0} {0} {1}';
-      const firstValue = testStr;
-      const expectedStr = 'test 1 1 2';
-      const result = formatString.call(testStr, '1', '2');
-      expect(result).toBe(expectedStr);
-      expect(testStr).toBe(firstValue);
-    });
-    it('should be successful result (parameters are numbers)', () => {
-      const testStr = 'test {0} {1} {2}';
-      const firstValue = testStr;
-      const expectedStr = 'test 1 2 3';
-      const result = formatString.call(testStr, 1, 2, 3);
-      expect(result).toBe(expectedStr);
-      expect(testStr).toBe(firstValue);
-    });
-    it('should be successful result (parameters are an array)', () => {
-      const testStr = 'test {0} {1} {2}';
-      const firstValue = testStr;
-      const expectedStr = 'test 1 2 3';
-      const result = formatString.call(testStr, [1, 2, 3]);
-      expect(result).toBe(expectedStr);
-      expect(testStr).toBe(firstValue);
-    });
-    it('String class should has format-method', () => {
-      const testStr = 'test {0} {1} {2}';
-      const firstValue = testStr;
-      const expectedStr = 'test 1 2 3';
-      const result = testStr.format([1, 2, 3]);
-      expect(result).toBe(expectedStr);
-      expect(testStr).toBe(firstValue);
-    });
+  it('should fill a placeholder used twice', () => {
+    expect(formatMessage('{n} of {n}', { n: 3 })).toBe('3 of 3');
+  });
+
+  it('should keep a placeholder without its param', () => {
+    expect(formatMessage('Must be one of: {values}')).toBe('Must be one of: {values}');
   });
 });

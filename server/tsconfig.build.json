@@ -7,7 +7,6 @@
     ".stack",
     "**/*spec.ts",
     "coverage",
-    "_stub",
     "assets",
     "test-environment.ts",
     "linter",
