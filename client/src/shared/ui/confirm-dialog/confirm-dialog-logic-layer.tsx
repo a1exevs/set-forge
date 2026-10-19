@@ -1,3 +1,4 @@
+import { isNotNull, type Nullable } from '@alexevs/ts-guards';
 import type { FC } from 'react';
 import { useCallback } from 'react';
 
@@ -7,7 +8,7 @@ import ConfirmDialog from './confirm-dialog';
 
 type Props = {
   open: boolean;
-  options: ConfirmOptions | null;
+  options: Nullable<ConfirmOptions>;
   onAnswer: (answer: ConfirmResult) => void;
   progressOf: (answer: ConfirmResult) => Progress;
 };
@@ -23,7 +24,7 @@ const ConfirmDialogLogicLayer: FC<Props> = ({ open, options, onAnswer, progressO
 
   return (
     <ConfirmDialog
-      open={open && options != null}
+      open={open && isNotNull(options)}
       title={title}
       description={options?.description}
       confirmationText={options?.confirmationText ?? ''}
