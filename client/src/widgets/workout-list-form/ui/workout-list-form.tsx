@@ -7,6 +7,7 @@ import { Button, NotFoundMessage, NumericField, Select } from '@shared/ui';
 import classes from './workout-list-form.module.scss';
 import { muscleGroupOptions } from '../config/muscle-group-options';
 import type { ExerciseFormData } from '../model/exercise-form-data';
+import { exerciseFieldPath } from '../model/form-fields';
 
 type Props = {
   /** No list to edit: the not-found message instead of the form. */
@@ -34,8 +35,8 @@ type Props = {
     exercise: Pick<ExerciseFormData, 'weight' | 'reps' | 'sets'>,
     field: 'weight' | 'reps' | 'sets',
   ) => string | undefined;
-  /** The server's error of a field by its request path (`name`, `exercises.0.sets`). */
-  getServerFieldError: (field: string) => string | undefined;
+  /** The server's error of a field by its request path (`name`, `exerciseFieldPath(0, 'sets')`). */
+  getServerFieldError: (path: string) => string | undefined;
 };
 
 const WorkoutListForm: FC<Props> = ({
@@ -147,8 +148,8 @@ const WorkoutListForm: FC<Props> = ({
                           placeholder="Bench Press"
                           required
                         />
-                        {getServerFieldError(`exercises.${index}.name`) && (
-                          <p className={classes.fieldError}>{getServerFieldError(`exercises.${index}.name`)}</p>
+                        {getServerFieldError(exerciseFieldPath(index, 'name')) && (
+                          <p className={classes.fieldError}>{getServerFieldError(exerciseFieldPath(index, 'name'))}</p>
                         )}
                       </div>
 
@@ -164,8 +165,10 @@ const WorkoutListForm: FC<Props> = ({
                             }
                           }}
                         />
-                        {getServerFieldError(`exercises.${index}.muscleGroup`) && (
-                          <p className={classes.fieldError}>{getServerFieldError(`exercises.${index}.muscleGroup`)}</p>
+                        {getServerFieldError(exerciseFieldPath(index, 'muscleGroup')) && (
+                          <p className={classes.fieldError}>
+                            {getServerFieldError(exerciseFieldPath(index, 'muscleGroup'))}
+                          </p>
                         )}
                       </div>
 
@@ -179,7 +182,7 @@ const WorkoutListForm: FC<Props> = ({
                           size="sm"
                           error={
                             (submitAttempted ? getExerciseNumericFieldError(exercise, 'weight') : undefined) ??
-                            getServerFieldError(`exercises.${index}.weight`)
+                            getServerFieldError(exerciseFieldPath(index, 'weight'))
                           }
                         />
                         <NumericField
@@ -191,7 +194,7 @@ const WorkoutListForm: FC<Props> = ({
                           size="sm"
                           error={
                             (submitAttempted ? getExerciseNumericFieldError(exercise, 'reps') : undefined) ??
-                            getServerFieldError(`exercises.${index}.reps`)
+                            getServerFieldError(exerciseFieldPath(index, 'reps'))
                           }
                         />
                         <NumericField
@@ -203,7 +206,7 @@ const WorkoutListForm: FC<Props> = ({
                           size="sm"
                           error={
                             (submitAttempted ? getExerciseNumericFieldError(exercise, 'sets') : undefined) ??
-                            getServerFieldError(`exercises.${index}.sets`)
+                            getServerFieldError(exerciseFieldPath(index, 'sets'))
                           }
                         />
                       </div>

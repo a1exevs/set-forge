@@ -12,6 +12,7 @@ import {
   hasInvalidExerciseNumericFields,
   toExerciseSubmitPayload,
 } from '../model/exercise-numeric-validation';
+import { exerciseFieldPath, isExerciseField } from '../model/form-fields';
 
 type BaseProps = {
   onCancel: () => void;
@@ -121,7 +122,9 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
     value: ExerciseFormData[keyof ExerciseFormData],
   ): void => {
     const index = exercises.findIndex(ex => ex.tempId === tempId);
-    dropServerErrors(path => path === `exercises.${index}.${field}`);
+    if (isExerciseField(field)) {
+      dropServerErrors(path => path === exerciseFieldPath(index, field));
+    }
     setExercises(prev => prev.map(ex => (ex.tempId === tempId ? { ...ex, [field]: value } : ex)));
   };
 
@@ -223,7 +226,7 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
       onCancel={onCancel}
       submitAttempted={submitAttempted}
       getExerciseNumericFieldError={getExerciseNumericFieldError}
-      getServerFieldError={(field: string): string | undefined => serverErrors[field]}
+      getServerFieldError={(path: string): string | undefined => serverErrors[path]}
     />
   );
 };
