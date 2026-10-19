@@ -104,6 +104,7 @@ describe('WorkoutListForm', () => {
           onCancel={(): void => undefined}
           submitAttempted={false}
           getExerciseNumericFieldError={getExerciseNumericFieldError}
+          getServerFieldError={(): undefined => undefined}
         />
       </ConfirmDialogProvider>,
     );

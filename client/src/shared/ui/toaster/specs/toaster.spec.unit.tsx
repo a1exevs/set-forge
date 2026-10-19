@@ -19,20 +19,12 @@ describe('toast helpers', () => {
     expect(successSpy).toHaveBeenCalledWith('Workout list created');
   });
 
-  it('toastError uses Error.message when error is an Error', () => {
+  it('toastError calls toast.error with the message', () => {
     const errorSpy = jest.spyOn(toast, 'error').mockImplementation((): string | number => 'err');
 
-    toastError(new Error('Server unavailable'), 'Failed to create workout list');
+    toastError('Нет связи с сервером');
 
-    expect(errorSpy).toHaveBeenCalledWith('Server unavailable');
-  });
-
-  it('toastError uses fallback when error is not an Error', () => {
-    const errorSpy = jest.spyOn(toast, 'error').mockImplementation((): string | number => 'err');
-
-    toastError('network', 'Failed to create workout list');
-
-    expect(errorSpy).toHaveBeenCalledWith('Failed to create workout list');
+    expect(errorSpy).toHaveBeenCalledWith('Нет связи с сервером');
   });
 });
 
@@ -66,7 +58,7 @@ describe('Toaster', () => {
   it('shows an error toast when toastError is called', async () => {
     render(<Toaster />);
 
-    toastError(new Error('Something went wrong'), 'Failed');
+    toastError('Something went wrong');
 
     await waitFor((): void => {
       expect(screen.getByText('Something went wrong')).toBeInTheDocument();

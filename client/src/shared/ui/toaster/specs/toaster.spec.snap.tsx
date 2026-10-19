@@ -35,23 +35,11 @@ describe('Toaster', () => {
 
   it('matches snapshot for error toast', async () => {
     const { baseElement } = await showAndSnapshot((): void => {
-      toastError(new Error('Failed to update workout list'), 'Failed');
+      toastError('Failed to update workout list');
     });
 
     await waitFor((): void => {
       expect(screen.getByText('Failed to update workout list')).toBeInTheDocument();
-    });
-
-    expect(baseElement).toMatchSnapshot();
-  });
-
-  it('matches snapshot for fallback error toast', async () => {
-    const { baseElement } = await showAndSnapshot((): void => {
-      toastError(null, 'Failed to start workout session');
-    });
-
-    await waitFor((): void => {
-      expect(screen.getByText('Failed to start workout session')).toBeInTheDocument();
     });
 
     expect(baseElement).toMatchSnapshot();

@@ -3,7 +3,8 @@ import { FC, useEffect, useRef, useState } from 'react';
 import type { WorkoutList } from '@entities/workout-list';
 import { countCompletedExercises, isSessionFullyComplete, type WorkoutSession } from '@entities/workout-session';
 import { hasRemainingSets } from '@entities/workout-session-exercise';
-import { toastError, useConfirm, useLoadingPhase, useProgress } from '@shared/lib';
+import { apiErrorText } from '@shared/api';
+import { toastError, useConfirm, useLoadingPhase, useProgress, useT } from '@shared/lib';
 
 import WorkoutModePage from './workout-mode-page';
 import { fireWorkoutCompleteConfetti } from '../lib/fire-workout-complete-confetti';
@@ -27,6 +28,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
 }) => {
   const confirmDialog = useConfirm();
   const { run, progressOf } = useProgress<'start'>();
+  const { t } = useT();
   const loadingPhase = useLoadingPhase(workoutList === undefined);
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
   const lastTapRef = useRef<Record<string, number>>({});
@@ -55,7 +57,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     try {
       await run('start', () => startSession(workoutList.id));
     } catch (error: unknown) {
-      toastError(error, 'Failed to start workout session');
+      toastError(apiErrorText(error, t) ?? 'Failed to start workout session');
     }
   };
 
@@ -86,7 +88,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
           celebrateOnce();
         }
       } catch (error: unknown) {
-        toastError(error, 'Failed to update session progress');
+        toastError(apiErrorText(error, t) ?? 'Failed to update session progress');
       }
     })();
   };
@@ -121,7 +123,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
         try {
           await finishSession(session.id);
         } catch (error: unknown) {
-          toastError(error, 'Failed to finish workout session');
+          toastError(apiErrorText(error, t) ?? 'Failed to finish workout session');
           throw error;
         }
       },
@@ -129,7 +131,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
         try {
           await discardSession(session.id);
         } catch (error: unknown) {
-          toastError(error, 'Failed to discard workout session');
+          toastError(apiErrorText(error, t) ?? 'Failed to discard workout session');
           throw error;
         }
       },

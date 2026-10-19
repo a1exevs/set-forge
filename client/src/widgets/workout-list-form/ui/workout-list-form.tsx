@@ -34,6 +34,8 @@ type Props = {
     exercise: Pick<ExerciseFormData, 'weight' | 'reps' | 'sets'>,
     field: 'weight' | 'reps' | 'sets',
   ) => string | undefined;
+  /** The server's error of a field by its request path (`name`, `exercises.0.sets`). */
+  getServerFieldError: (field: string) => string | undefined;
 };
 
 const WorkoutListForm: FC<Props> = ({
@@ -53,6 +55,7 @@ const WorkoutListForm: FC<Props> = ({
   onCancel,
   submitAttempted,
   getExerciseNumericFieldError,
+  getServerFieldError,
 }) => {
   if (notFound) {
     return (
@@ -85,6 +88,7 @@ const WorkoutListForm: FC<Props> = ({
                   placeholder="e.g., Push Day"
                   required
                 />
+                {getServerFieldError('name') && <p className={classes.fieldError}>{getServerFieldError('name')}</p>}
               </div>
 
               <div>
@@ -99,6 +103,9 @@ const WorkoutListForm: FC<Props> = ({
                   placeholder="Chest, shoulders, triceps"
                   rows={2}
                 />
+                {getServerFieldError('description') && (
+                  <p className={classes.fieldError}>{getServerFieldError('description')}</p>
+                )}
               </div>
             </div>
 
@@ -140,6 +147,9 @@ const WorkoutListForm: FC<Props> = ({
                           placeholder="Bench Press"
                           required
                         />
+                        {getServerFieldError(`exercises.${index}.name`) && (
+                          <p className={classes.fieldError}>{getServerFieldError(`exercises.${index}.name`)}</p>
+                        )}
                       </div>
 
                       <div>
@@ -154,6 +164,9 @@ const WorkoutListForm: FC<Props> = ({
                             }
                           }}
                         />
+                        {getServerFieldError(`exercises.${index}.muscleGroup`) && (
+                          <p className={classes.fieldError}>{getServerFieldError(`exercises.${index}.muscleGroup`)}</p>
+                        )}
                       </div>
 
                       <div className={classes.fieldRow}>
@@ -164,7 +177,10 @@ const WorkoutListForm: FC<Props> = ({
                           onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'weight', v)}
                           variant="decimal"
                           size="sm"
-                          error={submitAttempted ? getExerciseNumericFieldError(exercise, 'weight') : undefined}
+                          error={
+                            (submitAttempted ? getExerciseNumericFieldError(exercise, 'weight') : undefined) ??
+                            getServerFieldError(`exercises.${index}.weight`)
+                          }
                         />
                         <NumericField
                           label="Reps"
@@ -173,7 +189,10 @@ const WorkoutListForm: FC<Props> = ({
                           onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'reps', v)}
                           variant="integer"
                           size="sm"
-                          error={submitAttempted ? getExerciseNumericFieldError(exercise, 'reps') : undefined}
+                          error={
+                            (submitAttempted ? getExerciseNumericFieldError(exercise, 'reps') : undefined) ??
+                            getServerFieldError(`exercises.${index}.reps`)
+                          }
                         />
                         <NumericField
                           label="Sets"
@@ -182,7 +201,10 @@ const WorkoutListForm: FC<Props> = ({
                           onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'sets', v)}
                           variant="integer"
                           size="sm"
-                          error={submitAttempted ? getExerciseNumericFieldError(exercise, 'sets') : undefined}
+                          error={
+                            (submitAttempted ? getExerciseNumericFieldError(exercise, 'sets') : undefined) ??
+                            getServerFieldError(`exercises.${index}.sets`)
+                          }
                         />
                       </div>
                     </div>
