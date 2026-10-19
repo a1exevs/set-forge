@@ -29,6 +29,7 @@ jest.mock('@shared/ui', () => ({
 }));
 
 jest.mock('@widgets/workout-list-form', () => ({
+  ...jest.requireActual('@widgets/workout-list-form'),
   WorkoutListFormSkeleton: () => <div role="status" aria-label="Loading workout list" />,
   WorkoutListForm: ({
     onSubmit,
@@ -228,7 +229,7 @@ describe('EditWorkoutPageLogicLayer', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor((): void => {
-      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to update workout list');
+      expect(toastErrorMock).toHaveBeenCalledWith('Failed to update workout list');
       expect(resyncSession).not.toHaveBeenCalled();
       expect(toastSuccessMock).not.toHaveBeenCalled();
       expect(navigateMock).not.toHaveBeenCalled();
@@ -257,7 +258,7 @@ describe('EditWorkoutPageLogicLayer', () => {
     await waitFor((): void => {
       expect(updateWorkoutList).toHaveBeenCalled();
       expect(resyncSession).toHaveBeenCalledWith('sess-1');
-      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to update the current session');
+      expect(toastErrorMock).toHaveBeenCalledWith('Failed to update the current session');
       expect(toastSuccessMock).not.toHaveBeenCalled();
       expect(navigateMock).not.toHaveBeenCalled();
     });

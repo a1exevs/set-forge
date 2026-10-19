@@ -7,6 +7,7 @@ import { Button, NotFoundMessage, NumericField, Select } from '@shared/ui';
 import classes from './workout-list-form.module.scss';
 import { muscleGroupOptions } from '../config/muscle-group-options';
 import type { ExerciseFormData } from '../model/exercise-form-data';
+import { exerciseFieldPath } from '../model/form-fields';
 
 type Props = {
   /** No list to edit: the not-found message instead of the form. */
@@ -34,6 +35,8 @@ type Props = {
     exercise: Pick<ExerciseFormData, 'weight' | 'reps' | 'sets'>,
     field: 'weight' | 'reps' | 'sets',
   ) => string | undefined;
+  /** The server's error of a field by its request path (`name`, `exerciseFieldPath(0, 'sets')`). */
+  getServerFieldError: (path: string) => string | undefined;
 };
 
 const WorkoutListForm: FC<Props> = ({
@@ -53,6 +56,7 @@ const WorkoutListForm: FC<Props> = ({
   onCancel,
   submitAttempted,
   getExerciseNumericFieldError,
+  getServerFieldError,
 }) => {
   if (notFound) {
     return (
@@ -85,6 +89,7 @@ const WorkoutListForm: FC<Props> = ({
                   placeholder="e.g., Push Day"
                   required
                 />
+                {getServerFieldError('name') && <p className={classes.fieldError}>{getServerFieldError('name')}</p>}
               </div>
 
               <div>
@@ -99,6 +104,9 @@ const WorkoutListForm: FC<Props> = ({
                   placeholder="Chest, shoulders, triceps"
                   rows={2}
                 />
+                {getServerFieldError('description') && (
+                  <p className={classes.fieldError}>{getServerFieldError('description')}</p>
+                )}
               </div>
             </div>
 
@@ -140,6 +148,9 @@ const WorkoutListForm: FC<Props> = ({
                           placeholder="Bench Press"
                           required
                         />
+                        {getServerFieldError(exerciseFieldPath(index, 'name')) && (
+                          <p className={classes.fieldError}>{getServerFieldError(exerciseFieldPath(index, 'name'))}</p>
+                        )}
                       </div>
 
                       <div>
@@ -154,6 +165,11 @@ const WorkoutListForm: FC<Props> = ({
                             }
                           }}
                         />
+                        {getServerFieldError(exerciseFieldPath(index, 'muscleGroup')) && (
+                          <p className={classes.fieldError}>
+                            {getServerFieldError(exerciseFieldPath(index, 'muscleGroup'))}
+                          </p>
+                        )}
                       </div>
 
                       <div className={classes.fieldRow}>
@@ -164,7 +180,10 @@ const WorkoutListForm: FC<Props> = ({
                           onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'weight', v)}
                           variant="decimal"
                           size="sm"
-                          error={submitAttempted ? getExerciseNumericFieldError(exercise, 'weight') : undefined}
+                          error={
+                            (submitAttempted ? getExerciseNumericFieldError(exercise, 'weight') : undefined) ??
+                            getServerFieldError(exerciseFieldPath(index, 'weight'))
+                          }
                         />
                         <NumericField
                           label="Reps"
@@ -173,7 +192,10 @@ const WorkoutListForm: FC<Props> = ({
                           onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'reps', v)}
                           variant="integer"
                           size="sm"
-                          error={submitAttempted ? getExerciseNumericFieldError(exercise, 'reps') : undefined}
+                          error={
+                            (submitAttempted ? getExerciseNumericFieldError(exercise, 'reps') : undefined) ??
+                            getServerFieldError(exerciseFieldPath(index, 'reps'))
+                          }
                         />
                         <NumericField
                           label="Sets"
@@ -182,7 +204,10 @@ const WorkoutListForm: FC<Props> = ({
                           onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'sets', v)}
                           variant="integer"
                           size="sm"
-                          error={submitAttempted ? getExerciseNumericFieldError(exercise, 'sets') : undefined}
+                          error={
+                            (submitAttempted ? getExerciseNumericFieldError(exercise, 'sets') : undefined) ??
+                            getServerFieldError(exerciseFieldPath(index, 'sets'))
+                          }
                         />
                       </div>
                     </div>

@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
+import { type ApiErrorItem, ApiRequestError } from '@shared/api';
 import { useLanguageStore } from '@shared/lib';
 
 import type { AuthTab } from '../../model/auth-tab';
@@ -12,6 +13,14 @@ jest.mock('@tanstack/react-router', () => ({
 }));
 
 const PASSWORD = 'correct-horse';
+
+const serverFailure = (status: number, errors: ApiErrorItem[], resultCode = 1): ApiRequestError =>
+  new ApiRequestError(status, {
+    data: null,
+    messages: errors.map(item => item.message),
+    fieldsErrors: errors,
+    resultCode,
+  });
 
 describe('AuthPageLogicLayer', () => {
   const onLogin = jest.fn().mockResolvedValue(undefined);
@@ -175,6 +184,61 @@ describe('AuthPageLogicLayer', () => {
       expect(screen.getByLabelText('Email')).not.toBeDisabled();
       expect(screen.getByRole('button', { name: 'Log in' })).not.toHaveAttribute('aria-busy');
       expect(onAuthenticated).not.toHaveBeenCalled();
+    });
+  });
+
+  // @invariant session/server-errors-in-language
+  describe('server errors', () => {
+    const logIn = async (): Promise<void> => {
+      const user = userEvent.setup();
+      renderTab('login');
+      await user.type(screen.getByLabelText('Email'), 'jane@example.com');
+      await user.type(screen.getByLabelText('Password'), PASSWORD);
+      await user.click(screen.getByRole('button', { name: 'Log in' }));
+    };
+
+    it('shows a wrong password in the chosen language', async () => {
+      act((): void => useLanguageStore.getState().setLanguage('ru'));
+      onLogin.mockRejectedValueOnce(
+        serverFailure(401, [{ code: 'INVALID_EMAIL_OR_PASSWORD', params: {}, message: 'Invalid email or password' }]),
+      );
+
+      await logIn();
+
+      expect(await screen.findByText('Неверный email или пароль')).toBeInTheDocument();
+    });
+
+    it('puts a field error under its field and the rest at the form level', async () => {
+      onLogin.mockRejectedValueOnce(
+        serverFailure(400, [
+          { code: 'MUST_BE_A_STRING', params: {}, field: 'email', message: 'Must be a string' },
+          { code: 'MUST_BE_A_STRING', params: {}, field: 'nickname', message: 'Must be a string' },
+          { code: 'SOMETHING_NEW', params: {}, message: 'Something new happened' },
+        ]),
+      );
+
+      await logIn();
+
+      const emailError = await screen.findAllByText('Must be a string');
+      expect(emailError).toHaveLength(1);
+      expect(screen.getByText('Something new happened Must be a string')).toBeInTheDocument();
+    });
+
+    it('asks for the captcha with its text when the server demands it', async () => {
+      onLogin.mockRejectedValueOnce(
+        serverFailure(
+          401,
+          [
+            { code: 'INVALID_EMAIL_OR_PASSWORD', params: {}, message: 'Invalid email or password' },
+            { code: 'NEED_AUTHORIZATION_WITH_CAPTCHA', params: {}, message: 'Captcha verification required' },
+          ],
+          10,
+        ),
+      );
+
+      await logIn();
+
+      expect(await screen.findByText('Invalid email or password Captcha verification required')).toBeInTheDocument();
     });
   });
 });
