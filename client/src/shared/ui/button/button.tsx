@@ -47,7 +47,6 @@ const Button: FC<Props> = ({
       {progress === 'shown' && (
         <span className={classes.indicator}>
           <LoaderCircle aria-hidden />
-          <span className={classes.indicatorText}>Loading</span>
         </span>
       )}
     </HeadlessButton>

@@ -4,6 +4,7 @@ import type { WorkoutList, WorkoutListsExportFile } from '@entities/workout-list
 import { apiErrorText } from '@shared/api';
 import {
   downloadJsonFile,
+  type Language,
   toastError,
   toastSuccess,
   useConfirm,
@@ -24,7 +25,7 @@ type Props = {
   exportAllWorkoutLists: () => Promise<WorkoutListsExportFile>;
   importWorkoutLists: (file: WorkoutListsExportFile) => Promise<void>;
   onEdit: (id: string) => void;
-  formatDate: (date: string | null) => string;
+  formatDate: (iso: string, language: Language) => string;
 };
 
 const HomePageLogicLayer: FC<Props> = ({
@@ -41,7 +42,7 @@ const HomePageLogicLayer: FC<Props> = ({
   const confirmDialog = useConfirm();
   const importInputRef = useRef<HTMLInputElement>(null);
   const { run, progressOf } = useProgress<'export'>();
-  const { t } = useT();
+  const { t, language } = useT();
   const loadingPhase = useLoadingPhase(isLoading);
 
   const handleDelete = async (id: string, name: string): Promise<void> => {
@@ -139,7 +140,7 @@ const HomePageLogicLayer: FC<Props> = ({
       onImportClick={handleImportClick}
       onImportFile={handleImportFile}
       importInputRef={importInputRef}
-      formatDate={formatDate}
+      formatDate={(iso: string): string => formatDate(iso, language)}
     />
   );
 };

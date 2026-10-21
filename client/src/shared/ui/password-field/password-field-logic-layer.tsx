@@ -9,10 +9,22 @@ type Props = {
   autoComplete?: string;
   disabled?: boolean;
   revealable?: boolean;
+  showPasswordLabel: string;
+  hidePasswordLabel: string;
   onChange: (value: string) => void;
 };
 
-const PasswordField: FC<Props> = ({ id, name, value, autoComplete, disabled = false, revealable = true, onChange }) => {
+const PasswordField: FC<Props> = ({
+  id,
+  name,
+  value,
+  autoComplete,
+  disabled = false,
+  revealable = true,
+  showPasswordLabel,
+  hidePasswordLabel,
+  onChange,
+}) => {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -23,6 +35,8 @@ const PasswordField: FC<Props> = ({ id, name, value, autoComplete, disabled = fa
       autoComplete={autoComplete}
       disabled={disabled}
       revealable={revealable}
+      showPasswordLabel={showPasswordLabel}
+      hidePasswordLabel={hidePasswordLabel}
       visible={revealable && visible}
       onChange={onChange}
       onToggleVisible={(): void => setVisible(v => !v)}

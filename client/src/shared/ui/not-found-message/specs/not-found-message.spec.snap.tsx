@@ -13,12 +13,14 @@ jest.mock('@tanstack/react-router', () => ({
 
 describe('NotFoundMessage', () => {
   it('matches snapshot with default props', () => {
-    const { container } = render(<NotFoundMessage title="Workout list not found" />);
+    const { container } = render(<NotFoundMessage backToLabel="Back to Home" title="Workout list not found" />);
     expect(container).toMatchSnapshot();
   });
 
   it('matches snapshot with custom backToLink', () => {
-    const { container } = render(<NotFoundMessage title="Workout list not found" backToLink="/custom" />);
+    const { container } = render(
+      <NotFoundMessage backToLabel="Back to Home" title="Workout list not found" backToLink="/custom" />,
+    );
     expect(container).toMatchSnapshot();
   });
 });

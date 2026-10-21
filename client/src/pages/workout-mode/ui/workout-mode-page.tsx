@@ -56,7 +56,7 @@ const WorkoutModePage: FC<Props> = ({
     // TODO: Distinguish query errors from a missing list — not only "Workout list not found" (see data layer)
     return (
       <div className={classes.container}>
-        <NotFoundMessage title="Workout list not found" />
+        <NotFoundMessage title="Workout list not found" backToLabel="Back to Home" />
       </div>
     );
   }

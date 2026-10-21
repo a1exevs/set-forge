@@ -11,13 +11,13 @@ const defaultItems: MenuButtonItem[] = [
 
 describe('MenuButton', () => {
   it('matches snapshot when closed', () => {
-    const { container } = render(<MenuButton items={defaultItems} />);
+    const { container } = render(<MenuButton ariaLabel="Open menu" items={defaultItems} />);
     expect(container).toMatchSnapshot();
   });
 
   it('matches snapshot when opened', async () => {
     const user = userEvent.setup();
-    const { baseElement } = render(<MenuButton items={defaultItems} />);
+    const { baseElement } = render(<MenuButton ariaLabel="Open menu" items={defaultItems} />);
 
     await user.click(screen.getByRole('button', { name: 'Open menu' }));
 

@@ -33,7 +33,7 @@ const EditWorkoutPage: FC<Props> = ({
 
   // TODO: Distinguish query errors from a missing list — not only "Workout list not found" (see data layer)
   if (workout === null) {
-    return <NotFoundMessage title="Workout list not found" />;
+    return <NotFoundMessage title="Workout list not found" backToLabel="Back to Home" />;
   }
 
   return (
