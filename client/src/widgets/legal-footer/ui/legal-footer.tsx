@@ -17,9 +17,6 @@ const LegalFooter: FC<Props> = ({ t, className }) => {
       <Link to="/privacy" className={classes.legalLink}>
         {t('legal.privacyPolicy')}
       </Link>
-      <span className={classes.legalSep} aria-hidden>
-        ·
-      </span>
       <Link to="/terms" className={classes.legalLink}>
         {t('legal.termsOfUse')}
       </Link>
