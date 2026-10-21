@@ -7,6 +7,7 @@ export { formatDate } from './i18n/format';
 export { type Dictionaries, initI18n } from './i18n/init-i18n';
 export { useLanguageStore } from './i18n/language-store';
 export { isLanguage, type Language, LANGUAGES } from './i18n/languages';
+export { Trans } from './i18n/trans';
 export { type Translate, useT } from './i18n/use-t';
 export {
   decimalDraftMatchesValue,

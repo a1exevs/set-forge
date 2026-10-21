@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 
-import { useProgress } from '@shared/lib';
+import { useProgress, useT } from '@shared/lib';
 
 import DocumentReconsentGate from './document-reconsent-gate';
 
@@ -15,6 +15,7 @@ type Props = {
 };
 
 const DocumentReconsentGateLogicLayer: FC<Props> = ({ open, isError, onAccept, onLogout, onLeave }) => {
+  const { t } = useT();
   const [consent, setConsent] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   // Accept and Log out both end the gate: one in flight locks the other.
@@ -34,6 +35,7 @@ const DocumentReconsentGateLogicLayer: FC<Props> = ({ open, isError, onAccept, o
 
   return (
     <DocumentReconsentGate
+      t={t}
       open={gateOpen}
       busy={busy}
       isError={isError}

@@ -31,11 +31,10 @@ const ProfilePageLogicLayer: FC<Props> = ({ email, avatarLetter, onLogout, onDel
 
   const handleDeleteAccount = async (): Promise<void> => {
     const ok = await confirmDialog({
-      title: 'Delete account?',
-      description:
-        'This permanently deletes your account and all your data (workout lists, exercises, and session history). This cannot be undone.',
-      confirmationText: 'Delete account',
-      cancellationText: 'Cancel',
+      title: t('profile.deleteAccountDialog.title'),
+      description: t('profile.deleteAccountDialog.description'),
+      confirmationText: t('profile.deleteAccount'),
+      cancellationText: t('common.cancel'),
       onConfirm: onDeleteAccount,
     });
     if (ok) {

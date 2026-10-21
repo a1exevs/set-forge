@@ -9,7 +9,7 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithRouter } from 'storybook-dir/render-with-router';
 
-import LegalFooter from './legal-footer';
+import LegalFooter from './legal-footer-logic-layer';
 
 const meta = {
   title: 'Widgets/LegalFooter',

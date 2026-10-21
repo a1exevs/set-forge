@@ -187,6 +187,37 @@ describe('AuthPageLogicLayer', () => {
     });
   });
 
+  describe('a language switch', () => {
+    it('retranslates a validation error already on screen', async () => {
+      const user = userEvent.setup();
+      renderTab('login');
+      await user.click(screen.getByRole('button', { name: 'Log in' }));
+      expect(await screen.findByText('Email is required')).toBeInTheDocument();
+
+      act((): void => useLanguageStore.getState().setLanguage('ru'));
+
+      expect(screen.getByText('Введите адрес электронной почты')).toBeInTheDocument();
+      expect(screen.queryByText('Email is required')).not.toBeInTheDocument();
+    });
+
+    // @invariant session/server-errors-in-language
+    it('retranslates a server error already on screen', async () => {
+      onLogin.mockRejectedValueOnce(
+        serverFailure(401, [{ code: 'INVALID_EMAIL_OR_PASSWORD', params: {}, message: 'Invalid email or password' }]),
+      );
+      const user = userEvent.setup();
+      renderTab('login');
+      await user.type(screen.getByLabelText('Email'), 'jane@example.com');
+      await user.type(screen.getByLabelText('Password'), PASSWORD);
+      await user.click(screen.getByRole('button', { name: 'Log in' }));
+      expect(await screen.findByText('Invalid email or password')).toBeInTheDocument();
+
+      act((): void => useLanguageStore.getState().setLanguage('ru'));
+
+      expect(screen.getByText('Неверный email или пароль')).toBeInTheDocument();
+    });
+  });
+
   // @invariant session/server-errors-in-language
   describe('server errors', () => {
     const logIn = async (): Promise<void> => {
@@ -202,8 +233,11 @@ describe('AuthPageLogicLayer', () => {
       onLogin.mockRejectedValueOnce(
         serverFailure(401, [{ code: 'INVALID_EMAIL_OR_PASSWORD', params: {}, message: 'Invalid email or password' }]),
       );
-
-      await logIn();
+      const user = userEvent.setup();
+      renderTab('login');
+      await user.type(screen.getByLabelText('Электронная почта'), 'jane@example.com');
+      await user.type(screen.getByLabelText('Пароль'), PASSWORD);
+      await user.click(screen.getByRole('button', { name: 'Войти' }));
 
       expect(await screen.findByText('Неверный email или пароль')).toBeInTheDocument();
     });
