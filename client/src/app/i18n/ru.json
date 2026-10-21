@@ -52,7 +52,7 @@
     "FAILED_TO_CREATE_USER": "Не удалось создать пользователя",
     "FORBIDDEN": "Доступ запрещён",
     "INTERNAL_ERROR": "Внутренняя ошибка сервера",
-    "INVALID_EMAIL_OR_PASSWORD": "Неверный email или пароль",
+    "INVALID_EMAIL_OR_PASSWORD": "Неверная электронная почта или пароль",
     "INVALID_IMPORT_FILE_FORMAT": "Неверный формат файла импорта",
     "MUST_BE_A_NUMBER": "Должно быть числом",
     "MUST_BE_A_STRING": "Должно быть строкой",
@@ -60,7 +60,7 @@
     "MUST_BE_AN_ARRAY": "Должно быть списком",
     "MUST_BE_AN_INTEGER_NUMBER": "Должно быть целым числом",
     "MUST_BE_ONE_OF": "Допустимые значения: {{values}}",
-    "MUST_HAS_EMAIL_FORMAT": "Неверный формат email",
+    "MUST_HAS_EMAIL_FORMAT": "Неверный формат адреса электронной почты",
     "NEED_AUTHORIZATION_WITH_CAPTCHA": "Введите код с картинки",
     "NETWORK_ERROR": "Нет связи с сервером",
     "NOT_ENOUGH_PERMISSIONS": "Недостаточно прав",
@@ -78,7 +78,7 @@
     "UNEXPECTED_RESPONSE": "Сервер ответил неожиданно",
     "UNPROCESSABLE_ENTITY": "Запрос не может быть обработан",
     "UNSUPPORTED_EXPORT_FILE_VERSION": "Версия файла экспорта не поддерживается",
-    "USER_ALREADY_EXISTS": "Пользователь с таким email уже есть",
+    "USER_ALREADY_EXISTS": "Пользователь с такой электронной почтой уже есть",
     "USER_ROLE_CONFIGURATION_IS_MISSING": "Сервис недоступен: не настроена роль пользователя"
   },
   "language": {

@@ -214,7 +214,7 @@ describe('AuthPageLogicLayer', () => {
 
       act((): void => useLanguageStore.getState().setLanguage('ru'));
 
-      expect(screen.getByText('Неверный email или пароль')).toBeInTheDocument();
+      expect(screen.getByText('Неверная электронная почта или пароль')).toBeInTheDocument();
     });
   });
 
@@ -239,7 +239,7 @@ describe('AuthPageLogicLayer', () => {
       await user.type(screen.getByLabelText('Пароль'), PASSWORD);
       await user.click(screen.getByRole('button', { name: 'Войти' }));
 
-      expect(await screen.findByText('Неверный email или пароль')).toBeInTheDocument();
+      expect(await screen.findByText('Неверная электронная почта или пароль')).toBeInTheDocument();
     });
 
     it('puts a field error under its field and the rest at the form level', async () => {
