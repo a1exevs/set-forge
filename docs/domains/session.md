@@ -40,7 +40,7 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lin
 | route-guards | Guest-only (`/login`, `/register`), always-public (`/privacy`, `/terms`) and protected routes |
 | bootstrap-once | The auth session is verified once per app open; navigation between screens and link intent (hover, touch, focus) never request the current user again — a cleared refresh cookie is discovered by the next data request, a refresh token revoked on the server by the first refresh after the access token expires |
 | hooks-dont-navigate | Auth session hooks never navigate — the calling flow does — ❌ review |
-| server-errors-in-language | An error the server answers is shown in the chosen language by its code — under its field when the screen has it, else for the whole form or as a toast; a code the client does not know shows the server's English text |
+| server-errors-in-language | An error the server answers is shown in the chosen language by its code — under its field when the screen has it, else for the whole form or as a toast, and follows a language switch while it is on screen; a code the client does not know shows the server's English text |
 | interface-language | The interface language is detected once, on the first open of the app on a device (a Russian browser → Russian, anything else → English), and kept on that device until the user changes it |
 
 ## Flows

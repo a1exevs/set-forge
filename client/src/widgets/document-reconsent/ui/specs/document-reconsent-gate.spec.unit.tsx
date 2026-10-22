@@ -1,9 +1,10 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
 import { useAcceptDocumentsMutation, useCurrentUserQuery } from '@entities/session';
 import { useLogout } from '@features/logout';
+import { useLanguageStore } from '@shared/lib';
 
 import DocumentReconsentGate from '../document-reconsent-gate-data-layer';
 
@@ -56,6 +57,25 @@ describe('DocumentReconsentGate', () => {
     mockPathname = '/terms';
     rerender(<DocumentReconsentGate />);
     expect(screen.queryByText(/updated our documents/i)).not.toBeInTheDocument();
+  });
+
+  it('links each consent to its document inside the sentence, in the chosen language', async () => {
+    mockedCurrentUser.mockReturnValue({ data: { id: 1, email: 'a@b.c', documentsPendingAcceptance: true } });
+    render(<DocumentReconsentGate />);
+
+    expect(await screen.findByRole('link', { name: 'Privacy Policy' })).toHaveAttribute('href', '/privacy');
+    expect(screen.getByRole('link', { name: 'Terms of Use' })).toHaveAttribute('href', '/terms');
+
+    act((): void => useLanguageStore.getState().setLanguage('ru'));
+
+    expect(screen.getByText('Мы обновили документы')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Политикой обработки персональных данных' })).toHaveAttribute(
+      'href',
+      '/privacy',
+    );
+    expect(
+      screen.getByRole('checkbox', { name: /Я принимаю условия Пользовательского соглашения/ }),
+    ).toBeInTheDocument();
   });
 
   // @invariant session/reconsent-gate

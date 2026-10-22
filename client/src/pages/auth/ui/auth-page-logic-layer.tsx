@@ -1,3 +1,4 @@
+import type { Nullable } from '@alexevs/ts-guards';
 import { FC, FormEvent, useCallback, useState } from 'react';
 
 import {
@@ -7,10 +8,12 @@ import {
   validateRegisterEmail,
   validateRegisterPassword,
 } from '@entities/session';
-import { apiErrorTexts, ApiRequestError } from '@shared/api';
+import { ApiRequestError } from '@shared/api';
 import { useProgress, useT } from '@shared/lib';
 
 import AuthPage from './auth-page';
+import { authErrorText, serverFailureTexts } from '../lib/auth-error-texts';
+import type { AuthField, AuthFieldErrors, ServerFailure } from '../model/auth-form-error';
 import type { LoginInput, RegisterInput } from '../model/auth-input';
 import type { AuthTab } from '../model/auth-tab';
 
@@ -40,73 +43,39 @@ const AuthPageLogicLayer: FC<Props> = ({
   const [captcha, setCaptcha] = useState('');
   const [captchaImageUrl, setCaptchaImageUrl] = useState<string | null>(null);
   const [showCaptcha, setShowCaptcha] = useState(false);
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
-  const [consentError, setConsentError] = useState<string | null>(null);
-  const [termsError, setTermsError] = useState<string | null>(null);
-  const [captchaError, setCaptchaError] = useState<string | null>(null);
-  const [formError, setFormError] = useState<string | null>(null);
+  // Codes and the rejected request, not texts: an error on screen follows a language switch
+  const [fieldErrors, setFieldErrors] = useState<AuthFieldErrors>({});
+  const [failure, setFailure] = useState<Nullable<ServerFailure>>(null);
   const { run, progressOf, busy } = useProgress<'submit'>();
   const { t } = useT();
 
   const redirectTo = typeof redirectSearch.redirect === 'string' ? redirectSearch.redirect : undefined;
 
-  const resetFieldErrors = useCallback((): void => {
-    setEmailError(null);
-    setPasswordError(null);
-    setConfirmPasswordError(null);
-    setConsentError(null);
-    setTermsError(null);
-    setCaptchaError(null);
-    setFormError(null);
+  const resetErrors = useCallback((): void => {
+    setFieldErrors({});
+    setFailure(null);
   }, []);
 
-  // The server's errors in the chosen language: each under its field when the form has it, the rest at the form level.
-  const showServerErrors = useCallback(
-    (err: unknown, fieldSetters: Record<string, (text: string) => void>, fallback: string): void => {
-      if (!(err instanceof ApiRequestError)) {
-        setFormError('Something went wrong');
-        return;
-      }
-      const { byField, general } = apiErrorTexts(err, t);
-      const formLevel = [...general];
-      let underFields = 0;
-      for (const [field, text] of Object.entries(byField)) {
-        const setFieldError = fieldSetters[field];
-        if (setFieldError) {
-          setFieldError(text);
-          underFields += 1;
-        } else {
-          formLevel.push(text);
-        }
-      }
-      if (formLevel.length > 0) {
-        setFormError(formLevel.join(' '));
-      } else if (underFields === 0) {
-        setFormError(fallback);
-      }
-    },
-    [t],
-  );
+  // Shows the checks of a submit; true when one of them failed
+  const showFieldErrors = useCallback((checks: AuthFieldErrors): boolean => {
+    setFieldErrors(checks);
+    return Object.values(checks).some(Boolean);
+  }, []);
 
   const handleSubmit = useCallback(
     async (e: FormEvent<HTMLFormElement>): Promise<void> => {
       e.preventDefault();
-      resetFieldErrors();
+      resetErrors();
 
       if (activeTab === 'register') {
-        const eErr = validateRegisterEmail(email);
-        const pErr = validateRegisterPassword(password);
-        const pcErr = confirmPassword === password ? null : 'Passwords do not match';
-        const cErr = consent ? null : 'You must consent to the processing of your personal data';
-        const tErr = termsAccepted ? null : 'You must accept the Terms of Use';
-        setEmailError(eErr);
-        setPasswordError(pErr);
-        setConfirmPasswordError(pcErr);
-        setConsentError(cErr);
-        setTermsError(tErr);
-        if (eErr || pErr || pcErr || cErr || tErr) {
+        const invalid = showFieldErrors({
+          email: validateRegisterEmail(email),
+          password: validateRegisterPassword(password),
+          confirmPassword: confirmPassword === password ? null : 'passwordsMismatch',
+          consent: consent ? null : 'consentRequired',
+          termsAccepted: termsAccepted ? null : 'termsRequired',
+        });
+        if (invalid) {
           return;
         }
         try {
@@ -114,32 +83,22 @@ const AuthPageLogicLayer: FC<Props> = ({
             await onAuthenticated(redirectTo);
           }
         } catch (err) {
-          showServerErrors(
-            err,
-            {
-              email: setEmailError,
-              password: setPasswordError,
-              consent: setConsentError,
-              termsAccepted: setTermsError,
-            },
-            'Registration failed',
-          );
+          setFailure({
+            error: err,
+            fields: ['email', 'password', 'consent', 'termsAccepted'],
+            fallback: 'registrationFailed',
+          });
         }
         return;
       }
 
-      const eErr = validateLoginEmail(email);
-      const pErr = validateLoginPassword(password);
-      setEmailError(eErr);
-      setPasswordError(pErr);
-      if (eErr || pErr) {
+      const invalid = showFieldErrors({
+        email: validateLoginEmail(email),
+        password: validateLoginPassword(password),
+        captcha: showCaptcha && !captcha.trim() ? 'captchaRequired' : null,
+      });
+      if (invalid) {
         return;
-      }
-      if (showCaptcha) {
-        if (!captcha.trim()) {
-          setCaptchaError('Captcha is required');
-          return;
-        }
       }
 
       try {
@@ -154,7 +113,7 @@ const AuthPageLogicLayer: FC<Props> = ({
         setCaptcha('');
         setCaptchaImageUrl(null);
       } catch (err) {
-        const loginFields = { email: setEmailError, password: setPasswordError, captcha: setCaptchaError };
+        const loginFields: AuthField[] = ['email', 'password', 'captcha'];
         if (err instanceof ApiRequestError && isNeedCaptchaEnvelope(err.envelope)) {
           setShowCaptcha(true);
           setCaptcha('');
@@ -164,10 +123,10 @@ const AuthPageLogicLayer: FC<Props> = ({
           } catch {
             setCaptchaImageUrl(null);
           }
-          showServerErrors(err, loginFields, 'Captcha required');
+          setFailure({ error: err, fields: loginFields, fallback: 'captchaNeeded' });
           return;
         }
-        showServerErrors(err, loginFields, 'Login failed');
+        setFailure({ error: err, fields: loginFields, fallback: 'loginFailed' });
       }
     },
     [
@@ -183,12 +142,19 @@ const AuthPageLogicLayer: FC<Props> = ({
       onRegister,
       password,
       redirectTo,
-      resetFieldErrors,
+      resetErrors,
       run,
       showCaptcha,
-      showServerErrors,
+      showFieldErrors,
     ],
   );
+
+  // The texts in the current language, rebuilt on every render — a language switch included
+  const server = serverFailureTexts(failure, t);
+  const errorOf = (field: AuthField): Nullable<string> => {
+    const error = fieldErrors[field];
+    return error ? authErrorText(error, t) : (server.byField[field] ?? null);
+  };
 
   return (
     <AuthPage
@@ -202,13 +168,13 @@ const AuthPageLogicLayer: FC<Props> = ({
       captcha={captcha}
       captchaImageUrl={captchaImageUrl}
       showCaptcha={showCaptcha}
-      emailError={emailError}
-      passwordError={passwordError}
-      confirmPasswordError={confirmPasswordError}
-      consentError={consentError}
-      termsError={termsError}
-      captchaError={captchaError}
-      formError={formError}
+      emailError={errorOf('email')}
+      passwordError={errorOf('password')}
+      confirmPasswordError={errorOf('confirmPassword')}
+      consentError={errorOf('consent')}
+      termsError={errorOf('termsAccepted')}
+      captchaError={errorOf('captcha')}
+      formError={server.form}
       locked={busy}
       submitProgress={progressOf('submit')}
       onEmailChange={setEmail}

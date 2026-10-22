@@ -1,34 +1,37 @@
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function validateRegisterEmail(email: string): string | null {
+/** What is wrong with a sign-in or registration field: a code, so the screen says it in the chosen language. */
+export type AuthValidationError = 'emailRequired' | 'emailInvalid' | 'passwordLength' | 'passwordRequired';
+
+export function validateRegisterEmail(email: string): AuthValidationError | null {
   const v = email.trim();
   if (!v) {
-    return 'Email is required';
+    return 'emailRequired';
   }
   if (!EMAIL_RE.test(v)) {
-    return 'Enter a valid email';
+    return 'emailInvalid';
   }
   return null;
 }
 
-export function validateRegisterPassword(password: string): string | null {
+export function validateRegisterPassword(password: string): AuthValidationError | null {
   if (password.length < 8 || password.length > 50) {
-    return 'Password must be between 8 and 50 characters';
+    return 'passwordLength';
   }
   return null;
 }
 
-export function validateLoginEmail(email: string): string | null {
+export function validateLoginEmail(email: string): AuthValidationError | null {
   const v = email.trim();
   if (!v) {
-    return 'Email is required';
+    return 'emailRequired';
   }
   return null;
 }
 
-export function validateLoginPassword(password: string): string | null {
+export function validateLoginPassword(password: string): AuthValidationError | null {
   if (!password) {
-    return 'Password is required';
+    return 'passwordRequired';
   }
   return null;
 }

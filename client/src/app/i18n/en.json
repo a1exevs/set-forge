@@ -1,6 +1,48 @@
 {
+  "auth": {
+    "captcha": {
+      "hint": "Enter the characters from the image (session protected login).",
+      "image": "Captcha",
+      "label": "Captcha"
+    },
+    "confirmPassword": "Confirm password",
+    "email": "Email",
+    "errors": {
+      "captchaNeeded": "Captcha required",
+      "captchaRequired": "Captcha is required",
+      "consentRequired": "You must consent to the processing of your personal data",
+      "emailInvalid": "Enter a valid email",
+      "emailRequired": "Email is required",
+      "loginFailed": "Login failed",
+      "passwordLength": "Password must be between 8 and 50 characters",
+      "passwordRequired": "Password is required",
+      "passwordsMismatch": "Passwords do not match",
+      "registrationFailed": "Registration failed",
+      "termsRequired": "You must accept the Terms of Use",
+      "unknown": "Something went wrong"
+    },
+    "hidePassword": "Hide password",
+    "password": "Password",
+    "showPassword": "Show password",
+    "submit": {
+      "login": "Log in",
+      "register": "Create account"
+    },
+    "subtitle": "Sign in to sync workouts across devices",
+    "tabs": {
+      "label": "Authentication",
+      "login": "Log in",
+      "register": "Register"
+    }
+  },
   "common": {
-    "back": "Back"
+    "back": "Back",
+    "cancel": "Cancel",
+    "logOut": "Log out"
+  },
+  "consent": {
+    "personalData": "I consent to the processing of my personal data as described in the <policy>Privacy Policy</policy>",
+    "terms": "I accept the <terms>Terms of Use</terms>"
   },
   "errors": {
     "ARRAY_MUST_NOT_BE_SHORTER_THAN_N": "Must contain at least {{min}} items",
@@ -42,6 +84,10 @@
   "language": {
     "label": "Language"
   },
+  "legal": {
+    "privacyPolicy": "Privacy Policy",
+    "termsOfUse": "Terms of Use"
+  },
   "mainTabs": {
     "history": "History",
     "home": "Home",
@@ -49,7 +95,20 @@
     "profile": "Profile"
   },
   "profile": {
-    "openSettings": "Settings"
+    "deleteAccount": "Delete account",
+    "deleteAccountDialog": {
+      "description": "This permanently deletes your account and all your data (workout lists, exercises, and session history). This cannot be undone.",
+      "title": "Delete account?"
+    },
+    "deleteAccountHint": "Deleting your account permanently removes all your data. This cannot be undone.",
+    "openSettings": "Settings",
+    "title": "Profile"
+  },
+  "reconsent": {
+    "accept": "Accept",
+    "error": "Something went wrong. Please try again.",
+    "text": "Please review and accept the updated documents to keep using Set Forge.",
+    "title": "We’ve updated our documents"
   },
   "settings": {
     "title": "Settings"

@@ -26,11 +26,17 @@ const NEST_SHUTDOWN_TIMEOUT_MS = 15_000;
 const IS_WINDOWS = process.platform === 'win32';
 
 export type ApiStack = {
-  nest: ChildProcess;
+  /** The running Nest — a new process after `restartNest`. */
+  readonly nest: ChildProcess;
   /** The MySQL container — `docker rm -f <id>` removes it when the stack was killed without `stop()`. */
   containerId: string;
   /** Stops Nest, then the container. Safe to call more than once. */
   stop: () => Promise<void>;
+  /**
+   * Stops Nest and starts it again on the same database with `env` added — a state the server reaches only by its
+   * configuration (raised document versions). Resolves with the new process once it is spawned.
+   */
+  restartNest: (env: Record<string, string>) => Promise<ChildProcess>;
 };
 
 type StartApiStackOptions = {
@@ -255,17 +261,28 @@ export async function startApiStack({
     stdio: 'inherit',
   });
 
+  const spawnNest = (env: Record<string, string>): ChildProcess =>
+    spawnCommand('npx', ['nest', 'start', '--path', tsconfigPath], {
+      cwd: SERVER_ROOT,
+      env: {
+        ...process.env,
+        ...mysqlEnv,
+        PORT: String(serverPort),
+        CLIENT_URL: clientOrigin,
+        ...env,
+      },
+      stdio: 'inherit',
+    });
+
   log(`Starting Nest on port ${serverPort}…`);
-  const nest = spawnCommand('npx', ['nest', 'start', '--path', tsconfigPath], {
-    cwd: SERVER_ROOT,
-    env: {
-      ...process.env,
-      ...mysqlEnv,
-      PORT: String(serverPort),
-      CLIENT_URL: clientOrigin,
-    },
-    stdio: 'inherit',
-  });
+  let nest = spawnNest({});
+
+  const stopNest = async (): Promise<void> => {
+    if (nest.exitCode === null && nest.signalCode === null && nest.pid != null) {
+      killProcessTree(nest.pid, 'SIGTERM');
+      await waitForChildExit(nest, NEST_SHUTDOWN_TIMEOUT_MS);
+    }
+  };
 
   let stopped = false;
   const stop = async (): Promise<void> => {
@@ -274,10 +291,7 @@ export async function startApiStack({
     }
     stopped = true;
 
-    if (nest.exitCode === null && nest.signalCode === null && nest.pid != null) {
-      killProcessTree(nest.pid, 'SIGTERM');
-      await waitForChildExit(nest, NEST_SHUTDOWN_TIMEOUT_MS);
-    }
+    await stopNest();
 
     try {
       await container.stop();
@@ -288,5 +302,19 @@ export async function startApiStack({
     rmSync(buildDir, { recursive: true, force: true });
   };
 
-  return { nest, containerId: container.getId(), stop };
+  const restartNest = async (env: Record<string, string>): Promise<ChildProcess> => {
+    await stopNest();
+    log(`Restarting Nest on port ${serverPort} with ${Object.keys(env).join(', ')}…`);
+    nest = spawnNest(env);
+    return nest;
+  };
+
+  return {
+    get nest(): ChildProcess {
+      return nest;
+    },
+    containerId: container.getId(),
+    stop,
+    restartNest,
+  };
 }

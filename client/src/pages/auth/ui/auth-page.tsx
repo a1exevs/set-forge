@@ -3,7 +3,7 @@ import { LogIn, UserPlus } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { ChangeEvent, FC, FormEvent } from 'react';
 
-import type { Progress, Translate } from '@shared/lib';
+import { type Progress, Trans, type Translate } from '@shared/lib';
 import { BrandWordmark, Button, LanguageSelect, PasswordField } from '@shared/ui';
 import { LegalFooter } from '@widgets/legal-footer';
 
@@ -99,17 +99,17 @@ const AuthPage: FC<Props> = ({
       <div className={classes.card}>
         <header className={classes.header}>
           <BrandWordmark title="Set Forge" titleAs="h1" className={classes.wordmark} />
-          <p className={classes.subtitle}>Sign in to sync workouts across devices</p>
+          <p className={classes.subtitle}>{t('auth.subtitle')}</p>
         </header>
 
-        <div className={classes.tabs} role="tablist" aria-label="Authentication">
+        <div className={classes.tabs} role="tablist" aria-label={t('auth.tabs.label')}>
           <TabLink
             to="/login"
             active={activeTab === 'login'}
             search={redirectSearch}
             icon={<LogIn size={18} strokeWidth={1.75} aria-hidden />}
           >
-            Log in
+            {t('auth.tabs.login')}
           </TabLink>
           <TabLink
             to="/register"
@@ -117,13 +117,13 @@ const AuthPage: FC<Props> = ({
             search={redirectSearch}
             icon={<UserPlus size={18} strokeWidth={1.75} aria-hidden />}
           >
-            Register
+            {t('auth.tabs.register')}
           </TabLink>
         </div>
 
         <form className={classes.form} onSubmit={onSubmit} noValidate>
           <label className={classes.label} htmlFor="auth-email">
-            Email
+            {t('auth.email')}
           </label>
           <input
             id="auth-email"
@@ -137,11 +137,11 @@ const AuthPage: FC<Props> = ({
           {emailError && <p className={classes.fieldError}>{emailError}</p>}
 
           <label className={classes.label} htmlFor="auth-password">
-            Password
+            {t('auth.password')}
           </label>
           <PasswordField
-            showPasswordLabel="Show password"
-            hidePasswordLabel="Hide password"
+            showPasswordLabel={t('auth.showPassword')}
+            hidePasswordLabel={t('auth.hidePassword')}
             id="auth-password"
             name="password"
             value={password}
@@ -155,11 +155,11 @@ const AuthPage: FC<Props> = ({
           {isRegister && (
             <>
               <label className={classes.label} htmlFor="auth-password-confirm">
-                Confirm password
+                {t('auth.confirmPassword')}
               </label>
               <PasswordField
-                showPasswordLabel="Show password"
-                hidePasswordLabel="Hide password"
+                showPasswordLabel={t('auth.showPassword')}
+                hidePasswordLabel={t('auth.hidePassword')}
                 id="auth-password-confirm"
                 name="password-confirm"
                 value={confirmPassword}
@@ -174,12 +174,18 @@ const AuthPage: FC<Props> = ({
 
           {showCaptcha && (
             <>
-              <p className={classes.captchaHint}>Enter the characters from the image (session protected login).</p>
+              <p className={classes.captchaHint}>{t('auth.captcha.hint')}</p>
               {captchaImageUrl && (
-                <img src={captchaImageUrl} alt="Captcha" className={classes.captchaImg} width={200} height={60} />
+                <img
+                  src={captchaImageUrl}
+                  alt={t('auth.captcha.image')}
+                  className={classes.captchaImg}
+                  width={200}
+                  height={60}
+                />
               )}
               <label className={classes.label} htmlFor="auth-captcha">
-                Captcha
+                {t('auth.captcha.label')}
               </label>
               <input
                 id="auth-captcha"
@@ -206,10 +212,15 @@ const AuthPage: FC<Props> = ({
                   disabled={locked}
                 />
                 <span>
-                  I consent to the processing of my personal data as described in the{' '}
-                  <Link to="/privacy" className={classes.consentLink} target="_blank" rel="noopener noreferrer">
-                    Privacy Policy
-                  </Link>
+                  <Trans
+                    t={t}
+                    i18nKey="consent.personalData"
+                    components={{
+                      policy: (
+                        <Link to="/privacy" className={classes.consentLink} target="_blank" rel="noopener noreferrer" />
+                      ),
+                    }}
+                  />
                 </span>
               </label>
               {consentError && <p className={classes.fieldError}>{consentError}</p>}
@@ -224,10 +235,15 @@ const AuthPage: FC<Props> = ({
                   disabled={locked}
                 />
                 <span>
-                  I accept the{' '}
-                  <Link to="/terms" className={classes.consentLink} target="_blank" rel="noopener noreferrer">
-                    Terms of Use
-                  </Link>
+                  <Trans
+                    t={t}
+                    i18nKey="consent.terms"
+                    components={{
+                      terms: (
+                        <Link to="/terms" className={classes.consentLink} target="_blank" rel="noopener noreferrer" />
+                      ),
+                    }}
+                  />
                 </span>
               </label>
               {termsError && <p className={classes.fieldError}>{termsError}</p>}
@@ -237,7 +253,7 @@ const AuthPage: FC<Props> = ({
           {formError && <p className={classes.formError}>{formError}</p>}
 
           <Button type="submit" size="lg" progress={submitProgress} className={classes.submit}>
-            {isRegister ? 'Create account' : 'Log in'}
+            {isRegister ? t('auth.submit.register') : t('auth.submit.login')}
           </Button>
         </form>
 

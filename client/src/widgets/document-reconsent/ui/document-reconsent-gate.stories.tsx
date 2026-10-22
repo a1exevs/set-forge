@@ -8,8 +8,11 @@ import {
   buildMobileStoryObj,
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
+import { withTranslate } from 'storybook-dir/with-translate';
 
-import DocumentReconsentGate from './document-reconsent-gate';
+import DocumentReconsentGatePresentation from './document-reconsent-gate';
+
+const DocumentReconsentGate = withTranslate(DocumentReconsentGatePresentation);
 
 const meta = {
   title: 'Widgets/DocumentReconsentGate',
