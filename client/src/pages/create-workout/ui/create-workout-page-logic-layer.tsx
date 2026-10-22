@@ -18,7 +18,7 @@ const CreateWorkoutPageLogicLayer: FC<Props> = ({ onCreate }) => {
   const onSubmit = async (dto: CreateWorkoutListDto): Promise<void> => {
     try {
       if (await run('save', () => onCreate(dto))) {
-        toastSuccess('Workout list created');
+        toastSuccess(t('workoutList.toasts.created'));
         navigate({ to: '/' });
       }
     } catch (error: unknown) {
@@ -28,7 +28,7 @@ const CreateWorkoutPageLogicLayer: FC<Props> = ({ onCreate }) => {
       if (others.length > 0) {
         toastError(others.join(' '));
       } else if (Object.keys(fields).length === 0) {
-        toastError('Failed to create workout list');
+        toastError(t('workoutList.toasts.createFailed'));
       }
     }
   };

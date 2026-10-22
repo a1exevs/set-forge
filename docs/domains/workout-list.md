@@ -22,6 +22,7 @@ Each id is proven by the tests tagged `// @invariant workout-list/<id>`; `npm ru
 | delete-cascades | Deleting a list deletes its exercises in one transaction (the active workout session: `workout-session/list-delete-discards-active`) |
 | export-import | Export carries no ids and no progress; import creates all lists in one transaction |
 | form-validation | The client form stops a submit with an empty name, no exercises or invalid numbers |
+| muscle-group-key | A muscle group is stored, sent and exported by its key; only its label follows the interface language |
 
 ## Flows
 

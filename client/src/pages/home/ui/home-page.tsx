@@ -3,7 +3,7 @@ import { Download, Plus, Upload } from 'lucide-react';
 import { ChangeEvent, FC, RefObject } from 'react';
 
 import type { WorkoutList } from '@entities/workout-list';
-import type { LoadingPhase, Progress } from '@shared/lib';
+import type { LoadingPhase, Progress, Translate } from '@shared/lib';
 import { BrandWordmark, IconButton, MenuButton } from '@shared/ui';
 import { MainTabsBar } from '@widgets/main-tabs-bar';
 
@@ -11,6 +11,7 @@ import HomePageSkeleton from './home-page-skeleton';
 import classes from './home-page.module.scss';
 
 type Props = {
+  t: Translate;
   swipeRef: RefObject<HTMLDivElement>;
   workoutLists: WorkoutList[];
   loadingPhase: LoadingPhase;
@@ -25,6 +26,7 @@ type Props = {
 };
 
 const HomePage: FC<Props> = ({
+  t,
   swipeRef,
   workoutLists,
   loadingPhase,
@@ -39,7 +41,7 @@ const HomePage: FC<Props> = ({
 }) => {
   const renderLists = (): JSX.Element | null => {
     if (loadingPhase === 'skeleton') {
-      return <HomePageSkeleton />;
+      return <HomePageSkeleton t={t} />;
     }
     if (loadingPhase === 'blank') {
       return null;
@@ -48,8 +50,8 @@ const HomePage: FC<Props> = ({
     if (workoutLists.length === 0) {
       return (
         <div className={classes.empty}>
-          <p>No workout lists yet</p>
-          <p className={classes.emptyHint}>Create your first list to start tracking progress</p>
+          <p>{t('home.empty')}</p>
+          <p className={classes.emptyHint}>{t('home.emptyHint')}</p>
         </div>
       );
     }
@@ -62,20 +64,20 @@ const HomePage: FC<Props> = ({
               to="/workout/$id"
               params={{ id: list.id }}
               className={classes.cardLink}
-              aria-label={`Open ${list.name}`}
+              aria-label={t('home.openList', { name: list.name })}
             />
             <div className={classes.cardContent}>
               <div className={classes.cardHeader}>
                 <h2>{list.name}</h2>
-                <span className={classes.badge}>{list.exercises.length} ex.</span>
+                <span className={classes.badge}>{t('home.exercisesBadge', { number: list.exercises.length })}</span>
                 <div className={classes.menuButton}>
                   <MenuButton
-                    ariaLabel="Workout list actions"
+                    ariaLabel={t('home.listActions')}
                     items={[
-                      { id: 'edit', label: 'Edit', onClick: (): void => onEdit(list.id) },
+                      { id: 'edit', label: t('common.edit'), onClick: (): void => onEdit(list.id) },
                       {
                         id: 'delete',
-                        label: 'Delete',
+                        label: t('common.delete'),
                         onClick: (): void => {
                           onDelete(list.id, list.name);
                         },
@@ -86,8 +88,10 @@ const HomePage: FC<Props> = ({
               </div>
               {list.description && <p className={classes.description}>{list.description}</p>}
               <div className={classes.cardFooter}>
-                <span className={classes.date}>Created: {formatDate(list.createdAt)}</span>
-                {list.lastUsedAt && <span className={classes.lastUsed}>Last used: {formatDate(list.lastUsedAt)}</span>}
+                <span className={classes.date}>{t('home.created', { date: formatDate(list.createdAt) })}</span>
+                {list.lastUsedAt && (
+                  <span className={classes.lastUsed}>{t('home.lastUsed', { date: formatDate(list.lastUsedAt) })}</span>
+                )}
               </div>
             </div>
           </div>
@@ -103,18 +107,18 @@ const HomePage: FC<Props> = ({
     >
       <header className={classes.header}>
         <div className={classes.headerTop}>
-          <BrandWordmark title="Workout lists" />
+          <BrandWordmark title={t('home.title')} />
           <div className={classes.headerActions}>
             <IconButton
-              aria-label="Export workout lists"
-              title="Export workout lists"
+              aria-label={t('home.export')}
+              title={t('home.export')}
               disabled={workoutLists.length === 0}
               progress={exportProgress}
               onClick={(): void => void onExport()}
             >
               <Download size={18} strokeWidth={1.75} aria-hidden />
             </IconButton>
-            <IconButton aria-label="Import workout lists" title="Import workout lists" onClick={onImportClick}>
+            <IconButton aria-label={t('home.import')} title={t('home.import')} onClick={onImportClick}>
               <Upload size={18} strokeWidth={1.75} aria-hidden />
             </IconButton>
             <input
@@ -139,8 +143,8 @@ const HomePage: FC<Props> = ({
         variant="primary"
         shape="circle"
         size="lg"
-        aria-label="Create workout list"
-        title="Create workout list"
+        aria-label={t('home.create')}
+        title={t('home.create')}
       >
         <Plus size={24} strokeWidth={2} aria-hidden />
       </IconButton>

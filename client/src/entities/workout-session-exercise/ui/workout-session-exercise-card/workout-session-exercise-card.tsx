@@ -1,6 +1,5 @@
 import { FC, KeyboardEvent } from 'react';
 
-import { muscleGroupLabels } from '@entities/workout-exercise/@x/workout-session-exercise';
 import { cssVars } from '@shared/lib';
 import { Transition } from '@shared/ui';
 
@@ -9,6 +8,8 @@ import type { WorkoutSessionExercise } from '../../model/workout-session-exercis
 
 type Props = {
   exercise: WorkoutSessionExercise;
+  /** The muscle group in the chosen language. */
+  muscleGroupText: string;
   justCompleted: boolean;
   isFinished: boolean;
   isCompleted: boolean;
@@ -19,6 +20,7 @@ type Props = {
 
 const WorkoutSessionExerciseCard: FC<Props> = ({
   exercise,
+  muscleGroupText,
   justCompleted,
   isFinished,
   isCompleted,
@@ -38,7 +40,7 @@ const WorkoutSessionExerciseCard: FC<Props> = ({
       <div className={classes.exerciseHeader}>
         <div className={classes.exerciseInfo}>
           <span className={classes.exerciseName}>{exercise.name}</span>
-          <span className={classes.muscleBadge}>{muscleGroupLabels[exercise.muscleGroup]}</span>
+          <span className={classes.muscleBadge}>{muscleGroupText}</span>
         </div>
         <Transition
           show={justCompleted}

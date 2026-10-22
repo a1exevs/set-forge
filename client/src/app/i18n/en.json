@@ -37,8 +37,13 @@
   },
   "common": {
     "back": "Back",
+    "backToHome": "Back to Home",
     "cancel": "Cancel",
-    "logOut": "Log out"
+    "delete": "Delete",
+    "edit": "Edit",
+    "logOut": "Log out",
+    "ok": "Ok",
+    "save": "Save"
   },
   "consent": {
     "personalData": "I consent to the processing of my personal data as described in the <policy>Privacy Policy</policy>",
@@ -81,6 +86,46 @@
     "USER_ALREADY_EXISTS": "User already exists",
     "USER_ROLE_CONFIGURATION_IS_MISSING": "Service is unavailable: user role configuration is missing"
   },
+  "exercise": {
+    "reps": "Reps",
+    "sets": "Sets",
+    "weight": "Weight",
+    "weightValue": "{{weight}} kg"
+  },
+  "home": {
+    "create": "Create workout list",
+    "created": "Created: {{date}}",
+    "deleteDialog": {
+      "description": "Delete \"{{name}}\"? This cannot be undone.",
+      "title": "Delete workout list?"
+    },
+    "empty": "No workout lists yet",
+    "emptyHint": "Create your first list to start tracking progress",
+    "exercisesBadge": "{{number}} ex.",
+    "export": "Export workout lists",
+    "import": "Import workout lists",
+    "importDialog": {
+      "description_one": "Import {{count}} workout list?",
+      "description_other": "Import {{count}} workout lists?",
+      "import": "Import",
+      "title": "Import workout lists?"
+    },
+    "lastUsed": "Last used: {{date}}",
+    "listActions": "Workout list actions",
+    "loading": "Loading workout lists",
+    "openList": "Open {{name}}",
+    "title": "Workout lists",
+    "toasts": {
+      "deleted": "Workout list deleted",
+      "deleteFailed": "Failed to delete workout list",
+      "exported": "Workout lists exported",
+      "exportFailed": "Failed to export workout lists",
+      "imported": "Workout lists imported",
+      "importFailed": "Failed to import workout lists",
+      "invalidFile": "The selected file is not valid JSON.",
+      "nothingToImport": "The file does not contain any workout lists to import."
+    }
+  },
   "language": {
     "label": "Language"
   },
@@ -93,6 +138,15 @@
     "home": "Home",
     "navigation": "Main navigation",
     "profile": "Profile"
+  },
+  "muscleGroups": {
+    "arms": "Arms",
+    "back": "Back",
+    "cardio": "Cardio",
+    "chest": "Chest",
+    "core": "Core",
+    "legs": "Legs",
+    "shoulders": "Shoulders"
   },
   "profile": {
     "deleteAccount": "Delete account",
@@ -112,5 +166,55 @@
   },
   "settings": {
     "title": "Settings"
+  },
+  "workoutList": {
+    "notFound": "Workout list not found",
+    "resyncDialog": {
+      "description": "Update session saves the list and applies these changes to the active workout. Keep session saves the list only. Cancel returns to editing.",
+      "keep": "Keep session",
+      "title": "Also update the current session?",
+      "update": "Update session"
+    },
+    "toasts": {
+      "created": "Workout list created",
+      "createFailed": "Failed to create workout list",
+      "resyncFailed": "Failed to update the current session",
+      "updated": "Workout list updated",
+      "updateFailed": "Failed to update workout list"
+    }
+  },
+  "workoutListForm": {
+    "addExercise": "+ Add Exercise",
+    "createTitle": "New Workout List",
+    "description": "Description",
+    "descriptionPlaceholder": "Chest, shoulders, triceps",
+    "dialogs": {
+      "checkExercises": "Please check exercise data validity",
+      "createFailed": "An error occurred while creating the workout list",
+      "exercisesRequired": "Please add at least one exercise",
+      "nameRequired": "Please enter a list name",
+      "saveFailed": "An error occurred while editing the workout list"
+    },
+    "editTitle": "Editing {{name}}",
+    "errors": {
+      "repsInvalid": "Enter a valid number of reps",
+      "repsNotPositive": "Reps must be greater than 0",
+      "setsInvalid": "Enter a valid number of sets",
+      "setsNotPositive": "Sets must be greater than 0",
+      "weightInvalid": "Enter a valid weight",
+      "weightNegative": "Weight cannot be negative"
+    },
+    "exerciseName": "Name *",
+    "exerciseNamePlaceholder": "Bench Press",
+    "exercises": "Exercises",
+    "loading": "Loading workout list",
+    "muscleGroup": "Muscle Group",
+    "name": "List Name *",
+    "namePlaceholder": "e.g., Push Day",
+    "noExercises": "Add exercises to your list",
+    "removeExercise": "Remove exercise",
+    "submitCreate": "Create List",
+    "untitled": "Untitled",
+    "weight": "Weight (kg)"
   }
 }

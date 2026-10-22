@@ -35,7 +35,7 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
       if (others.length > 0) {
         toastError(others.join(' '));
       } else if (Object.keys(fields).length === 0) {
-        toastError('Failed to update workout list');
+        toastError(t('workoutList.toasts.updateFailed'));
       }
       throw error;
     }
@@ -44,7 +44,7 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
       try {
         await resyncSession(resyncSessionId);
       } catch (error: unknown) {
-        toastError(apiErrorText(error, t) ?? 'Failed to update the current session');
+        toastError(apiErrorText(error, t) ?? t('workoutList.toasts.resyncFailed'));
         throw error;
       }
     }
@@ -53,12 +53,11 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
   const onSubmit = async (dto: UpdateWorkoutListDto): Promise<void> => {
     if (activeSessionId) {
       const result = await confirmDialog({
-        title: 'Also update the current session?',
-        description:
-          'Update session saves the list and applies these changes to the active workout. Keep session saves the list only. Cancel returns to editing.',
-        confirmationText: 'Update session',
-        alternateText: 'Keep session',
-        cancellationText: 'Cancel',
+        title: t('workoutList.resyncDialog.title'),
+        description: t('workoutList.resyncDialog.description'),
+        confirmationText: t('workoutList.resyncDialog.update'),
+        alternateText: t('workoutList.resyncDialog.keep'),
+        cancellationText: t('common.cancel'),
         onConfirm: () => save(dto, activeSessionId),
         onAlternate: () => save(dto, null),
       });
@@ -76,12 +75,13 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
       }
     }
 
-    toastSuccess('Workout list updated');
+    toastSuccess(t('workoutList.toasts.updated'));
     navigate({ to: '/' });
   };
 
   return (
     <EditWorkoutPage
+      t={t}
       loadingPhase={loadingPhase}
       workout={workout ?? null}
       submitProgress={progressOf('save')}

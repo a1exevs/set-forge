@@ -7,7 +7,7 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 
-import WorkoutListFormSkeleton from './workout-list-form-skeleton';
+import WorkoutListFormSkeleton from './workout-list-form-skeleton-logic-layer';
 
 const meta = {
   title: 'Widgets/WorkoutListFormSkeleton',

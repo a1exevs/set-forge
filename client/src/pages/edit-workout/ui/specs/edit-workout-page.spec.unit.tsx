@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
+import { t } from 'tests/common/translate';
+
 import type { WorkoutList } from '@entities/workout-list';
 
 import EditWorkoutPage from '../edit-workout-page';
@@ -24,6 +26,7 @@ const WORKOUT_LIST: WorkoutList = {
 };
 
 const baseProps = {
+  t,
   loadingPhase: 'content' as const,
   workout: WORKOUT_LIST,
   submitProgress: 'idle' as const,

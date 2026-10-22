@@ -7,8 +7,11 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 import { withFrame } from 'storybook-dir/showcase';
+import { withTranslate } from 'storybook-dir/with-translate';
 
-import HomePageSkeleton from './home-page-skeleton';
+import HomePageSkeletonPresentation from './home-page-skeleton';
+
+const HomePageSkeleton = withTranslate(HomePageSkeletonPresentation);
 
 const meta = {
   title: 'Pages/HomePageSkeleton',
