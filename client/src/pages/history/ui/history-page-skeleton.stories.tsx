@@ -13,6 +13,7 @@ import HistoryPageSkeleton from './history-page-skeleton';
 const meta = {
   title: 'Pages/HistoryPageSkeleton',
   component: HistoryPageSkeleton,
+  args: { label: 'Loading history' },
   decorators: [withFrame],
   parameters: {
     docs: {

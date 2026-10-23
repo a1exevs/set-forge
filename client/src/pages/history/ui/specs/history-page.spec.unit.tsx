@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 
-import { t } from 'tests/common/translate';
+import { t, tRu } from 'tests/common/translate';
 
 import { type MuscleGroup, muscleGroupLabel } from '@entities/workout-exercise';
 import type { WorkoutSession } from '@entities/workout-session';
@@ -40,6 +40,8 @@ const SESSION: WorkoutSession = {
 };
 
 const baseProps = {
+  t,
+  language: 'en' as const,
   swipeRef: createRef<HTMLDivElement>(),
   sessions: [SESSION],
   total: 1,
@@ -121,5 +123,49 @@ describe('HistoryPage', () => {
     await user.click(screen.getByRole('button', { expanded: false }));
 
     expect(onToggle).toHaveBeenCalledWith('sess-1');
+  });
+
+  // AC-2 of #112: workouts and reps in the plural form of the language
+  it.each([
+    ['ru', 1, '1 тренировка'],
+    ['ru', 2, '2 тренировки'],
+    ['ru', 5, '5 тренировок'],
+    ['ru', 11, '11 тренировок'],
+    ['ru', 21, '21 тренировка'],
+    ['ru', 22, '22 тренировки'],
+    ['en', 1, '1 workout'],
+    ['en', 2, '2 workouts'],
+  ] as const)('counts %s workouts: %i', (language, total, text) => {
+    render(<HistoryPage {...baseProps} t={language === 'ru' ? tRu : t} language={language} total={total} />);
+
+    expect(screen.getByText(text)).toBeInTheDocument();
+  });
+
+  it.each([
+    ['ru', 1, '60 кг × 1 повтор'],
+    ['ru', 2, '60 кг × 2 повтора'],
+    ['ru', 5, '60 кг × 5 повторов'],
+    ['ru', 11, '60 кг × 11 повторов'],
+    ['ru', 21, '60 кг × 21 повтор'],
+    ['ru', 22, '60 кг × 22 повтора'],
+    ['en', 1, '60 kg × 1 rep'],
+    ['en', 2, '60 kg × 2 reps'],
+  ] as const)('shows the reps in %s: %i', (language, reps, text) => {
+    const [session] = baseProps.sessions;
+    if (!session) {
+      throw new Error('no session in the fixture');
+    }
+    const withReps = { ...session, exercises: session.exercises.map(exercise => ({ ...exercise, weight: 60, reps })) };
+    render(
+      <HistoryPage
+        {...baseProps}
+        t={language === 'ru' ? tRu : t}
+        language={language}
+        sessions={[withReps]}
+        expandedIds={{ [withReps.id]: true }}
+      />,
+    );
+
+    expect(screen.getAllByText(text).length).toBeGreaterThan(0);
   });
 });

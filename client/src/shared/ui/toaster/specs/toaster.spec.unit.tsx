@@ -34,7 +34,7 @@ describe('Toaster', () => {
   });
 
   it('renders sonner toaster at bottom-left when a toast is shown', async () => {
-    render(<Toaster />);
+    render(<Toaster ariaLabel="Notifications" />);
     toastSuccess('Workout list created');
 
     await waitFor((): void => {
@@ -46,7 +46,7 @@ describe('Toaster', () => {
   });
 
   it('shows a success toast when toastSuccess is called', async () => {
-    render(<Toaster />);
+    render(<Toaster ariaLabel="Notifications" />);
 
     toastSuccess('Workout list created');
 
@@ -56,12 +56,18 @@ describe('Toaster', () => {
   });
 
   it('shows an error toast when toastError is called', async () => {
-    render(<Toaster />);
+    render(<Toaster ariaLabel="Notifications" />);
 
     toastError('Something went wrong');
 
     await waitFor((): void => {
       expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     });
+  });
+
+  it('names the toast region by the given label', () => {
+    render(<Toaster ariaLabel="Уведомления" />);
+
+    expect(screen.getByRole('region', { name: /^Уведомления/ })).toBeInTheDocument();
   });
 });

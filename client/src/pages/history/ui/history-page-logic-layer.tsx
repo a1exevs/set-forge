@@ -27,7 +27,7 @@ const HistoryPageLogicLayer: FC<Props> = ({
   hasMore,
   fetchNextPage,
 }) => {
-  const { t } = useT();
+  const { t, language } = useT();
   const swipeRef = useMainTabSwipe();
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -57,6 +57,8 @@ const HistoryPageLogicLayer: FC<Props> = ({
 
   return (
     <HistoryPage
+      t={t}
+      language={language}
       swipeRef={swipeRef}
       sessions={sessions}
       total={total}
@@ -66,8 +68,8 @@ const HistoryPageLogicLayer: FC<Props> = ({
       expandedIds={expandedIds}
       onToggle={handleToggle}
       sentinelRef={sentinelRef}
-      formatSessionDate={formatSessionDate}
-      formatSummary={formatSummary}
+      formatSessionDate={(iso: string | null): string => formatSessionDate(iso, language)}
+      formatSummary={(session: WorkoutSession): string => formatSummary(session, t)}
       formatMuscleGroup={(group: MuscleGroup): string => muscleGroupLabel(group, t)}
     />
   );

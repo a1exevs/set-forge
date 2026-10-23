@@ -11,7 +11,7 @@ describe('authErrorText', () => {
   it('names each code of the form', () => {
     expect(authErrorText('emailRequired', t)).toBe('Email is required');
     expect(authErrorText('passwordsMismatch', t)).toBe('Passwords do not match');
-    expect(authErrorText('captchaNeeded', t)).toBe('Captcha required');
+    expect(authErrorText('captchaDemanded', t)).toBe('Captcha required');
   });
 });
 
