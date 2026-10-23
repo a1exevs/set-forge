@@ -1,5 +1,6 @@
 import { FC } from 'react';
 
+import type { Translate } from '@shared/lib';
 import { Skeleton } from '@shared/ui';
 
 import classes from './home-page.module.scss';
@@ -9,8 +10,12 @@ import classes from './home-page.module.scss';
  * bone the size of the line it stands in for (title, badge, the 44 px menu slot, description, two footer lines).
  * Nine cards — three rows of the desktop grid; the page clips them to the first screen.
  */
-const HomePageSkeleton: FC = () => (
-  <div role="status" aria-label="Loading workout lists" className={classes.listGrid}>
+type Props = {
+  t: Translate;
+};
+
+const HomePageSkeleton: FC<Props> = ({ t }) => (
+  <div role="status" aria-label={t('home.loading')} className={classes.listGrid}>
     {Array.from({ length: 9 }, (_: unknown, index: number) => (
       <div key={index} className={classes.card}>
         <div className={classes.cardContent}>

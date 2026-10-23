@@ -12,34 +12,43 @@ export type ExerciseSubmitPayload = {
 
 export type ExerciseNumericFieldKey = 'weight' | 'reps' | 'sets';
 
+/** What is wrong with a number of an exercise: a code, so the form says it in the chosen language. */
+export type ExerciseNumericError =
+  | 'weightInvalid'
+  | 'weightNegative'
+  | 'repsInvalid'
+  | 'repsNotPositive'
+  | 'setsInvalid'
+  | 'setsNotPositive';
+
 export const getExerciseNumericFieldError = (
   exercise: Pick<ExerciseFormData, 'weight' | 'reps' | 'sets'>,
   field: ExerciseNumericFieldKey,
-): string | undefined => {
+): ExerciseNumericError | undefined => {
   if (field === 'weight') {
     if (exercise.weight === null || Number.isNaN(exercise.weight)) {
-      return 'Enter a valid weight';
+      return 'weightInvalid';
     }
     if (exercise.weight < 0) {
-      return 'Weight cannot be negative';
+      return 'weightNegative';
     }
     return undefined;
   }
   if (field === 'reps') {
     if (exercise.reps === null || Number.isNaN(exercise.reps)) {
-      return 'Enter a valid number of reps';
+      return 'repsInvalid';
     }
     if (exercise.reps <= 0) {
-      return 'Reps must be greater than 0';
+      return 'repsNotPositive';
     }
     return undefined;
   }
   if (field === 'sets') {
     if (exercise.sets === null || Number.isNaN(exercise.sets)) {
-      return 'Enter a valid number of sets';
+      return 'setsInvalid';
     }
     if (exercise.sets <= 0) {
-      return 'Sets must be greater than 0';
+      return 'setsNotPositive';
     }
     return undefined;
   }

@@ -10,12 +10,15 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
+import { withTranslate } from 'storybook-dir/with-translate';
 
 import type { WorkoutListsExportFile } from '@entities/workout-list';
 import { formatDate } from '@shared/lib';
 
-import HomePage from './home-page';
+import HomePagePresentation from './home-page';
 import HomePageLogicLayer from './home-page-logic-layer';
+
+const HomePage = withTranslate(HomePagePresentation);
 
 const renderHomePage = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({

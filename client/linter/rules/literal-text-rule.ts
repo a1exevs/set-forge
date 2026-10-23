@@ -20,6 +20,29 @@ const TEXT_ATTRIBUTES = [
  */
 const NOT_TEXT: (string | RegExp)[] = [/^[\p{N}\p{P}\p{S}\s]+$/u, '[A-Z_-]+', 'Set Forge'];
 
+/**
+ * Calls whose string arguments are never text: the plugin's defaults (an option replaces them, so they are repeated
+ * here) and the field names and request paths of a form (`exerciseFieldPath(index, 'name')`,
+ * `getServerFieldError('name')`) — getters and paths only, a setter takes text.
+ */
+const NOT_TEXT_CALLS = [
+  'i18n(ext)?',
+  't',
+  'require',
+  'addEventListener',
+  'removeEventListener',
+  'postMessage',
+  'getElementById',
+  'dispatch',
+  'commit',
+  'includes',
+  'indexOf',
+  'endsWith',
+  'startsWith',
+  '[a-zA-Z]+FieldPath',
+  'get[a-zA-Z]*FieldError',
+];
+
 const SOURCES = ['src/**/*.{ts,tsx}'];
 const EXEMPT = ['src/**/specs/**', 'src/**/*.stories.tsx', ...LITERAL_TEXT_BASELINE];
 
@@ -48,6 +71,7 @@ export const literalTextConfigs = (): Linter.Config[] => [
           mode: 'jsx-only',
           'jsx-attributes': { include: TEXT_ATTRIBUTES },
           words: { exclude: NOT_TEXT },
+          callees: { exclude: NOT_TEXT_CALLS },
           message: 'Interface text comes from the dictionaries — use `t(…)` (src/app/i18n)',
         },
       ],

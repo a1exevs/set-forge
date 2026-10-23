@@ -1,4 +1,4 @@
-import { formatDate } from '../format';
+import { formatDate, formatNumber } from '../format';
 
 // Midday UTC: the same calendar day in every time zone the tests run in.
 const OCT_19 = '2026-10-19T12:00:00.000Z';
@@ -18,5 +18,16 @@ describe('formatDate', () => {
 
   it('gives an empty label for an invalid date instead of throwing', () => {
     expect(formatDate('not a date', 'en')).toBe('');
+  });
+});
+
+describe('formatNumber', () => {
+  it('uses the decimal separator of the language', () => {
+    expect(formatNumber(12.5, 'en')).toBe('12.5');
+    expect(formatNumber(12.5, 'ru')).toBe('12,5');
+  });
+
+  it('keeps whole numbers whole', () => {
+    expect(formatNumber(80, 'ru')).toBe('80');
   });
 });

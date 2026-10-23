@@ -1,7 +1,7 @@
 import { ChevronDown } from 'lucide-react';
 import { FC, RefObject } from 'react';
 
-import { muscleGroupLabels } from '@entities/workout-exercise';
+import type { MuscleGroup } from '@entities/workout-exercise';
 import type { WorkoutSession } from '@entities/workout-session';
 import { isExerciseComplete, type WorkoutSessionExercise } from '@entities/workout-session-exercise';
 import type { LoadingPhase } from '@shared/lib';
@@ -24,6 +24,7 @@ type Props = {
   sentinelRef: RefObject<HTMLDivElement>;
   formatSessionDate: (iso: string | null) => string;
   formatSummary: (session: WorkoutSession) => string;
+  formatMuscleGroup: (group: MuscleGroup) => string;
 };
 
 const HistoryPage: FC<Props> = ({
@@ -38,6 +39,7 @@ const HistoryPage: FC<Props> = ({
   sentinelRef,
   formatSessionDate,
   formatSummary,
+  formatMuscleGroup,
 }) => {
   const renderBody = (): JSX.Element | null => {
     if (loadingPhase === 'skeleton') {
@@ -104,7 +106,7 @@ const HistoryPage: FC<Props> = ({
                           <div className={classes.exerciseMain}>
                             <div className={classes.exerciseName}>
                               {exercise.name}
-                              <span className={classes.muscleBadge}>{muscleGroupLabels[exercise.muscleGroup]}</span>
+                              <span className={classes.muscleBadge}>{formatMuscleGroup(exercise.muscleGroup)}</span>
                             </div>
                             <div className={classes.exerciseSub}>
                               {exercise.weight} kg × {exercise.reps} reps

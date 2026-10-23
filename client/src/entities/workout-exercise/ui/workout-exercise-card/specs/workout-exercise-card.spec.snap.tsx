@@ -1,5 +1,7 @@
 import { render } from '@testing-library/react';
 
+import { t } from 'tests/common/translate';
+
 import type { WorkoutExercise } from '../../../model/workout-exercise';
 import WorkoutExerciseCard from '../workout-exercise-card';
 
@@ -14,7 +16,7 @@ const EXERCISE: WorkoutExercise = {
 
 describe('WorkoutExerciseCard', () => {
   it('matches snapshot', () => {
-    const { container } = render(<WorkoutExerciseCard exercise={EXERCISE} />);
+    const { container } = render(<WorkoutExerciseCard exercise={EXERCISE} t={t} language="en" />);
     expect(container).toMatchSnapshot();
   });
 });

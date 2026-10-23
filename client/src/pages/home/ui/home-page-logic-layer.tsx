@@ -47,22 +47,22 @@ const HomePageLogicLayer: FC<Props> = ({
 
   const handleDelete = async (id: string, name: string): Promise<void> => {
     const ok = await confirmDialog({
-      title: 'Delete workout list?',
-      description: `Delete "${name}"? This cannot be undone.`,
-      confirmationText: 'Delete',
-      cancellationText: 'Cancel',
+      title: t('home.deleteDialog.title'),
+      description: t('home.deleteDialog.description', { name }),
+      confirmationText: t('common.delete'),
+      cancellationText: t('common.cancel'),
       onConfirm: async (): Promise<void> => {
         try {
           await deleteWorkoutList(id);
         } catch (error: unknown) {
-          toastError(apiErrorText(error, t) ?? 'Failed to delete workout list');
+          toastError(apiErrorText(error, t) ?? t('home.toasts.deleteFailed'));
           throw error;
         }
       },
     });
     if (ok) {
       clearWorkoutSessionCachesForDeletedList(id);
-      toastSuccess('Workout list deleted');
+      toastSuccess(t('home.toasts.deleted'));
     }
   };
 
@@ -72,10 +72,10 @@ const HomePageLogicLayer: FC<Props> = ({
         downloadJsonFile(await exportAllWorkoutLists(), buildWorkoutListsExportFilename());
       });
       if (done) {
-        toastSuccess('Workout lists exported');
+        toastSuccess(t('home.toasts.exported'));
       }
     } catch (error: unknown) {
-      toastError(apiErrorText(error, t) ?? 'Failed to export workout lists');
+      toastError(apiErrorText(error, t) ?? t('home.toasts.exportFailed'));
     }
   };
 
@@ -94,7 +94,7 @@ const HomePageLogicLayer: FC<Props> = ({
     try {
       parsed = JSON.parse(await file.text());
     } catch {
-      toastError('The selected file is not valid JSON.');
+      toastError(t('home.toasts.invalidFile'));
       return;
     }
 
@@ -105,31 +105,32 @@ const HomePageLogicLayer: FC<Props> = ({
         : 0;
 
     if (count === 0) {
-      toastError('The file does not contain any workout lists to import.');
+      toastError(t('home.toasts.nothingToImport'));
       return;
     }
 
     const ok = await confirmDialog({
-      title: 'Import workout lists?',
-      description: `Import ${count} workout list${count === 1 ? '' : 's'}?`,
-      confirmationText: 'Import',
-      cancellationText: 'Cancel',
+      title: t('home.importDialog.title'),
+      description: t('home.importDialog.description', { count }),
+      confirmationText: t('home.importDialog.import'),
+      cancellationText: t('common.cancel'),
       onConfirm: async (): Promise<void> => {
         try {
           await importWorkoutLists(parsed as WorkoutListsExportFile);
         } catch (error: unknown) {
-          toastError(apiErrorText(error, t) ?? 'Failed to import workout lists');
+          toastError(apiErrorText(error, t) ?? t('home.toasts.importFailed'));
           throw error;
         }
       },
     });
     if (ok) {
-      toastSuccess('Workout lists imported');
+      toastSuccess(t('home.toasts.imported'));
     }
   };
 
   return (
     <HomePage
+      t={t}
       swipeRef={swipeRef}
       workoutLists={workoutLists}
       loadingPhase={loadingPhase}

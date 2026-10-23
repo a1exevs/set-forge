@@ -24,3 +24,15 @@ export const formatDate = (
   }
   return format.format(date);
 };
+
+const numberFormats = new Map<Language, Intl.NumberFormat>();
+
+/** A number with the decimal and group separators of the interface language (`12.5` / `12,5`). */
+export const formatNumber = (value: number, language: Language): string => {
+  let format = numberFormats.get(language);
+  if (!format) {
+    format = new Intl.NumberFormat(language);
+    numberFormats.set(language, format);
+  }
+  return format.format(value);
+};

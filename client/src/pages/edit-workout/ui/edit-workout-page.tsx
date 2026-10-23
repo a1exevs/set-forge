@@ -1,11 +1,12 @@
 import { FC } from 'react';
 
 import type { UpdateWorkoutListDto, WorkoutList } from '@entities/workout-list';
-import type { LoadingPhase, Progress } from '@shared/lib';
+import type { LoadingPhase, Progress, Translate } from '@shared/lib';
 import { NotFoundMessage } from '@shared/ui';
 import { WorkoutListForm, WorkoutListFormSkeleton } from '@widgets/workout-list-form';
 
 type Props = {
+  t: Translate;
   loadingPhase: LoadingPhase;
   workout: WorkoutList | null;
   submitProgress: Progress;
@@ -16,6 +17,7 @@ type Props = {
 };
 
 const EditWorkoutPage: FC<Props> = ({
+  t,
   loadingPhase,
   workout,
   submitProgress,
@@ -33,7 +35,7 @@ const EditWorkoutPage: FC<Props> = ({
 
   // TODO: Distinguish query errors from a missing list — not only "Workout list not found" (see data layer)
   if (workout === null) {
-    return <NotFoundMessage title="Workout list not found" backToLabel="Back to Home" />;
+    return <NotFoundMessage title={t('workoutList.notFound')} backToLabel={t('common.backToHome')} />;
   }
 
   return (

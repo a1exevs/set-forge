@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
+import { t } from 'tests/common/translate';
+
 import type { WorkoutExercise } from '../../../model/workout-exercise';
 import WorkoutExerciseCard from '../workout-exercise-card';
 
@@ -15,19 +17,19 @@ const EXERCISE: WorkoutExercise = {
 describe('WorkoutExerciseCard', () => {
   describe('rendering', () => {
     it('renders exercise name', () => {
-      render(<WorkoutExerciseCard exercise={EXERCISE} />);
+      render(<WorkoutExerciseCard exercise={EXERCISE} t={t} language="en" />);
 
       expect(screen.getByRole('heading', { name: 'Bench Press' })).toBeInTheDocument();
     });
 
     it('renders muscle group label', () => {
-      render(<WorkoutExerciseCard exercise={EXERCISE} />);
+      render(<WorkoutExerciseCard exercise={EXERCISE} t={t} language="en" />);
 
       expect(screen.getByText('Chest')).toBeInTheDocument();
     });
 
     it('renders weight, reps, and sets', () => {
-      render(<WorkoutExerciseCard exercise={EXERCISE} />);
+      render(<WorkoutExerciseCard exercise={EXERCISE} t={t} language="en" />);
 
       expect(screen.getByText('60 kg')).toBeInTheDocument();
       expect(screen.getByText('10')).toBeInTheDocument();
@@ -35,7 +37,7 @@ describe('WorkoutExerciseCard', () => {
     });
 
     it('is read-only without training hint or button role', () => {
-      render(<WorkoutExerciseCard exercise={EXERCISE} />);
+      render(<WorkoutExerciseCard exercise={EXERCISE} t={t} language="en" />);
 
       expect(screen.queryByText('Double tap to mark a set')).not.toBeInTheDocument();
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
