@@ -4,7 +4,7 @@ import { FC, RefObject } from 'react';
 import type { MuscleGroup } from '@entities/workout-exercise';
 import type { WorkoutSession } from '@entities/workout-session';
 import { isExerciseComplete, type WorkoutSessionExercise } from '@entities/workout-session-exercise';
-import type { LoadingPhase } from '@shared/lib';
+import { formatNumber, type Language, type LoadingPhase, type Translate } from '@shared/lib';
 import { BrandWordmark } from '@shared/ui';
 import { MainTabsBar } from '@widgets/main-tabs-bar';
 
@@ -12,6 +12,8 @@ import HistoryPageSkeleton from './history-page-skeleton';
 import classes from './history-page.module.scss';
 
 type Props = {
+  t: Translate;
+  language: Language;
   swipeRef: RefObject<HTMLDivElement>;
   sessions: WorkoutSession[];
   total: number;
@@ -28,6 +30,8 @@ type Props = {
 };
 
 const HistoryPage: FC<Props> = ({
+  t,
+  language,
   swipeRef,
   sessions,
   total,
@@ -43,7 +47,7 @@ const HistoryPage: FC<Props> = ({
 }) => {
   const renderBody = (): JSX.Element | null => {
     if (loadingPhase === 'skeleton') {
-      return <HistoryPageSkeleton />;
+      return <HistoryPageSkeleton label={t('history.loading')} />;
     }
     if (loadingPhase === 'blank') {
       return null;
@@ -52,8 +56,8 @@ const HistoryPage: FC<Props> = ({
     if (isError) {
       return (
         <div className={classes.stateMessage}>
-          <p>Could not load your workout history</p>
-          <p className={classes.emptyHint}>Please try again later</p>
+          <p>{t('history.error')}</p>
+          <p className={classes.emptyHint}>{t('history.errorHint')}</p>
         </div>
       );
     }
@@ -61,8 +65,8 @@ const HistoryPage: FC<Props> = ({
     if (sessions.length === 0) {
       return (
         <div className={classes.empty}>
-          <p>No completed workouts yet</p>
-          <p className={classes.emptyHint}>Finish a workout to see it here</p>
+          <p>{t('history.empty')}</p>
+          <p className={classes.emptyHint}>{t('history.emptyHint')}</p>
         </div>
       );
     }
@@ -109,7 +113,10 @@ const HistoryPage: FC<Props> = ({
                               <span className={classes.muscleBadge}>{formatMuscleGroup(exercise.muscleGroup)}</span>
                             </div>
                             <div className={classes.exerciseSub}>
-                              {exercise.weight} kg × {exercise.reps} reps
+                              {t('history.exerciseLine', {
+                                weight: formatNumber(exercise.weight, language),
+                                count: exercise.reps,
+                              })}
                             </div>
                           </div>
                           <span
@@ -131,7 +138,7 @@ const HistoryPage: FC<Props> = ({
 
         <div ref={sentinelRef} className={classes.sentinel} aria-hidden />
         {showNextPageSkeleton && (
-          <HistoryPageSkeleton rows={2} label="Loading more history" className={classes.nextPageSkeleton} />
+          <HistoryPageSkeleton rows={2} label={t('history.loadingMore')} className={classes.nextPageSkeleton} />
         )}
       </>
     );
@@ -144,12 +151,8 @@ const HistoryPage: FC<Props> = ({
     >
       <header className={classes.header}>
         <div className={classes.headerTop}>
-          <BrandWordmark title="History" />
-          {total > 0 && (
-            <span className={classes.count}>
-              {total} workout{total === 1 ? '' : 's'}
-            </span>
-          )}
+          <BrandWordmark title={t('history.title')} />
+          {total > 0 && <span className={classes.count}>{t('history.count', { count: total })}</span>}
         </div>
       </header>
 

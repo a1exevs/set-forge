@@ -9,11 +9,11 @@ export type AuthFormError =
   | 'passwordsMismatch'
   | 'consentRequired'
   | 'termsRequired'
-  | 'captchaRequired'
+  | 'captchaEmpty'
   | 'unknown'
   | 'registrationFailed'
   | 'loginFailed'
-  | 'captchaNeeded';
+  | 'captchaDemanded';
 
 /** The checks of the last submit: a field that passed holds `null`. */
 export type AuthFieldErrors = Partial<Record<AuthField, AuthFormError | null>>;

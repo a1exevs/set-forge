@@ -6,7 +6,7 @@ import { toastError, toastSuccess } from '@shared/lib';
 import Toaster from '../toaster-data-layer';
 
 const showAndSnapshot = async (show: () => void): Promise<{ baseElement: HTMLElement }> => {
-  const result = render(<Toaster />);
+  const result = render(<Toaster ariaLabel="Notifications" />);
   show();
 
   await waitFor((): void => {

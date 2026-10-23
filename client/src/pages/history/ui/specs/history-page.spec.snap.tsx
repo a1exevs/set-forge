@@ -42,6 +42,8 @@ describe('HistoryPage', () => {
   it('matches snapshot with an expanded session', () => {
     const { container } = render(
       <HistoryPage
+        t={t}
+        language="en"
         swipeRef={createRef<HTMLDivElement>()}
         sessions={[SESSION]}
         total={1}

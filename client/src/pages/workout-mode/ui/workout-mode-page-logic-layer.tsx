@@ -57,7 +57,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     try {
       await run('start', () => startSession(workoutList.id));
     } catch (error: unknown) {
-      toastError(apiErrorText(error, t) ?? 'Failed to start workout session');
+      toastError(apiErrorText(error, t) ?? t('workoutMode.toasts.startFailed'));
     }
   };
 
@@ -88,7 +88,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
           celebrateOnce();
         }
       } catch (error: unknown) {
-        toastError(apiErrorText(error, t) ?? 'Failed to update session progress');
+        toastError(apiErrorText(error, t) ?? t('workoutMode.toasts.progressFailed'));
       }
     })();
   };
@@ -113,17 +113,16 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     }
 
     const result = await confirmDialog({
-      title: 'Finish workout?',
-      description:
-        'Finish saves this session to history. Discard deletes this active session without saving. Cancel keeps the workout open.',
-      confirmationText: 'Finish',
-      alternateText: 'Discard',
-      cancellationText: 'Cancel',
+      title: t('workoutMode.finishDialog.title'),
+      description: t('workoutMode.finishDialog.description'),
+      confirmationText: t('workoutMode.finishDialog.finish'),
+      alternateText: t('workoutMode.finishDialog.discard'),
+      cancellationText: t('common.cancel'),
       onConfirm: async (): Promise<void> => {
         try {
           await finishSession(session.id);
         } catch (error: unknown) {
-          toastError(apiErrorText(error, t) ?? 'Failed to finish workout session');
+          toastError(apiErrorText(error, t) ?? t('workoutMode.toasts.finishFailed'));
           throw error;
         }
       },
@@ -131,7 +130,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
         try {
           await discardSession(session.id);
         } catch (error: unknown) {
-          toastError(apiErrorText(error, t) ?? 'Failed to discard workout session');
+          toastError(apiErrorText(error, t) ?? t('workoutMode.toasts.discardFailed'));
           throw error;
         }
       },
@@ -195,6 +194,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
 
   return (
     <WorkoutModePage
+      t={t}
       loadingPhase={loadingPhase}
       phase={phase}
       workoutList={workoutList ?? null}

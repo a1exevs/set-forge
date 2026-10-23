@@ -1,17 +1,16 @@
 import { countCompletedExercises, type WorkoutSession } from '@entities/workout-session';
+import { formatDate, type Language, type Translate } from '@shared/lib';
 
-export const formatSessionDate = (iso: string | null): string => {
+const WITH_YEAR: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+
+export const formatSessionDate = (iso: string | null, language: Language): string => {
   if (!iso) {
     return '';
   }
-  return new Date(iso).toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
+  return formatDate(iso, language, WITH_YEAR);
 };
 
-export const formatDuration = (session: WorkoutSession): string | null => {
+export const formatDuration = (session: WorkoutSession, t: Translate): string | null => {
   if (!session.finishedAt) {
     return null;
   }
@@ -21,17 +20,20 @@ export const formatDuration = (session: WorkoutSession): string | null => {
   }
   const totalMinutes = Math.round(ms / 60000);
   if (totalMinutes < 60) {
-    return `${totalMinutes} min`;
+    return t('history.duration.minutes', { minutes: totalMinutes });
   }
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  return minutes === 0 ? `${hours} h` : `${hours} h ${minutes} min`;
+  return minutes === 0
+    ? t('history.duration.hours', { hours })
+    : t('history.duration.hoursMinutes', { hours, minutes });
 };
 
-export const formatSummary = (session: WorkoutSession): string => {
-  const total = session.exercises.length;
-  const completed = countCompletedExercises(session);
-  const exercisesLabel = `${completed}/${total} exercise${total === 1 ? '' : 's'}`;
-  const duration = formatDuration(session);
+export const formatSummary = (session: WorkoutSession, t: Translate): string => {
+  const exercisesLabel = t('history.summary', {
+    completed: countCompletedExercises(session),
+    count: session.exercises.length,
+  });
+  const duration = formatDuration(session, t);
   return duration ? `${exercisesLabel} · ${duration}` : exercisesLabel;
 };

@@ -178,7 +178,7 @@ const AuthPage: FC<Props> = ({
               {captchaImageUrl && (
                 <img
                   src={captchaImageUrl}
-                  alt={t('auth.captcha.image')}
+                  alt={t('auth.captcha.imageAlt')}
                   className={classes.captchaImg}
                   width={200}
                   height={60}

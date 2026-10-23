@@ -21,16 +21,16 @@ export const authErrorText = (error: AuthFormError, t: Translate): string => {
       return t('auth.errors.consentRequired');
     case 'termsRequired':
       return t('auth.errors.termsRequired');
-    case 'captchaRequired':
-      return t('auth.errors.captchaRequired');
+    case 'captchaEmpty':
+      return t('auth.errors.captchaEmpty');
     case 'unknown':
       return t('auth.errors.unknown');
     case 'registrationFailed':
       return t('auth.errors.registrationFailed');
     case 'loginFailed':
       return t('auth.errors.loginFailed');
-    case 'captchaNeeded':
-      return t('auth.errors.captchaNeeded');
+    case 'captchaDemanded':
+      return t('auth.errors.captchaDemanded');
     default:
       return exhaustiveCheck(error);
   }

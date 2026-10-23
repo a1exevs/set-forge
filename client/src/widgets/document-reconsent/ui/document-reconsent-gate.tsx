@@ -81,7 +81,7 @@ const DocumentReconsentGate: FC<Props> = ({
           </span>
         </label>
 
-        {isError && <p className={classes.error}>{t('reconsent.error')}</p>}
+        {isError && <p className={classes.error}>{t('reconsent.acceptFailed')}</p>}
 
         <div className={classes.actions}>
           <Button
