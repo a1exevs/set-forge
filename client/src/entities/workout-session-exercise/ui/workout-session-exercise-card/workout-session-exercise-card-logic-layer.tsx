@@ -15,7 +15,7 @@ type Props = {
 };
 
 const WorkoutSessionExerciseCardLogicLayer: FC<Props> = ({ exercise, justCompleted, isFinished, onTap }) => {
-  const { t } = useT();
+  const { t, language } = useT();
   const progress = getExerciseProgress(exercise);
   const isCompleted = isExerciseComplete(exercise);
 
@@ -32,6 +32,8 @@ const WorkoutSessionExerciseCardLogicLayer: FC<Props> = ({ exercise, justComplet
 
   return (
     <WorkoutSessionExerciseCard
+      t={t}
+      language={language}
       exercise={exercise}
       muscleGroupText={muscleGroupLabel(exercise.muscleGroup, t)}
       justCompleted={justCompleted}

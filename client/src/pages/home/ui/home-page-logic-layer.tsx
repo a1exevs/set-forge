@@ -55,14 +55,14 @@ const HomePageLogicLayer: FC<Props> = ({
         try {
           await deleteWorkoutList(id);
         } catch (error: unknown) {
-          toastError(apiErrorText(error, t) ?? t('home.toasts.deleteFailed'));
+          toastError(apiErrorText(error, t) ?? t('home.toasts.listDeleteFailed'));
           throw error;
         }
       },
     });
     if (ok) {
       clearWorkoutSessionCachesForDeletedList(id);
-      toastSuccess(t('home.toasts.deleted'));
+      toastSuccess(t('home.toasts.listDeleted'));
     }
   };
 
@@ -72,10 +72,10 @@ const HomePageLogicLayer: FC<Props> = ({
         downloadJsonFile(await exportAllWorkoutLists(), buildWorkoutListsExportFilename());
       });
       if (done) {
-        toastSuccess(t('home.toasts.exported'));
+        toastSuccess(t('home.toasts.listsExported'));
       }
     } catch (error: unknown) {
-      toastError(apiErrorText(error, t) ?? t('home.toasts.exportFailed'));
+      toastError(apiErrorText(error, t) ?? t('home.toasts.listsExportFailed'));
     }
   };
 
@@ -118,13 +118,13 @@ const HomePageLogicLayer: FC<Props> = ({
         try {
           await importWorkoutLists(parsed as WorkoutListsExportFile);
         } catch (error: unknown) {
-          toastError(apiErrorText(error, t) ?? t('home.toasts.importFailed'));
+          toastError(apiErrorText(error, t) ?? t('home.toasts.listsImportFailed'));
           throw error;
         }
       },
     });
     if (ok) {
-      toastSuccess(t('home.toasts.imported'));
+      toastSuccess(t('home.toasts.listsImported'));
     }
   };
 

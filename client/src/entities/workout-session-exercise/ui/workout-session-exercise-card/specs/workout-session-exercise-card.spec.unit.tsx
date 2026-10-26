@@ -1,5 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+import { useLanguageStore } from '@shared/lib';
 
 import type { WorkoutSessionExercise } from '../../../model/workout-session-exercise';
 import WorkoutSessionExerciseCard from '../workout-session-exercise-card-logic-layer';
@@ -114,5 +116,29 @@ describe('WorkoutSessionExerciseCard', () => {
       expect(onTap).toHaveBeenCalledTimes(2);
       expect(onTap).toHaveBeenCalledWith('sx-1');
     });
+  });
+
+  // AC-2 of #112: the sets in the plural form of the language; in Russian after «из» — из 1 / 21 подхода, из 3 / 5 / 11 подходов
+  it.each([
+    ['ru', 1, 'Bench Press: 0 из 1 подхода'],
+    ['ru', 2, 'Bench Press: 0 из 2 подходов'],
+    ['ru', 5, 'Bench Press: 0 из 5 подходов'],
+    ['ru', 11, 'Bench Press: 0 из 11 подходов'],
+    ['ru', 21, 'Bench Press: 0 из 21 подхода'],
+    ['ru', 22, 'Bench Press: 0 из 22 подходов'],
+    ['en', 1, 'Bench Press: 0 of 1 set'],
+    ['en', 2, 'Bench Press: 0 of 2 sets'],
+  ] as const)('names the card in %s with %i sets in the right plural form', (language, sets, name) => {
+    act((): void => useLanguageStore.getState().setLanguage(language));
+    render(
+      <WorkoutSessionExerciseCard
+        exercise={{ ...EXERCISE, completedSets: 0, sets }}
+        justCompleted={false}
+        isFinished={false}
+        onTap={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name })).toBeInTheDocument();
   });
 });

@@ -182,7 +182,7 @@ describe('WorkoutModePageLogicLayer', () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Start workout' }));
+    await user.click(screen.getByRole('button', { name: 'Начать тренировку' }));
 
     await waitFor((): void => {
       expect(toastErrorMock).toHaveBeenCalledWith('Некорректный запрос');

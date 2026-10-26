@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { t, tRu } from 'tests/common/translate';
+
 import type { WorkoutList } from '@entities/workout-list';
 import type { WorkoutSession } from '@entities/workout-session';
 
@@ -55,6 +57,7 @@ const SESSION: WorkoutSession = {
 };
 
 const baseProps = {
+  t,
   loadingPhase: 'content' as const,
   justCompleted: null,
   isFinished: false,
@@ -100,7 +103,7 @@ describe('WorkoutModePage', () => {
     render(<WorkoutModePage {...baseProps} phase="preview" workoutList={WORKOUT_LIST} session={null} />);
 
     expect(screen.getByText('Push Day')).toBeInTheDocument();
-    expect(screen.getByText('0 / 1 exercises')).toBeInTheDocument();
+    expect(screen.getByText('0 / 1 exercise')).toBeInTheDocument();
     expect(screen.getByText(/Ready to train\?/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Start workout' })).toBeInTheDocument();
     expect(screen.getByText('Bench Press')).toBeInTheDocument();
@@ -127,5 +130,31 @@ describe('WorkoutModePage', () => {
     await user.click(screen.getByRole('button', { name: 'Start workout' }));
 
     expect(onStart).toHaveBeenCalledTimes(1);
+  });
+
+  // AC-2 of #112: the progress in the plural form of the language
+  it.each([
+    ['ru', 1, '0 / 1 упражнение'],
+    ['ru', 2, '0 / 2 упражнения'],
+    ['ru', 5, '0 / 5 упражнений'],
+    ['ru', 11, '0 / 11 упражнений'],
+    ['ru', 21, '0 / 21 упражнение'],
+    ['ru', 22, '0 / 22 упражнения'],
+    ['en', 1, '0 / 1 exercise'],
+    ['en', 2, '0 / 2 exercises'],
+  ] as const)('shows the progress in %s of %i exercises in the right plural form', (language, total, progress) => {
+    render(
+      <WorkoutModePage
+        {...baseProps}
+        t={language === 'ru' ? tRu : t}
+        phase="preview"
+        workoutList={WORKOUT_LIST}
+        session={null}
+        totalExercises={total}
+        completedExercises={0}
+      />,
+    );
+
+    expect(screen.getByText(progress)).toBeInTheDocument();
   });
 });

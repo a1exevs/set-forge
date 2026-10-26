@@ -12,6 +12,7 @@ import {
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
 import { type MuscleGroup, muscleGroupLabel } from '@entities/workout-exercise';
+import type { WorkoutSession } from '@entities/workout-session';
 import { useT } from '@shared/lib';
 
 import HistoryPage from './history-page';
@@ -59,9 +60,11 @@ const renderHistoryPageIn =
       initialEntries: ['/history'],
       component: function HistoryPageStory(): JSX.Element {
         // The story follows the toolbar language like the page does
-        const { t } = useT();
+        const { t, language } = useT();
         return (
           <HistoryPage
+            t={t}
+            language={language}
             swipeRef={createRef<HTMLDivElement>()}
             sessions={sessions}
             total={sessions.length}
@@ -71,8 +74,8 @@ const renderHistoryPageIn =
             expandedIds={{}}
             onToggle={fn()}
             sentinelRef={createRef<HTMLDivElement>()}
-            formatSessionDate={formatSessionDate}
-            formatSummary={formatSummary}
+            formatSessionDate={(iso: string | null): string => formatSessionDate(iso, language)}
+            formatSummary={(session: WorkoutSession): string => formatSummary(session, t)}
             formatMuscleGroup={(group: MuscleGroup): string => muscleGroupLabel(group, t)}
           />
         );

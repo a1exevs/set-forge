@@ -95,7 +95,7 @@ const AuthPageLogicLayer: FC<Props> = ({
       const invalid = showFieldErrors({
         email: validateLoginEmail(email),
         password: validateLoginPassword(password),
-        captcha: showCaptcha && !captcha.trim() ? 'captchaRequired' : null,
+        captcha: showCaptcha && !captcha.trim() ? 'captchaEmpty' : null,
       });
       if (invalid) {
         return;
@@ -123,7 +123,7 @@ const AuthPageLogicLayer: FC<Props> = ({
           } catch {
             setCaptchaImageUrl(null);
           }
-          setFailure({ error: err, fields: loginFields, fallback: 'captchaNeeded' });
+          setFailure({ error: err, fields: loginFields, fallback: 'captchaDemanded' });
           return;
         }
         setFailure({ error: err, fields: loginFields, fallback: 'loginFailed' });

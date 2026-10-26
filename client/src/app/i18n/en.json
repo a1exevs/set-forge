@@ -2,14 +2,14 @@
   "auth": {
     "captcha": {
       "hint": "Enter the characters from the image (session protected login).",
-      "image": "Captcha",
+      "imageAlt": "Captcha",
       "label": "Captcha"
     },
     "confirmPassword": "Confirm password",
     "email": "Email",
     "errors": {
-      "captchaNeeded": "Captcha required",
-      "captchaRequired": "Captcha is required",
+      "captchaDemanded": "Captcha required",
+      "captchaEmpty": "Captcha is required",
       "consentRequired": "You must consent to the processing of your personal data",
       "emailInvalid": "Enter a valid email",
       "emailRequired": "Email is required",
@@ -92,9 +92,29 @@
     "weight": "Weight",
     "weightValue": "{{weight}} kg"
   },
+  "history": {
+    "count_one": "{{count}} workout",
+    "count_other": "{{count}} workouts",
+    "duration": {
+      "hours": "{{hours}} h",
+      "hoursMinutes": "{{hours}} h {{minutes}} min",
+      "minutes": "{{minutes}} min"
+    },
+    "empty": "No completed workouts yet",
+    "emptyHint": "Finish a workout to see it here",
+    "error": "Could not load your workout history",
+    "errorHint": "Please try again later",
+    "exerciseLine_one": "{{weight}} kg × {{count}} rep",
+    "exerciseLine_other": "{{weight}} kg × {{count}} reps",
+    "loading": "Loading history",
+    "loadingMore": "Loading more history",
+    "summary_one": "{{completed}}/{{count}} exercise",
+    "summary_other": "{{completed}}/{{count}} exercises",
+    "title": "History"
+  },
   "home": {
-    "create": "Create workout list",
     "created": "Created: {{date}}",
+    "createList": "Create workout list",
     "deleteDialog": {
       "description": "Delete \"{{name}}\"? This cannot be undone.",
       "title": "Delete workout list?"
@@ -102,27 +122,27 @@
     "empty": "No workout lists yet",
     "emptyHint": "Create your first list to start tracking progress",
     "exercisesBadge": "{{number}} ex.",
-    "export": "Export workout lists",
-    "import": "Import workout lists",
+    "exportLists": "Export workout lists",
     "importDialog": {
       "description_one": "Import {{count}} workout list?",
       "description_other": "Import {{count}} workout lists?",
       "import": "Import",
       "title": "Import workout lists?"
     },
+    "importLists": "Import workout lists",
     "lastUsed": "Last used: {{date}}",
     "listActions": "Workout list actions",
     "loading": "Loading workout lists",
     "openList": "Open {{name}}",
     "title": "Workout lists",
     "toasts": {
-      "deleted": "Workout list deleted",
-      "deleteFailed": "Failed to delete workout list",
-      "exported": "Workout lists exported",
-      "exportFailed": "Failed to export workout lists",
-      "imported": "Workout lists imported",
-      "importFailed": "Failed to import workout lists",
       "invalidFile": "The selected file is not valid JSON.",
+      "listDeleted": "Workout list deleted",
+      "listDeleteFailed": "Failed to delete workout list",
+      "listsExported": "Workout lists exported",
+      "listsExportFailed": "Failed to export workout lists",
+      "listsImported": "Workout lists imported",
+      "listsImportFailed": "Failed to import workout lists",
       "nothingToImport": "The file does not contain any workout lists to import."
     }
   },
@@ -160,12 +180,15 @@
   },
   "reconsent": {
     "accept": "Accept",
-    "error": "Something went wrong. Please try again.",
+    "acceptFailed": "Something went wrong. Please try again.",
     "text": "Please review and accept the updated documents to keep using Set Forge.",
     "title": "We’ve updated our documents"
   },
   "settings": {
     "title": "Settings"
+  },
+  "toaster": {
+    "label": "Notifications"
   },
   "workoutList": {
     "notFound": "Workout list not found",
@@ -215,6 +238,34 @@
     "removeExercise": "Remove exercise",
     "submitCreate": "Create List",
     "untitled": "Untitled",
-    "weight": "Weight (kg)"
+    "weightLabel": "Weight (kg)"
+  },
+  "workoutMode": {
+    "completed": "Workout completed",
+    "finish": "Finish workout",
+    "finishDialog": {
+      "description": "Finish saves this session to history. Discard deletes this active session without saving. Cancel keeps the workout open.",
+      "discard": "Discard",
+      "finish": "Finish",
+      "title": "Finish workout?"
+    },
+    "loading": "Loading workout",
+    "previewHint": "Ready to train? Tap Start workout only when you are about to begin — the timer starts then, so your workout duration in history stays accurate.",
+    "progress_one": "{{completed}} / {{count}} exercise",
+    "progress_other": "{{completed}} / {{count}} exercises",
+    "start": "Start workout",
+    "toasts": {
+      "discardFailed": "Failed to discard workout session",
+      "finishFailed": "Failed to finish workout session",
+      "progressFailed": "Failed to update session progress",
+      "startFailed": "Failed to start workout session"
+    }
+  },
+  "workoutSession": {
+    "card": {
+      "hint": "Double tap to mark a set",
+      "label_one": "{{name}}: {{completed}} of {{count}} set",
+      "label_other": "{{name}}: {{completed}} of {{count}} sets"
+    }
   }
 }

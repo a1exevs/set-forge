@@ -178,7 +178,7 @@ const WorkoutListForm: FC<Props> = ({
 
                       <div className={classes.fieldRow}>
                         <NumericField
-                          label={t('workoutListForm.weight')}
+                          label={t('workoutListForm.weightLabel')}
                           id={`weight-${exercise.tempId}`}
                           value={exercise.weight}
                           onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'weight', v)}

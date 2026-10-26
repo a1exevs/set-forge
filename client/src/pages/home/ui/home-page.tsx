@@ -110,15 +110,15 @@ const HomePage: FC<Props> = ({
           <BrandWordmark title={t('home.title')} />
           <div className={classes.headerActions}>
             <IconButton
-              aria-label={t('home.export')}
-              title={t('home.export')}
+              aria-label={t('home.exportLists')}
+              title={t('home.exportLists')}
               disabled={workoutLists.length === 0}
               progress={exportProgress}
               onClick={(): void => void onExport()}
             >
               <Download size={18} strokeWidth={1.75} aria-hidden />
             </IconButton>
-            <IconButton aria-label={t('home.import')} title={t('home.import')} onClick={onImportClick}>
+            <IconButton aria-label={t('home.importLists')} title={t('home.importLists')} onClick={onImportClick}>
               <Upload size={18} strokeWidth={1.75} aria-hidden />
             </IconButton>
             <input
@@ -143,8 +143,8 @@ const HomePage: FC<Props> = ({
         variant="primary"
         shape="circle"
         size="lg"
-        aria-label={t('home.create')}
-        title={t('home.create')}
+        aria-label={t('home.createList')}
+        title={t('home.createList')}
       >
         <Plus size={24} strokeWidth={2} aria-hidden />
       </IconButton>

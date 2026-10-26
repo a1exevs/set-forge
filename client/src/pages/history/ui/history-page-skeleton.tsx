@@ -7,12 +7,12 @@ import classes from './history-page.module.scss';
 type Props = {
   /** Ten fill the first screen while the first page loads; two close the list while the next one does. */
   rows?: number;
-  label?: string;
+  label: string;
   className?: string;
 };
 
 /** The shape of the history rows while they load: the same cards, a title, two meta lines, a chevron. */
-const HistoryPageSkeleton: FC<Props> = ({ rows = 10, label = 'Loading history', className }) => (
+const HistoryPageSkeleton: FC<Props> = ({ rows = 10, label, className }) => (
   <div role="status" aria-label={label} className={className ? `${classes.list} ${className}` : classes.list}>
     {Array.from({ length: rows }, (_: unknown, index: number) => (
       <div key={index} className={classes.card}>
