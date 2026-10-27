@@ -1,12 +1,13 @@
 import { Link } from '@tanstack/react-router';
 import { ChangeEvent, FC } from 'react';
 
-import type { Progress } from '@shared/lib';
+import { type Progress, Trans, type Translate } from '@shared/lib';
 import { Button, Dialog } from '@shared/ui';
 
 import classes from './document-reconsent-gate.module.scss';
 
 type Props = {
+  t: Translate;
   open: boolean;
   busy: boolean;
   isError: boolean;
@@ -21,6 +22,7 @@ type Props = {
 };
 
 const DocumentReconsentGate: FC<Props> = ({
+  t,
   open,
   busy,
   isError,
@@ -34,10 +36,10 @@ const DocumentReconsentGate: FC<Props> = ({
   onLogout,
 }) => {
   return (
-    <Dialog open={open} onClose={(): void => undefined} disableAnimation ariaLabel="Updated documents">
+    <Dialog open={open} onClose={(): void => undefined} disableAnimation ariaLabel={t('reconsent.title')}>
       <div className={classes.content}>
-        <h2 className={classes.title}>We’ve updated our documents</h2>
-        <p className={classes.text}>Please review and accept the updated documents to keep using Set Forge.</p>
+        <h2 className={classes.title}>{t('reconsent.title')}</h2>
+        <p className={classes.text}>{t('reconsent.text')}</p>
 
         <label className={classes.check}>
           {/** TODO implement shared chackbox via Headless UI and use it **/}
@@ -49,10 +51,13 @@ const DocumentReconsentGate: FC<Props> = ({
             disabled={busy}
           />
           <span>
-            I consent to the processing of my personal data as described in the{' '}
-            <Link to="/privacy" className={classes.link} target="_blank" rel="noopener noreferrer">
-              Privacy Policy
-            </Link>
+            <Trans
+              t={t}
+              i18nKey="consent.personalData"
+              components={{
+                policy: <Link to="/privacy" className={classes.link} target="_blank" rel="noopener noreferrer" />,
+              }}
+            />
           </span>
         </label>
 
@@ -66,14 +71,17 @@ const DocumentReconsentGate: FC<Props> = ({
             disabled={busy}
           />
           <span>
-            I accept the{' '}
-            <Link to="/terms" className={classes.link} target="_blank" rel="noopener noreferrer">
-              Terms of Use
-            </Link>
+            <Trans
+              t={t}
+              i18nKey="consent.terms"
+              components={{
+                terms: <Link to="/terms" className={classes.link} target="_blank" rel="noopener noreferrer" />,
+              }}
+            />
           </span>
         </label>
 
-        {isError && <p className={classes.error}>Something went wrong. Please try again.</p>}
+        {isError && <p className={classes.error}>{t('reconsent.acceptFailed')}</p>}
 
         <div className={classes.actions}>
           <Button
@@ -82,7 +90,7 @@ const DocumentReconsentGate: FC<Props> = ({
             onClick={(): void => onLogout()}
             className={classes.action}
           >
-            Log out
+            {t('common.logOut')}
           </Button>
           <Button
             progress={acceptProgress}
@@ -90,7 +98,7 @@ const DocumentReconsentGate: FC<Props> = ({
             disabled={!consent || !termsAccepted}
             className={classes.action}
           >
-            Accept
+            {t('reconsent.accept')}
           </Button>
         </div>
       </div>

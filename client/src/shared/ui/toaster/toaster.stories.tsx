@@ -12,6 +12,7 @@ import Button from '../button/button';
 const meta = {
   title: 'Shared/Toaster',
   component: Toaster,
+  args: { ariaLabel: 'Notifications' },
   decorators: [withFrame],
   parameters: {
     docs: {
@@ -47,7 +48,7 @@ const ToasterDemo: FC = () => (
         Failure
       </Button>
     </Row>
-    <Toaster />
+    <Toaster ariaLabel="Notifications" />
   </Stack>
 );
 

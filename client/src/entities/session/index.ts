@@ -1,4 +1,5 @@
 export {
+  type AuthValidationError,
   validateLoginEmail,
   validateLoginPassword,
   validateRegisterEmail,

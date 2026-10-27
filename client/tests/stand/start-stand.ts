@@ -2,7 +2,7 @@
  * The verification stand: the e2e stack kept running for a person or an agent to check a change by hand —
  * ephemeral MySQL → Nest → Vite, on the ports of a free slot (`stand-registry.ts`), with the data of a preset.
  *
- *   npm run client:stand -- [--preset=empty|user|data|history]     (default: user)
+ *   npm run client:stand -- [--preset=empty|user|data|history|reconsent]     (default: user)
  *   npm run client:stand:stop                         (every stand of this checkout)
  *
  * Runs until Ctrl+C, SIGTERM or `client:stand:stop` (a signal, or on Windows the stop file of the slot), then stops
@@ -12,7 +12,7 @@ import { type ChildProcess } from 'node:child_process';
 import { existsSync, rmSync } from 'node:fs';
 import { setTimeout as sleep } from 'node:timers/promises';
 
-import { applyPreset, isStandPreset, STAND_PRESETS, type StandPreset } from './stand-presets.ts';
+import { applyPreset, isStandPreset, presetServerEnv, STAND_PRESETS, type StandPreset } from './stand-presets.ts';
 import {
   claimSlot,
   currentBranch,
@@ -159,9 +159,14 @@ async function main(): Promise<void> {
       // A stop request came during the start; `shutdown` takes over from here.
       return;
     }
-    stack.nest.on('exit', code => {
-      void shutdown(code ?? 1);
-    });
+    // Nest exiting ends the stand — except the restart a preset asks for
+    let restartingNest = false;
+    const onNestExit = (code: number | null): void => {
+      if (!restartingNest) {
+        void shutdown(code ?? 1);
+      }
+    };
+    stack.nest.on('exit', onNestExit);
 
     log(`Starting Vite on port ${entry.clientPort}…`);
     vite = spawnCommand('npm', ['run', 'dev', '--', '--strictPort'], {
@@ -182,6 +187,14 @@ async function main(): Promise<void> {
     await waitForUrl(clientOrigin, failed);
 
     const notes = await applyPreset(preset, serverOrigin);
+    const serverEnv = presetServerEnv(preset);
+    if (serverEnv) {
+      restartingNest = true;
+      const nest = await stack.restartNest(serverEnv);
+      restartingNest = false;
+      nest.on('exit', onNestExit);
+      await waitForUrl(`${serverOrigin}/api/1.0/health`, failed);
+    }
     log(`Ready: ${clientOrigin} (API ${serverOrigin}, slot ${entry.slot}, preset "${preset}").`);
     for (const note of notes) {
       log(note);

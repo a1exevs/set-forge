@@ -7,12 +7,15 @@ import classes from './toaster.module.scss';
 
 type Props = {
   theme: Theme;
+  /** The name screen readers give the toast region; sonner adds its keyboard shortcut. */
+  ariaLabel: string;
 };
 
-const Toaster: FC<Props> = ({ theme }) => {
+const Toaster: FC<Props> = ({ theme, ariaLabel }) => {
   return (
     <SonnerToaster
       theme={theme}
+      containerAriaLabel={ariaLabel}
       position="bottom-left"
       closeButton
       className={classes.toaster}

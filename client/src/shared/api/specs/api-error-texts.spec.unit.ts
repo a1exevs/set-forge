@@ -25,7 +25,7 @@ describe('apiErrorTexts', () => {
     });
 
     it('in Russian', () => {
-      expect(apiErrorTexts(error, ru).general).toEqual(['Неверный email или пароль']);
+      expect(apiErrorTexts(error, ru).general).toEqual(['Неверная электронная почта или пароль']);
     });
 
     it('keeps the English text of a code the client does not know', () => {

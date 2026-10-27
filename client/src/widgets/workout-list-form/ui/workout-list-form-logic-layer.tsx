@@ -1,12 +1,15 @@
-import { FC, FormEvent, useEffect, useState } from 'react';
+import { FC, FormEvent, useEffect, useMemo, useState } from 'react';
 
-import type { MuscleGroup } from '@entities/workout-exercise';
+import { type MuscleGroup, muscleGroupLabel, muscleGroups } from '@entities/workout-exercise';
 import type { CreateWorkoutListDto, UpdateWorkoutListDto, WorkoutList } from '@entities/workout-list';
-import { type Progress, useConfirm } from '@shared/lib';
+import { type Progress, useConfirm, useT } from '@shared/lib';
+import type { SelectOption } from '@shared/ui';
 
 import WorkoutListForm from './workout-list-form';
+import { exerciseErrorText } from '../lib/exercise-error-text';
 import type { ExerciseFormData } from '../model/exercise-form-data';
 import {
+  type ExerciseNumericFieldKey,
   getExerciseNumericFieldError,
   hasInvalidExerciseName,
   hasInvalidExerciseNumericFields,
@@ -39,6 +42,12 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
   const { mode, onCancel, submitProgress = 'idle', serverFieldErrors } = props;
   const initialData = props.mode === 'edit' ? props.initialData : undefined;
   const confirmDialog = useConfirm();
+  const { t } = useT();
+  const muscleGroupOptions = useMemo(
+    (): SelectOption[] =>
+      muscleGroups.map((group: MuscleGroup) => ({ value: group, label: muscleGroupLabel(group, t) })),
+    [t],
+  );
 
   const [name, setName] = useState<string>(() => initialData?.name ?? '');
   const [description, setDescription] = useState<string>(() => initialData?.description ?? '');
@@ -134,18 +143,18 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
 
       if (!name.trim()) {
         await confirmDialog({
-          title: 'Please enter a list name',
+          title: t('workoutListForm.dialogs.nameRequired'),
           hideCancelButton: true,
-          confirmationText: 'Ok',
+          confirmationText: t('common.ok'),
         });
         return;
       }
 
       if (exercises.length === 0) {
         await confirmDialog({
-          title: 'Please add at least one exercise',
+          title: t('workoutListForm.dialogs.exercisesRequired'),
           hideCancelButton: true,
-          confirmationText: 'Ok',
+          confirmationText: t('common.ok'),
         });
         return;
       }
@@ -159,9 +168,9 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
 
       if (nameInvalid) {
         await confirmDialog({
-          title: 'Please check exercise data validity',
+          title: t('workoutListForm.dialogs.checkExercises'),
           hideCancelButton: true,
-          confirmationText: 'Ok',
+          confirmationText: t('common.ok'),
         });
         return;
       }
@@ -196,23 +205,29 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
         };
         props.onSubmit(dto);
       }
-    } catch (e: unknown) {
+    } catch {
+      // An unexpected failure of the form itself: its message is not for the user
       await confirmDialog({
-        title: `${e instanceof Error ? e.message : `An error occurred while ${mode === 'create' ? 'creating' : 'editing'} the workout list`}`,
+        title: mode === 'create' ? t('workoutListForm.dialogs.createFailed') : t('workoutListForm.dialogs.saveFailed'),
         hideCancelButton: true,
-        confirmationText: 'Ok',
+        confirmationText: t('common.ok'),
       });
     }
   };
 
-  const title = mode === 'create' ? 'New Workout List' : `Editing ${name || initialData?.name || 'Untitled'}`;
-  const submitButtonText = mode === 'create' ? 'Create List' : 'Save';
+  const title =
+    mode === 'create'
+      ? t('workoutListForm.createTitle')
+      : t('workoutListForm.editTitle', { name: name || initialData?.name || t('workoutListForm.untitled') });
+  const submitButtonText = mode === 'create' ? t('workoutListForm.submitCreate') : t('common.save');
 
   return (
     <WorkoutListForm
+      t={t}
       notFound={mode === 'edit' && !initialData}
       title={title}
       submitButtonText={submitButtonText}
+      muscleGroupOptions={muscleGroupOptions}
       submitProgress={submitProgress}
       name={name}
       description={description}
@@ -225,7 +240,13 @@ const WorkoutListFormLogicLayer: FC<Props> = props => {
       onSubmit={handleSubmit}
       onCancel={onCancel}
       submitAttempted={submitAttempted}
-      getExerciseNumericFieldError={getExerciseNumericFieldError}
+      getExerciseNumericFieldError={(
+        exercise: Pick<ExerciseFormData, 'weight' | 'reps' | 'sets'>,
+        field: ExerciseNumericFieldKey,
+      ): string | undefined => {
+        const error = getExerciseNumericFieldError(exercise, field);
+        return error === undefined ? undefined : exerciseErrorText(error, t);
+      }}
       getServerFieldError={(path: string): string | undefined => serverErrors[path]}
     />
   );

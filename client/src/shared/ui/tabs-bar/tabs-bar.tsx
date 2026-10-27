@@ -17,14 +17,15 @@ export type TabsBarItem = {
 type Props = {
   items: TabsBarItem[];
   activeItemId: string;
+  ariaLabel: string;
   className?: string;
 };
 
-const TabsBar: FC<Props> = ({ items, activeItemId, className }) => {
+const TabsBar: FC<Props> = ({ items, activeItemId, ariaLabel, className }) => {
   const classNames = [classes.tabsBar, className].filter(Boolean).join(' ');
 
   return (
-    <nav className={classNames} role="tablist" aria-label="Main navigation">
+    <nav className={classNames} role="tablist" aria-label={ariaLabel}>
       {items.map((item: TabsBarItem) => {
         const isActive = item.id === activeItemId;
         const Icon = item.icon;

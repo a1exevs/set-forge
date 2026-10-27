@@ -1,14 +1,17 @@
 import { FC, KeyboardEvent } from 'react';
 
-import { muscleGroupLabels } from '@entities/workout-exercise/@x/workout-session-exercise';
-import { cssVars } from '@shared/lib';
+import { cssVars, formatNumber, type Language, type Translate } from '@shared/lib';
 import { Transition } from '@shared/ui';
 
 import classes from './workout-session-exercise-card.module.scss';
 import type { WorkoutSessionExercise } from '../../model/workout-session-exercise';
 
 type Props = {
+  t: Translate;
+  language: Language;
   exercise: WorkoutSessionExercise;
+  /** The muscle group in the chosen language. */
+  muscleGroupText: string;
   justCompleted: boolean;
   isFinished: boolean;
   isCompleted: boolean;
@@ -18,7 +21,10 @@ type Props = {
 };
 
 const WorkoutSessionExerciseCard: FC<Props> = ({
+  t,
+  language,
   exercise,
+  muscleGroupText,
   justCompleted,
   isFinished,
   isCompleted,
@@ -31,14 +37,18 @@ const WorkoutSessionExerciseCard: FC<Props> = ({
       className={`${classes.exerciseCard} ${isCompleted ? classes.completed : ''}`}
       role="button"
       tabIndex={0}
-      aria-label={`${exercise.name}: ${exercise.completedSets} of ${exercise.sets} sets`}
+      aria-label={t('workoutSession.card.label', {
+        name: exercise.name,
+        completed: exercise.completedSets,
+        count: exercise.sets,
+      })}
       onClick={onActivate}
       onKeyDown={onKeyDown}
     >
       <div className={classes.exerciseHeader}>
         <div className={classes.exerciseInfo}>
           <span className={classes.exerciseName}>{exercise.name}</span>
-          <span className={classes.muscleBadge}>{muscleGroupLabels[exercise.muscleGroup]}</span>
+          <span className={classes.muscleBadge}>{muscleGroupText}</span>
         </div>
         <Transition
           show={justCompleted}
@@ -55,15 +65,17 @@ const WorkoutSessionExerciseCard: FC<Props> = ({
 
       <div className={classes.exerciseDetails}>
         <div className={classes.detail}>
-          <span className={classes.detailLabel}>Weight</span>
-          <span className={classes.detailValue}>{exercise.weight} kg</span>
+          <span className={classes.detailLabel}>{t('exercise.weight')}</span>
+          <span className={classes.detailValue}>
+            {t('exercise.weightValue', { weight: formatNumber(exercise.weight, language) })}
+          </span>
         </div>
         <div className={classes.detail}>
-          <span className={classes.detailLabel}>Reps</span>
+          <span className={classes.detailLabel}>{t('exercise.reps')}</span>
           <span className={classes.detailValue}>{exercise.reps}</span>
         </div>
         <div className={classes.detail}>
-          <span className={classes.detailLabel}>Sets</span>
+          <span className={classes.detailLabel}>{t('exercise.sets')}</span>
           <span className={classes.detailValue}>
             {exercise.completedSets} / {exercise.sets}
           </span>
@@ -77,7 +89,7 @@ const WorkoutSessionExerciseCard: FC<Props> = ({
         />
       </div>
 
-      {!isCompleted && !isFinished && <p className={classes.hint}>Double tap to mark a set</p>}
+      {!isCompleted && !isFinished && <p className={classes.hint}>{t('workoutSession.card.hint')}</p>}
     </div>
   );
 };

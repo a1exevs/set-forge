@@ -34,7 +34,7 @@ const ProfilePage: FC<Props> = ({
     <div ref={swipeRef} className={classes.container}>
       <header className={classes.header}>
         <div className={classes.headerTop}>
-          <BrandWordmark title="Profile" />
+          <BrandWordmark title={t('profile.title')} />
           <IconButton as={Link} to="/settings" aria-label={t('profile.openSettings')} title={t('profile.openSettings')}>
             <Settings size={20} strokeWidth={1.75} aria-hidden />
           </IconButton>
@@ -51,21 +51,19 @@ const ProfilePage: FC<Props> = ({
             onClick={(): void => void onLogout()}
             className={classes.logoutButton}
           >
-            Log out
+            {t('common.logOut')}
           </Button>
         </div>
 
         <div className={classes.dangerZone}>
-          <p className={classes.dangerHint}>
-            Deleting your account permanently removes all your data. This cannot be undone.
-          </p>
+          <p className={classes.dangerHint}>{t('profile.deleteAccountHint')}</p>
           <Button
             variant="danger"
             progress={deleteAccountProgress}
             onClick={(): void => void onDeleteAccount()}
             className={classes.deleteButton}
           >
-            Delete account
+            {t('profile.deleteAccount')}
           </Button>
         </div>
 

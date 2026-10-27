@@ -8,13 +8,13 @@ export type MenuButtonItem = { id: string; label: string; onClick: () => void };
 
 type Props = {
   items: MenuButtonItem[];
-  ariaLabel?: string;
+  ariaLabel: string;
 };
 
 const MenuButton: FC<Props> = ({ items, ariaLabel }) => {
   return (
     <Menu>
-      <HeadlessMenuButton className={classes.trigger} aria-label={ariaLabel ?? 'Open menu'}>
+      <HeadlessMenuButton className={classes.trigger} aria-label={ariaLabel}>
         <EllipsisVertical className={classes.icon} size={20} strokeWidth={2} aria-hidden />
       </HeadlessMenuButton>
       <MenuItems anchor="bottom start" className={classes.items}>

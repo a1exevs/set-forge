@@ -11,19 +11,14 @@ const defaultItems: MenuButtonItem[] = [
 
 describe('MenuButton', () => {
   describe('rendering', () => {
-    it('renders trigger button with default aria-label "Open menu"', () => {
-      render(<MenuButton items={defaultItems} />);
-      expect(screen.getByRole('button', { name: 'Open menu' })).toBeInTheDocument();
-    });
-
-    it('renders with custom ariaLabel', () => {
+    it('names the trigger by its ariaLabel', () => {
       render(<MenuButton items={defaultItems} ariaLabel="Workout list actions" />);
       expect(screen.getByRole('button', { name: 'Workout list actions' })).toBeInTheDocument();
     });
 
     it('renders menu items in order when opened', async () => {
       const user = userEvent.setup();
-      render(<MenuButton items={defaultItems} />);
+      render(<MenuButton ariaLabel="Open menu" items={defaultItems} />);
 
       await user.click(screen.getByRole('button', { name: 'Open menu' }));
 
@@ -41,7 +36,7 @@ describe('MenuButton', () => {
   describe('interactions', () => {
     it('opens dropdown when trigger is clicked', async () => {
       const user = userEvent.setup();
-      render(<MenuButton items={defaultItems} />);
+      render(<MenuButton ariaLabel="Open menu" items={defaultItems} />);
 
       expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
 
@@ -59,7 +54,7 @@ describe('MenuButton', () => {
         { id: 'edit', label: 'Edit', onClick: onEditClick },
         { id: 'delete', label: 'Delete', onClick: (): void => undefined },
       ];
-      render(<MenuButton items={items} />);
+      render(<MenuButton ariaLabel="Open menu" items={items} />);
 
       await user.click(screen.getByRole('button', { name: 'Open menu' }));
 
@@ -80,7 +75,7 @@ describe('MenuButton', () => {
   describe('accessibility', () => {
     it('trigger has aria-expanded when menu is open', async () => {
       const user = userEvent.setup();
-      render(<MenuButton items={defaultItems} />);
+      render(<MenuButton ariaLabel="Open menu" items={defaultItems} />);
 
       const trigger = screen.getByRole('button', { name: 'Open menu' });
       expect(trigger).toHaveAttribute('aria-expanded', 'false');

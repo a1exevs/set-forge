@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { answerWith } from 'tests/common/answer-confirm';
 
 import type { WorkoutList } from '@entities/workout-list';
-import type { ConfirmOptions } from '@shared/lib';
+import { type ConfirmOptions, useLanguageStore } from '@shared/lib';
 
 import HomePageLogicLayer from '../home-page-logic-layer';
 
@@ -51,8 +51,8 @@ const WORKOUT_LIST: WorkoutList = {
 };
 
 // jsdom's File has no text(); the page reads the chosen file with it
-const importFile = (): File => {
-  const json = JSON.stringify({ version: 1, workoutLists: [{ name: 'Leg Day' }] });
+const importFile = (lists = 1): File => {
+  const json = JSON.stringify({ version: 1, workoutLists: Array.from({ length: lists }, () => ({ name: 'Leg Day' })) });
   const file = new File([json], 'lists.json', { type: 'application/json' });
   Object.defineProperty(file, 'text', { value: (): Promise<string> => Promise.resolve(json) });
   return file;
@@ -79,7 +79,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -108,7 +108,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -135,7 +135,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -164,7 +164,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={exportAllWorkoutLists}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -191,7 +191,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={exportAllWorkoutLists}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -214,7 +214,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -241,7 +241,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={exportAllWorkoutLists}
         importWorkoutLists={jest.fn()}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -266,7 +266,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={importWorkoutLists}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 
@@ -284,6 +284,45 @@ describe('HomePageLogicLayer', () => {
     expect(options.onConfirm).toBeDefined();
   });
 
+  // AC-2 of #112: the count in the plural form of the chosen language. Russian has one / few / many — 11–14 are many
+  // and 21, 22 go back to one and few, so a text put under the wrong form shows here.
+  it.each([
+    ['ru', 1, 'Импортировать 1 список тренировок?'],
+    ['ru', 2, 'Импортировать 2 списка тренировок?'],
+    ['ru', 5, 'Импортировать 5 списков тренировок?'],
+    ['ru', 11, 'Импортировать 11 списков тренировок?'],
+    ['ru', 21, 'Импортировать 21 список тренировок?'],
+    ['ru', 22, 'Импортировать 22 списка тренировок?'],
+    ['en', 1, 'Import 1 workout list?'],
+    ['en', 2, 'Import 2 workout lists?'],
+  ] as const)('asks in %s to import %i lists in the right plural form', async (language, lists, question) => {
+    act((): void => useLanguageStore.getState().setLanguage(language));
+    confirmDialogMock.mockResolvedValue(false);
+    const user = userEvent.setup();
+    const { container } = render(
+      <HomePageLogicLayer
+        workoutLists={[WORKOUT_LIST]}
+        isLoading={false}
+        deleteWorkoutList={deleteWorkoutList}
+        clearWorkoutSessionCachesForDeletedList={clearWorkoutSessionCachesForDeletedList}
+        exportAllWorkoutLists={jest.fn()}
+        importWorkoutLists={jest.fn()}
+        onEdit={jest.fn()}
+        formatDate={(iso: string): string => iso}
+      />,
+    );
+
+    const input = container.querySelector('input[type="file"]');
+    if (!(input instanceof HTMLInputElement)) {
+      throw new Error('file input not found');
+    }
+    await user.upload(input, importFile(lists));
+
+    await waitFor((): void => expect(confirmDialogMock).toHaveBeenCalled());
+    const [options] = confirmDialogMock.mock.calls[0] as [ConfirmOptions];
+    expect(options.description).toBe(question);
+  });
+
   it('keeps the import confirmation open with an error toast when the import fails', async () => {
     const user = userEvent.setup();
     const error = new Error('Import failed');
@@ -299,7 +338,7 @@ describe('HomePageLogicLayer', () => {
         exportAllWorkoutLists={jest.fn()}
         importWorkoutLists={importWorkoutLists}
         onEdit={jest.fn()}
-        formatDate={(date: string | null): string => date ?? ''}
+        formatDate={(iso: string): string => iso}
       />,
     );
 

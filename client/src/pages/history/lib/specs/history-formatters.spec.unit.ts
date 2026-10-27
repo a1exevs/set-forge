@@ -1,3 +1,5 @@
+import { t, tRu } from 'tests/common/translate';
+
 import type { WorkoutSession } from '@entities/workout-session';
 
 import { formatDuration, formatSessionDate, formatSummary } from '../history-formatters';
@@ -37,17 +39,18 @@ const buildSession = (overrides: Partial<WorkoutSession> = {}): WorkoutSession =
 describe('history-page-formatters', () => {
   describe('formatSessionDate', () => {
     it('returns an empty string for a null date', () => {
-      expect(formatSessionDate(null)).toBe('');
+      expect(formatSessionDate(null, 'en')).toBe('');
     });
 
-    it('formats an ISO date in en-US locale', () => {
-      expect(formatSessionDate('2026-06-03T12:00:00.000Z')).toMatch(/Jun 3, 2026/);
+    it('formats the date with the year in the order and names of the language', () => {
+      expect(formatSessionDate('2026-06-03T12:00:00.000Z', 'en')).toBe('Jun 3, 2026');
+      expect(formatSessionDate('2026-06-03T12:00:00.000Z', 'ru')).toBe('3 июн. 2026 г.');
     });
   });
 
   describe('formatDuration', () => {
     it('returns null when finishedAt is missing', () => {
-      expect(formatDuration(buildSession({ finishedAt: null }))).toBeNull();
+      expect(formatDuration(buildSession({ finishedAt: null }), t)).toBeNull();
     });
 
     it('formats sub-hour durations in minutes', () => {
@@ -57,12 +60,13 @@ describe('history-page-formatters', () => {
             startedAt: '2026-06-03T12:00:00.000Z',
             finishedAt: '2026-06-03T12:45:00.000Z',
           }),
+          t,
         ),
       ).toBe('45 min');
     });
 
     it('formats whole-hour durations without trailing minutes', () => {
-      expect(formatDuration(buildSession())).toBe('1 h');
+      expect(formatDuration(buildSession(), t)).toBe('1 h');
     });
 
     it('formats hour and minute durations', () => {
@@ -72,28 +76,63 @@ describe('history-page-formatters', () => {
             startedAt: '2026-06-03T12:00:00.000Z',
             finishedAt: '2026-06-03T13:30:00.000Z',
           }),
+          t,
         ),
       ).toBe('1 h 30 min');
+    });
+
+    it('says the duration in the language', () => {
+      const session = buildSession({ startedAt: '2026-06-03T12:00:00.000Z', finishedAt: '2026-06-03T13:30:00.000Z' });
+
+      expect(formatDuration(session, tRu)).toBe('1 ч 30 мин');
     });
   });
 
   describe('formatSummary', () => {
     it('includes exercise progress and duration', () => {
-      expect(formatSummary(buildSession())).toBe('1/2 exercises · 1 h');
+      expect(formatSummary(buildSession(), t)).toBe('1/2 exercises · 1 h');
     });
 
     it('omits duration when it cannot be derived', () => {
-      expect(formatSummary(buildSession({ finishedAt: null }))).toBe('1/2 exercises');
+      expect(formatSummary(buildSession({ finishedAt: null }), t)).toBe('1/2 exercises');
     });
 
     it('uses the singular exercise label for a single exercise', () => {
       const session = buildSession();
       expect(
-        formatSummary({
-          ...session,
-          exercises: session.exercises.slice(0, 1),
-        }),
+        formatSummary(
+          {
+            ...session,
+            exercises: session.exercises.slice(0, 1),
+          },
+          t,
+        ),
       ).toBe('1/1 exercise · 1 h');
+    });
+
+    // AC-2 of #112: the exercises in the plural form of the language
+    it.each([
+      [1, '0/1 упражнение'],
+      [2, '0/2 упражнения'],
+      [5, '0/5 упражнений'],
+      [11, '0/11 упражнений'],
+      [21, '0/21 упражнение'],
+      [22, '0/22 упражнения'],
+    ])('counts %i exercises in Russian', (total: number, summary: string) => {
+      const [exercise] = buildSession().exercises;
+      if (!exercise) {
+        throw new Error('no exercise in the fixture');
+      }
+      const session = buildSession({
+        finishedAt: null,
+        exercises: Array.from({ length: total }, (_: unknown, index: number) => ({
+          ...exercise,
+          id: `ex-${index}`,
+          completedSets: 0,
+        })),
+      });
+
+      expect(formatSummary(session, tRu)).toBe(summary);
     });
   });
 });

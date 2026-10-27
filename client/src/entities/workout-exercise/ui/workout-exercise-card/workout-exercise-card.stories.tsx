@@ -7,7 +7,7 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 
-import WorkoutExerciseCard from './workout-exercise-card';
+import WorkoutExerciseCard from './workout-exercise-card-logic-layer';
 
 const meta = {
   title: 'Entities/WorkoutExerciseCard',

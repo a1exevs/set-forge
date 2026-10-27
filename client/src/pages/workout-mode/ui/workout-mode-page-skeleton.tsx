@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
 
+import type { Translate } from '@shared/lib';
 import { Skeleton } from '@shared/ui';
 
 import classes from './workout-mode-page.module.scss';
-import { PREVIEW_HINT } from '../config/preview-hint';
 
 /**
  * The shape of the workout screen while the list and the active session load: the real way back, a title and the
@@ -13,12 +13,16 @@ import { PREVIEW_HINT } from '../config/preview-hint';
  * so it opens without a shift; resuming an active session moves the list up once (the phase is unknown until the
  * session query answers).
  */
-const WorkoutModePageSkeleton: FC = () => (
+type Props = {
+  t: Translate;
+};
+
+const WorkoutModePageSkeleton: FC<Props> = ({ t }) => (
   <div className={`${classes.container} ${classes.containerLoading}`}>
     <header className={classes.header}>
       <div className={classes.headerTop}>
         <Link to="/" className={classes.backButton}>
-          ← Back
+          ← {t('common.back')}
         </Link>
       </div>
       <div className={classes.titleSkeleton}>
@@ -34,9 +38,9 @@ const WorkoutModePageSkeleton: FC = () => (
     </header>
 
     <main className={classes.main}>
-      <div role="status" aria-label="Loading workout" className={classes.previewStart}>
+      <div role="status" aria-label={t('workoutMode.loading')} className={classes.previewStart}>
         <p className={classes.previewHint}>
-          <Skeleton text={PREVIEW_HINT} />
+          <Skeleton text={t('workoutMode.previewHint')} />
         </p>
         <div className={classes.actionBar}>
           <Skeleton variant="rect" height="3.35rem" className={classes.actionButtonSkeleton} />

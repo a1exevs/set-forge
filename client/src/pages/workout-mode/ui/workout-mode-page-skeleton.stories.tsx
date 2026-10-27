@@ -7,8 +7,11 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
+import { withTranslate } from 'storybook-dir/with-translate';
 
-import WorkoutModePageSkeleton from './workout-mode-page-skeleton';
+import WorkoutModePageSkeletonPresentation from './workout-mode-page-skeleton';
+
+const WorkoutModePageSkeleton = withTranslate(WorkoutModePageSkeletonPresentation);
 
 const renderSkeleton = (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({

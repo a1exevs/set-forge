@@ -22,7 +22,7 @@ const FIVE_TABS: TabsBarItem[] = [
 const meta = {
   title: 'Shared/TabsBar',
   component: TabsBar,
-  args: { items: TWO_TABS, activeItemId: 'home' },
+  args: { items: TWO_TABS, activeItemId: 'home', ariaLabel: 'Main navigation' },
   parameters: {
     layout: 'fullscreen',
     docs: {
