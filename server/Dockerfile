@@ -4,6 +4,7 @@ ENV HUSKY=0
 COPY package.json package-lock.json ./
 COPY server/package.json ./server/package.json
 COPY client/package.json ./client/package.json
+COPY packages/eslint-config/package.json ./packages/eslint-config/package.json
 RUN npm ci --workspace @set-forge/server --include-workspace-root
 
 FROM deps AS build

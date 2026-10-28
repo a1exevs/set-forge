@@ -52,7 +52,7 @@ describe('HistoryPageLogicLayer', () => {
     act(() => {
       jest.advanceTimersByTime(300);
     });
-    // The first page answers while its skeleton is still held: the list and its sentinel come 500 ms later
+    // The first page answers while its skeleton is still held: the list and its sentinel come once the hold ends
     rerender(<HistoryPageLogicLayer {...props} sessions={[SESSION]} isLoading={false} />);
     act(() => {
       jest.advanceTimersByTime(500);

@@ -30,7 +30,7 @@ const repoRoot = join(clientDir, '..');
 const rulesDir = join(repoRoot, '.claude', 'rules');
 
 const FRONTMATTER_KEYS = ['description', 'paths'];
-const PATH_PREFIXES = ['client/', 'server/', '.claude/', 'docs/', 'scripts/'];
+const PATH_PREFIXES = ['client/', 'server/', '.claude/', 'docs/', 'scripts/', 'packages/'];
 const REVIEW = '❌ review';
 
 const problems: string[] = [];

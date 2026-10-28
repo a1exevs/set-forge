@@ -39,6 +39,7 @@
 | [styling-guidelines](.claude/rules/styling-guidelines.md) | SCSS modules |
 | [typescript-guidelines](.claude/rules/typescript-guidelines.md) | TypeScript |
 | [component-typing](.claude/rules/component-typing.md) | FC / Props / JSX callbacks |
+| [code-comments](.claude/rules/code-comments.md) | Comments: why in a line or two, the rule by id, own layer, comment-length lint |
 | [i18n](.claude/rules/i18n.md) | Interface language, dictionaries, the `t` prop, literal-text lint |
 | [storybook](.claude/rules/storybook.md) | Stories next to components, titles by FSD layer, showcase, Chromatic |
 | [personal-data-compliance](.claude/rules/personal-data-compliance.md) | User PD, privacy policy, terms, doc versioning |

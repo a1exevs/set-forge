@@ -6,7 +6,7 @@ import { DEFAULT_LANGUAGE, type Language, LANGUAGES } from './languages';
 
 export type Dictionaries = Record<Language, ResourceLanguage>;
 
-/** Starts i18next in the stored (or detected) language; the dictionaries come from the app. */
+/** Starts i18next in the stored (or detected) language with the given dictionaries. */
 export const initI18n = (dictionaries: Dictionaries): void => {
   void i18next.use(initReactI18next).init({
     resources: dictionaries,

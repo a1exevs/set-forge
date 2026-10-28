@@ -98,7 +98,7 @@ export const Progress: Story = {
   ),
 };
 
-/** The floating "create" button of the home page: a router `Link` as a primary circle. */
+/** A router `Link` as a primary circle: a floating action. */
 export const AsLink: Story = {
   render: (): ReactElement =>
     renderWithRouter({

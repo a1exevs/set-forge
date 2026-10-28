@@ -53,7 +53,7 @@ const StatefulPasswordField: FC<StatefulProps> = ({ id, initialValue = '', disab
   );
 };
 
-/** Filled and hidden: the sign-in form. */
+/** Filled and hidden. */
 export const Default: Story = {
   render: (): ReactElement => <StatefulPasswordField id="password" initialValue="secret" />,
 };
@@ -66,7 +66,7 @@ export const Visible: Story = {
   },
 };
 
-/** Empty, disabled and without the toggle (the register form). */
+/** Empty, disabled and without the toggle. */
 export const States: Story = {
   render: (): ReactElement => (
     <Stack>

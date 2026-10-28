@@ -1,8 +1,6 @@
 /**
- * Current required versions of the legal documents, read from the environment
- * (`TERMS_VERSION` / `PRIVACY_VERSION`, default `1`). Bump the env value when a document
- * changes materially — users whose stored accepted version is lower (or null) are asked to
- * re-accept on their next visit. Read at call time so runtime env changes are picked up.
+ * The required versions of the legal documents from `TERMS_VERSION` / `PRIVACY_VERSION`, read at call time. Bump one
+ * when its document changes materially: a lower accepted version is pending (session/pending-derived).
  */
 export const DocumentVersions = {
   terms(): number {

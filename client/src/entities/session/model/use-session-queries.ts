@@ -19,17 +19,16 @@ import {
   postRegistration,
 } from '../api/session-api';
 
-// Session mutations own the session cache only. Where the user goes next (home, redirect target, /login) is the
-// caller's flow — see pages/auth, pages/profile and features/logout.
+// Session mutations own the session cache only; where the user goes next is the caller's flow
+// (session/hooks-dont-navigate).
 
 export function useCurrentUserQuery(enabled: boolean): UseQueryResult<CurrentUser | null> {
   return useQuery<CurrentUser | null>({
     queryKey: sessionQueryKeys.me,
     queryFn: fetchCurrentUser,
     enabled,
-    // The session is verified once per app open (the root route primes this query); it stays fresh for the life of
-    // the app, so a page mount or a window focus never asks the server who the user is again. A session that ended
-    // on the server is discovered by the next data request (401 → refresh → /login), not by refetching this one.
+    // session/bootstrap-once: fresh for the life of the app — a session that ended is found by the next data request,
+    // not by refetching this one.
     staleTime: Infinity,
   });
 }

@@ -77,11 +77,8 @@ export const uiLayerFiles: Record<Exclude<UiFileKind, 'presentation'>, string[]>
 };
 
 /**
- * A `ui` segment holds components only; everything else has an FSD home:
- * constants → `config/`, types and logic (hooks included) → `model/`, helpers → `lib/`.
- * React specifics: a component's own `type Props` stays next to it.
- * In sliced layers that is the only type allowed; `shared/ui` may also export the types of its public contract
- * (`MenuButtonItem`, `SelectOption`): `shared/model` is for domain-agnostic state, not for one component's contract.
+ * fsd-architecture §4: a `ui` segment holds components and their `type Props` only; `shared/ui` may also export the
+ * types of its public contract.
  */
 const onlyPropsTypes = {
   selector: declarations('TSTypeAliasDeclaration[id.name!=/Props$/]'),

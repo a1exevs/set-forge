@@ -3,10 +3,8 @@ import { Linter } from 'eslint';
 import { slicedLayers, slicesOf } from '../fsd';
 
 /**
- * Inside one slice — and inside `shared`, whose segments play the same roles — a segment may import only the
- * segments to its right: `ui → model → api → lib, config`. Keys are the importing segment, values the segments it
- * must not import — not even types. `model` is missing for api/lib/config on purpose: they may `import type` from it
- * (see {@link modelTypeOnlyRule}), just not its code. `app` is exempt: its segments are wiring, not layers of logic.
+ * fsd-architecture §4: the segments each segment must not import, not even their types. `model` is missing for
+ * api / lib / config on purpose: they may `import type` from it ({@link modelTypeOnlyRule}), just not its code.
  */
 const forbiddenBySegment: Record<string, string[]> = {
   model: ['ui'],

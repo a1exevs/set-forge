@@ -40,9 +40,7 @@ const config: StorybookConfig = {
     getAbsolutePath('@chromatic-com/storybook'),
     getAbsolutePath('@storybook/addon-interactions'),
     // Accessibility panel: axe runs on the open story; keep it green (see .claude/rules/storybook.md).
-    // TODO: run every story in CI with @storybook/test-runner + axe-playwright (play functions and axe violations
-    //   on every PR, not only Chromatic on `testing`). Storybook 9 replaces the test-runner with the Vitest addon —
-    //   decide between the two at the upgrade, and whether Jest stays for unit tests next to it.
+    // TODO: axe and play functions on every story in CI — @storybook/test-runner, or the Vitest addon of Storybook 9.
     getAbsolutePath('@storybook/addon-a11y'),
     getAbsolutePath('storybook-addon-pseudo-states'),
   ],

@@ -5,8 +5,7 @@ import { AppException } from '@common/exceptions';
 
 /**
  * Requires the session cookie (the refresh token). Without it the request carries no session credential, so the
- * answer is 401 — the same as `JwtAuthGuard` gives for a missing or expired access token — and the client treats
- * both alike: refresh, and on failure end the session on `/login`.
+ * answer is 401 — the same as `JwtAuthGuard` gives for a missing or expired access token.
  */
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {

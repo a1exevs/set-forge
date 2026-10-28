@@ -165,10 +165,8 @@ async function withLock<T>(cwd: string, action: (file: string) => Promise<T>): P
 }
 
 /**
- * Removes what a killed stand leaves: whatever still listens on its ports (a Nest or Vite the kill of the process
- * tree missed), its MySQL container — Testcontainers' reaper is shared by every stand on the machine and keeps it
- * while any other stand runs — and its API build in `server/.stack/<port>` of its checkout. After a graceful stop
- * all of it is already gone.
+ * Removes what a killed stand leaves: listeners on its ports, its MySQL container (the reaper shared by every stand
+ * keeps it while another runs) and its API build in `server/.stack/<port>`. A graceful stop leaves none of it.
  */
 export function removeLeftovers(entry: StandEntry): void {
   const killed = killListeners([entry.serverPort, entry.clientPort]);

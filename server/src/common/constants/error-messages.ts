@@ -1,6 +1,6 @@
 /**
  * The error catalogue: the key is the code the API sends in `fieldsErrors[].code`, the value is its English text with
- * named `{param}` placeholders filled from `fieldsErrors[].params`. The client translates by the code.
+ * named `{param}` placeholders filled from `fieldsErrors[].params`.
  */
 export const ErrorMessages = {
   // Validation

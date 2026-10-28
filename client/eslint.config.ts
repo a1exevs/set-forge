@@ -1,4 +1,5 @@
 import eslintJs from '@eslint/js';
+import { commentLengthConfigs } from '@set-forge/eslint-config';
 import { defineConfig } from 'eslint/config';
 import prettierConfig from 'eslint-config-prettier';
 import storyBookPlugin from 'eslint-plugin-storybook';
@@ -74,9 +75,7 @@ export default defineConfig(
     },
   },
   {
-    // Declaration merging needs `interface`: module augmentation (`declare module '@tanstack/react-router'
-    // { interface Register }`, `declare module 'i18next' { interface CustomTypeOptions }`) and ambient globals
-    // (`interface ImportMeta` in vite-env.d.ts).
+    // Declaration merging needs `interface`: module augmentation and ambient globals (typescript-guidelines).
     files: ['src/app/router/router.ts', 'src/app/i18n/dictionaries.ts', 'src/**/*.d.ts'],
     rules: {
       '@typescript-eslint/consistent-type-definitions': 'off',
@@ -114,6 +113,7 @@ export default defineConfig(
   }),
   // Interface text through the dictionaries: no literals in JSX, text attributes or toasts.
   ...literalTextConfigs(),
+  ...commentLengthConfigs(),
   {
     // Tests config files
     files: ['tests/**/*.{ts,tsx}'],

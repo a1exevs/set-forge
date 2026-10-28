@@ -13,12 +13,8 @@ import { WorkoutSessionExercise } from '@workout-sessions/workout-session-exerci
 import { WorkoutSession } from '@workout-sessions/workout-session.model';
 
 /**
- * Verifies that deleting the current account removes the user together with ALL user-owned
- * data via the DB-level `ON DELETE CASCADE` foreign keys defined in the migrations:
- *   users → workout_lists → workout_exercises
- *   users → workout_sessions → workout_session_exercises
- *   users → refreshTokens
- *   users → users_roles
+ * Deleting the current account removes the user with all user-owned data through the `ON DELETE CASCADE` keys of the
+ * migrations.
  */
 // @invariant session/deletion-cascade
 describe('Account deletion cascade', () => {

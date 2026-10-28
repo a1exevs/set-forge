@@ -70,8 +70,8 @@ export class WorkoutListsService {
     const list = await this.findOwnedOrThrow(userId, id);
     const existingById = new Map(list.exercises.map(exercise => [exercise.id, exercise]));
 
-    // Reconcile by replace: existing exercises keep their id (so active sessions can resync
-    // against a stable sourceExerciseId), new ones get fresh ids, removed ones are dropped.
+    // Reconcile by replace (workout-list/update-keeps-ids): existing exercises keep their id, new ones get fresh ids,
+    // removed ones are dropped.
     const rows = dto.exercises.map((exercise, index) => {
       const existing = exercise.id ? existingById.get(exercise.id) : undefined;
       return {
@@ -111,7 +111,7 @@ export class WorkoutListsService {
     return WorkoutListsService.toExportFile(lists);
   }
 
-  // Reserved for GET /workout-lists/:id/export
+  // One list in the shape of the export file.
   public async exportOne(userId: number, listId: string): Promise<WorkoutListsExportFileResponse.Dto> {
     const list = await this.getOne(userId, listId);
     return WorkoutListsService.toExportFile([list]);

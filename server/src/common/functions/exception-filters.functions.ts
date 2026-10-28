@@ -25,9 +25,8 @@ const codeOfStatus = (status: number): ErrorCode =>
 
 type ClientHttpError = Error & { status: number; expose?: unknown };
 
-// Express middleware fails with an `http-errors` error, not a Nest exception: body-parser's 413 for a body over the
-// limit, serve-static's 404 for a missing file. Its text is shown only when it says so (`expose`) — the 404 of a file
-// holds a server path.
+// Express middleware fails with an `http-errors` error (body-parser's 413, serve-static's 404), not a Nest exception;
+// its text is shown only when `expose` says so — the 404 of a file holds a server path.
 const isClientHttpError = (exception: unknown): exception is ClientHttpError =>
   exception instanceof Error &&
   'status' in exception &&
@@ -52,7 +51,7 @@ export function toErrorResult(exception: unknown): ErrorResult {
   return { status: HttpStatus.INTERNAL_SERVER_ERROR, errors: [new ErrorItemResponse.Dto('INTERNAL_ERROR')] };
 }
 
-// A field error keeps the "field - text" form in `messages`, the one the client shows today.
+// `messages` carries a field error as "field - text"; `fieldsErrors` carries it by code.
 const toMessage = (error: ErrorItemResponse.Dto): string =>
   error.field ? `${error.field} - ${error.message}` : error.message;
 

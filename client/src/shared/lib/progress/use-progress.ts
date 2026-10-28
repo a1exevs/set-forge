@@ -10,7 +10,7 @@ type ProgressControl<K extends string> = {
   run: (key: K, task: () => Promise<unknown>) => Promise<boolean>;
   /** The look of action `key`: its own progress, or `locked` while another action of the group runs. */
   progressOf: (key: K) => Progress;
-  /** An action of the group is in flight — fields and the other controls lock on it. */
+  /** An action of the group is in flight. */
   busy: boolean;
 };
 

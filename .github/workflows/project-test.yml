@@ -26,6 +26,7 @@ jobs:
 
       - name: Unit tests
         run: |
+          npm run eslint-config:test
           npm run client:test:unit
           npm run server:test:unit
 

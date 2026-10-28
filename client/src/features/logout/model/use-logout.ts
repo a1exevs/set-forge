@@ -22,7 +22,7 @@ export function useLogout(): Logout {
         .then((): void => undefined)
         .catch((): void => undefined),
     leave: (): void => {
-      // Before the navigation: a cached user would send /login back home
+      // Before the navigation: `/login` is guest-only (session/route-guards), so no cached user may stay
       clearSessionCache();
       void navigate({ to: '/login' });
     },

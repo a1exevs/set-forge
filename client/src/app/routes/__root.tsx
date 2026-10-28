@@ -42,9 +42,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   beforeLoad: async ({ context, location }) => {
     const path = location.pathname;
 
-    // Legal documents are open to everyone — never redirect and never require a session.
-    // Do not bootstrap here: signed-in users with pending reconsent must still be able to
-    // read these pages; the reconsent gate is suppressed on these paths in the widget.
+    // Legal documents are open to everyone, without a bootstrap: a user with pending re-acceptance still reads them
+    // (session/route-guards, session/reconsent-gate).
     if (ALWAYS_PUBLIC_PATHS.has(path)) {
       return;
     }

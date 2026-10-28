@@ -156,7 +156,7 @@ export function useIncrementSessionProgressMutation(): UseMutationResult<
     },
     onError: (_error, { workoutListId }, context) => {
       const cached = getCachedSession(qc, workoutListId);
-      // Another path (e.g. entry finish) may have completed the session; do not undo that UI.
+      // The session may have been completed meanwhile (workout-session/finish-on-entry-if-complete): keep that.
       if (cached?.status === 'completed') {
         return;
       }

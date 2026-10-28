@@ -4,6 +4,7 @@ paths:
   - "client/**"
   - "server/**"
   - "scripts/**"
+  - "packages/**"
   - "eslint.config.ts"
   - "lint-staged.config.cjs"
   - "package.json"
@@ -72,8 +73,9 @@ exception is a spec that spies on the module: `jest.spyOn(fs, 'existsSync')` nee
 
 ## Node scripts
 
-Repository scripts (`scripts/`, `client/scripts/`, the Playwright API stack, the verification stand) are TypeScript
-that Node runs as is — `node scripts/check-domain-docs.ts`, no ts-node, no build. Node only strips the types, hence:
+Repository scripts (`scripts/`, `client/scripts/`, the Playwright API stack, the verification stand) and the
+`packages/` workspaces are TypeScript that Node runs as is — `node scripts/check-domain-docs.ts`, no ts-node, no
+build. Node only strips the types, hence:
 
 - erasable syntax only: no `enum` (an `as const` object + a union type), `namespace` or constructor parameter
   properties;
@@ -98,4 +100,4 @@ Node does not type-check either, so every script folder is covered by a `tsc` pr
 | Node built-ins via `node:` | `npm run lint:root` · `npm run client:lint` · `npm run server:lint` · ESLint `import/enforce-node-protocol-usage` |
 | Node built-ins imported by name, `* as` only for `jest.spyOn` | ❌ review |
 | `node:` where no linter reads: `server/database/config.js`, `server/.sequelizerc`, inline `node -e` (`package.json`, `docker-compose.yml`) | ❌ review |
-| Node scripts: erasable syntax, strict types | `npm run lint:root` · `scripts/tsconfig.json` · `npm run client:lint` · `client/tsconfig.scripts.json` |
+| Node scripts: erasable syntax, strict types | `npm run lint:root` · `scripts/tsconfig.json` · `packages/eslint-config/tsconfig.json` · `npm run client:lint` · `client/tsconfig.scripts.json` |

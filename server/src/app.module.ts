@@ -43,9 +43,8 @@ import { WorkoutSession, WorkoutSessionExercise, WorkoutSessionsModule } from '@
         WorkoutSessionExercise,
       ],
       autoLoadModels: true,
-      // Schema is owned by sequelize-cli migrations under server/database/migrations.
-      // Keep this `false` in every environment so dev and prod share one source of truth
-      // and accidental model edits never silently mutate the database.
+      // The schema is owned by the migrations (server/database/migrations) in every environment: a model edit never
+      // changes the database.
       synchronize: false,
     }),
     UsersModule,

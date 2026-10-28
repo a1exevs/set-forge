@@ -4,7 +4,8 @@
   "description": "Build workout lists, log sets and weights, rate perceived effort, and track strength progress over time.",
   "workspaces": [
     "client",
-    "server"
+    "server",
+    "packages/*"
   ],
   "engines": {
     "node": "22.23.2",
@@ -13,13 +14,14 @@
   "scripts": {
     "setup:env": "node scripts/setup-env.ts",
     "prepare": "node -e \"if (process.env.HUSKY === '0') process.exit(0); const {existsSync}=require('node:fs'); if (existsSync('node_modules/husky')) require('node:child_process').execSync('husky install',{stdio:'inherit'});\"",
-    "format:root": "prettier --write \"scripts/**/*.ts\" eslint.config.ts",
-    "format:root:check": "prettier --check \"scripts/**/*.ts\" eslint.config.ts",
-    "lint:root": "npm run lint:scripts && npm run lint:config && npm run lint:eslint && npm run lint:docs",
+    "format:root": "prettier --write \"scripts/**/*.ts\" \"packages/**/*.ts\" eslint.config.ts",
+    "format:root:check": "prettier --check \"scripts/**/*.ts\" \"packages/**/*.ts\" eslint.config.ts",
+    "lint:root": "npm run lint:scripts && npm run lint:packages && npm run lint:config && npm run lint:eslint && npm run lint:docs",
     "lint:scripts": "tsc -p scripts/tsconfig.json",
+    "lint:packages": "tsc -p packages/eslint-config/tsconfig.json",
     "lint:config": "tsc -p tsconfig.json",
-    "lint:eslint": "eslint scripts lint-staged.config.cjs eslint.config.ts",
-    "lint:eslint:fix": "eslint scripts lint-staged.config.cjs eslint.config.ts --fix",
+    "lint:eslint": "eslint scripts packages lint-staged.config.cjs eslint.config.ts",
+    "lint:eslint:fix": "eslint scripts packages lint-staged.config.cjs eslint.config.ts --fix",
     "lint:docs": "node scripts/check-domain-docs.ts",
     "version:patch": "node scripts/increase-version.ts patch",
     "version:minor": "node scripts/increase-version.ts minor",
@@ -27,6 +29,7 @@
     "update-version:patch": "node scripts/update-version.ts patch",
     "update-version:minor": "node scripts/update-version.ts minor",
     "update-version:major": "node scripts/update-version.ts major",
+    "eslint-config:test": "npm run test -w @set-forge/eslint-config",
     "client:dev": "npm run dev -w @set-forge/client",
     "client:build": "npm run build -w @set-forge/client",
     "client:preview": "npm run preview -w @set-forge/client",
