@@ -103,106 +103,6 @@ exports[`ConfirmDialog matches snapshot with custom button texts 1`] = `
 </body>
 `;
 
-exports[`ConfirmDialog matches snapshot with default options 1`] = `
-<body>
-  <div
-    aria-hidden="true"
-  >
-    <button
-      type="button"
-    >
-      Open
-    </button>
-  </div>
-  <div
-    id="headlessui-portal-root"
-  >
-    <div
-      data-headlessui-portal=""
-    >
-      <button
-        aria-hidden="true"
-        data-headlessui-focus-guard="true"
-        style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
-        type="button"
-      />
-      <div>
-        <div
-          aria-label="Confirm action"
-          aria-modal="true"
-          class="dialogRoot"
-          data-headlessui-state="open"
-          data-open=""
-          id="headlessui-dialog-:r0:"
-          role="dialog"
-          tabindex="-1"
-        >
-          <div
-            aria-hidden="true"
-            class="dialogBackdrop"
-            data-headlessui-state="open"
-            data-open=""
-            style="--dialog-backdrop: #000000;"
-          />
-          <div
-            class="dialogOverlay"
-          >
-            <div
-              class="dialogPanel"
-              data-headlessui-state="open"
-              data-open=""
-              id="headlessui-dialog-panel-:r6:"
-            >
-              <div
-                class="container"
-              >
-                <h2
-                  class="title"
-                >
-                  Confirm action
-                </h2>
-                <div
-                  class="buttons  "
-                >
-                  <button
-                    class="button secondary md"
-                    data-headlessui-state=""
-                    type="button"
-                  >
-                    <span
-                      class="label"
-                    >
-                      Cancel
-                    </span>
-                  </button>
-                  <button
-                    class="button primary md"
-                    data-headlessui-state=""
-                    type="button"
-                  >
-                    <span
-                      class="label"
-                    >
-                      Confirm
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <button
-        aria-hidden="true"
-        data-headlessui-focus-guard="true"
-        style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
-        type="button"
-      />
-    </div>
-  </div>
-</body>
-`;
-
 exports[`ConfirmDialog matches snapshot with description 1`] = `
 <body>
   <div>
@@ -374,6 +274,106 @@ exports[`ConfirmDialog matches snapshot with hideCancelButton 1`] = `
                       class="label"
                     >
                       Ok
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button
+        aria-hidden="true"
+        data-headlessui-focus-guard="true"
+        style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
+        type="button"
+      />
+    </div>
+  </div>
+</body>
+`;
+
+exports[`ConfirmDialog matches snapshot with the two buttons 1`] = `
+<body>
+  <div
+    aria-hidden="true"
+  >
+    <button
+      type="button"
+    >
+      Open
+    </button>
+  </div>
+  <div
+    id="headlessui-portal-root"
+  >
+    <div
+      data-headlessui-portal=""
+    >
+      <button
+        aria-hidden="true"
+        data-headlessui-focus-guard="true"
+        style="position: fixed; top: 1px; left: 1px; width: 1px; height: 0px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
+        type="button"
+      />
+      <div>
+        <div
+          aria-label="Confirm action"
+          aria-modal="true"
+          class="dialogRoot"
+          data-headlessui-state="open"
+          data-open=""
+          id="headlessui-dialog-:r0:"
+          role="dialog"
+          tabindex="-1"
+        >
+          <div
+            aria-hidden="true"
+            class="dialogBackdrop"
+            data-headlessui-state="open"
+            data-open=""
+            style="--dialog-backdrop: #000000;"
+          />
+          <div
+            class="dialogOverlay"
+          >
+            <div
+              class="dialogPanel"
+              data-headlessui-state="open"
+              data-open=""
+              id="headlessui-dialog-panel-:r6:"
+            >
+              <div
+                class="container"
+              >
+                <h2
+                  class="title"
+                >
+                  Confirm action
+                </h2>
+                <div
+                  class="buttons  "
+                >
+                  <button
+                    class="button secondary md"
+                    data-headlessui-state=""
+                    type="button"
+                  >
+                    <span
+                      class="label"
+                    >
+                      Cancel
+                    </span>
+                  </button>
+                  <button
+                    class="button primary md"
+                    data-headlessui-state=""
+                    type="button"
+                  >
+                    <span
+                      class="label"
+                    >
+                      Confirm
                     </span>
                   </button>
                 </div>

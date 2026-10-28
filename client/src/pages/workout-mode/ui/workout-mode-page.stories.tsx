@@ -10,11 +10,14 @@ import {
   buildTabletStoryObj,
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
+import { withTranslate } from 'storybook-dir/with-translate';
 
 import type { WorkoutSession } from '@entities/workout-session';
 
 import WorkoutModePageLogicLayer from './workout-mode-page-logic-layer';
-import WorkoutModePageSkeleton from './workout-mode-page-skeleton';
+import WorkoutModePageSkeletonPresentation from './workout-mode-page-skeleton';
+
+const WorkoutModePageSkeleton = withTranslate(WorkoutModePageSkeletonPresentation);
 
 const renderWorkoutModePage = (session: WorkoutSession | null) => (): ReturnType<typeof renderWithPageRouter> =>
   renderWithPageRouter({

@@ -19,20 +19,12 @@ describe('toast helpers', () => {
     expect(successSpy).toHaveBeenCalledWith('Workout list created');
   });
 
-  it('toastError uses Error.message when error is an Error', () => {
+  it('toastError calls toast.error with the message', () => {
     const errorSpy = jest.spyOn(toast, 'error').mockImplementation((): string | number => 'err');
 
-    toastError(new Error('Server unavailable'), 'Failed to create workout list');
+    toastError('Нет связи с сервером');
 
-    expect(errorSpy).toHaveBeenCalledWith('Server unavailable');
-  });
-
-  it('toastError uses fallback when error is not an Error', () => {
-    const errorSpy = jest.spyOn(toast, 'error').mockImplementation((): string | number => 'err');
-
-    toastError('network', 'Failed to create workout list');
-
-    expect(errorSpy).toHaveBeenCalledWith('Failed to create workout list');
+    expect(errorSpy).toHaveBeenCalledWith('Нет связи с сервером');
   });
 });
 
@@ -42,7 +34,7 @@ describe('Toaster', () => {
   });
 
   it('renders sonner toaster at bottom-left when a toast is shown', async () => {
-    render(<Toaster />);
+    render(<Toaster ariaLabel="Notifications" />);
     toastSuccess('Workout list created');
 
     await waitFor((): void => {
@@ -54,7 +46,7 @@ describe('Toaster', () => {
   });
 
   it('shows a success toast when toastSuccess is called', async () => {
-    render(<Toaster />);
+    render(<Toaster ariaLabel="Notifications" />);
 
     toastSuccess('Workout list created');
 
@@ -64,12 +56,18 @@ describe('Toaster', () => {
   });
 
   it('shows an error toast when toastError is called', async () => {
-    render(<Toaster />);
+    render(<Toaster ariaLabel="Notifications" />);
 
-    toastError(new Error('Something went wrong'), 'Failed');
+    toastError('Something went wrong');
 
     await waitFor((): void => {
       expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     });
+  });
+
+  it('names the toast region by the given label', () => {
+    render(<Toaster ariaLabel="Уведомления" />);
+
+    expect(screen.getByRole('region', { name: /^Уведомления/ })).toBeInTheDocument();
   });
 });

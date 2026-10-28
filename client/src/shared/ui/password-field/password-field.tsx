@@ -12,6 +12,8 @@ type Props = {
   autoComplete?: string;
   disabled?: boolean;
   revealable?: boolean;
+  showPasswordLabel: string;
+  hidePasswordLabel: string;
   visible: boolean;
   onChange: (value: string) => void;
   onToggleVisible: () => void;
@@ -24,6 +26,8 @@ const PasswordFieldView: FC<Props> = ({
   autoComplete,
   disabled = false,
   revealable = true,
+  showPasswordLabel,
+  hidePasswordLabel,
   visible,
   onChange,
   onToggleVisible,
@@ -48,7 +52,7 @@ const PasswordFieldView: FC<Props> = ({
         className={classes.toggle}
         onClick={onToggleVisible}
         disabled={disabled}
-        aria-label={visible ? 'Hide password' : 'Show password'}
+        aria-label={visible ? hidePasswordLabel : showPasswordLabel}
         aria-pressed={visible}
       >
         {visible ? (

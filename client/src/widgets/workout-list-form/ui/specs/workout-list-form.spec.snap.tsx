@@ -1,10 +1,14 @@
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
+import { t } from 'tests/common/translate';
+
+import { type MuscleGroup, muscleGroupLabel, muscleGroups } from '@entities/workout-exercise';
 import { ConfirmDialogProvider } from '@shared/ui';
 
+import { exerciseErrorText } from '../../lib/exercise-error-text';
 import type { ExerciseFormData } from '../../model/exercise-form-data';
-import { getExerciseNumericFieldError } from '../../model/exercise-numeric-validation';
+import { type ExerciseNumericFieldKey, getExerciseNumericFieldError } from '../../model/exercise-numeric-validation';
 import WorkoutListFormPresentation from '../workout-list-form';
 import WorkoutListForm from '../workout-list-form-logic-layer';
 
@@ -88,6 +92,11 @@ describe('WorkoutListForm', () => {
     const { container } = render(
       <ConfirmDialogProvider>
         <WorkoutListFormPresentation
+          t={t}
+          muscleGroupOptions={muscleGroups.map((group: MuscleGroup) => ({
+            value: group,
+            label: muscleGroupLabel(group, t),
+          }))}
           notFound={false}
           title="New Workout List"
           submitButtonText="Create List"
@@ -103,7 +112,14 @@ describe('WorkoutListForm', () => {
           onSubmit={(): void => undefined}
           onCancel={(): void => undefined}
           submitAttempted={false}
-          getExerciseNumericFieldError={getExerciseNumericFieldError}
+          getExerciseNumericFieldError={(
+            exercise: Pick<ExerciseFormData, 'weight' | 'reps' | 'sets'>,
+            field: ExerciseNumericFieldKey,
+          ): string | undefined => {
+            const error = getExerciseNumericFieldError(exercise, field);
+            return error === undefined ? undefined : exerciseErrorText(error, t);
+          }}
+          getServerFieldError={(): undefined => undefined}
         />
       </ConfirmDialogProvider>,
     );

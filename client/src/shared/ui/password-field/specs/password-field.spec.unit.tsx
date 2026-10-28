@@ -14,6 +14,8 @@ const StatefulPasswordField: FC<{
   const [value, setValue] = useState(initialValue);
   return (
     <PasswordField
+      showPasswordLabel="Show password"
+      hidePasswordLabel="Hide password"
       id="pwd"
       name={name}
       value={value}
@@ -30,34 +32,86 @@ const StatefulPasswordField: FC<{
 describe('PasswordField', () => {
   describe('rendering', () => {
     it('renders a password input by default', () => {
-      render(<PasswordField id="pwd" value="secret" onChange={jest.fn()} />);
+      render(
+        <PasswordField
+          showPasswordLabel="Show password"
+          hidePasswordLabel="Hide password"
+          id="pwd"
+          value="secret"
+          onChange={jest.fn()}
+        />,
+      );
       expect(screen.getByDisplayValue('secret')).toHaveAttribute('type', 'password');
     });
 
     it('renders show-password toggle', () => {
-      render(<PasswordField id="pwd" value="" onChange={jest.fn()} />);
+      render(
+        <PasswordField
+          showPasswordLabel="Show password"
+          hidePasswordLabel="Hide password"
+          id="pwd"
+          value=""
+          onChange={jest.fn()}
+        />,
+      );
       expect(screen.getByRole('button', { name: 'Show password' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Show password' })).toHaveAttribute('aria-pressed', 'false');
     });
 
     it('forwards disabled to input and toggle', () => {
-      render(<PasswordField id="pwd" value="" onChange={jest.fn()} disabled />);
+      render(
+        <PasswordField
+          showPasswordLabel="Show password"
+          hidePasswordLabel="Hide password"
+          id="pwd"
+          value=""
+          onChange={jest.fn()}
+          disabled
+        />,
+      );
       expect(screen.getByDisplayValue('')).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Show password' })).toBeDisabled();
     });
 
     it('applies autoComplete when provided', () => {
-      render(<PasswordField id="pwd" value="" onChange={jest.fn()} autoComplete="current-password" />);
+      render(
+        <PasswordField
+          showPasswordLabel="Show password"
+          hidePasswordLabel="Hide password"
+          id="pwd"
+          value=""
+          onChange={jest.fn()}
+          autoComplete="current-password"
+        />,
+      );
       expect(screen.getByDisplayValue('')).toHaveAttribute('autocomplete', 'current-password');
     });
 
     it('applies name when provided', () => {
-      render(<PasswordField id="pwd" name="password" value="" onChange={jest.fn()} />);
+      render(
+        <PasswordField
+          showPasswordLabel="Show password"
+          hidePasswordLabel="Hide password"
+          id="pwd"
+          name="password"
+          value=""
+          onChange={jest.fn()}
+        />,
+      );
       expect(screen.getByDisplayValue('')).toHaveAttribute('name', 'password');
     });
 
     it('renders no toggle and keeps the value hidden when not revealable', () => {
-      render(<PasswordField id="pwd" value="secret" onChange={jest.fn()} revealable={false} />);
+      render(
+        <PasswordField
+          showPasswordLabel="Show password"
+          hidePasswordLabel="Hide password"
+          id="pwd"
+          value="secret"
+          onChange={jest.fn()}
+          revealable={false}
+        />,
+      );
       expect(screen.getByDisplayValue('secret')).toHaveAttribute('type', 'password');
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
@@ -76,7 +130,15 @@ describe('PasswordField', () => {
 
     it('toggles visibility between password and text', async () => {
       const user = userEvent.setup();
-      render(<PasswordField id="pwd" value="secret" onChange={jest.fn()} />);
+      render(
+        <PasswordField
+          showPasswordLabel="Show password"
+          hidePasswordLabel="Hide password"
+          id="pwd"
+          value="secret"
+          onChange={jest.fn()}
+        />,
+      );
       const input = screen.getByDisplayValue('secret');
       const toggle = screen.getByRole('button', { name: 'Show password' });
 
@@ -93,7 +155,16 @@ describe('PasswordField', () => {
 
     it('does not toggle when disabled', async () => {
       const user = userEvent.setup();
-      render(<PasswordField id="pwd" value="secret" onChange={jest.fn()} disabled />);
+      render(
+        <PasswordField
+          showPasswordLabel="Show password"
+          hidePasswordLabel="Hide password"
+          id="pwd"
+          value="secret"
+          onChange={jest.fn()}
+          disabled
+        />,
+      );
       await user.click(screen.getByRole('button', { name: 'Show password' }));
       expect(screen.getByDisplayValue('secret')).toHaveAttribute('type', 'password');
     });

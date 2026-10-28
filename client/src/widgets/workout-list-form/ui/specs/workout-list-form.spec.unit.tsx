@@ -242,6 +242,69 @@ describe('WorkoutListForm', () => {
     });
   });
 
+  describe('server errors', () => {
+    const serverFieldErrors = {
+      name: 'Must be a string',
+      'exercises.0.muscleGroup': 'Must be one of: chest, back',
+      'exercises.0.sets': 'Must not be less than 1',
+    };
+
+    it('shows each server error under its field', () => {
+      render(
+        <ConfirmDialogProvider>
+          <WorkoutListForm
+            {...defaultProps}
+            mode="edit"
+            initialData={initialDataEdit}
+            serverFieldErrors={serverFieldErrors}
+          />
+        </ConfirmDialogProvider>,
+      );
+
+      expect(screen.getByText('Must be a string')).toBeInTheDocument();
+      expect(screen.getByText('Must be one of: chest, back')).toBeInTheDocument();
+      expect(screen.getByText('Must not be less than 1')).toBeInTheDocument();
+    });
+
+    it('drops the server error of a field the user edits, and keeps the others', async () => {
+      const user = userEvent.setup();
+      render(
+        <ConfirmDialogProvider>
+          <WorkoutListForm
+            {...defaultProps}
+            mode="edit"
+            initialData={initialDataEdit}
+            serverFieldErrors={serverFieldErrors}
+          />
+        </ConfirmDialogProvider>,
+      );
+
+      await user.type(screen.getByLabelText('List Name *'), ' A');
+
+      expect(screen.queryByText('Must be a string')).not.toBeInTheDocument();
+      expect(screen.getByText('Must not be less than 1')).toBeInTheDocument();
+    });
+
+    it('drops the exercise errors when an exercise is added, since the positions shift', async () => {
+      const user = userEvent.setup();
+      render(
+        <ConfirmDialogProvider>
+          <WorkoutListForm
+            {...defaultProps}
+            mode="edit"
+            initialData={initialDataEdit}
+            serverFieldErrors={serverFieldErrors}
+          />
+        </ConfirmDialogProvider>,
+      );
+
+      await user.click(screen.getByRole('button', { name: '+ Add Exercise' }));
+
+      expect(screen.queryByText('Must not be less than 1')).not.toBeInTheDocument();
+      expect(screen.getByText('Must be a string')).toBeInTheDocument();
+    });
+  });
+
   describe('save in flight', () => {
     it('locks the fields and Cancel and shows the save progress', async () => {
       const user = userEvent.setup();

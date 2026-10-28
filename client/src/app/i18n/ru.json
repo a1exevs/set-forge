@@ -1,0 +1,283 @@
+{
+  "auth": {
+    "captcha": {
+      "hint": "Введите символы с картинки (защита входа).",
+      "imageAlt": "Картинка с кодом",
+      "label": "Код с картинки"
+    },
+    "confirmPassword": "Повторите пароль",
+    "email": "Электронная почта",
+    "errors": {
+      "captchaDemanded": "Нужно ввести код с картинки",
+      "captchaEmpty": "Введите код с картинки",
+      "consentRequired": "Нужно согласие на обработку персональных данных",
+      "emailInvalid": "Введите корректный адрес электронной почты",
+      "emailRequired": "Введите адрес электронной почты",
+      "loginFailed": "Не удалось войти",
+      "passwordLength": "Пароль должен содержать от 8 до 50 символов",
+      "passwordRequired": "Введите пароль",
+      "passwordsMismatch": "Пароли не совпадают",
+      "registrationFailed": "Не удалось зарегистрироваться",
+      "termsRequired": "Нужно принять условия Пользовательского соглашения",
+      "unknown": "Что-то пошло не так"
+    },
+    "hidePassword": "Скрыть пароль",
+    "password": "Пароль",
+    "showPassword": "Показать пароль",
+    "submit": {
+      "login": "Войти",
+      "register": "Создать аккаунт"
+    },
+    "subtitle": "Войдите, чтобы синхронизировать тренировки между устройствами",
+    "tabs": {
+      "label": "Вход и регистрация",
+      "login": "Вход",
+      "register": "Регистрация"
+    }
+  },
+  "common": {
+    "back": "Назад",
+    "backToHome": "На главную",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Изменить",
+    "logOut": "Выйти",
+    "ok": "ОК",
+    "save": "Сохранить"
+  },
+  "consent": {
+    "personalData": "Я даю согласие на обработку моих персональных данных в соответствии с <policy>Политикой обработки персональных данных</policy>",
+    "terms": "Я принимаю условия <terms>Пользовательского соглашения</terms>"
+  },
+  "errors": {
+    "ARRAY_MUST_NOT_BE_SHORTER_THAN_N": "Нужно хотя бы {{min}} элементов",
+    "BAD_REQUEST": "Некорректный запрос",
+    "CONSENT_TO_PERSONAL_DATA_PROCESSING_IS_REQUIRED": "Нужно согласие на обработку персональных данных",
+    "FAILED_TO_CREATE_ROLE": "Не удалось создать роль",
+    "FAILED_TO_CREATE_USER": "Не удалось создать пользователя",
+    "FORBIDDEN": "Доступ запрещён",
+    "INTERNAL_ERROR": "Внутренняя ошибка сервера",
+    "INVALID_EMAIL_OR_PASSWORD": "Неверная электронная почта или пароль",
+    "INVALID_IMPORT_FILE_FORMAT": "Неверный формат файла импорта",
+    "MUST_BE_A_NUMBER": "Должно быть числом",
+    "MUST_BE_A_STRING": "Должно быть строкой",
+    "MUST_BE_A_UUID": "Должно быть идентификатором UUID",
+    "MUST_BE_AN_ARRAY": "Должно быть списком",
+    "MUST_BE_AN_INTEGER_NUMBER": "Должно быть целым числом",
+    "MUST_BE_ONE_OF": "Допустимые значения: {{values}}",
+    "MUST_HAS_EMAIL_FORMAT": "Неверный формат адреса электронной почты",
+    "NEED_AUTHORIZATION_WITH_CAPTCHA": "Введите код с картинки",
+    "NETWORK_ERROR": "Нет связи с сервером",
+    "NOT_ENOUGH_PERMISSIONS": "Недостаточно прав",
+    "NOT_FOUND": "Не найдено",
+    "NUMERIC_MUST_NOT_BE_GREATER_THAN_N": "Должно быть не больше {{max}}",
+    "NUMERIC_MUST_NOT_BE_LESS_THAN_N": "Должно быть не меньше {{min}}",
+    "PAYLOAD_TOO_LARGE": "Слишком большой запрос",
+    "REFRESH_TOKEN_EXPIRED": "Сессия истекла, войдите снова",
+    "REFRESH_TOKEN_IS_MALFORMED": "Сессия повреждена, войдите снова",
+    "REFRESH_TOKEN_NOT_FOUND": "Сессия не найдена, войдите снова",
+    "REFRESH_TOKEN_REVOKED": "Сессия завершена, войдите снова",
+    "STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N": "Длина должна быть от {{min}} до {{max}} символов",
+    "TERMS_ACCEPTANCE_IS_REQUIRED": "Нужно принять пользовательское соглашение",
+    "UNAUTHORIZED": "Вы не авторизованы",
+    "UNEXPECTED_RESPONSE": "Сервер ответил неожиданно",
+    "UNPROCESSABLE_ENTITY": "Запрос не может быть обработан",
+    "UNSUPPORTED_EXPORT_FILE_VERSION": "Версия файла экспорта не поддерживается",
+    "USER_ALREADY_EXISTS": "Пользователь с такой электронной почтой уже есть",
+    "USER_ROLE_CONFIGURATION_IS_MISSING": "Сервис недоступен: не настроена роль пользователя"
+  },
+  "exercise": {
+    "reps": "Повторы",
+    "sets": "Подходы",
+    "weight": "Вес",
+    "weightValue": "{{weight}} кг"
+  },
+  "history": {
+    "count_one": "{{count}} тренировка",
+    "count_few": "{{count}} тренировки",
+    "count_many": "{{count}} тренировок",
+    "count_other": "{{count}} тренировки",
+    "duration": {
+      "hours": "{{hours}} ч",
+      "hoursMinutes": "{{hours}} ч {{minutes}} мин",
+      "minutes": "{{minutes}} мин"
+    },
+    "empty": "Пока нет завершённых тренировок",
+    "emptyHint": "Завершите тренировку, и она появится здесь",
+    "error": "Не удалось загрузить историю тренировок",
+    "errorHint": "Попробуйте позже",
+    "exerciseLine_one": "{{weight}} кг × {{count}} повтор",
+    "exerciseLine_few": "{{weight}} кг × {{count}} повтора",
+    "exerciseLine_many": "{{weight}} кг × {{count}} повторов",
+    "exerciseLine_other": "{{weight}} кг × {{count}} повтора",
+    "loading": "Загрузка истории",
+    "loadingMore": "Загрузка следующих тренировок",
+    "summary_one": "{{completed}}/{{count}} упражнение",
+    "summary_few": "{{completed}}/{{count}} упражнения",
+    "summary_many": "{{completed}}/{{count}} упражнений",
+    "summary_other": "{{completed}}/{{count}} упражнения",
+    "title": "История"
+  },
+  "home": {
+    "created": "Создан: {{date}}",
+    "createList": "Создать список",
+    "deleteDialog": {
+      "description": "Удалить «{{name}}»? Отменить это нельзя.",
+      "title": "Удалить список тренировок?"
+    },
+    "empty": "Пока нет списков тренировок",
+    "emptyHint": "Создайте первый список, чтобы отслеживать прогресс",
+    "exercisesBadge": "{{number}} упр.",
+    "exportLists": "Экспортировать списки",
+    "importDialog": {
+      "description_one": "Импортировать {{count}} список тренировок?",
+      "description_few": "Импортировать {{count}} списка тренировок?",
+      "description_many": "Импортировать {{count}} списков тренировок?",
+      "description_other": "Импортировать {{count}} списка тренировок?",
+      "import": "Импортировать",
+      "title": "Импортировать списки тренировок?"
+    },
+    "importLists": "Импортировать списки",
+    "lastUsed": "Использован: {{date}}",
+    "listActions": "Действия со списком",
+    "loading": "Загрузка списков тренировок",
+    "openList": "Открыть {{name}}",
+    "title": "Списки тренировок",
+    "toasts": {
+      "invalidFile": "Выбранный файл не является корректным JSON.",
+      "listDeleted": "Список тренировок удалён",
+      "listDeleteFailed": "Не удалось удалить список тренировок",
+      "listsExported": "Списки тренировок экспортированы",
+      "listsExportFailed": "Не удалось экспортировать списки тренировок",
+      "listsImported": "Списки тренировок импортированы",
+      "listsImportFailed": "Не удалось импортировать списки тренировок",
+      "nothingToImport": "В файле нет списков тренировок для импорта."
+    }
+  },
+  "language": {
+    "label": "Язык"
+  },
+  "legal": {
+    "privacyPolicy": "Политика обработки персональных данных",
+    "termsOfUse": "Пользовательское соглашение"
+  },
+  "mainTabs": {
+    "history": "История",
+    "home": "Главная",
+    "navigation": "Основная навигация",
+    "profile": "Профиль"
+  },
+  "muscleGroups": {
+    "arms": "Руки",
+    "back": "Спина",
+    "cardio": "Кардио",
+    "chest": "Грудь",
+    "core": "Кор",
+    "legs": "Ноги",
+    "shoulders": "Плечи"
+  },
+  "profile": {
+    "deleteAccount": "Удалить аккаунт",
+    "deleteAccountDialog": {
+      "description": "Аккаунт и все ваши данные (списки тренировок, упражнения и история сессий) будут удалены безвозвратно. Отменить это нельзя.",
+      "title": "Удалить аккаунт?"
+    },
+    "deleteAccountHint": "Удаление аккаунта безвозвратно стирает все ваши данные. Отменить это нельзя.",
+    "openSettings": "Настройки",
+    "title": "Профиль"
+  },
+  "reconsent": {
+    "accept": "Принять",
+    "acceptFailed": "Что-то пошло не так. Попробуйте ещё раз.",
+    "text": "Чтобы продолжить пользоваться Set Forge, ознакомьтесь с обновлёнными документами и примите их.",
+    "title": "Мы обновили документы"
+  },
+  "settings": {
+    "title": "Настройки"
+  },
+  "toaster": {
+    "label": "Уведомления"
+  },
+  "workoutList": {
+    "notFound": "Список тренировок не найден",
+    "resyncDialog": {
+      "description": "«Обновить тренировку» сохранит список и применит изменения к начатой тренировке. «Оставить тренировку» сохранит только список. «Отмена» вернёт к редактированию.",
+      "keep": "Оставить тренировку",
+      "title": "Обновить и текущую тренировку?",
+      "update": "Обновить тренировку"
+    },
+    "toasts": {
+      "created": "Список тренировок создан",
+      "createFailed": "Не удалось создать список тренировок",
+      "resyncFailed": "Не удалось обновить текущую тренировку",
+      "updated": "Список тренировок обновлён",
+      "updateFailed": "Не удалось обновить список тренировок"
+    }
+  },
+  "workoutListForm": {
+    "addExercise": "+ Добавить упражнение",
+    "createTitle": "Новый список тренировок",
+    "description": "Описание",
+    "descriptionPlaceholder": "Грудь, плечи, трицепс",
+    "dialogs": {
+      "checkExercises": "Проверьте данные упражнений",
+      "createFailed": "Не удалось создать список тренировок",
+      "exercisesRequired": "Добавьте хотя бы одно упражнение",
+      "nameRequired": "Введите название списка",
+      "saveFailed": "Не удалось сохранить список тренировок"
+    },
+    "editTitle": "Редактирование: {{name}}",
+    "errors": {
+      "repsInvalid": "Введите корректное число повторов",
+      "repsNotPositive": "Повторов должно быть больше 0",
+      "setsInvalid": "Введите корректное число подходов",
+      "setsNotPositive": "Подходов должно быть больше 0",
+      "weightInvalid": "Введите корректный вес",
+      "weightNegative": "Вес не может быть отрицательным"
+    },
+    "exerciseName": "Название *",
+    "exerciseNamePlaceholder": "Жим лёжа",
+    "exercises": "Упражнения",
+    "loading": "Загрузка списка тренировок",
+    "muscleGroup": "Группа мышц",
+    "name": "Название списка *",
+    "namePlaceholder": "Например, День жима",
+    "noExercises": "Добавьте упражнения в список",
+    "removeExercise": "Удалить упражнение",
+    "submitCreate": "Создать список",
+    "untitled": "Без названия",
+    "weightLabel": "Вес (кг)"
+  },
+  "workoutMode": {
+    "completed": "Тренировка завершена",
+    "finish": "Завершить тренировку",
+    "finishDialog": {
+      "description": "«Завершить» сохранит тренировку в историю. «Не сохранять» удалит начатую тренировку без сохранения. «Отмена» вернёт к тренировке.",
+      "discard": "Не сохранять",
+      "finish": "Завершить",
+      "title": "Завершить тренировку?"
+    },
+    "loading": "Загрузка тренировки",
+    "previewHint": "Готовы к тренировке? Нажимайте «Начать тренировку», только когда готовы приступить: таймер запускается в этот момент, и длительность тренировки в истории будет точной.",
+    "progress_one": "{{completed}} / {{count}} упражнение",
+    "progress_few": "{{completed}} / {{count}} упражнения",
+    "progress_many": "{{completed}} / {{count}} упражнений",
+    "progress_other": "{{completed}} / {{count}} упражнения",
+    "start": "Начать тренировку",
+    "toasts": {
+      "discardFailed": "Не удалось удалить тренировку",
+      "finishFailed": "Не удалось завершить тренировку",
+      "progressFailed": "Не удалось сохранить прогресс тренировки",
+      "startFailed": "Не удалось начать тренировку"
+    }
+  },
+  "workoutSession": {
+    "card": {
+      "hint": "Дважды коснитесь, чтобы отметить подход",
+      "label_one": "{{name}}: {{completed}} из {{count}} подхода",
+      "label_few": "{{name}}: {{completed}} из {{count}} подходов",
+      "label_many": "{{name}}: {{completed}} из {{count}} подходов",
+      "label_other": "{{name}}: {{completed}} из {{count}} подхода"
+    }
+  }
+}

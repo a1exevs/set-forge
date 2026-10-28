@@ -30,18 +30,22 @@ const items = [
 
 describe('TabsBar', () => {
   it('matches snapshot with active home tab', () => {
-    const { container } = render(<TabsBar items={items} activeItemId="home" />);
+    const { container } = render(<TabsBar ariaLabel="Main navigation" items={items} activeItemId="home" />);
     expect(container).toMatchSnapshot();
   });
 
   it('matches snapshot with active profile tab', () => {
-    const { container } = render(<TabsBar items={items} activeItemId="profile" />);
+    const { container } = render(<TabsBar ariaLabel="Main navigation" items={items} activeItemId="profile" />);
     expect(container).toMatchSnapshot();
   });
 
   it('matches snapshot with badge', () => {
     const { container } = render(
-      <TabsBar items={[{ id: 'home', label: 'Home', to: '/', icon: Home, badgeCount: 10 }]} activeItemId="home" />,
+      <TabsBar
+        ariaLabel="Main navigation"
+        items={[{ id: 'home', label: 'Home', to: '/', icon: Home, badgeCount: 10 }]}
+        activeItemId="home"
+      />,
     );
     expect(container).toMatchSnapshot();
   });

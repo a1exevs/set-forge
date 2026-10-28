@@ -1,7 +1,17 @@
 import { ChangeEvent, FC, useRef } from 'react';
 
 import type { WorkoutList, WorkoutListsExportFile } from '@entities/workout-list';
-import { downloadJsonFile, toastError, toastSuccess, useConfirm, useLoadingPhase, useProgress } from '@shared/lib';
+import { apiErrorText } from '@shared/api';
+import {
+  downloadJsonFile,
+  type Language,
+  toastError,
+  toastSuccess,
+  useConfirm,
+  useLoadingPhase,
+  useProgress,
+  useT,
+} from '@shared/lib';
 import { useMainTabSwipe } from '@widgets/main-tabs-bar';
 
 import HomePage from './home-page';
@@ -15,7 +25,7 @@ type Props = {
   exportAllWorkoutLists: () => Promise<WorkoutListsExportFile>;
   importWorkoutLists: (file: WorkoutListsExportFile) => Promise<void>;
   onEdit: (id: string) => void;
-  formatDate: (date: string | null) => string;
+  formatDate: (iso: string, language: Language) => string;
 };
 
 const HomePageLogicLayer: FC<Props> = ({
@@ -32,26 +42,27 @@ const HomePageLogicLayer: FC<Props> = ({
   const confirmDialog = useConfirm();
   const importInputRef = useRef<HTMLInputElement>(null);
   const { run, progressOf } = useProgress<'export'>();
+  const { t, language } = useT();
   const loadingPhase = useLoadingPhase(isLoading);
 
   const handleDelete = async (id: string, name: string): Promise<void> => {
     const ok = await confirmDialog({
-      title: 'Delete workout list?',
-      description: `Delete "${name}"? This cannot be undone.`,
-      confirmationText: 'Delete',
-      cancellationText: 'Cancel',
+      title: t('home.deleteDialog.title'),
+      description: t('home.deleteDialog.description', { name }),
+      confirmationText: t('common.delete'),
+      cancellationText: t('common.cancel'),
       onConfirm: async (): Promise<void> => {
         try {
           await deleteWorkoutList(id);
         } catch (error: unknown) {
-          toastError(error, 'Failed to delete workout list');
+          toastError(apiErrorText(error, t) ?? t('home.toasts.listDeleteFailed'));
           throw error;
         }
       },
     });
     if (ok) {
       clearWorkoutSessionCachesForDeletedList(id);
-      toastSuccess('Workout list deleted');
+      toastSuccess(t('home.toasts.listDeleted'));
     }
   };
 
@@ -61,10 +72,10 @@ const HomePageLogicLayer: FC<Props> = ({
         downloadJsonFile(await exportAllWorkoutLists(), buildWorkoutListsExportFilename());
       });
       if (done) {
-        toastSuccess('Workout lists exported');
+        toastSuccess(t('home.toasts.listsExported'));
       }
     } catch (error: unknown) {
-      toastError(error, 'Failed to export workout lists');
+      toastError(apiErrorText(error, t) ?? t('home.toasts.listsExportFailed'));
     }
   };
 
@@ -83,7 +94,7 @@ const HomePageLogicLayer: FC<Props> = ({
     try {
       parsed = JSON.parse(await file.text());
     } catch {
-      toastError(null, 'The selected file is not valid JSON.');
+      toastError(t('home.toasts.invalidFile'));
       return;
     }
 
@@ -94,31 +105,32 @@ const HomePageLogicLayer: FC<Props> = ({
         : 0;
 
     if (count === 0) {
-      toastError(null, 'The file does not contain any workout lists to import.');
+      toastError(t('home.toasts.nothingToImport'));
       return;
     }
 
     const ok = await confirmDialog({
-      title: 'Import workout lists?',
-      description: `Import ${count} workout list${count === 1 ? '' : 's'}?`,
-      confirmationText: 'Import',
-      cancellationText: 'Cancel',
+      title: t('home.importDialog.title'),
+      description: t('home.importDialog.description', { count }),
+      confirmationText: t('home.importDialog.import'),
+      cancellationText: t('common.cancel'),
       onConfirm: async (): Promise<void> => {
         try {
           await importWorkoutLists(parsed as WorkoutListsExportFile);
         } catch (error: unknown) {
-          toastError(error, 'Failed to import workout lists');
+          toastError(apiErrorText(error, t) ?? t('home.toasts.listsImportFailed'));
           throw error;
         }
       },
     });
     if (ok) {
-      toastSuccess('Workout lists imported');
+      toastSuccess(t('home.toasts.listsImported'));
     }
   };
 
   return (
     <HomePage
+      t={t}
       swipeRef={swipeRef}
       workoutLists={workoutLists}
       loadingPhase={loadingPhase}
@@ -129,7 +141,7 @@ const HomePageLogicLayer: FC<Props> = ({
       onImportClick={handleImportClick}
       onImportFile={handleImportFile}
       importInputRef={importInputRef}
-      formatDate={formatDate}
+      formatDate={(iso: string): string => formatDate(iso, language)}
     />
   );
 };

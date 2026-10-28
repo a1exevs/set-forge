@@ -14,12 +14,21 @@ export const STAND_PRESETS = {
   user: `a registered user ${STAND_USER.email} without data`,
   data: `a registered user ${STAND_USER.email} with two workout lists and one completed session`,
   history: `the data of "data" plus a one-set list finished ${EXTRA_HISTORY_SESSIONS} times — history has a second page`,
+  reconsent: `the user of "user", who accepted the documents of version 1, and a server that now requires version 2 — the re-consent gate after login`,
 } as const;
 
 export type StandPreset = keyof typeof STAND_PRESETS;
 
 export function isStandPreset(value: string): value is StandPreset {
   return Object.hasOwn(STAND_PRESETS, value);
+}
+
+/**
+ * The server configuration a preset moves to once its data is in: a document update is a raised required version, and
+ * a user who accepted the old one can be made only before it.
+ */
+export function presetServerEnv(preset: StandPreset): Record<string, string> | null {
+  return preset === 'reconsent' ? { TERMS_VERSION: '2', PRIVACY_VERSION: '2' } : null;
 }
 
 type Envelope<T> = { resultCode: number; data: T | null; messages: string[] };
@@ -141,5 +150,9 @@ export async function applyPreset(preset: StandPreset, serverOrigin: string): Pr
       await seedHistory(serverOrigin, auth);
     }
   }
-  return [`log in as ${STAND_USER.email} / ${STAND_USER.password}`];
+  const notes = [`log in as ${STAND_USER.email} / ${STAND_USER.password}`];
+  if (preset === 'reconsent') {
+    notes.push('the documents are at version 2: the re-consent gate opens after login');
+  }
+  return notes;
 }

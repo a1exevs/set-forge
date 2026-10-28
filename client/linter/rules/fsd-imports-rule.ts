@@ -40,10 +40,12 @@ function publicApiSidestep(ownEntity?: string): Pattern {
   };
 }
 
-/** Third-party UI primitives are wrapped in `shared/ui`, toasts go through `shared/lib`. */
+/** Third-party UI primitives are wrapped in `shared/ui`, toasts and translation go through `shared/lib`. */
 const uiKitImports: Pattern = {
-  group: ['@headlessui/*', 'sonner'],
-  message: 'Headless UI and sonner are wrapped in `src/shared` — import the wrapper from `@shared/ui` / `@shared/lib`.',
+  group: ['@headlessui/*', 'sonner', 'i18next', 'react-i18next'],
+  message:
+    'Headless UI, sonner and i18next are wrapped in `src/shared` — import the wrapper from `@shared/ui` / ' +
+    '`@shared/lib` (`useT`, `Translate`).',
 };
 
 /** Server state lives in the `model` / `api` segments, components get it through entity hooks. */
@@ -97,7 +99,7 @@ const base = (ownEntity?: string): Pattern[] => [
  *   (relative paths leaving a slice are Steiger's job);
  * - upper layers are banned, so are sibling slices through the alias — except the `@x` API between entities;
  * - `@shared/<segment>` is banned inside that very segment (relative paths there);
- * - Headless UI / sonner only inside `shared`, React Query outside `ui` segments.
+ * - Headless UI / sonner / i18next only inside `shared`, React Query outside `ui` segments.
  */
 export function fsdImportsConfigs(): Linter.Config[] {
   const configs: Linter.Config[] = [];

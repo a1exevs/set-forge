@@ -4,11 +4,16 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { clearAccessToken, setSessionExpiredHandler } from '@shared/api';
-import { ConfirmDialogProvider, Toaster } from '@shared/ui';
+import { initI18n } from '@shared/lib';
+import { ConfirmDialogProvider } from '@shared/ui';
 
+import AppToaster from './app-toaster';
 import { queryClient } from '../api/query-client';
+import { dictionaries } from '../i18n/dictionaries';
 import { router } from '../router/router';
 import '../styles/global.scss';
+
+initI18n(dictionaries);
 
 setSessionExpiredHandler(() => {
   clearAccessToken();
@@ -27,7 +32,7 @@ createRoot(rootElement).render(
     <QueryClientProvider client={queryClient}>
       <ConfirmDialogProvider>
         <RouterProvider router={router} context={{ queryClient }} />
-        <Toaster />
+        <AppToaster />
       </ConfirmDialogProvider>
     </QueryClientProvider>
   </StrictMode>,

@@ -1,40 +1,68 @@
-import { HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Logger, NotFoundException } from '@nestjs/common';
 
+import { ResultCodes } from '@common/constants';
 import { HttpExceptionFilter } from '@common/exception-filters';
+import { AppException } from '@common/exceptions';
 import { getMockArgumentsHostData } from '@test/unit/helpers';
 
 describe('HttpExceptionFilter', () => {
+  let logError: jest.SpyInstance;
+
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.clearAllTimers();
+    logError = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
   });
 
-  describe('catch', () => {
-    it('should catch exception', async () => {
-      const { mockArgumentsHost, mockGetResponse, response } = getMockArgumentsHostData({});
-      const errorCode = HttpStatus.BAD_REQUEST;
-      const errorMessage = 'Error message';
-      const httpExceptionFilter = new HttpExceptionFilter();
-      httpExceptionFilter.catch(new HttpException(errorMessage, errorCode), mockArgumentsHost);
-      const body = JSON.parse(response._getData());
+  afterEach(() => {
+    logError.mockRestore();
+  });
 
-      expect(response._getStatusCode()).toBe(errorCode);
-      expect(mockGetResponse).toBeCalledTimes(1);
-      expect(body.messages).toContainEqual(errorMessage);
-      expect(body.data).toBeNull();
-    });
+  it('should send an AppException in the envelope with its code', () => {
+    const { mockArgumentsHost, response } = getMockArgumentsHostData({});
+    new HttpExceptionFilter().catch(AppException.of(HttpStatus.UNAUTHORIZED, 'UNAUTHORIZED'), mockArgumentsHost);
+    const body = JSON.parse(response._getData());
 
-    it('should respond when UnauthorizedException is caught', () => {
-      const { mockArgumentsHost, mockGetResponse, response } = getMockArgumentsHostData({});
-      const errorMessage = 'User is not authorized';
-      const httpExceptionFilter = new HttpExceptionFilter();
-      httpExceptionFilter.catch(new UnauthorizedException({ message: errorMessage }), mockArgumentsHost);
-      const body = JSON.parse(response._getData());
+    expect(response._getStatusCode()).toBe(HttpStatus.UNAUTHORIZED);
+    expect(body.data).toBeNull();
+    expect(body.resultCode).toBe(ResultCodes.ERROR);
+    expect(body.messages).toEqual(['User is not authorized']);
+    expect(body.fieldsErrors).toEqual([{ code: 'UNAUTHORIZED', params: {}, message: 'User is not authorized' }]);
+    expect(logError).not.toBeCalled();
+  });
 
-      expect(response._getStatusCode()).toBe(HttpStatus.UNAUTHORIZED);
-      expect(mockGetResponse).toBeCalledTimes(1);
-      expect(body.messages).toContainEqual(errorMessage);
-      expect(body.data).toBeNull();
-    });
+  it('should send a Nest exception in the envelope with the code of its status', () => {
+    const { mockArgumentsHost, response } = getMockArgumentsHostData({});
+    new HttpExceptionFilter().catch(new NotFoundException(), mockArgumentsHost);
+    const body = JSON.parse(response._getData());
+
+    expect(response._getStatusCode()).toBe(HttpStatus.NOT_FOUND);
+    expect(body.fieldsErrors[0].code).toBe('NOT_FOUND');
+  });
+
+  it('should send a crash as an internal error and log it', () => {
+    const { mockArgumentsHost, response } = getMockArgumentsHostData({});
+    new HttpExceptionFilter().catch(new Error('db is down'), mockArgumentsHost);
+    const body = JSON.parse(response._getData());
+
+    expect(response._getStatusCode()).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(body.messages).toEqual(['Internal server error']);
+    expect(logError).toBeCalledWith(expect.stringContaining('db is down'));
+  });
+
+  it('should log the internal failure behind an error, never send it', () => {
+    const { mockArgumentsHost, response } = getMockArgumentsHostData({});
+    const exception = AppException.of(HttpStatus.BAD_REQUEST, 'FAILED_TO_CREATE_USER', {}, new Error('duplicate'));
+    new HttpExceptionFilter().catch(exception, mockArgumentsHost);
+
+    expect(response._getData()).not.toContain('duplicate');
+    expect(logError).toBeCalledWith(expect.stringContaining('duplicate'));
+  });
+
+  it('should send nothing when the headers are already sent', () => {
+    const { mockArgumentsHost, response } = getMockArgumentsHostData({});
+    response.headersSent = true;
+    new HttpExceptionFilter().catch(new NotFoundException(), mockArgumentsHost);
+
+    expect(response._getData()).toBe('');
   });
 });

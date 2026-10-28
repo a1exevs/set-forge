@@ -1,5 +1,8 @@
 import { FC, KeyboardEvent } from 'react';
 
+import { muscleGroupLabel } from '@entities/workout-exercise/@x/workout-session-exercise';
+import { useT } from '@shared/lib';
+
 import WorkoutSessionExerciseCard from './workout-session-exercise-card';
 import { getExerciseProgress, isExerciseComplete } from '../../model/exercise-progress';
 import type { WorkoutSessionExercise } from '../../model/workout-session-exercise';
@@ -12,6 +15,7 @@ type Props = {
 };
 
 const WorkoutSessionExerciseCardLogicLayer: FC<Props> = ({ exercise, justCompleted, isFinished, onTap }) => {
+  const { t, language } = useT();
   const progress = getExerciseProgress(exercise);
   const isCompleted = isExerciseComplete(exercise);
 
@@ -28,7 +32,10 @@ const WorkoutSessionExerciseCardLogicLayer: FC<Props> = ({ exercise, justComplet
 
   return (
     <WorkoutSessionExerciseCard
+      t={t}
+      language={language}
       exercise={exercise}
+      muscleGroupText={muscleGroupLabel(exercise.muscleGroup, t)}
       justCompleted={justCompleted}
       isFinished={isFinished}
       isCompleted={isCompleted}

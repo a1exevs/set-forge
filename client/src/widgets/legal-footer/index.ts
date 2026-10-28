@@ -1,1 +1,1 @@
-export { default as LegalFooter } from './ui/legal-footer';
+export { default as LegalFooter } from './ui/legal-footer-logic-layer';

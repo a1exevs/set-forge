@@ -3,7 +3,8 @@ import { FC, useEffect, useRef, useState } from 'react';
 import type { WorkoutList } from '@entities/workout-list';
 import { countCompletedExercises, isSessionFullyComplete, type WorkoutSession } from '@entities/workout-session';
 import { hasRemainingSets } from '@entities/workout-session-exercise';
-import { toastError, useConfirm, useLoadingPhase, useProgress } from '@shared/lib';
+import { apiErrorText } from '@shared/api';
+import { toastError, useConfirm, useLoadingPhase, useProgress, useT } from '@shared/lib';
 
 import WorkoutModePage from './workout-mode-page';
 import { fireWorkoutCompleteConfetti } from '../lib/fire-workout-complete-confetti';
@@ -27,6 +28,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
 }) => {
   const confirmDialog = useConfirm();
   const { run, progressOf } = useProgress<'start'>();
+  const { t } = useT();
   const loadingPhase = useLoadingPhase(workoutList === undefined);
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
   const lastTapRef = useRef<Record<string, number>>({});
@@ -55,7 +57,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     try {
       await run('start', () => startSession(workoutList.id));
     } catch (error: unknown) {
-      toastError(error, 'Failed to start workout session');
+      toastError(apiErrorText(error, t) ?? t('workoutMode.toasts.startFailed'));
     }
   };
 
@@ -86,7 +88,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
           celebrateOnce();
         }
       } catch (error: unknown) {
-        toastError(error, 'Failed to update session progress');
+        toastError(apiErrorText(error, t) ?? t('workoutMode.toasts.progressFailed'));
       }
     })();
   };
@@ -111,17 +113,16 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
     }
 
     const result = await confirmDialog({
-      title: 'Finish workout?',
-      description:
-        'Finish saves this session to history. Discard deletes this active session without saving. Cancel keeps the workout open.',
-      confirmationText: 'Finish',
-      alternateText: 'Discard',
-      cancellationText: 'Cancel',
+      title: t('workoutMode.finishDialog.title'),
+      description: t('workoutMode.finishDialog.description'),
+      confirmationText: t('workoutMode.finishDialog.finish'),
+      alternateText: t('workoutMode.finishDialog.discard'),
+      cancellationText: t('common.cancel'),
       onConfirm: async (): Promise<void> => {
         try {
           await finishSession(session.id);
         } catch (error: unknown) {
-          toastError(error, 'Failed to finish workout session');
+          toastError(apiErrorText(error, t) ?? t('workoutMode.toasts.finishFailed'));
           throw error;
         }
       },
@@ -129,7 +130,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
         try {
           await discardSession(session.id);
         } catch (error: unknown) {
-          toastError(error, 'Failed to discard workout session');
+          toastError(apiErrorText(error, t) ?? t('workoutMode.toasts.discardFailed'));
           throw error;
         }
       },
@@ -193,6 +194,7 @@ const WorkoutModePageLogicLayer: FC<Props> = ({
 
   return (
     <WorkoutModePage
+      t={t}
       loadingPhase={loadingPhase}
       phase={phase}
       workoutList={workoutList ?? null}

@@ -1,20 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
-import { ErrorMessages } from '@common/constants';
+import { validationError } from '@common/utils';
 
 export namespace LoginRequest {
   export class Dto {
     @ApiProperty()
-    @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
+    @IsString(validationError('MUST_BE_A_STRING'))
     readonly email: string;
 
     @ApiProperty()
-    @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
+    @IsString(validationError('MUST_BE_A_STRING'))
     readonly password: string;
 
     @ApiProperty({ required: false })
-    @IsString({ message: ErrorMessages.MUST_BE_A_STRING })
+    @IsString(validationError('MUST_BE_A_STRING'))
     @IsOptional()
     readonly captcha?: string;
 

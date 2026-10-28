@@ -7,13 +7,13 @@ import type { MenuButtonItem } from '../menu-button/menu-button';
 type Props = {
   letter: string;
   items: MenuButtonItem[];
-  ariaLabel?: string;
+  ariaLabel: string;
 };
 
 const UserAvatarMenu: FC<Props> = ({ letter, items, ariaLabel }) => {
   return (
     <Menu>
-      <HeadlessMenuButton className={classes.trigger} aria-label={ariaLabel ?? 'Account menu'} type="button">
+      <HeadlessMenuButton className={classes.trigger} aria-label={ariaLabel} type="button">
         <span className={classes.letter} aria-hidden>
           {letter}
         </span>

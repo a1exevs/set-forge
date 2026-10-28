@@ -6,7 +6,7 @@ node_modules
 .claude
 CLAUDE.md
 .idea
-server/_stub
+server/test/api
 client/.storybook-static
 client/playwright-report
 client/test-results

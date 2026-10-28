@@ -1,18 +1,21 @@
 import { ChangeEvent, FC, FormEvent } from 'react';
 
 import { type MuscleGroup, muscleGroups } from '@entities/workout-exercise';
-import type { Progress } from '@shared/lib';
-import { Button, NotFoundMessage, NumericField, Select } from '@shared/ui';
+import type { Progress, Translate } from '@shared/lib';
+import { Button, NotFoundMessage, NumericField, Select, type SelectOption } from '@shared/ui';
 
 import classes from './workout-list-form.module.scss';
-import { muscleGroupOptions } from '../config/muscle-group-options';
 import type { ExerciseFormData } from '../model/exercise-form-data';
+import { exerciseFieldPath } from '../model/form-fields';
 
 type Props = {
+  t: Translate;
   /** No list to edit: the not-found message instead of the form. */
   notFound: boolean;
   title: string;
   submitButtonText: string;
+  /** The muscle groups in the chosen language, their values the stored keys. */
+  muscleGroupOptions: SelectOption[];
   /** The save in flight: the fields and Cancel wait for its answer. */
   submitProgress: Progress;
   name: string;
@@ -34,12 +37,16 @@ type Props = {
     exercise: Pick<ExerciseFormData, 'weight' | 'reps' | 'sets'>,
     field: 'weight' | 'reps' | 'sets',
   ) => string | undefined;
+  /** The server's error of a field by its request path (`name`, `exerciseFieldPath(0, 'sets')`). */
+  getServerFieldError: (path: string) => string | undefined;
 };
 
 const WorkoutListForm: FC<Props> = ({
+  t,
   notFound,
   title,
   submitButtonText,
+  muscleGroupOptions,
   submitProgress,
   name,
   description,
@@ -53,11 +60,12 @@ const WorkoutListForm: FC<Props> = ({
   onCancel,
   submitAttempted,
   getExerciseNumericFieldError,
+  getServerFieldError,
 }) => {
   if (notFound) {
     return (
       <div className={classes.container}>
-        <NotFoundMessage title="Workout list not found" backToLink="/" />
+        <NotFoundMessage title={t('workoutList.notFound')} backToLabel={t('common.backToHome')} backToLink="/" />
       </div>
     );
   }
@@ -74,7 +82,7 @@ const WorkoutListForm: FC<Props> = ({
             <div className={classes.section}>
               <div>
                 <label htmlFor="name" className={classes.label}>
-                  List Name *
+                  {t('workoutListForm.name')}
                 </label>
                 <input
                   id="name"
@@ -82,36 +90,40 @@ const WorkoutListForm: FC<Props> = ({
                   value={name}
                   onChange={(e: ChangeEvent<HTMLInputElement>): void => onNameChange(e.target.value)}
                   className={classes.input}
-                  placeholder="e.g., Push Day"
+                  placeholder={t('workoutListForm.namePlaceholder')}
                   required
                 />
+                {getServerFieldError('name') && <p className={classes.fieldError}>{getServerFieldError('name')}</p>}
               </div>
 
               <div>
                 <label htmlFor="description" className={classes.label}>
-                  Description
+                  {t('workoutListForm.description')}
                 </label>
                 <textarea
                   id="description"
                   value={description}
                   onChange={(e: ChangeEvent<HTMLTextAreaElement>): void => onDescriptionChange(e.target.value)}
                   className={classes.textarea}
-                  placeholder="Chest, shoulders, triceps"
+                  placeholder={t('workoutListForm.descriptionPlaceholder')}
                   rows={2}
                 />
+                {getServerFieldError('description') && (
+                  <p className={classes.fieldError}>{getServerFieldError('description')}</p>
+                )}
               </div>
             </div>
 
             <div className={`${classes.section} ${classes.section_withoutGap}`}>
               <div className={classes.sectionHeader}>
-                <h2>Exercises</h2>
+                <h2>{t('workoutListForm.exercises')}</h2>
                 <Button type="button" onClick={onAddExercise} size="sm">
-                  + Add Exercise
+                  {t('workoutListForm.addExercise')}
                 </Button>
               </div>
 
               {exercises.length === 0 ? (
-                <p className={classes.emptyExercises}>Add exercises to your list</p>
+                <p className={classes.emptyExercises}>{t('workoutListForm.noExercises')}</p>
               ) : (
                 <div className={classes.exerciseList}>
                   {exercises.map((exercise: ExerciseFormData, index: number) => (
@@ -122,14 +134,14 @@ const WorkoutListForm: FC<Props> = ({
                           type="button"
                           className={classes.removeButton}
                           onClick={(): void => onRemoveExercise(exercise.tempId)}
-                          aria-label="Remove exercise"
+                          aria-label={t('workoutListForm.removeExercise')}
                         >
                           ✕
                         </button>
                       </div>
 
                       <div>
-                        <label className={classes.label}>Name *</label>
+                        <label className={classes.label}>{t('workoutListForm.exerciseName')}</label>
                         <input
                           type="text"
                           value={exercise.name}
@@ -137,13 +149,16 @@ const WorkoutListForm: FC<Props> = ({
                             onUpdateExercise(exercise.tempId, 'name', e.target.value)
                           }
                           className={classes.input}
-                          placeholder="Bench Press"
+                          placeholder={t('workoutListForm.exerciseNamePlaceholder')}
                           required
                         />
+                        {getServerFieldError(exerciseFieldPath(index, 'name')) && (
+                          <p className={classes.fieldError}>{getServerFieldError(exerciseFieldPath(index, 'name'))}</p>
+                        )}
                       </div>
 
                       <div>
-                        <label className={classes.label}>Muscle Group</label>
+                        <label className={classes.label}>{t('workoutListForm.muscleGroup')}</label>
                         <Select
                           value={exercise.muscleGroup}
                           options={muscleGroupOptions}
@@ -154,35 +169,49 @@ const WorkoutListForm: FC<Props> = ({
                             }
                           }}
                         />
+                        {getServerFieldError(exerciseFieldPath(index, 'muscleGroup')) && (
+                          <p className={classes.fieldError}>
+                            {getServerFieldError(exerciseFieldPath(index, 'muscleGroup'))}
+                          </p>
+                        )}
                       </div>
 
                       <div className={classes.fieldRow}>
                         <NumericField
-                          label="Weight (kg)"
+                          label={t('workoutListForm.weightLabel')}
                           id={`weight-${exercise.tempId}`}
                           value={exercise.weight}
                           onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'weight', v)}
                           variant="decimal"
                           size="sm"
-                          error={submitAttempted ? getExerciseNumericFieldError(exercise, 'weight') : undefined}
+                          error={
+                            (submitAttempted ? getExerciseNumericFieldError(exercise, 'weight') : undefined) ??
+                            getServerFieldError(exerciseFieldPath(index, 'weight'))
+                          }
                         />
                         <NumericField
-                          label="Reps"
+                          label={t('exercise.reps')}
                           id={`reps-${exercise.tempId}`}
                           value={exercise.reps}
                           onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'reps', v)}
                           variant="integer"
                           size="sm"
-                          error={submitAttempted ? getExerciseNumericFieldError(exercise, 'reps') : undefined}
+                          error={
+                            (submitAttempted ? getExerciseNumericFieldError(exercise, 'reps') : undefined) ??
+                            getServerFieldError(exerciseFieldPath(index, 'reps'))
+                          }
                         />
                         <NumericField
-                          label="Sets"
+                          label={t('exercise.sets')}
                           id={`sets-${exercise.tempId}`}
                           value={exercise.sets}
                           onChange={(v: number | null): void => onUpdateExercise(exercise.tempId, 'sets', v)}
                           variant="integer"
                           size="sm"
-                          error={submitAttempted ? getExerciseNumericFieldError(exercise, 'sets') : undefined}
+                          error={
+                            (submitAttempted ? getExerciseNumericFieldError(exercise, 'sets') : undefined) ??
+                            getServerFieldError(exerciseFieldPath(index, 'sets'))
+                          }
                         />
                       </div>
                     </div>
@@ -199,7 +228,7 @@ const WorkoutListForm: FC<Props> = ({
               progress={submitProgress === 'idle' ? 'idle' : 'locked'}
               onClick={onCancel}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" progress={submitProgress}>
               {submitButtonText}

@@ -10,6 +10,7 @@ import plugins from './linter/plugins';
 import curlyRule from './linter/rules/curly-rule';
 import { fsdImportsConfigs } from './linter/rules/fsd-imports-rule';
 import importOrderRule from './linter/rules/import-order-rule';
+import { literalTextConfigs } from './linter/rules/literal-text-rule';
 import returnTypeRule, { jsxCallbackSelectors } from './linter/rules/return-type-rule';
 import {
   modelTypeReaders,
@@ -74,8 +75,9 @@ export default defineConfig(
   },
   {
     // Declaration merging needs `interface`: module augmentation (`declare module '@tanstack/react-router'
-    // { interface Register }`) and ambient globals (`interface ImportMeta` in vite-env.d.ts).
-    files: ['src/app/router/router.ts', 'src/**/*.d.ts'],
+    // { interface Register }`, `declare module 'i18next' { interface CustomTypeOptions }`) and ambient globals
+    // (`interface ImportMeta` in vite-env.d.ts).
+    files: ['src/app/router/router.ts', 'src/app/i18n/dictionaries.ts', 'src/**/*.d.ts'],
     rules: {
       '@typescript-eslint/consistent-type-definitions': 'off',
     },
@@ -110,6 +112,8 @@ export default defineConfig(
       })),
     ];
   }),
+  // Interface text through the dictionaries: no literals in JSX, text attributes or toasts.
+  ...literalTextConfigs(),
   {
     // Tests config files
     files: ['tests/**/*.{ts,tsx}'],
@@ -119,7 +123,7 @@ export default defineConfig(
   },
   {
     // linter config files
-    files: ['linter/**/*.{ts,tsx}', 'eslint.config.ts', 'steiger.config.ts'],
+    files: ['linter/**/*.{ts,tsx}', 'eslint.config.ts', 'steiger.config.ts', 'i18next.config.ts'],
     rules: {
       'no-restricted-imports': 'off',
       '@typescript-eslint/ban-ts-comment': ['error', { 'ts-ignore': 'allow-with-description' }],

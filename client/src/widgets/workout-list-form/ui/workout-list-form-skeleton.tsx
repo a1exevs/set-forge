@@ -1,5 +1,6 @@
 import { FC } from 'react';
 
+import type { Translate } from '@shared/lib';
 import { Skeleton } from '@shared/ui';
 
 import classes from './workout-list-form.module.scss';
@@ -9,7 +10,11 @@ import classes from './workout-list-form.module.scss';
  * exercise cards and the two actions, in the same sections and geometry as the form itself, clipped to the first
  * screen so the placeholders fill it and never scroll.
  */
-const WorkoutListFormSkeleton: FC = () => (
+type Props = {
+  t: Translate;
+};
+
+const WorkoutListFormSkeleton: FC<Props> = ({ t }) => (
   <div className={`${classes.container} ${classes.containerLoading}`}>
     <header className={classes.header}>
       <div className={classes.titleSkeleton}>
@@ -18,7 +23,7 @@ const WorkoutListFormSkeleton: FC = () => (
     </header>
 
     <main className={classes.main}>
-      <div role="status" aria-label="Loading workout list" className={classes.form}>
+      <div role="status" aria-label={t('workoutListForm.loading')} className={classes.form}>
         <div className={classes.section}>
           <div>
             <div className={classes.label}>

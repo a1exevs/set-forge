@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { useConfirm, useProgress } from '@shared/lib';
+import { useConfirm, useProgress, useT } from '@shared/lib';
 import { useMainTabSwipe } from '@widgets/main-tabs-bar';
 
 import ProfilePage from './profile-page';
@@ -17,6 +17,7 @@ type Props = {
 };
 
 const ProfilePageLogicLayer: FC<Props> = ({ email, avatarLetter, onLogout, onDeleteAccount, onLeave }) => {
+  const { t } = useT();
   const swipeRef = useMainTabSwipe();
   const confirmDialog = useConfirm();
   // Deletion runs in its dialog, which covers the page; only logout needs to lock the other button.
@@ -30,11 +31,10 @@ const ProfilePageLogicLayer: FC<Props> = ({ email, avatarLetter, onLogout, onDel
 
   const handleDeleteAccount = async (): Promise<void> => {
     const ok = await confirmDialog({
-      title: 'Delete account?',
-      description:
-        'This permanently deletes your account and all your data (workout lists, exercises, and session history). This cannot be undone.',
-      confirmationText: 'Delete account',
-      cancellationText: 'Cancel',
+      title: t('profile.deleteAccountDialog.title'),
+      description: t('profile.deleteAccountDialog.description'),
+      confirmationText: t('profile.deleteAccount'),
+      cancellationText: t('common.cancel'),
       onConfirm: onDeleteAccount,
     });
     if (ok) {
@@ -44,6 +44,7 @@ const ProfilePageLogicLayer: FC<Props> = ({ email, avatarLetter, onLogout, onDel
 
   return (
     <ProfilePage
+      t={t}
       swipeRef={swipeRef}
       email={email}
       avatarLetter={avatarLetter}

@@ -1,17 +1,23 @@
+/**
+ * The error catalogue: the key is the code the API sends in `fieldsErrors[].code`, the value is its English text with
+ * named `{param}` placeholders filled from `fieldsErrors[].params`. The client translates by the code.
+ */
 export const ErrorMessages = {
   // Validation
   MUST_BE_A_NUMBER: 'Must be a number',
   MUST_BE_AN_INTEGER_NUMBER: 'Must be an integer',
   MUST_BE_A_STRING: 'Must be a string',
-  MUST_BE_A_BOOLEAN: 'Must be a boolean',
+  MUST_BE_AN_ARRAY: 'Must be an array',
+  MUST_BE_A_UUID: 'Must be a UUID',
+  MUST_BE_ONE_OF: 'Must be one of: {values}',
   MUST_HAS_EMAIL_FORMAT: 'Invalid email format',
   CONSENT_TO_PERSONAL_DATA_PROCESSING_IS_REQUIRED: 'Consent to the processing of personal data is required',
   TERMS_ACCEPTANCE_IS_REQUIRED: 'Acceptance of the Terms of Use is required',
   STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N:
-    'Length must be greater than {0} and less than {1} characters',
-  STRING_LENGTH_MUST_NOT_BE_GREATER_THAN_N: 'Length must be less than {0} characters',
-  NUMERIC_MUST_NOT_BE_LESS_THAN_N: 'Must not be less than {0}',
-  NUMERIC_MUST_NOT_BE_GREATER_THAN_N: 'Must not be greater than {0}',
+    'Length must be greater than {min} and less than {max} characters',
+  NUMERIC_MUST_NOT_BE_LESS_THAN_N: 'Must not be less than {min}',
+  NUMERIC_MUST_NOT_BE_GREATER_THAN_N: 'Must not be greater than {max}',
+  ARRAY_MUST_NOT_BE_SHORTER_THAN_N: 'Must contain at least {min} items',
 
   // Access
   UNAUTHORIZED: 'User is not authorized',
@@ -19,8 +25,7 @@ export const ErrorMessages = {
   FORBIDDEN: 'Access denied',
   NOT_ENOUGH_PERMISSIONS: 'Insufficient permissions',
   INVALID_EMAIL_OR_PASSWORD: 'Invalid email or password',
-  SERVICE_IS_UNAVAILABLE: 'Service is unavailable',
-  USER_ROLE_CONFIGURATION_IS_MISSING: 'User role configuration is missing',
+  USER_ROLE_CONFIGURATION_IS_MISSING: 'Service is unavailable: user role configuration is missing',
 
   // Refresh tokens
   REFRESH_TOKEN_IS_MALFORMED: 'Refresh token is malformed',
@@ -28,23 +33,23 @@ export const ErrorMessages = {
   REFRESH_TOKEN_NOT_FOUND: 'Refresh token not found',
   REFRESH_TOKEN_REVOKED: 'Refresh token revoked',
 
-  // Files
-  FILE_UPLOAD_ERROR: 'An error occurred while saving the file',
-  UPLOAD_FILE_SIZE_CANNOT_EXCEED_N_MBT: 'Uploaded file size must not exceed {0} MB',
-  FILE_NOT_SELECTED: 'No file selected',
-  IMAGE_FILE_COMPRESSING_ERROR: 'Error compressing image file',
-
-  // Users
-  USER_M_IS_ALREADY_A_FOLLOWER_OF_USER_N: 'User id={0} is already a follower of user id={1}',
-  USER_M_IS_NOT_A_FOLLOWER_OF_USER_N: 'User id={0} is not a follower of user id={1}',
-  USER_ALREADY_HAS_THE_ROLE_N: 'User already has role {0}',
+  // Users and roles
   USER_ALREADY_EXISTS: 'User already exists',
-  USER_N_NOT_FOUND: 'User with id {0} not found',
-
-  // Failures
-  FAILED_TO_CREATE_POST: 'Failed to create post',
-  FAILED_TO_CREATE_ROLE: 'Failed to create role',
-  FAILED_TO_FIND_USER: 'Failed to find user',
-  FAILED_TO_FIND_ROLE: 'Failed to find role',
   FAILED_TO_CREATE_USER: 'Failed to create user',
-};
+  FAILED_TO_CREATE_ROLE: 'Failed to create role',
+
+  // Workout lists
+  INVALID_IMPORT_FILE_FORMAT: 'Invalid import file format',
+  UNSUPPORTED_EXPORT_FILE_VERSION: 'Unsupported export file version',
+
+  // By HTTP status — errors without a code of their own (bare Nest exceptions, routing, body parsing, crashes)
+  BAD_REQUEST: 'Bad request',
+  NOT_FOUND: 'Not found',
+  UNPROCESSABLE_ENTITY: 'Unprocessable entity',
+  PAYLOAD_TOO_LARGE: 'Request is too large',
+  INTERNAL_ERROR: 'Internal server error',
+} as const;
+
+export type ErrorCode = keyof typeof ErrorMessages;
+
+export type ErrorParams = Record<string, string | number>;

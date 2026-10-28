@@ -1,14 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { createRequest } from 'node-mocks-http';
 
-import { ResponseInterceptor } from '@common/interceptors';
 import { SecurityController } from '@security/security.controller';
 import { SecurityService } from '@security/security.service';
 
 describe('SecurityController', () => {
   let securityController: SecurityController;
   let securityService: SecurityService;
-  let responseInterceptor: ResponseInterceptor<any>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -26,7 +24,6 @@ describe('SecurityController', () => {
     }).compile();
     securityController = moduleRef.get<SecurityController>(SecurityController);
     securityService = moduleRef.get<SecurityService>(SecurityService);
-    responseInterceptor = moduleRef.get<ResponseInterceptor<any>>(ResponseInterceptor);
   });
 
   describe('SecurityController - definition', () => {
@@ -35,9 +32,6 @@ describe('SecurityController', () => {
     });
     it('SecurityService - should be defined', () => {
       expect(securityService).toBeDefined();
-    });
-    it('ResponseInterceptor - should be defined', () => {
-      expect(responseInterceptor).toBeDefined();
     });
   });
 

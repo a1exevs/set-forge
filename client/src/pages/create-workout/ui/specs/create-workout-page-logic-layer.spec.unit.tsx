@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import type { CreateWorkoutListDto } from '@entities/workout-list';
+import { ApiRequestError } from '@shared/api';
 
 import CreateWorkoutPageLogicLayer from '../create-workout-page-logic-layer';
 
@@ -20,14 +21,18 @@ jest.mock('@tanstack/react-router', () => ({
 }));
 
 jest.mock('@widgets/workout-list-form', () => ({
+  ...jest.requireActual('@widgets/workout-list-form'),
   WorkoutListForm: ({
     onSubmit,
     onCancel,
+    serverFieldErrors,
   }: {
     onSubmit: (dto: CreateWorkoutListDto) => void | Promise<void>;
     onCancel: () => void;
+    serverFieldErrors?: Record<string, string>;
   }) => (
     <div>
+      <output data-testid="server-field-errors">{JSON.stringify(serverFieldErrors ?? {})}</output>
       <button
         type="button"
         onClick={(): void => {
@@ -101,9 +106,35 @@ describe('CreateWorkoutPageLogicLayer', () => {
 
     await waitFor((): void => {
       expect(onCreate).toHaveBeenCalledWith(CREATE_DTO);
-      expect(toastErrorMock).toHaveBeenCalledWith(error, 'Failed to create workout list');
+      expect(toastErrorMock).toHaveBeenCalledWith('Failed to create workout list');
       expect(toastSuccessMock).not.toHaveBeenCalled();
       expect(navigateMock).not.toHaveBeenCalled();
+    });
+  });
+
+  it('hands the field errors to the form and toasts the rest', async () => {
+    const user = userEvent.setup();
+    const onCreate = jest.fn().mockRejectedValue(
+      new ApiRequestError(400, {
+        data: null,
+        messages: [],
+        fieldsErrors: [
+          { code: 'NUMERIC_MUST_NOT_BE_LESS_THAN_N', params: { min: 1 }, field: 'exercises.0.sets', message: '' },
+          { code: 'BAD_REQUEST', params: {}, message: 'Bad request' },
+        ],
+        resultCode: 1,
+      }),
+    );
+
+    render(<CreateWorkoutPageLogicLayer onCreate={onCreate} />);
+
+    await user.click(screen.getByRole('button', { name: 'Create List' }));
+
+    await waitFor((): void => {
+      expect(screen.getByTestId('server-field-errors')).toHaveTextContent(
+        JSON.stringify({ 'exercises.0.sets': 'Must not be less than 1' }),
+      );
+      expect(toastErrorMock).toHaveBeenCalledWith('Bad request');
     });
   });
 

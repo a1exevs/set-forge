@@ -12,6 +12,7 @@ import Button from '../button/button';
 const meta = {
   title: 'Shared/Toaster',
   component: Toaster,
+  args: { ariaLabel: 'Notifications' },
   decorators: [withFrame],
   parameters: {
     docs: {
@@ -41,21 +42,13 @@ const ToasterDemo: FC = () => (
       <Button
         variant="danger"
         onClick={(): void => {
-          toastError(new Error('Failed to update workout list'), 'Failed');
+          toastError('Failed to update workout list');
         }}
       >
         Failure
       </Button>
-      <Button
-        variant="secondary"
-        onClick={(): void => {
-          toastError(null, 'Failed to start workout session');
-        }}
-      >
-        Failure without error
-      </Button>
     </Row>
-    <Toaster />
+    <Toaster ariaLabel="Notifications" />
   </Stack>
 );
 
@@ -71,14 +64,8 @@ export const Success: Story = {
   play: clickToast('Success'),
 };
 
-/** An error toast: `toastError` shows the error's message. */
+/** An error toast: `toastError` shows the message its caller translated. */
 export const Failure: Story = {
   render: (): ReactElement => <ToasterDemo />,
   play: clickToast('Failure'),
-};
-
-/** `toastError(null, fallback)`: no error object, the fallback text is shown. */
-export const FailureWithoutError: Story = {
-  render: (): ReactElement => <ToasterDemo />,
-  play: clickToast('Failure without error'),
 };

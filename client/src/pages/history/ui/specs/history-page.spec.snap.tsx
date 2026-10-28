@@ -1,6 +1,9 @@
 import { render } from '@testing-library/react';
 import { createRef } from 'react';
 
+import { t } from 'tests/common/translate';
+
+import { type MuscleGroup, muscleGroupLabel } from '@entities/workout-exercise';
 import type { WorkoutSession } from '@entities/workout-session';
 
 import HistoryPage from '../history-page';
@@ -39,6 +42,8 @@ describe('HistoryPage', () => {
   it('matches snapshot with an expanded session', () => {
     const { container } = render(
       <HistoryPage
+        t={t}
+        language="en"
         swipeRef={createRef<HTMLDivElement>()}
         sessions={[SESSION]}
         total={1}
@@ -50,6 +55,7 @@ describe('HistoryPage', () => {
         sentinelRef={createRef<HTMLDivElement>()}
         formatSessionDate={(iso: string | null): string => iso ?? ''}
         formatSummary={(): string => '1/1 exercise · 60 min'}
+        formatMuscleGroup={(group: MuscleGroup): string => muscleGroupLabel(group, t)}
       />,
     );
 

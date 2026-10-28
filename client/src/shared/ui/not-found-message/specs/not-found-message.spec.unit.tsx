@@ -15,32 +15,32 @@ jest.mock('@tanstack/react-router', () => ({
 describe('NotFoundMessage', () => {
   describe('rendering', () => {
     it('renders title', () => {
-      render(<NotFoundMessage title="Workout list not found" />);
+      render(<NotFoundMessage backToLabel="Back to Home" title="Workout list not found" />);
 
       expect(screen.getByRole('heading', { name: 'Workout list not found' })).toBeInTheDocument();
     });
 
     it('renders Back to Home link', () => {
-      render(<NotFoundMessage title="Workout list not found" />);
+      render(<NotFoundMessage backToLabel="Back to Home" title="Workout list not found" />);
 
       expect(screen.getByRole('link', { name: 'Back to Home' })).toBeInTheDocument();
     });
 
     it('renders with custom title', () => {
-      render(<NotFoundMessage title="Custom not found message" />);
+      render(<NotFoundMessage backToLabel="Back to Home" title="Custom not found message" />);
 
       expect(screen.getByRole('heading', { name: 'Custom not found message' })).toBeInTheDocument();
     });
 
     it('uses default backToLink when not provided', () => {
-      render(<NotFoundMessage title="Workout list not found" />);
+      render(<NotFoundMessage backToLabel="Back to Home" title="Workout list not found" />);
 
       const link = screen.getByRole('link', { name: 'Back to Home' });
       expect(link).toHaveAttribute('href', '/');
     });
 
     it('uses custom backToLink when provided', () => {
-      render(<NotFoundMessage title="Workout list not found" backToLink="/custom" />);
+      render(<NotFoundMessage backToLabel="Back to Home" title="Workout list not found" backToLink="/custom" />);
 
       const link = screen.getByRole('link', { name: 'Back to Home' });
       expect(link).toHaveAttribute('href', '/custom');
@@ -56,7 +56,7 @@ describe('NotFoundMessage', () => {
   describe('interactions', () => {
     it('link is clickable', async () => {
       const user = userEvent.setup();
-      render(<NotFoundMessage title="Workout list not found" />);
+      render(<NotFoundMessage backToLabel="Back to Home" title="Workout list not found" />);
 
       const link = screen.getByRole('link', { name: 'Back to Home' });
       await user.click(link);

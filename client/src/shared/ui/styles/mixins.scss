@@ -30,7 +30,7 @@
 }
 
 // The progress of an action control (`data-progress` = `pending` | `shown` | `locked`): the label fades out but keeps
-// the size, an indicator spins in the center. `.label`, `.indicator`, `.indicatorText` are the parts it renders.
+// the size, an indicator spins in the center. `.label` and `.indicator` are the parts it renders.
 @mixin action-progress {
   position: relative;
 
@@ -59,16 +59,6 @@
         animation: none;
       }
     }
-  }
-
-  // Read by screen readers, invisible on screen
-  .indicatorText {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
 
   &[data-progress='pending'],

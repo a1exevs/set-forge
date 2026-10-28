@@ -40,8 +40,7 @@ exports[`WorkoutSessionExerciseCard matches snapshot for completed exercise 1`] 
         <span
           class="detailValue"
         >
-          60
-           kg
+          60 kg
         </span>
       </div>
       <div
@@ -128,8 +127,7 @@ exports[`WorkoutSessionExerciseCard matches snapshot for in-progress exercise 1`
         <span
           class="detailValue"
         >
-          60
-           kg
+          60 kg
         </span>
       </div>
       <div
@@ -226,8 +224,7 @@ exports[`WorkoutSessionExerciseCard matches snapshot when justCompleted 1`] = `
         <span
           class="detailValue"
         >
-          60
-           kg
+          60 kg
         </span>
       </div>
       <div

@@ -8,6 +8,7 @@
     ".storybook/*.{ts,tsx}",
     "scripts/*.ts",
     "steiger.config.ts",
+    "i18next.config.ts",
   ],
   "project": [
     "src/**/*.{ts,tsx}",

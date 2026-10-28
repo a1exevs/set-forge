@@ -65,8 +65,18 @@ const editModeNoDataArgs = {
   onCancel: (): void => undefined,
 };
 
+/** The server's errors of a failed save, each under its field. */
+const serverErrorArgs = {
+  ...editModeArgs,
+  serverFieldErrors: {
+    name: 'Must be a string',
+    'exercises.0.muscleGroup': 'Must be one of: chest, back, legs, shoulders, arms, core, cardio',
+    'exercises.1.sets': 'Must not be less than 1',
+  },
+};
+
 const renderWithProvider = (
-  args: typeof createModeArgs | typeof editModeArgs | typeof editModeNoDataArgs,
+  args: typeof createModeArgs | typeof editModeArgs | typeof editModeNoDataArgs | typeof serverErrorArgs,
 ): ReactElement => (
   <ConfirmDialogProvider>
     <WorkoutListForm {...args} />
@@ -131,4 +141,14 @@ export const EditModeNoDataTablet = buildTabletStoryObj<typeof meta>({
 
 export const EditModeNoDataMobile = buildMobileStoryObj<typeof meta>({
   render: renderEditModeNoDataWithRouter,
+});
+
+/** A save the server rejected: its field errors under the name, the muscle group and the sets. */
+export const ServerErrorsDesktop = buildDesktopStoryObj<typeof meta>({
+  render: () => renderWithProvider(serverErrorArgs),
+});
+
+/** The same on a phone, where the error lines wrap under narrow fields. */
+export const ServerErrorsMobile = buildMobileStoryObj<typeof meta>({
+  render: () => renderWithProvider(serverErrorArgs),
 });

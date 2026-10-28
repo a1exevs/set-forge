@@ -94,6 +94,17 @@ describe('Session bootstrap in the router', () => {
       expect(bootstrapSessionAndPrimeCache).toHaveBeenCalledTimes(1);
     });
 
+    it('keeps Settings behind the session', async () => {
+      bootstrapSessionAndPrimeCache.mockResolvedValueOnce(null);
+      const queryClient = createTestQueryClient();
+      const router = createTestRouter('/settings', queryClient);
+      renderApp(router, queryClient);
+
+      await screen.findByRole('heading', { name: 'Set Forge' });
+      expect(router.state.location.pathname).toBe('/login');
+      expect(router.state.location.search).toEqual({ redirect: '/settings' });
+    });
+
     it('shows the legal pages to a guest without a session check', async () => {
       const queryClient = createTestQueryClient();
       const router = createTestRouter('/privacy', queryClient);

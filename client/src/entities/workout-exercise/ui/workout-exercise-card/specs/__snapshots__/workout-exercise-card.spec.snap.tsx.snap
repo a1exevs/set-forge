@@ -35,8 +35,7 @@ exports[`WorkoutExerciseCard matches snapshot 1`] = `
         <span
           class="detailValue"
         >
-          60
-           kg
+          60 kg
         </span>
       </div>
       <div

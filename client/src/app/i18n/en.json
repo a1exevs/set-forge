@@ -1,0 +1,271 @@
+{
+  "auth": {
+    "captcha": {
+      "hint": "Enter the characters from the image (session protected login).",
+      "imageAlt": "Captcha",
+      "label": "Captcha"
+    },
+    "confirmPassword": "Confirm password",
+    "email": "Email",
+    "errors": {
+      "captchaDemanded": "Captcha required",
+      "captchaEmpty": "Captcha is required",
+      "consentRequired": "You must consent to the processing of your personal data",
+      "emailInvalid": "Enter a valid email",
+      "emailRequired": "Email is required",
+      "loginFailed": "Login failed",
+      "passwordLength": "Password must be between 8 and 50 characters",
+      "passwordRequired": "Password is required",
+      "passwordsMismatch": "Passwords do not match",
+      "registrationFailed": "Registration failed",
+      "termsRequired": "You must accept the Terms of Use",
+      "unknown": "Something went wrong"
+    },
+    "hidePassword": "Hide password",
+    "password": "Password",
+    "showPassword": "Show password",
+    "submit": {
+      "login": "Log in",
+      "register": "Create account"
+    },
+    "subtitle": "Sign in to sync workouts across devices",
+    "tabs": {
+      "label": "Authentication",
+      "login": "Log in",
+      "register": "Register"
+    }
+  },
+  "common": {
+    "back": "Back",
+    "backToHome": "Back to Home",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "logOut": "Log out",
+    "ok": "Ok",
+    "save": "Save"
+  },
+  "consent": {
+    "personalData": "I consent to the processing of my personal data as described in the <policy>Privacy Policy</policy>",
+    "terms": "I accept the <terms>Terms of Use</terms>"
+  },
+  "errors": {
+    "ARRAY_MUST_NOT_BE_SHORTER_THAN_N": "Must contain at least {{min}} items",
+    "BAD_REQUEST": "Bad request",
+    "CONSENT_TO_PERSONAL_DATA_PROCESSING_IS_REQUIRED": "Consent to the processing of personal data is required",
+    "FAILED_TO_CREATE_ROLE": "Failed to create role",
+    "FAILED_TO_CREATE_USER": "Failed to create user",
+    "FORBIDDEN": "Access denied",
+    "INTERNAL_ERROR": "Internal server error",
+    "INVALID_EMAIL_OR_PASSWORD": "Invalid email or password",
+    "INVALID_IMPORT_FILE_FORMAT": "Invalid import file format",
+    "MUST_BE_A_NUMBER": "Must be a number",
+    "MUST_BE_A_STRING": "Must be a string",
+    "MUST_BE_A_UUID": "Must be a UUID",
+    "MUST_BE_AN_ARRAY": "Must be an array",
+    "MUST_BE_AN_INTEGER_NUMBER": "Must be an integer",
+    "MUST_BE_ONE_OF": "Must be one of: {{values}}",
+    "MUST_HAS_EMAIL_FORMAT": "Invalid email format",
+    "NEED_AUTHORIZATION_WITH_CAPTCHA": "Captcha verification required",
+    "NETWORK_ERROR": "No connection to the server",
+    "NOT_ENOUGH_PERMISSIONS": "Insufficient permissions",
+    "NOT_FOUND": "Not found",
+    "NUMERIC_MUST_NOT_BE_GREATER_THAN_N": "Must not be greater than {{max}}",
+    "NUMERIC_MUST_NOT_BE_LESS_THAN_N": "Must not be less than {{min}}",
+    "PAYLOAD_TOO_LARGE": "Request is too large",
+    "REFRESH_TOKEN_EXPIRED": "Refresh token has expired",
+    "REFRESH_TOKEN_IS_MALFORMED": "Refresh token is malformed",
+    "REFRESH_TOKEN_NOT_FOUND": "Refresh token not found",
+    "REFRESH_TOKEN_REVOKED": "Refresh token revoked",
+    "STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N": "Length must be greater than {{min}} and less than {{max}} characters",
+    "TERMS_ACCEPTANCE_IS_REQUIRED": "Acceptance of the Terms of Use is required",
+    "UNAUTHORIZED": "User is not authorized",
+    "UNEXPECTED_RESPONSE": "The server answered unexpectedly",
+    "UNPROCESSABLE_ENTITY": "Unprocessable entity",
+    "UNSUPPORTED_EXPORT_FILE_VERSION": "Unsupported export file version",
+    "USER_ALREADY_EXISTS": "User already exists",
+    "USER_ROLE_CONFIGURATION_IS_MISSING": "Service is unavailable: user role configuration is missing"
+  },
+  "exercise": {
+    "reps": "Reps",
+    "sets": "Sets",
+    "weight": "Weight",
+    "weightValue": "{{weight}} kg"
+  },
+  "history": {
+    "count_one": "{{count}} workout",
+    "count_other": "{{count}} workouts",
+    "duration": {
+      "hours": "{{hours}} h",
+      "hoursMinutes": "{{hours}} h {{minutes}} min",
+      "minutes": "{{minutes}} min"
+    },
+    "empty": "No completed workouts yet",
+    "emptyHint": "Finish a workout to see it here",
+    "error": "Could not load your workout history",
+    "errorHint": "Please try again later",
+    "exerciseLine_one": "{{weight}} kg × {{count}} rep",
+    "exerciseLine_other": "{{weight}} kg × {{count}} reps",
+    "loading": "Loading history",
+    "loadingMore": "Loading more history",
+    "summary_one": "{{completed}}/{{count}} exercise",
+    "summary_other": "{{completed}}/{{count}} exercises",
+    "title": "History"
+  },
+  "home": {
+    "created": "Created: {{date}}",
+    "createList": "Create workout list",
+    "deleteDialog": {
+      "description": "Delete \"{{name}}\"? This cannot be undone.",
+      "title": "Delete workout list?"
+    },
+    "empty": "No workout lists yet",
+    "emptyHint": "Create your first list to start tracking progress",
+    "exercisesBadge": "{{number}} ex.",
+    "exportLists": "Export workout lists",
+    "importDialog": {
+      "description_one": "Import {{count}} workout list?",
+      "description_other": "Import {{count}} workout lists?",
+      "import": "Import",
+      "title": "Import workout lists?"
+    },
+    "importLists": "Import workout lists",
+    "lastUsed": "Last used: {{date}}",
+    "listActions": "Workout list actions",
+    "loading": "Loading workout lists",
+    "openList": "Open {{name}}",
+    "title": "Workout lists",
+    "toasts": {
+      "invalidFile": "The selected file is not valid JSON.",
+      "listDeleted": "Workout list deleted",
+      "listDeleteFailed": "Failed to delete workout list",
+      "listsExported": "Workout lists exported",
+      "listsExportFailed": "Failed to export workout lists",
+      "listsImported": "Workout lists imported",
+      "listsImportFailed": "Failed to import workout lists",
+      "nothingToImport": "The file does not contain any workout lists to import."
+    }
+  },
+  "language": {
+    "label": "Language"
+  },
+  "legal": {
+    "privacyPolicy": "Privacy Policy",
+    "termsOfUse": "Terms of Use"
+  },
+  "mainTabs": {
+    "history": "History",
+    "home": "Home",
+    "navigation": "Main navigation",
+    "profile": "Profile"
+  },
+  "muscleGroups": {
+    "arms": "Arms",
+    "back": "Back",
+    "cardio": "Cardio",
+    "chest": "Chest",
+    "core": "Core",
+    "legs": "Legs",
+    "shoulders": "Shoulders"
+  },
+  "profile": {
+    "deleteAccount": "Delete account",
+    "deleteAccountDialog": {
+      "description": "This permanently deletes your account and all your data (workout lists, exercises, and session history). This cannot be undone.",
+      "title": "Delete account?"
+    },
+    "deleteAccountHint": "Deleting your account permanently removes all your data. This cannot be undone.",
+    "openSettings": "Settings",
+    "title": "Profile"
+  },
+  "reconsent": {
+    "accept": "Accept",
+    "acceptFailed": "Something went wrong. Please try again.",
+    "text": "Please review and accept the updated documents to keep using Set Forge.",
+    "title": "We’ve updated our documents"
+  },
+  "settings": {
+    "title": "Settings"
+  },
+  "toaster": {
+    "label": "Notifications"
+  },
+  "workoutList": {
+    "notFound": "Workout list not found",
+    "resyncDialog": {
+      "description": "Update session saves the list and applies these changes to the active workout. Keep session saves the list only. Cancel returns to editing.",
+      "keep": "Keep session",
+      "title": "Also update the current session?",
+      "update": "Update session"
+    },
+    "toasts": {
+      "created": "Workout list created",
+      "createFailed": "Failed to create workout list",
+      "resyncFailed": "Failed to update the current session",
+      "updated": "Workout list updated",
+      "updateFailed": "Failed to update workout list"
+    }
+  },
+  "workoutListForm": {
+    "addExercise": "+ Add Exercise",
+    "createTitle": "New Workout List",
+    "description": "Description",
+    "descriptionPlaceholder": "Chest, shoulders, triceps",
+    "dialogs": {
+      "checkExercises": "Please check exercise data validity",
+      "createFailed": "An error occurred while creating the workout list",
+      "exercisesRequired": "Please add at least one exercise",
+      "nameRequired": "Please enter a list name",
+      "saveFailed": "An error occurred while editing the workout list"
+    },
+    "editTitle": "Editing {{name}}",
+    "errors": {
+      "repsInvalid": "Enter a valid number of reps",
+      "repsNotPositive": "Reps must be greater than 0",
+      "setsInvalid": "Enter a valid number of sets",
+      "setsNotPositive": "Sets must be greater than 0",
+      "weightInvalid": "Enter a valid weight",
+      "weightNegative": "Weight cannot be negative"
+    },
+    "exerciseName": "Name *",
+    "exerciseNamePlaceholder": "Bench Press",
+    "exercises": "Exercises",
+    "loading": "Loading workout list",
+    "muscleGroup": "Muscle Group",
+    "name": "List Name *",
+    "namePlaceholder": "e.g., Push Day",
+    "noExercises": "Add exercises to your list",
+    "removeExercise": "Remove exercise",
+    "submitCreate": "Create List",
+    "untitled": "Untitled",
+    "weightLabel": "Weight (kg)"
+  },
+  "workoutMode": {
+    "completed": "Workout completed",
+    "finish": "Finish workout",
+    "finishDialog": {
+      "description": "Finish saves this session to history. Discard deletes this active session without saving. Cancel keeps the workout open.",
+      "discard": "Discard",
+      "finish": "Finish",
+      "title": "Finish workout?"
+    },
+    "loading": "Loading workout",
+    "previewHint": "Ready to train? Tap Start workout only when you are about to begin — the timer starts then, so your workout duration in history stays accurate.",
+    "progress_one": "{{completed}} / {{count}} exercise",
+    "progress_other": "{{completed}} / {{count}} exercises",
+    "start": "Start workout",
+    "toasts": {
+      "discardFailed": "Failed to discard workout session",
+      "finishFailed": "Failed to finish workout session",
+      "progressFailed": "Failed to update session progress",
+      "startFailed": "Failed to start workout session"
+    }
+  },
+  "workoutSession": {
+    "card": {
+      "hint": "Double tap to mark a set",
+      "label_one": "{{name}}: {{completed}} of {{count}} set",
+      "label_other": "{{name}}: {{completed}} of {{count}} sets"
+    }
+  }
+}

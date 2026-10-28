@@ -1,6 +1,8 @@
+import type { ApiErrorItem } from './api-error';
+
 export type CommonResponseEnvelope<T> = {
   data: T | null;
   messages: string[];
-  fieldsErrors: string[];
+  fieldsErrors: ApiErrorItem[];
   resultCode: number;
 };

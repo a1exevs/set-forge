@@ -1,6 +1,5 @@
-import { UnauthorizedException } from '@nestjs/common';
-
 import { MAX_AUTH_FAILED_COUNT, SvgCaptchaGuard } from '@auth/guards';
+import { AppException } from '@common/exceptions';
 import { getMockExecutionContextData } from '@test/unit/helpers';
 
 describe('SwgCaptchaGuard', () => {
@@ -63,7 +62,7 @@ describe('SwgCaptchaGuard', () => {
 
       const captchaGuard = new SvgCaptchaGuard();
 
-      expect(() => captchaGuard.canActivate(mockContext)).toThrow(UnauthorizedException);
+      expect(() => captchaGuard.canActivate(mockContext)).toThrow(AppException);
       expect(mockGetRequest).toBeCalledTimes(1);
       expect(request.session['captcha']).toBeNull();
     });

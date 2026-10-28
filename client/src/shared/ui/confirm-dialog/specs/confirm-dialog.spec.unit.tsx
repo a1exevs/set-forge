@@ -289,7 +289,14 @@ describe('useConfirm', () => {
         <button
           type="button"
           onClick={async (): Promise<void> => {
-            onResult(await confirmDialog({ title: 'Delete list?', confirmationText: 'Delete', onConfirm: action }));
+            onResult(
+              await confirmDialog({
+                title: 'Delete list?',
+                confirmationText: 'Delete',
+                cancellationText: 'Cancel',
+                onConfirm: action,
+              }),
+            );
           }}
         >
           Open

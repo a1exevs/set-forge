@@ -11,6 +11,10 @@ import {
 } from 'storybook-dir/helpers';
 import { renderWithPageRouter } from 'storybook-dir/render-with-page-router';
 
+import { type MuscleGroup, muscleGroupLabel } from '@entities/workout-exercise';
+import type { WorkoutSession } from '@entities/workout-session';
+import { useT } from '@shared/lib';
+
 import HistoryPage from './history-page';
 import HistoryPageLogicLayer from './history-page-logic-layer';
 import { formatSessionDate, formatSummary } from '../lib/history-formatters';
@@ -54,21 +58,28 @@ const renderHistoryPageIn =
   (): ReturnType<typeof renderWithPageRouter> =>
     renderWithPageRouter({
       initialEntries: ['/history'],
-      component: (): JSX.Element => (
-        <HistoryPage
-          swipeRef={createRef<HTMLDivElement>()}
-          sessions={sessions}
-          total={sessions.length}
-          loadingPhase={loadingPhase}
-          isError={false}
-          showNextPageSkeleton={showNextPageSkeleton}
-          expandedIds={{}}
-          onToggle={fn()}
-          sentinelRef={createRef<HTMLDivElement>()}
-          formatSessionDate={formatSessionDate}
-          formatSummary={formatSummary}
-        />
-      ),
+      component: function HistoryPageStory(): JSX.Element {
+        // The story follows the toolbar language like the page does
+        const { t, language } = useT();
+        return (
+          <HistoryPage
+            t={t}
+            language={language}
+            swipeRef={createRef<HTMLDivElement>()}
+            sessions={sessions}
+            total={sessions.length}
+            loadingPhase={loadingPhase}
+            isError={false}
+            showNextPageSkeleton={showNextPageSkeleton}
+            expandedIds={{}}
+            onToggle={fn()}
+            sentinelRef={createRef<HTMLDivElement>()}
+            formatSessionDate={(iso: string | null): string => formatSessionDate(iso, language)}
+            formatSummary={(session: WorkoutSession): string => formatSummary(session, t)}
+            formatMuscleGroup={(group: MuscleGroup): string => muscleGroupLabel(group, t)}
+          />
+        );
+      },
     });
 
 const renderHistoryPageLoading = renderHistoryPageIn({

@@ -31,8 +31,7 @@ exports[`HistoryPage matches snapshot with an expanded session 1`] = `
         <span
           class="count"
         >
-          1
-           workout
+          1 workout
         </span>
       </div>
     </header>
@@ -110,10 +109,7 @@ exports[`HistoryPage matches snapshot with an expanded session 1`] = `
                 <div
                   class="exerciseSub"
                 >
-                  60
-                   kg × 
-                  10
-                   reps
+                  60 kg × 10 reps
                 </div>
               </div>
               <span

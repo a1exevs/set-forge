@@ -39,6 +39,8 @@ const StatefulPasswordField: FC<StatefulProps> = ({ id, initialValue = '', disab
     <Stack>
       <label htmlFor={id}>Password</label>
       <PasswordField
+        showPasswordLabel="Show password"
+        hidePasswordLabel="Hide password"
         id={id}
         name="password"
         autoComplete="current-password"
