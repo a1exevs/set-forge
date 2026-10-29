@@ -63,15 +63,21 @@ export class TokensService {
     return { user, accessToken, refreshToken: newRefreshToken };
   }
 
-  public async removeRefreshToken(refreshToken: string): Promise<boolean> {
-    const payload = await this.decodeRefreshToken(refreshToken);
-    const tokenId = payload.jti;
-
-    if (!tokenId) {
-      throw AppException.of(HttpStatus.UNPROCESSABLE_ENTITY, 'REFRESH_TOKEN_IS_MALFORMED');
+  /**
+   * Removes the stored record the token names; an expired token still names it. Never fails: a token that is damaged,
+   * not signed by us or already removed leaves nothing to remove.
+   */
+  public async revokeRefreshToken(refreshToken: string): Promise<void> {
+    let payload: Partial<RefreshTokenPayload>;
+    try {
+      payload = await this.jwtService.verifyAsync(refreshToken, { ignoreExpiration: true });
+    } catch {
+      return;
     }
 
-    return !!(await this.refreshTokensService.removeTokenByUUId(tokenId));
+    if (payload.jti) {
+      await this.refreshTokensService.removeTokenByUUId(payload.jti);
+    }
   }
 
   public static getRefreshTokenExpiresIn(): number {
@@ -88,20 +94,20 @@ export class TokensService {
     const payload = await this.decodeRefreshToken(encoded);
     const token = await this.getStoredTokenFromRefreshTokenPayload(payload);
 
-    await this.removeRefreshToken(encoded);
+    await this.revokeRefreshToken(encoded);
 
     if (!token) {
-      throw AppException.of(HttpStatus.UNPROCESSABLE_ENTITY, 'REFRESH_TOKEN_NOT_FOUND');
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_NOT_FOUND');
     }
 
     if (token.isRevoked) {
-      throw AppException.of(HttpStatus.UNPROCESSABLE_ENTITY, 'REFRESH_TOKEN_REVOKED');
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_REVOKED');
     }
 
     const user = await this.getUserFromRefreshTokenPayload(payload);
 
     if (!user) {
-      throw AppException.of(HttpStatus.UNPROCESSABLE_ENTITY, 'REFRESH_TOKEN_IS_MALFORMED');
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_IS_MALFORMED');
     }
 
     const newRefreshToken = await this.generateRefreshToken(user, TokensService.getRefreshTokenExpiresIn());
@@ -114,9 +120,9 @@ export class TokensService {
       return await this.jwtService.verifyAsync(token);
     } catch (e) {
       if (e instanceof TokenExpiredError) {
-        throw AppException.of(HttpStatus.UNPROCESSABLE_ENTITY, 'REFRESH_TOKEN_EXPIRED');
+        throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_EXPIRED');
       } else {
-        throw AppException.of(HttpStatus.UNPROCESSABLE_ENTITY, 'REFRESH_TOKEN_IS_MALFORMED');
+        throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_IS_MALFORMED');
       }
     }
   }
@@ -125,7 +131,7 @@ export class TokensService {
     const subId = payload.sub;
 
     if (!subId) {
-      throw AppException.of(HttpStatus.UNPROCESSABLE_ENTITY, 'REFRESH_TOKEN_IS_MALFORMED');
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_IS_MALFORMED');
     }
 
     return this.usersService.getUserById(subId);
@@ -135,7 +141,7 @@ export class TokensService {
     const tokenId = payload.jti;
 
     if (!tokenId) {
-      throw AppException.of(HttpStatus.UNPROCESSABLE_ENTITY, 'REFRESH_TOKEN_IS_MALFORMED');
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_IS_MALFORMED');
     }
 
     return this.refreshTokensService.findTokenByUUId(tokenId);

@@ -6,6 +6,39 @@ import { ROLES_KEY } from '@common/decorators';
 import { RolesGuard } from '@common/guards';
 import { getMockExecutionContextData, getMockJWTServiceData, sendPseudoError } from '@test/unit/helpers';
 
+type GuardSetup = {
+  rolesGuard: RolesGuard;
+  reflector: Reflector;
+  mockContext: ReturnType<typeof getMockExecutionContextData>['mockContext'];
+  request: { user: unknown };
+};
+
+const setupGuard = (params: {
+  userRoles: string[];
+  requiredRoles: string[] | undefined;
+  authorization?: (token: string) => string;
+}): GuardSetup => {
+  const payload = { id: 1, roles: params.userRoles.map(value => ({ value })) };
+  const { jwtService, token } = getMockJWTServiceData({ expiresIn: '600s', payload });
+  const authorization = params.authorization ? params.authorization(token) : `Bearer ${token}`;
+  const req = { user: null, headers: { authorization } };
+  const { mockContext, request } = getMockExecutionContextData({ req });
+  const reflector = new Reflector();
+  jest.spyOn(reflector, 'getAllAndOverride').mockImplementation(() => params.requiredRoles);
+
+  return { rolesGuard: new RolesGuard(jwtService, reflector), reflector, mockContext, request };
+};
+
+const expectRejected = (setup: GuardSetup, status: HttpStatus, message: string): void => {
+  try {
+    setup.rolesGuard.canActivate(setup.mockContext);
+    sendPseudoError();
+  } catch (err) {
+    expect(err.status).toBe(status);
+    expect(err.message).toBe(message);
+  }
+};
+
 describe('RolesGuard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -13,224 +46,75 @@ describe('RolesGuard', () => {
   });
 
   describe('canActivate', () => {
-    it('should be successful result', async () => {
-      const payloadPropertyName1 = 'id';
-      const payloadPropertyName2 = 'roles';
-      const payloadPropertyValue1 = 1;
-      const payloadPropertyValue2 = [{ value: 'admin' }];
-      const payload = {
-        [payloadPropertyName1]: payloadPropertyValue1,
-        [payloadPropertyName2]: payloadPropertyValue2,
-      };
-      const { jwtService, token } = getMockJWTServiceData({ expiresIn: '600s', payload });
-      const req = {
-        user: null,
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      };
-      const { mockContext, mockGetRequest, request } = getMockExecutionContextData({ req });
-      const reflector = new Reflector();
-      jest.spyOn(reflector, 'getAllAndOverride').mockImplementation(() => {
-        return ['admin'];
-      });
+    it('should pass a user who has the required roles', () => {
+      const setup = setupGuard({ userRoles: ['admin'], requiredRoles: ['admin'] });
 
-      const rolesGuard = new RolesGuard(jwtService, reflector);
-      const result = rolesGuard.canActivate(mockContext);
-
-      expect(result).toBe(true);
-      expect(mockGetRequest).toBeCalledTimes(1);
-      expect(reflector.getAllAndOverride).toBeCalledTimes(1);
-      expect(reflector.getAllAndOverride).toBeCalledWith(ROLES_KEY, [mockContext.getHandler(), mockContext.getClass()]);
-      expect(request.user).toHaveProperty(payloadPropertyName1, payloadPropertyValue1);
-      expect(request.user).toHaveProperty(payloadPropertyName2, payloadPropertyValue2);
+      expect(setup.rolesGuard.canActivate(setup.mockContext)).toBe(true);
+      expect(setup.reflector.getAllAndOverride).toBeCalledWith(ROLES_KEY, [
+        setup.mockContext.getHandler(),
+        setup.mockContext.getClass(),
+      ]);
+      expect(setup.request.user).toEqual(expect.objectContaining({ id: 1, roles: [{ value: 'admin' }] }));
     });
-    it('token should be expired', async () => {
-      const expiresIn = 600;
-      const payloadPropertyName1 = 'id';
-      const payloadPropertyName2 = 'roles';
-      const payloadPropertyValue1 = 1;
-      const payloadPropertyValue2 = [{ value: 'admin' }];
-      const payload = {
-        [payloadPropertyName1]: payloadPropertyValue1,
-        [payloadPropertyName2]: payloadPropertyValue2,
-      };
-      const { jwtService, token } = getMockJWTServiceData({
-        expiresIn: `${expiresIn}s`,
-        payload,
-      });
+    it('should work as JWT Auth Guard when no roles are required', () => {
+      const withoutRoles = setupGuard({ userRoles: ['user'], requiredRoles: undefined });
+      const withEmptyRoles = setupGuard({ userRoles: ['user'], requiredRoles: [] });
 
-      const req = {
-        user: null,
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      };
-      const { mockContext, mockGetRequest } = getMockExecutionContextData({ req });
-      const reflector = new Reflector();
-      jest.spyOn(reflector, 'getAllAndOverride').mockImplementation(() => {
-        return ['admin'];
-      });
-      const rolesGuard = new RolesGuard(jwtService, reflector);
+      expect(withoutRoles.rolesGuard.canActivate(withoutRoles.mockContext)).toBe(true);
+      expect(withEmptyRoles.rolesGuard.canActivate(withEmptyRoles.mockContext)).toBe(true);
+    });
+    it('should answer 401 to an expired token', () => {
+      const expiresIn = 600;
+      const setup = setupGuard({ userRoles: ['admin'], requiredRoles: ['admin'] });
+
       jest.useFakeTimers();
-      expect.assertions(4);
+      expect.assertions(3);
       setTimeout(() => {
-        try {
-          rolesGuard.canActivate(mockContext);
-          sendPseudoError();
-        } catch (err) {
-          expect(err.status).toBe(HttpStatus.FORBIDDEN);
-          expect(err.message).toBe(ErrorMessages.FORBIDDEN);
-          expect(mockGetRequest).toBeCalledTimes(1);
-          expect(reflector.getAllAndOverride).toBeCalledTimes(0);
-        }
+        expectRejected(setup, HttpStatus.UNAUTHORIZED, ErrorMessages.UNAUTHORIZED);
+        expect(setup.reflector.getAllAndOverride).toBeCalledTimes(0);
       }, expiresIn * 1000);
       jest.runOnlyPendingTimers();
+      jest.useRealTimers();
     });
-    it('should throw exception (no Bearer token in headers)', async () => {
-      const expiresIn = 600;
-      const payloadPropertyName1 = 'id';
-      const payloadPropertyName2 = 'roles';
-      const payloadPropertyValue1 = 1;
-      const payloadPropertyValue2 = [{ value: 'admin' }];
-      const payload = {
-        [payloadPropertyName1]: payloadPropertyValue1,
-        [payloadPropertyName2]: payloadPropertyValue2,
-      };
+    it('should answer 401 without a Bearer token', () => {
+      const setup = setupGuard({ userRoles: ['admin'], requiredRoles: ['admin'], authorization: token => token });
+
+      expectRejected(setup, HttpStatus.UNAUTHORIZED, ErrorMessages.UNAUTHORIZED);
+      expect(setup.reflector.getAllAndOverride).toBeCalledTimes(0);
+    });
+    it('should answer 401 to a damaged Bearer token', () => {
+      const setup = setupGuard({
+        userRoles: ['admin'],
+        requiredRoles: ['admin'],
+        authorization: token => `Bearer ${token}1234`,
+      });
+
+      expectRejected(setup, HttpStatus.UNAUTHORIZED, ErrorMessages.UNAUTHORIZED);
+      expect(setup.reflector.getAllAndOverride).toBeCalledTimes(0);
+    });
+    it('should answer 403 to a token without roles', () => {
       const { jwtService, token } = getMockJWTServiceData({
-        expiresIn: `${expiresIn}s`,
-        payload,
+        expiresIn: '600s',
+        payload: {},
+        subject: '1',
+        jwtId: 'refresh-token-id',
       });
-
-      const req = {
-        user: null,
-        headers: {
-          authorization: `${token}`,
-        },
-      };
-      const { mockContext, mockGetRequest } = getMockExecutionContextData({ req });
+      const req = { user: null, headers: { authorization: `Bearer ${token}` } };
+      const { mockContext, request } = getMockExecutionContextData({ req });
       const reflector = new Reflector();
-      jest.spyOn(reflector, 'getAllAndOverride').mockImplementation(() => {
-        return ['admin'];
-      });
+      jest.spyOn(reflector, 'getAllAndOverride').mockImplementation(() => ['admin']);
 
-      const rolesGuard = new RolesGuard(jwtService, reflector);
-      try {
-        rolesGuard.canActivate(mockContext);
-        sendPseudoError();
-      } catch (err) {
-        expect(err.status).toBe(HttpStatus.FORBIDDEN);
-        expect(err.message).toBe(ErrorMessages.FORBIDDEN);
-        expect(mockGetRequest).toBeCalledTimes(1);
-        expect(reflector.getAllAndOverride).toBeCalledTimes(0);
-      }
+      expectRejected(
+        { rolesGuard: new RolesGuard(jwtService, reflector), reflector, mockContext, request },
+        HttpStatus.FORBIDDEN,
+        ErrorMessages.NOT_ENOUGH_PERMISSIONS,
+      );
     });
-    it('should throw exception (incorrect Bearer token in headers)', async () => {
-      const expiresIn = 600;
-      const payloadPropertyName1 = 'id';
-      const payloadPropertyName2 = 'roles';
-      const payloadPropertyValue1 = 1;
-      const payloadPropertyValue2 = [{ value: 'admin' }];
-      const payload = {
-        [payloadPropertyName1]: payloadPropertyValue1,
-        [payloadPropertyName2]: payloadPropertyValue2,
-      };
-      const { jwtService, token } = getMockJWTServiceData({
-        expiresIn: `${expiresIn}s`,
-        payload,
-      });
+    it('should answer 403 to a user without the required roles', () => {
+      const setup = setupGuard({ userRoles: ['user'], requiredRoles: ['admin'] });
 
-      const req = {
-        user: null,
-        headers: {
-          authorization: `Bearer ${token}1234`,
-        },
-      };
-      const { mockContext, mockGetRequest } = getMockExecutionContextData({ req });
-      const reflector = new Reflector();
-      jest.spyOn(reflector, 'getAllAndOverride').mockImplementation(() => {
-        return ['admin'];
-      });
-
-      const rolesGuard = new RolesGuard(jwtService, reflector);
-      try {
-        rolesGuard.canActivate(mockContext);
-        sendPseudoError();
-      } catch (err) {
-        expect(err.status).toBe(HttpStatus.FORBIDDEN);
-        expect(err.message).toBe(ErrorMessages.FORBIDDEN);
-        expect(mockGetRequest).toBeCalledTimes(1);
-        expect(reflector.getAllAndOverride).toBeCalledTimes(0);
-      }
-    });
-    it('should work as JWT Auth Guard if required roles are missing', async () => {
-      const payloadPropertyName1 = 'id';
-      const payloadPropertyName2 = 'roles';
-      const payloadPropertyValue1 = 1;
-      const payloadPropertyValue2 = [{ value: 'admin' }];
-      const payload = {
-        [payloadPropertyName1]: payloadPropertyValue1,
-        [payloadPropertyName2]: payloadPropertyValue2,
-      };
-      const { jwtService, token } = getMockJWTServiceData({ expiresIn: '600s', payload });
-      const req = {
-        user: null,
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      };
-      const { mockContext, mockGetRequest, request } = getMockExecutionContextData({ req });
-      const reflector = new Reflector();
-      jest.spyOn(reflector, 'getAllAndOverride').mockImplementation(() => []);
-
-      const rolesGuard = new RolesGuard(jwtService, reflector);
-      const result = rolesGuard.canActivate(mockContext);
-
-      expect(result).toBe(true);
-      expect(mockGetRequest).toBeCalledTimes(1);
-      expect(reflector.getAllAndOverride).toBeCalledTimes(1);
-      expect(reflector.getAllAndOverride).toBeCalledWith(ROLES_KEY, [mockContext.getHandler(), mockContext.getClass()]);
-      expect(request.user).toHaveProperty(payloadPropertyName1, payloadPropertyValue1);
-      expect(request.user).toHaveProperty(payloadPropertyName2, payloadPropertyValue2);
-    });
-    it('should throw error (user has not requirement roles', async () => {
-      const payloadPropertyName1 = 'id';
-      const payloadPropertyName2 = 'roles';
-      const payloadPropertyValue1 = 1;
-      const payloadPropertyValue2 = [{ value: 'user' }];
-      const payload = {
-        [payloadPropertyName1]: payloadPropertyValue1,
-        [payloadPropertyName2]: payloadPropertyValue2,
-      };
-      const { jwtService, token } = getMockJWTServiceData({ expiresIn: '600s', payload });
-      const req = {
-        user: null,
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      };
-      const { mockContext, mockGetRequest, request } = getMockExecutionContextData({ req });
-      const reflector = new Reflector();
-      jest.spyOn(reflector, 'getAllAndOverride').mockImplementation(() => {
-        return ['admin'];
-      });
-
-      const rolesGuard = new RolesGuard(jwtService, reflector);
-      try {
-        rolesGuard.canActivate(mockContext);
-        sendPseudoError();
-      } catch (error) {
-        expect(error.status).toBe(HttpStatus.FORBIDDEN);
-        expect(error.message).toBe(ErrorMessages.FORBIDDEN);
-        expect(mockGetRequest).toBeCalledTimes(1);
-        expect(reflector.getAllAndOverride).toBeCalledTimes(1);
-        expect(reflector.getAllAndOverride).toBeCalledWith(ROLES_KEY, [
-          mockContext.getHandler(),
-          mockContext.getClass(),
-        ]);
-        expect(request.user).toHaveProperty(payloadPropertyName1, payloadPropertyValue1);
-        expect(request.user).toHaveProperty(payloadPropertyName2, payloadPropertyValue2);
-      }
+      expectRejected(setup, HttpStatus.FORBIDDEN, ErrorMessages.NOT_ENOUGH_PERMISSIONS);
+      expect(setup.reflector.getAllAndOverride).toBeCalledTimes(1);
     });
   });
 });

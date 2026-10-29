@@ -59,11 +59,11 @@ describe('User workflow', () => {
           });
       });
 
-      it('Register user (bad request - user was registered before)', () => {
+      it('Register user (conflict - user was registered before)', () => {
         return request(app.getHttpServer())
           .post(`${api}/${Routes.ENDPOINT_AUTH}/registration`)
           .send({ email: userEmail, password: userPassword, consent: true, termsAccepted: true })
-          .expect(HttpStatus.BAD_REQUEST)
+          .expect(HttpStatus.CONFLICT)
           .expect(response => {
             expect(response.body.data).toBeNull();
             expect(response.body.messages[0]).toBe(ErrorMessages.USER_ALREADY_EXISTS);

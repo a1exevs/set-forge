@@ -4,7 +4,8 @@ export const Docs = {
   REGISTRATION_ENDPOINT: 'Register a user',
   REGISTRATION_SUCCESSFUL_RESULT: 'User registered successfully',
   REGISTRATION_BAD_REQUEST: 'Bad request',
-  REGISTRATION_FORBIDDEN: 'Service is unavailable: the user role is not configured',
+  REGISTRATION_CONFLICT: 'A user with this email already exists',
+  REGISTRATION_SERVICE_UNAVAILABLE: 'Service is unavailable: the user role is not configured',
   EMAIL_FORMAT: 'login@domain',
 
   AUTHORIZATION_ENDPOINT: 'Log in',
@@ -14,16 +15,14 @@ export const Docs = {
 
   REFRESH_TOKENS_ENDPOINT: 'Refresh access tokens',
   REFRESH_TOKENS_SUCCESSFUL_RESULT: 'Tokens refreshed successfully',
-  REFRESH_TOKENS_UNPROCESSABLE_ENTITY: 'Unprocessable entity',
-  REFRESH_TOKENS_UNAUTHORIZED: 'Unauthorized',
+  REFRESH_TOKENS_UNAUTHORIZED: 'No refresh cookie, or its token is malformed, expired, unknown or revoked',
 
   GET_CURRENT_USER_ENDPOINT: 'Get current user',
   GET_CURRENT_USER_SUCCESSFUL_RESULT: 'Current user retrieved successfully',
   GET_CURRENT_USER_UNAUTHORIZED: 'Unauthorized',
 
   LOGOUT_ENDPOINT: 'Log out',
-  LOGOUT_SUCCESSFUL_RESULT: 'Session closed successfully',
-  LOGOUT_UNPROCESSABLE_ENTITY: 'Unprocessable entity',
+  LOGOUT_SUCCESSFUL_RESULT: 'Session closed, also when its refresh token was damaged, expired or already revoked',
   LOGOUT_UNAUTHORIZED: 'Unauthorized',
 
   DELETE_ACCOUNT_ENDPOINT: 'Delete the current user account and all related data',

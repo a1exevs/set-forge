@@ -1,11 +1,11 @@
 import { HttpStatus } from '@nestjs/common';
 
-import { UnauthorizedExceptionFilter } from '@auth/exception-filters';
+import { CaptchaCountExceptionFilter } from '@auth/exception-filters';
 import { ErrorMessages, ResultCodes } from '@common/constants';
 import { AppException } from '@common/exceptions';
 import { getMockArgumentsHostData } from '@test/unit/helpers';
 
-describe('UnauthorizedExceptionFilter', () => {
+describe('CaptchaCountExceptionFilter', () => {
   const invalidCredentials = (): AppException => AppException.of(HttpStatus.UNAUTHORIZED, 'INVALID_EMAIL_OR_PASSWORD');
 
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('UnauthorizedExceptionFilter', () => {
     const { mockArgumentsHost, request, response } = getMockArgumentsHostData({
       sessionVariables: [{ key: 'authFailedCount', value: '4' }],
     });
-    new UnauthorizedExceptionFilter().catch(invalidCredentials(), mockArgumentsHost);
+    new CaptchaCountExceptionFilter().catch(invalidCredentials(), mockArgumentsHost);
     const body = JSON.parse(response._getData());
 
     expect(response._getStatusCode()).toBe(HttpStatus.UNAUTHORIZED);
@@ -36,7 +36,7 @@ describe('UnauthorizedExceptionFilter', () => {
     const { mockArgumentsHost, request, response } = getMockArgumentsHostData({
       sessionVariables: [{ key: 'authFailedCount', value: '3' }],
     });
-    new UnauthorizedExceptionFilter().catch(invalidCredentials(), mockArgumentsHost);
+    new CaptchaCountExceptionFilter().catch(invalidCredentials(), mockArgumentsHost);
     const body = JSON.parse(response._getData());
 
     expect(request.session['authFailedCount']).toBe(4);
@@ -49,7 +49,7 @@ describe('UnauthorizedExceptionFilter', () => {
       sessionVariables: [{ key: 'authFailedCount', value: '5' }],
     });
     const wrongCaptcha = AppException.of(HttpStatus.UNAUTHORIZED, 'NEED_AUTHORIZATION_WITH_CAPTCHA');
-    new UnauthorizedExceptionFilter().catch(wrongCaptcha, mockArgumentsHost);
+    new CaptchaCountExceptionFilter().catch(wrongCaptcha, mockArgumentsHost);
     const body = JSON.parse(response._getData());
 
     expect(body.resultCode).toBe(ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
@@ -60,7 +60,7 @@ describe('UnauthorizedExceptionFilter', () => {
     const { mockArgumentsHost, request, response } = getMockArgumentsHostData({
       sessionVariables: [{ key: 'authFailedCount', value: '4' }],
     });
-    new UnauthorizedExceptionFilter().catch(
+    new CaptchaCountExceptionFilter().catch(
       AppException.of(HttpStatus.BAD_REQUEST, 'MUST_BE_A_STRING'),
       mockArgumentsHost,
     );

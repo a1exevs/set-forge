@@ -44,7 +44,7 @@ describe('AuthService', () => {
             generateRefreshToken: jest.fn(x => x),
             getRefreshTokenExpiration: jest.fn(x => x),
             updateAccessRefreshTokensFromRefreshToken: jest.fn(x => x),
-            removeRefreshToken: jest.fn(x => x),
+            revokeRefreshToken: jest.fn(async () => undefined),
           },
         },
       ],
@@ -150,7 +150,7 @@ describe('AuthService', () => {
         await authService.registration(registerDto);
         sendPseudoError();
       } catch (error) {
-        expect(error.status).toBe(400);
+        expect(error.status).toBe(HttpStatus.CONFLICT);
         expect(userService.getUserByEmail).toBeCalledTimes(1);
         expect(userService.getUserByEmail).toBeCalledWith(email);
         expect(userService.createUser).toBeCalledTimes(0);
@@ -288,14 +288,14 @@ describe('AuthService', () => {
     it('Refresh method: should throw exception (token not found)', async () => {
       const currentRefreshToken = 'adfsdfsadfsdf';
       jest.spyOn(tokenService, 'updateAccessRefreshTokensFromRefreshToken').mockImplementation(async () => {
-        throw AppException.of(HttpStatus.UNPROCESSABLE_ENTITY, 'REFRESH_TOKEN_NOT_FOUND');
+        throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_NOT_FOUND');
       });
 
       try {
         await authService.refresh(currentRefreshToken);
         sendPseudoError();
       } catch (error) {
-        expect(error.status).toBe(422);
+        expect(error.status).toBe(HttpStatus.UNAUTHORIZED);
         expect(error.errors).toEqual([new ErrorItemResponse.Dto('REFRESH_TOKEN_NOT_FOUND')]);
         expect(tokenService.updateAccessRefreshTokensFromRefreshToken).toBeCalledTimes(1);
         expect(tokenService.updateAccessRefreshTokensFromRefreshToken).toBeCalledWith(currentRefreshToken);
@@ -351,45 +351,12 @@ describe('AuthService', () => {
   });
 
   describe('AuthService - logout', () => {
-    it('Logout method: should be successful result', async () => {
+    it('Logout method: should revoke the refresh token', async () => {
       const refreshToken = 'sdfsdfsdfsdf';
-      const refreshTokenResult = true;
-      jest.spyOn(tokenService, 'removeRefreshToken').mockImplementation(async () => {
-        return Promise.resolve(refreshTokenResult);
-      });
-      const result = await authService.logout(refreshToken);
 
-      expect(result).toBe(refreshTokenResult);
-      expect(tokenService.removeRefreshToken).toBeCalledTimes(1);
-      expect(tokenService.removeRefreshToken).toBeCalledWith(refreshToken);
-    });
-    it('Logout method: should be unsuccessful result', async () => {
-      const refreshToken = 'sdfsdfsdafsdf';
-      const refreshTokenResult = false;
-      jest.spyOn(tokenService, 'removeRefreshToken').mockImplementation(async () => {
-        return Promise.resolve(refreshTokenResult);
-      });
-      const result = await authService.logout(refreshToken);
-
-      expect(result).toBe(refreshTokenResult);
-      expect(tokenService.removeRefreshToken).toBeCalledTimes(1);
-      expect(tokenService.removeRefreshToken).toBeCalledWith(refreshToken);
-    });
-    it('Logout method: should throw exception (token expired)', async () => {
-      const refreshToken = 'sdfsdfsdafsdf';
-      jest.spyOn(tokenService, 'removeRefreshToken').mockImplementation(async () => {
-        throw AppException.of(HttpStatus.UNPROCESSABLE_ENTITY, 'REFRESH_TOKEN_EXPIRED');
-      });
-
-      try {
-        await authService.logout(refreshToken);
-        sendPseudoError();
-      } catch (error) {
-        expect(error.status).toBe(422);
-        expect(error.errors).toEqual([new ErrorItemResponse.Dto('REFRESH_TOKEN_EXPIRED')]);
-        expect(tokenService.removeRefreshToken).toBeCalledTimes(1);
-        expect(tokenService.removeRefreshToken).toBeCalledWith(refreshToken);
-      }
+      await expect(authService.logout(refreshToken)).resolves.toBeUndefined();
+      expect(tokenService.revokeRefreshToken).toBeCalledTimes(1);
+      expect(tokenService.revokeRefreshToken).toBeCalledWith(refreshToken);
     });
   });
 
