@@ -17,7 +17,7 @@ const LegalDocumentLogicLayer: FC<Props> = ({ content, effectiveDate, backTo = '
   const { t, language } = useT();
   const router = useRouter();
 
-  // Return to wherever the user came from (e.g. Profile), falling back to `backTo` for direct
+  // Return to wherever the user came from, falling back to `backTo` for direct
   // loads / new tabs where there is no in-app history to step back through.
   const handleBack = (): void => {
     if (router.history.canGoBack()) {

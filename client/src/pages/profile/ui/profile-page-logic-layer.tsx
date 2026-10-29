@@ -20,7 +20,7 @@ const ProfilePageLogicLayer: FC<Props> = ({ email, avatarLetter, onLogout, onDel
   const { t } = useT();
   const swipeRef = useMainTabSwipe();
   const confirmDialog = useConfirm();
-  // Deletion runs in its dialog, which covers the page; only logout needs to lock the other button.
+  // Only logout locks the other action: deletion runs inside its confirm dialog.
   const { run, progressOf } = useProgress<'logout' | 'deleteAccount'>();
 
   const handleLogout = async (): Promise<void> => {

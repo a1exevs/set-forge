@@ -21,10 +21,8 @@ const returnTypeRule: Linter.RulesRecord = {
 const inlineFunction = ':matches(ArrowFunctionExpression, FunctionExpression)';
 
 /**
- * component-typing: inline JSX callbacks declare parameter and return types
- * (`onChange={(e: ChangeEvent<HTMLInputElement>): void => …}`); list render callbacks type their parameter
- * (`items.map((item: Item) => …)`). Shared by every `no-restricted-syntax` config — flat config replaces the rule
- * options per block, so the ui blocks include these selectors too.
+ * component-typing: inline JSX callbacks type their parameters and return, list render callbacks their parameter.
+ * Every `no-restricted-syntax` block includes these selectors: flat config replaces a rule's options per block.
  */
 export const jsxCallbackSelectors = [
   {

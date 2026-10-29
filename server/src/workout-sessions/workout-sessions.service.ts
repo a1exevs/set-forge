@@ -164,7 +164,7 @@ export class WorkoutSessionsService {
     return { result: true };
   }
 
-  // Hard-deletes active sessions for a workout list (e.g. before the list itself is removed).
+  // Hard-deletes the active workout sessions of a list (workout-session/list-delete-discards-active).
   public async discardActiveForList(userId: number, workoutListId: string, transaction?: Transaction): Promise<void> {
     await this.workoutSessionRepository.destroy({
       where: { userId, workoutListId, status: SESSION_STATUS.ACTIVE },
@@ -210,10 +210,7 @@ export class WorkoutSessionsService {
       };
     });
 
-    // Resync happens off-screen while editing the list, so it never auto-finishes the session even
-    // when the re-snapshot leaves every set complete. The session stays active and is finished
-    // explicitly from workout mode (on the next entry or via the Finish button) so the user always
-    // sees the completed session with its celebration.
+    // workout-session/resync-keeps-progress: resync never finishes the workout session, even with every set complete.
     await this.sequelize.transaction(async transaction => {
       await session.update({ workoutListName: list.name }, { transaction });
       await this.workoutSessionExerciseRepository.destroy({ where: { workoutSessionId: session.id }, transaction });

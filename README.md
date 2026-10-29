@@ -14,6 +14,7 @@ Workspaces:
 |--------|------|----------------------|
 | **@set-forge/client** | [`client/`](client/) | React / Vite web app |
 | **@set-forge/server** | [`server/`](server/) | Nest API / backend   |
+| **@set-forge/eslint-config** | [`packages/eslint-config/`](packages/eslint-config/) | ESLint rules shared by the client, the server and the root |
 
 Shared release notes: [`RELEASE-NOTES.md`](RELEASE-NOTES.md) (repository root).
 
@@ -43,7 +44,7 @@ npm run client:e2e:install # once, for the client e2e
 
 | Workflow | Runs on | What it checks |
 |----------|---------|----------------|
-| [Project test](.github/workflows/project-test.yml) | `ubuntu-latest` | Client unit + snap, server unit |
+| [Project test](.github/workflows/project-test.yml) | `ubuntu-latest` | ESLint rules, client unit + snap, server unit |
 | [E2E Tests](.github/workflows/e2e-tests.yml) | `windows-latest` + `ubuntu-latest` | Client Playwright e2e; server Jest e2e (Docker + Testcontainers) |
 | [Project build](.github/workflows/project-build.yml) | `ubuntu-latest` | Format, lint, client/server build, Storybook build |
 | [Chromatic](.github/workflows/chromatic.yml) | — | Visual regression (Storybook) |
@@ -59,8 +60,9 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 | `npm run setup:env` / `npm run setup:env -- --fix` | Create the missing dev env files (`.env`, `server/.development.env`, `server/.e2e.env`) from their examples and check (or sync) the MySQL credentials between the root `.env` and `server/.development.env` ([`scripts/setup-env.ts`](scripts/setup-env.ts)) |
 | `npm run setup:env -- --prod` / `-- --prod --fix` | Same for the prod stack: `.env` + `server/.production.env` (see [`DEPLOY-SELECTEL.md`](DEPLOY-SELECTEL.md#8-configure-environment-variables)) |
 | `npm run prepare` | Husky install (runs automatically after `npm install` unless `HUSKY=0`) |
-| `npm run format:root` / `npm run format:root:check` | Prettier for `scripts/**/*.ts` and the root `eslint.config.ts` (root `.prettierrc.cjs`) |
-| `npm run lint:root` / `npm run lint:scripts` / `npm run lint:config` / `npm run lint:eslint` / `npm run lint:docs` | Repo-wide checks (what CI runs): the repo scripts type-check (`scripts/tsconfig.json`), the root ESLint config type-checks (`tsconfig.json`), ESLint over `scripts/`, `lint-staged.config.cjs` and `eslint.config.ts`, domain docs in `docs/domains` are thin and point at real code |
+| `npm run format:root` / `npm run format:root:check` | Prettier for `scripts/**/*.ts`, `packages/**/*.ts` and the root `eslint.config.ts` (root `.prettierrc.cjs`) |
+| `npm run lint:root` / `npm run lint:scripts` / `npm run lint:packages` / `npm run lint:config` / `npm run lint:eslint` / `npm run lint:docs` | Repo-wide checks (what CI runs): the repo scripts type-check (`scripts/tsconfig.json`), the packages type-check (`packages/eslint-config/tsconfig.json`), the root ESLint config type-checks (`tsconfig.json`), ESLint over `scripts/`, `packages/`, `lint-staged.config.cjs` and `eslint.config.ts`, domain docs in `docs/domains` are thin and point at real code |
+| `npm run eslint-config:test` | Tests of the shared ESLint rules (`packages/eslint-config`, `node --test`) |
 | `npm run lint:eslint:fix` | ESLint autofix for the same root files |
 | `npm run version:patch` / `npm run version:minor` / `npm run version:major` | Bump version via `scripts/increase-version.ts` |
 | `npm run update-version:patch` / `npm run update-version:minor` / `npm run update-version:major` | Version bump branch (`scripts/update-version.ts`), run by `/release` in phase A |

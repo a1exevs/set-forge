@@ -182,7 +182,7 @@ describe('WorkoutListsService', () => {
       expect(exerciseModel.destroy).toBeCalledWith(expect.objectContaining({ where: { workoutListId: 'list-1' } }));
       const rows = exerciseModel.bulkCreate.mock.calls[0][0];
       expect(rows).toHaveLength(2);
-      // existing exercise keeps its id (so an active session can resync against it)
+      // existing exercise keeps its id (workout-list/update-keeps-ids)
       expect(rows[0]).toEqual(expect.objectContaining({ id: 'ex-keep', position: 0 }));
       expect(rows[0]).not.toHaveProperty('completedSets');
       // new exercise has no id

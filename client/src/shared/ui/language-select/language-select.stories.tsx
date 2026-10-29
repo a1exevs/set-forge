@@ -52,7 +52,7 @@ export const Open: Story = {
   },
 };
 
-/** Compact: a globe and the language, for the sign-in footer and the legal pages; its list opens where it fits. */
+/** Compact: a globe and the language; its list opens where it fits. */
 export const Compact: Story = {
   render: (): ReactElement => <StatefulLanguageSelect initialValue="en" variant="compact" />,
   play: async ({ canvasElement }): Promise<void> => {

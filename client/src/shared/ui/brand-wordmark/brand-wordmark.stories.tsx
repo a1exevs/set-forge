@@ -23,10 +23,10 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Icon and the app name: the auth page header. */
+/** Icon and the app name. */
 export const Default: Story = {};
 
-/** The main page header: the app name leads, the page title is the `h1`. */
+/** The app name leads, the title is the `h1`. */
 export const WithLeadingTitle: Story = {
   args: { leadingTitle: 'Set Forge', title: 'Workout lists', titleAs: 'h1' },
 };

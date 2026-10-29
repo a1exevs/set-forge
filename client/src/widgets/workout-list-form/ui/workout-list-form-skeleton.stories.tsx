@@ -32,5 +32,5 @@ export const Desktop4k = buildDesktop4KStoryObj<typeof meta>({});
 export const Desktop = buildDesktopStoryObj<typeof meta>({});
 /** The loading form on a tablet. */
 export const Tablet = buildTabletStoryObj<typeof meta>({});
-/** The loading form on a phone: the everyday form of the page. */
+/** The loading form on a phone. */
 export const Mobile = buildMobileStoryObj<typeof meta>({});

@@ -7,11 +7,8 @@ import { Skeleton } from '@shared/ui';
 import classes from './workout-mode-page.module.scss';
 
 /**
- * The shape of the workout screen while the list and the active session load: the real way back, a title and the
- * progress in the header, then the shape of the preview — the hint, the Start button, five exercise cards — clipped
- * to the first screen, so the placeholders fill it and never scroll. The preview is the entry of every new workout,
- * so it opens without a shift; resuming an active session moves the list up once (the phase is unknown until the
- * session query answers).
+ * The workout screen while the list and the active session load: the shape of the preview, clipped to the first
+ * screen so it never scrolls. The preview opens every new workout without a shift; a resumed one moves up once.
  */
 type Props = {
   t: Translate;

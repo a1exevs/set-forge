@@ -22,7 +22,7 @@ export class UsersService {
     }
     let user: User;
     try {
-      // Registration is where the user just accepted the documents — stamp the current versions.
+      // A created user has accepted the current versions (session/acceptance-stamps).
       user = await this.userRepository.create({
         ...dto,
         acceptedTermsVersion: DocumentVersions.terms(),
@@ -37,7 +37,7 @@ export class UsersService {
     return user;
   }
 
-  /** Records acceptance of the current document versions (used on registration and re-acceptance). */
+  /** Stamps the current document versions and the time as accepted (session/acceptance-stamps). */
   async updateDocumentAcceptance(userId: number): Promise<void> {
     await this.userRepository.update(
       {
@@ -65,10 +65,8 @@ export class UsersService {
   }
 
   /**
-   * Deletes the user row. All user-owned data is removed by DB-level
-   * `ON DELETE CASCADE` foreign keys (workout lists → exercises, workout
-   * sessions → session exercises, refresh tokens, user roles). A `where`-based
-   * destroy issues a single DELETE so InnoDB applies the cascade.
+   * Deletes the user row; the `ON DELETE CASCADE` keys remove the rest (session/deletion-cascade). A `where`-based
+   * destroy issues one DELETE, so InnoDB applies the cascade.
    */
   async deleteUser(id: number): Promise<boolean> {
     const deletedCount = await this.userRepository.destroy({ where: { id } });

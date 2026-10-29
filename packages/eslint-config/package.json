@@ -1,0 +1,15 @@
+{
+  "name": "@set-forge/eslint-config",
+  "private": true,
+  "description": "ESLint rules and configs shared by the client, the server and the repository root.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --test \"src/**/specs/*.spec.ts\""
+  },
+  "devDependencies": {
+    "eslint": "9.39.5"
+  }
+}

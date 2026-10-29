@@ -1,4 +1,5 @@
 import eslintJs from '@eslint/js';
+import { commentLengthConfigs } from '@set-forge/eslint-config';
 import { defineConfig } from 'eslint/config';
 import prettierConfig from 'eslint-config-prettier';
 import tsEslint from 'typescript-eslint';
@@ -34,6 +35,7 @@ export default defineConfig(
       'import/enforce-node-protocol-usage': ['error', 'always'],
     },
   },
+  ...commentLengthConfigs(),
   {
     // source files
     files: ['src/**/*.ts'],

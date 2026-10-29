@@ -93,13 +93,8 @@ const base = (ownEntity?: string): Pattern[] => [
 ];
 
 /**
- * `no-restricted-imports` blocks for every FSD location, one block per layer (per slice for `entities`, per segment
- * for `shared`):
- * - `src/...` paths, bare layer aliases, own-index imports and public-API sidesteps are always banned
- *   (relative paths leaving a slice are Steiger's job);
- * - upper layers are banned, so are sibling slices through the alias — except the `@x` API between entities;
- * - `@shared/<segment>` is banned inside that very segment (relative paths there);
- * - Headless UI / sonner / i18next only inside `shared`, React Query outside `ui` segments.
+ * `no-restricted-imports` blocks for every FSD location — one per layer, per slice for `entities`, per segment for
+ * `shared` — enforcing the imports of fsd-architecture §7–§8; relative paths leaving a slice are Steiger's job.
  */
 export function fsdImportsConfigs(): Linter.Config[] {
   const configs: Linter.Config[] = [];

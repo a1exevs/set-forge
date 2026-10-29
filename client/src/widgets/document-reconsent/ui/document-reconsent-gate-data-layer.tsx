@@ -8,10 +8,8 @@ import DocumentReconsentGateLogicLayer from './document-reconsent-gate-logic-lay
 import { LEGAL_DOCUMENT_PATHS } from '../config/legal-document-paths';
 
 /**
- * Blocking gate shown when the signed-in user must (re-)accept the current legal documents
- * (see `documentsPendingAcceptance`). It cannot be dismissed — the user either accepts both
- * documents or logs out. Suppressed on `/privacy` and `/terms` so the documents themselves
- * remain readable. Renders nothing when acceptance is up to date.
+ * The gate a signed-in user cannot dismiss while documents await acceptance (session/reconsent-gate); nothing
+ * when acceptance is up to date.
  */
 const DocumentReconsentGateDataLayer: FC = () => {
   const pathname = useRouterState({ select: state => state.location.pathname });

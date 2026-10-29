@@ -12,7 +12,7 @@ export type LegalSection = {
   blocks: LegalBlock[];
 };
 
-/** One language version of a legal document (privacy policy, terms of use). */
+/** One language version of a legal document. */
 export type LegalContent = {
   title: string;
   effectiveLabel: string;

@@ -52,7 +52,7 @@ const StatefulNumericField: FC<StatefulProps> = ({ variant, label, initialValue,
   );
 };
 
-/** Decimal, small: the weight field of an exercise card. */
+/** Decimal, small. */
 export const Default: Story = {
   render: (): ReactElement => (
     <Stack>

@@ -1,7 +1,8 @@
-// Lints the files of the repository root: the scripts Node runs as they are and the lint-staged config. The client
-// and the server keep their own configs (client/eslint.config.ts, server/eslint.config.ts).
+// Lints the files of the repository root: the scripts Node runs as they are, the shared packages and the lint-staged
+// config. The client and the server keep their own configs (client/eslint.config.ts, server/eslint.config.ts).
 
 import eslintJs from '@eslint/js';
+import { commentLengthConfigs } from '@set-forge/eslint-config';
 import { defineConfig } from 'eslint/config';
 import importPlugin from 'eslint-plugin-import';
 import globals from 'globals';
@@ -21,6 +22,7 @@ export default defineConfig(
       'import/enforce-node-protocol-usage': ['error', 'always'],
     },
   },
+  ...commentLengthConfigs(),
   {
     // CommonJS configs that their tools load with require()
     files: ['**/*.cjs'],

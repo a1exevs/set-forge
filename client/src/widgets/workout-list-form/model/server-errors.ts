@@ -10,7 +10,7 @@ export type FormServerErrors = {
   others: string[];
 };
 
-/** The errors of a failed save, split into what the form shows under its fields and what the page shows itself. */
+/** The errors of a failed save, split into those the form shows under its fields and the rest. */
 export const formServerErrors = (error: unknown, t: Translate): FormServerErrors => {
   const { byField, general } = apiErrorTexts(error, t);
   const errors: FormServerErrors = { fields: {}, others: [...general] };

@@ -26,10 +26,8 @@ export namespace RegisterRequest {
     )
     readonly password: string;
 
-    // Two separate, specific acts of will (152-ФЗ requires PD-processing consent to be a distinct
-    // expression, not bundled with acceptance of other documents). Both must be `true`.
-    // No constructor default: `plainToInstance` runs this constructor with no args, so a request that
-    // omits a flag leaves it `undefined` and is rejected. Validated at the boundary only; not persisted.
+    // session/separate-consent (152-ФЗ). No constructor default: `plainToInstance` calls it with no args, so an
+    // omitted flag stays `undefined` and is rejected.
     @ApiProperty({ description: 'Consent to the processing of personal data', example: true })
     @Equals(true, validationError('CONSENT_TO_PERSONAL_DATA_PROCESSING_IS_REQUIRED'))
     readonly consent?: boolean;

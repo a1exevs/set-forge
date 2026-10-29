@@ -24,7 +24,7 @@ const EditWorkoutPageLogicLayer: FC<Props> = ({ id, workout, activeSessionId, up
   const [serverFieldErrors, setServerFieldErrors] = useState<Record<string, string>>();
   const loadingPhase = useLoadingPhase(workout === undefined);
 
-  // Rejects after its toast, so the button or the dialog that runs it goes back to normal and the user stays.
+  // Rejects after its toast, so the action that runs it ends and the user stays.
   const save = async (dto: UpdateWorkoutListDto, resyncSessionId: string | null): Promise<void> => {
     try {
       await updateWorkoutList(id, dto);

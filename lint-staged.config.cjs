@@ -73,7 +73,7 @@ function serverTsTasks(files) {
 module.exports = {
   "client/**/*.{ts,tsx}": clientTsTasks,
   "client/{src,.storybook}/**/*.{css,scss}": ["prettier --ignore-path client/.prettierignore --write"],
-  "{scripts/**/*.ts,eslint.config.ts}": ["prettier --write", "eslint --fix"],
+  "{scripts/**/*.ts,packages/**/*.ts,eslint.config.ts}": ["prettier --write", "eslint --fix"],
   "lint-staged.config.cjs": ["eslint --fix"],
   "server/{src,test}/**/*.ts": serverTsTasks,
 };

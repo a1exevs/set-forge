@@ -15,6 +15,8 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // @set-forge/eslint-config imports its files with `.ts`: Node runs it as is.
+    "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": false,
     "types": ["node"]
   },

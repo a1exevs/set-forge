@@ -1,6 +1,6 @@
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** What is wrong with a sign-in or registration field: a code, so the screen says it in the chosen language. */
+/** What is wrong with a sign-in or registration field, as a code to translate. */
 export type AuthValidationError = 'emailRequired' | 'emailInvalid' | 'passwordLength' | 'passwordRequired';
 
 export function validateRegisterEmail(email: string): AuthValidationError | null {

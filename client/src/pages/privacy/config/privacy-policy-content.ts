@@ -2,18 +2,8 @@ import type { Language } from '@shared/lib';
 import type { LegalContent } from '@widgets/legal-document';
 
 /**
- * Operator identity shown in the policy and used as the contact point for data-subject requests.
- * 152-ФЗ (ст. 18.1) requires the operator to be identifiable and reachable.
- *
- * `name` is per-language (`ru`/`en`) because a legal entity is named differently in each language
- * (e.g. «ИП Иванов Иван Иванович» vs "Ivan Ivanov, sole proprietor"). Both names and `contactEmail`
- * are injected at build time (see vite.config.ts) so the real operator identity lives only in the
- * deployer's local env and never in the (public) source:
- *   - `VITE_PRIVACY_OPERATOR_NAME_RU` / `VITE_PRIVACY_OPERATOR_NAME_EN` — language-specific names;
- *   - `VITE_PRIVACY_OPERATOR_NAME` — optional shared fallback used for any language left unset;
- *   - `VITE_PRIVACY_CONTACT_EMAIL` — contact mailbox (language-agnostic).
- * Each falls back to a placeholder when unset (dev, tests, unconfigured build) — set the real values
- * before going public.
+ * The operator identity of the policy, identifiable and reachable as 152-ФЗ (ст. 18.1) requires: per-language names
+ * and a contact email injected at build time, placeholders when unset (personal-data-compliance, invariant 4).
  */
 const operatorNameShared = (typeof __PRIVACY_OPERATOR_NAME__ !== 'undefined' && __PRIVACY_OPERATOR_NAME__) || '';
 const operatorNameRu =

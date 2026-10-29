@@ -22,7 +22,7 @@ type Props = {
   className?: string;
 };
 
-/** A placeholder bone with a calm pulse: hidden from assistive technology, so the page names its loading once. */
+/** A placeholder bone with a calm pulse: hidden from assistive technology, so a loading is announced once, not per bone. */
 const Skeleton: FC<Props> = ({
   variant = 'text',
   width = undefined,

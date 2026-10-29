@@ -43,7 +43,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** The app's two tabs, home active. */
+/** Two tabs, the first active. */
 export const Default: Story = {};
 
 /** The second tab active. */
