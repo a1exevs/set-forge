@@ -18,7 +18,7 @@ export class UsersService {
   async createUser(dto: CreateUserRequest.Dto): Promise<User> {
     const role = await this.roleService.getRoleByValue('user');
     if (!role) {
-      throw AppException.of(HttpStatus.FORBIDDEN, 'USER_ROLE_CONFIGURATION_IS_MISSING');
+      throw AppException.of(HttpStatus.SERVICE_UNAVAILABLE, 'USER_ROLE_CONFIGURATION_IS_MISSING');
     }
     let user: User;
     try {

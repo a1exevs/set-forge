@@ -1,1 +1,1 @@
-export { UnauthorizedExceptionFilter } from '@auth/exception-filters/unauthorized.exception-filter';
+export { CaptchaCountExceptionFilter } from '@auth/exception-filters/captcha-count.exception-filter';

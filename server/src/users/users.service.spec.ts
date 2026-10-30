@@ -7,7 +7,7 @@ import { ErrorMessages } from '@common/constants';
 import { ErrorItemResponse } from '@common/dto';
 import { Role } from '@roles/roles.model';
 import { RolesService } from '@roles/roles.service';
-import { mockUsers } from '@test/unit/helpers';
+import { mockUsers, sendPseudoError } from '@test/unit/helpers';
 import { CreateUserRequest } from '@users/dto';
 import { User } from '@users/users.model';
 import { UsersService } from '@users/users.service';
@@ -92,8 +92,9 @@ describe('UsersService', () => {
       jest.spyOn(rolesService, 'getRoleByValue').mockImplementation(() => null);
       try {
         await usersService.createUser(dto);
+        sendPseudoError();
       } catch (error) {
-        expect(error.status).toBe(HttpStatus.FORBIDDEN);
+        expect(error.status).toBe(HttpStatus.SERVICE_UNAVAILABLE);
         expect(error.errors).toEqual([new ErrorItemResponse.Dto('USER_ROLE_CONFIGURATION_IS_MISSING')]);
         expect(rolesService.getRoleByValue).toBeCalledTimes(1);
         expect(rolesService.getRoleByValue).toBeCalledWith('user');

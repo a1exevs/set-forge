@@ -13,7 +13,7 @@ import { ErrorResult, sendErrorResponse } from '@common/functions';
  * session) never counts — invariant session/captcha-counts-login-only.
  */
 @Catch()
-export class UnauthorizedExceptionFilter extends HttpExceptionFilter {
+export class CaptchaCountExceptionFilter extends HttpExceptionFilter {
   protected respond(result: ErrorResult, host: ArgumentsHost): void {
     if (result.status !== HttpStatus.UNAUTHORIZED) {
       super.respond(result, host);

@@ -235,7 +235,7 @@
               ]
             },
             {
-              "name": "registration (user exists - bad request)",
+              "name": "registration (user exists - conflict)",
               "request": {
                 "auth": {
                   "type": "noauth"
@@ -269,8 +269,8 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test(\"400 with the error codes\", function () {",
-                      "    pm.response.to.have.status(400);",
+                      "pm.test(\"409 with the error codes\", function () {",
+                      "    pm.response.to.have.status(409);",
                       "    var body = pm.response.json();",
                       "    pm.expect(body.resultCode).to.eql(1);",
                       "    pm.expect(body.data).to.eql(null);",
@@ -384,7 +384,8 @@
                       "});",
                       "var data = pm.response.json().data;",
                       "pm.collectionVariables.set(\"access_token\", data.accessToken);",
-                      "pm.collectionVariables.set(\"current_user_id\", data.userId);"
+                      "pm.collectionVariables.set(\"current_user_id\", data.userId);",
+                      "pm.collectionVariables.set(\"refresh_token\", pm.cookies.get(\"refreshToken\"));"
                     ]
                   }
                 }
@@ -479,6 +480,68 @@
               ]
             },
             {
+              "name": "refresh access token (previous cookie - unauthorized)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "refreshToken={{refresh_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/refresh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "refresh"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "// The cookie of the login, replaced by the refresh before this request.",
+                      "pm.test(\"401 with the error codes\", function () {",
+                      "    pm.response.to.have.status(401);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"REFRESH_TOKEN_NOT_FOUND\",\"params\":{}}]);",
+                      "});",
+                      "pm.collectionVariables.unset(\"refresh_token\");"
+                    ]
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableCookies": true
+              }
+            },
+            {
               "name": "refresh access token (no cookie - unauthorized)",
               "request": {
                 "auth": {
@@ -524,6 +587,66 @@
                       "        return item;",
                       "    });",
                       "    pm.expect(errors).to.eql([{\"code\":\"UNAUTHORIZED\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableCookies": true
+              }
+            },
+            {
+              "name": "refresh access token (damaged cookie - unauthorized)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "refreshToken=damaged"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/refresh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "refresh"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"401 with the error codes\", function () {",
+                      "    pm.response.to.have.status(401);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"REFRESH_TOKEN_IS_MALFORMED\",\"params\":{}}]);",
                       "});"
                     ]
                   }
@@ -2414,6 +2537,60 @@
         {
           "name": "auth (end of session)",
           "item": [
+            {
+              "name": "logout (damaged cookie)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "refreshToken=damaged"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "logout"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Logout with a damaged cookie: 200, the cookie cleared\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "    pm.expect(pm.response.json().data.result).to.eql(true);",
+                      "    var cleared = pm.response.headers.all().filter(function (header) {",
+                      "        return header.key.toLowerCase() === \"set-cookie\" && header.value.indexOf(\"refreshToken=;\") === 0;",
+                      "    });",
+                      "    pm.expect(cleared.length).to.eql(1);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableCookies": true
+              }
+            },
             {
               "name": "logout",
               "request": {

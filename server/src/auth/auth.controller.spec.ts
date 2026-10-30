@@ -6,7 +6,7 @@ import { createRequest, createResponse } from 'node-mocks-http';
 import { AuthController } from '@auth/auth.controller';
 import { AuthService } from '@auth/auth.service';
 import { AuthenticationResponse, GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto';
-import { UnauthorizedExceptionFilter } from '@auth/exception-filters';
+import { CaptchaCountExceptionFilter } from '@auth/exception-filters';
 import { SvgCaptchaGuard } from '@auth/guards';
 import { IAuthenticationResult } from '@auth/interfaces';
 import { TokensService } from '@auth/tokens.service';
@@ -49,7 +49,7 @@ const getMockAuthenticationResponse = function (userId, accessToken, refreshToke
 describe('AuthController', () => {
   let authController: AuthController;
   let authService: AuthService;
-  let unauthorizedExceptionFilter: UnauthorizedExceptionFilter;
+  let captchaCountExceptionFilter: CaptchaCountExceptionFilter;
   let jwtAuthGuard: JwtAuthGuard;
   let refreshTokenGuard: RefreshTokenGuard;
   let svgCaptchaGuard: SvgCaptchaGuard;
@@ -82,7 +82,7 @@ describe('AuthController', () => {
     }).compile();
     authController = moduleRef.get<AuthController>(AuthController);
     authService = moduleRef.get<AuthService>(AuthService);
-    unauthorizedExceptionFilter = moduleRef.get<UnauthorizedExceptionFilter>(UnauthorizedExceptionFilter);
+    captchaCountExceptionFilter = moduleRef.get<CaptchaCountExceptionFilter>(CaptchaCountExceptionFilter);
     jwtAuthGuard = moduleRef.get<JwtAuthGuard>(JwtAuthGuard);
     refreshTokenGuard = moduleRef.get<RefreshTokenGuard>(RefreshTokenGuard);
     svgCaptchaGuard = moduleRef.get<SvgCaptchaGuard>(SvgCaptchaGuard);
@@ -95,8 +95,8 @@ describe('AuthController', () => {
     it('AuthService - should be defined', () => {
       expect(authService).toBeDefined();
     });
-    it('UnauthorizedExceptionFilter - should be defined', () => {
-      expect(unauthorizedExceptionFilter).toBeDefined();
+    it('CaptchaCountExceptionFilter - should be defined', () => {
+      expect(captchaCountExceptionFilter).toBeDefined();
     });
     it('JwtAuthGuard - should be defined', () => {
       expect(jwtAuthGuard).toBeDefined();
@@ -226,18 +226,18 @@ describe('AuthController', () => {
       expect(mockRegistrationF).toBeCalledTimes(1);
       expect(mockRegistrationF).toBeCalledWith(registerDto);
     });
-    it('Registration method: should return bad request (user already exists)', async () => {
+    it('Registration method: should return conflict (user already exists)', async () => {
       const res = createResponse();
       const exceptionMessage = ErrorMessages.USER_ALREADY_EXISTS;
       const registerDto = { email: 'user@yandex.ru', password: '12345678' };
       jest.spyOn(authService, 'registration').mockImplementation(async () => {
-        throw new HttpException(exceptionMessage, HttpStatus.BAD_REQUEST);
+        throw new HttpException(exceptionMessage, HttpStatus.CONFLICT);
       });
       try {
         await authController.registration(registerDto, res);
         sendPseudoError();
       } catch (err) {
-        expect(err.status).toBe(400);
+        expect(err.status).toBe(HttpStatus.CONFLICT);
         expect(authService.registration).toBeCalledTimes(1);
         expect(err.getResponse()).toBe(exceptionMessage);
       }
@@ -345,14 +345,11 @@ describe('AuthController', () => {
       const req = createRequest();
       const res = createResponse();
       req._setCookiesVariable('refreshToken', refreshToken);
-      const mockServiceLogoutResponse = false;
-      const mockLogoutF = jest
-        .spyOn(authService, 'logout')
-        .mockImplementation(async () => Promise.resolve(mockServiceLogoutResponse));
+      const mockLogoutF = jest.spyOn(authService, 'logout').mockImplementation(async () => Promise.resolve());
 
       const response = await authController.logout(req, res);
 
-      expect(response.result).toEqual(mockServiceLogoutResponse);
+      expect(response.result).toBe(true);
       expect(res.cookies.refreshToken.value).toBe('');
       expect(mockLogoutF).toBeCalledTimes(1);
       expect(mockLogoutF).toBeCalledWith(refreshToken);

@@ -22,7 +22,7 @@ export class AuthService {
   public async registration(dto: RegisterRequest.Dto): Promise<IAuthenticationResult> {
     const candidate = await this.userService.getUserByEmail(dto.email);
     if (candidate) {
-      throw AppException.of(HttpStatus.BAD_REQUEST, 'USER_ALREADY_EXISTS');
+      throw AppException.of(HttpStatus.CONFLICT, 'USER_ALREADY_EXISTS');
     }
 
     const hashPassword = await bcrypt.hash(dto.password, 5);
@@ -88,8 +88,8 @@ export class AuthService {
     );
   }
 
-  public async logout(refreshToken: string): Promise<boolean> {
-    return this.tokensService.removeRefreshToken(refreshToken);
+  public async logout(refreshToken: string): Promise<void> {
+    await this.tokensService.revokeRefreshToken(refreshToken);
   }
 
   public async deleteAccount(userId: number): Promise<boolean> {

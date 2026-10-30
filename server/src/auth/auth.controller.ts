@@ -16,7 +16,7 @@ import { CookieOptions, Request, Response } from 'express';
 
 import { AuthService } from '@auth/auth.service';
 import { AuthenticationResponse, GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto';
-import { UnauthorizedExceptionFilter } from '@auth/exception-filters';
+import { CaptchaCountExceptionFilter } from '@auth/exception-filters';
 import { SvgCaptchaGuard } from '@auth/guards';
 import { IAuthenticationResult } from '@auth/interfaces';
 import { Docs, ResultCodes, Routes } from '@common/constants';
@@ -50,13 +50,17 @@ export class AuthController {
         { code: 'CONSENT_TO_PERSONAL_DATA_PROCESSING_IS_REQUIRED', field: 'consent' },
         { code: 'TERMS_ACCEPTANCE_IS_REQUIRED', field: 'termsAccepted' },
       ],
-      userExists: [{ code: 'USER_ALREADY_EXISTS' }],
       creationFailed: [{ code: 'FAILED_TO_CREATE_USER' }],
     },
   })
   @ApiErrorResult({
-    status: HttpStatus.FORBIDDEN,
-    description: Docs.REGISTRATION_FORBIDDEN,
+    status: HttpStatus.CONFLICT,
+    description: Docs.REGISTRATION_CONFLICT,
+    cases: { userExists: [{ code: 'USER_ALREADY_EXISTS' }] },
+  })
+  @ApiErrorResult({
+    status: HttpStatus.SERVICE_UNAVAILABLE,
+    description: Docs.REGISTRATION_SERVICE_UNAVAILABLE,
     cases: { roleMissing: [{ code: 'USER_ROLE_CONFIGURATION_IS_MISSING' }] },
   })
   @Post('/registration')
@@ -97,7 +101,7 @@ export class AuthController {
     cases: { invalidFields: [{ code: 'MUST_BE_A_STRING', field: 'email' }] },
   })
   @UseGuards(SvgCaptchaGuard)
-  @UseFilters(UnauthorizedExceptionFilter)
+  @UseFilters(CaptchaCountExceptionFilter)
   @Post('/login')
   async login(@Body() dto: LoginRequest.Dto, @Res({ passthrough: true }) response: Response, @Req() request) {
     const loginResult: IAuthenticationResult = await this.authService.login(dto);
@@ -116,19 +120,15 @@ export class AuthController {
     description: Docs.REFRESH_TOKENS_SUCCESSFUL_RESULT,
   })
   @ApiErrorResult({
-    status: HttpStatus.UNPROCESSABLE_ENTITY,
-    description: Docs.REFRESH_TOKENS_UNPROCESSABLE_ENTITY,
+    status: HttpStatus.UNAUTHORIZED,
+    description: Docs.REFRESH_TOKENS_UNAUTHORIZED,
     cases: {
+      ...ApiErrorCases.UNAUTHORIZED,
       malformed: [{ code: 'REFRESH_TOKEN_IS_MALFORMED' }],
       expired: [{ code: 'REFRESH_TOKEN_EXPIRED' }],
       notFound: [{ code: 'REFRESH_TOKEN_NOT_FOUND' }],
       revoked: [{ code: 'REFRESH_TOKEN_REVOKED' }],
     },
-  })
-  @ApiErrorResult({
-    status: HttpStatus.UNAUTHORIZED,
-    description: Docs.REFRESH_TOKENS_UNAUTHORIZED,
-    cases: ApiErrorCases.UNAUTHORIZED,
   })
   @UseGuards(RefreshTokenGuard)
   @Post('/refresh')
@@ -183,14 +183,6 @@ export class AuthController {
     description: Docs.LOGOUT_SUCCESSFUL_RESULT,
   })
   @ApiErrorResult({
-    status: HttpStatus.UNPROCESSABLE_ENTITY,
-    description: Docs.LOGOUT_UNPROCESSABLE_ENTITY,
-    cases: {
-      malformed: [{ code: 'REFRESH_TOKEN_IS_MALFORMED' }],
-      expired: [{ code: 'REFRESH_TOKEN_EXPIRED' }],
-    },
-  })
-  @ApiErrorResult({
     status: HttpStatus.UNAUTHORIZED,
     description: Docs.LOGOUT_UNAUTHORIZED,
     cases: ApiErrorCases.UNAUTHORIZED,
@@ -198,9 +190,9 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, RefreshTokenGuard)
   @Delete('/logout')
   async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
-    const result = await this.authService.logout(request.cookies.refreshToken);
+    await this.authService.logout(request.cookies.refreshToken);
     response.clearCookie('refreshToken', AuthController.refreshCookieBaseOptions());
-    return new OperationResultResponse.Dto({ result });
+    return new OperationResultResponse.Dto({ result: true });
   }
 
   @ApiOperation({ summary: Docs.DELETE_ACCOUNT_ENDPOINT })

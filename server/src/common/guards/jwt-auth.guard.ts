@@ -1,6 +1,5 @@
 import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Observable } from 'rxjs';
 
 import { AppException } from '@common/exceptions';
 
@@ -8,7 +7,7 @@ import { AppException } from '@common/exceptions';
 export class JwtAuthGuard implements CanActivate {
   constructor(private jstService: JwtService) {}
 
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     try {
       const authHeader = request.headers.authorization;

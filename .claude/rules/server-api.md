@@ -32,7 +32,7 @@ The client shows an error in the user's language by its code, so every error car
 - Validation: every class-validator decorator takes `validationError(code, params)` from `@common/utils`;
   `ValidationPipe` turns each failed constraint into an item whose `field` is the dotted path (`exercises.0.name`).
 - `fieldsErrors` holds the items `{ code, params, field?, message }`, `messages` their texts ("field - text").
-- A route filter extends `HttpExceptionFilter` (`UnauthorizedExceptionFilter` on `/login` counts the failed
+- A route filter extends `HttpExceptionFilter` (`CaptchaCountExceptionFilter` on `/login` counts the failed
   sign-ins).
 
 ## Swagger per endpoint

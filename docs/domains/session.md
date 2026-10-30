@@ -79,7 +79,9 @@ Both clear every cached query and end on `/login` once the request answers, also
 asks for confirmation and runs inside it; while logout is in flight, deletion waits, and the other way round. Both
 revoke the refresh token on the server and clear the refresh cookie, which every open tab shares: a request without
 it is answered as unauthenticated — the same answer as for an expired access token — so another tab ends on `/login`
-with its next data request, without waiting for its access token to expire.
+with its next data request, without waiting for its access token to expire. Logout succeeds whatever state the refresh
+token is in — expired, damaged or already revoked: the cookie is cleared and the token's record, when the server can
+tell which one it is, removed. A refresh with such a token is answered as unauthenticated.
 
 ## Map
 
