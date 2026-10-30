@@ -35,7 +35,7 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lin
 | refresh-single-flight | Concurrent token refreshes share one request |
 | no-open-redirect | After sign-in only an in-app `redirect` target is followed (no open redirect) |
 | captcha-counts-login-only | Only failed sign-ins lead to the captcha: after 5 in a session the login demands it, a wrong captcha keeps demanding it, a successful login starts over; a failed request elsewhere (an expired session) never counts |
-| logout-ends-on-login | Logout and account deletion end on `/login` also when the request fails |
+| logout-ends-on-login | Logout ends on `/login` also when the request fails; account deletion ends there once the account is deleted or the session has already ended, and keeps the user signed in on any other failure |
 | user-scoped | All workout data is scoped to the signed-in user |
 | route-guards | Guest-only (`/login`, `/register`), always-public (`/privacy`, `/terms`) and protected routes |
 | bootstrap-once | The auth session is verified once per app open; navigation between screens and link intent (hover, touch, focus) never request the current user again — a cleared refresh cookie is discovered by the next data request, a refresh token revoked on the server by the first refresh after the access token expires |
@@ -75,8 +75,11 @@ it.
 
 ### Logout and account deletion
 
-Both clear every cached query and end on `/login` once the request answers, also when it fails. Deleting the account
-asks for confirmation and runs inside it; while logout is in flight, deletion waits, and the other way round. Both
+Both clear every cached query and end on `/login` once the session has ended. Logout does so also when it fails: the
+user wants out anyway. Deleting the account asks for confirmation and runs inside it; it ends on `/login` once the
+account is deleted or the server answers that the session has already ended. Any other failure — a server error, a
+lost connection — keeps the user signed in with the dialog open and says the account was not deleted, so a failure
+never passes for success. While logout is in flight, deletion waits, and the other way round. Both
 revoke the refresh token on the server and clear the refresh cookie, which every open tab shares: a request without
 it is answered as unauthenticated — the same answer as for an expired access token — so another tab ends on `/login`
 with its next data request, without waiting for its access token to expire. Logout succeeds whatever state the refresh

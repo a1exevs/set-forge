@@ -1,4 +1,12 @@
-import { apiRequest, clearAccessToken, getAccessToken, getApiBaseUrl, ResultCodes, setAccessToken } from '@shared/api';
+import {
+  apiRequest,
+  ApiRequestError,
+  clearAccessToken,
+  getAccessToken,
+  getApiBaseUrl,
+  ResultCodes,
+  setAccessToken,
+} from '@shared/api';
 
 import type { CurrentUser } from '../model/current-user';
 
@@ -99,13 +107,20 @@ export async function patchDocumentsAcceptance(): Promise<CurrentUser> {
   return res.data;
 }
 
+/**
+ * Resolves once the session has ended — the account deleted, or the session over already; rejects and keeps the
+ * session on any other failure (session/logout-ends-on-login).
+ */
 export async function deleteAccount(): Promise<void> {
   try {
     await apiRequest<unknown>('/auth/account', {
       method: 'DELETE',
       auth: true,
     });
-  } finally {
-    clearAccessToken();
+  } catch (error: unknown) {
+    if (!(error instanceof ApiRequestError && error.status === 401)) {
+      throw error;
+    }
   }
+  clearAccessToken();
 }

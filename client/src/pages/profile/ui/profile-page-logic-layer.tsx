@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { useConfirm, useProgress, useT } from '@shared/lib';
+import { toastError, useConfirm, useProgress, useT } from '@shared/lib';
 import { useMainTabSwipe } from '@widgets/main-tabs-bar';
 
 import ProfilePage from './profile-page';
@@ -10,9 +10,9 @@ type Props = {
   avatarLetter: string;
   /** Never rejects. */
   onLogout: () => Promise<void>;
-  /** Never rejects. */
+  /** Resolves once the session has ended; rejects when the account stays and the user stays signed in. */
   onDeleteAccount: () => Promise<void>;
-  /** Leaves the profile once the session has ended — after logout and account deletion, also when they failed. */
+  /** Leaves the profile once the session has ended (session/logout-ends-on-login). */
   onLeave: () => void;
 };
 
@@ -35,7 +35,14 @@ const ProfilePageLogicLayer: FC<Props> = ({ email, avatarLetter, onLogout, onDel
       description: t('profile.deleteAccountDialog.description'),
       confirmationText: t('profile.deleteAccount'),
       cancellationText: t('common.cancel'),
-      onConfirm: onDeleteAccount,
+      onConfirm: async (): Promise<void> => {
+        try {
+          await onDeleteAccount();
+        } catch (error: unknown) {
+          toastError(t('profile.toasts.deleteAccountFailed'));
+          throw error;
+        }
+      },
     });
     if (ok) {
       onLeave();
