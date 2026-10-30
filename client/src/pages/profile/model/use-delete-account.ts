@@ -1,7 +1,7 @@
 import { useDeleteAccountMutation } from '@entities/session';
 
 type DeleteAccount = {
-  /** Deletes the account; never rejects — the session ends either way. */
+  /** Resolves once the session has ended; rejects when the account stays and the session goes on. */
   deleteAccount: () => Promise<void>;
 };
 
@@ -9,10 +9,8 @@ export function useDeleteAccount(): DeleteAccount {
   const deleteAccountMutation = useDeleteAccountMutation();
 
   return {
-    deleteAccount: (): Promise<void> =>
-      deleteAccountMutation
-        .mutateAsync()
-        .then((): void => undefined)
-        .catch((): void => undefined),
+    deleteAccount: async (): Promise<void> => {
+      await deleteAccountMutation.mutateAsync();
+    },
   };
 }

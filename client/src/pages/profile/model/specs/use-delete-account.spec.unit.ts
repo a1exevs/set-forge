@@ -26,12 +26,13 @@ describe('useDeleteAccount', () => {
   });
 
   // @invariant session/logout-ends-on-login
-  it('resolves when the request fails, so the caller still goes to /login', async () => {
+  it('rejects when the request fails, so the caller keeps the user signed in', async () => {
+    const error = new Error('offline');
     mockedDeleteAccountMutation.mockReturnValue({
-      mutateAsync: jest.fn().mockRejectedValue(new Error('offline')),
+      mutateAsync: jest.fn().mockRejectedValue(error),
     });
     const { result } = renderHook(() => useDeleteAccount());
 
-    await expect(result.current.deleteAccount()).resolves.toBeUndefined();
+    await expect(result.current.deleteAccount()).rejects.toBe(error);
   });
 });

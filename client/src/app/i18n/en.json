@@ -176,7 +176,10 @@
     },
     "deleteAccountHint": "Deleting your account permanently removes all your data. This cannot be undone.",
     "openSettings": "Settings",
-    "title": "Profile"
+    "title": "Profile",
+    "toasts": {
+      "deleteAccountFailed": "Failed to delete account. Please try again."
+    }
   },
   "reconsent": {
     "accept": "Accept",
