@@ -33,6 +33,7 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lin
 | reconsent-gate | The gate blocks app routes until accept or logout, and stays closed on `/privacy` and `/terms` |
 | deletion-cascade | Account deletion removes every user-owned row (DB cascade) |
 | refresh-single-flight | Concurrent token refreshes share one request |
+| refresh-token-lifetime | A refresh token is accepted only within its lifetime from issue — each refresh issues a new one — and refused after it even when the browser still holds it, the token's own expiry and its stored record alike; logout with it still succeeds |
 | no-open-redirect | After sign-in only an in-app `redirect` target is followed (no open redirect) |
 | captcha-counts-login-only | Only failed sign-ins lead to the captcha: after 5 in a session the login demands it, a wrong captcha keeps demanding it, a successful login starts over; a failed request elsewhere (an expired session) never counts |
 | logout-ends-on-login | Logout ends on `/login` also when the request fails; account deletion ends there once the account is deleted or the session has already ended, and keeps the user signed in on any other failure |

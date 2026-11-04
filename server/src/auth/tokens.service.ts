@@ -41,12 +41,13 @@ export class TokensService {
     return this.jwtService.signAsync(payload, opts);
   }
 
-  public async generateRefreshToken(user: User, expiresIn: number): Promise<string> {
-    const token = await this.refreshTokensService.createRefreshToken(user, expiresIn);
+  public async generateRefreshToken(user: User, ttl: number): Promise<string> {
+    const token = await this.refreshTokensService.createRefreshToken(user, ttl);
 
     const opts: SignOptions = {
       ...BASE_OPTIONS,
-      expiresIn,
+      // `ttl` is in ms, while jsonwebtoken reads a numeric `expiresIn` as seconds.
+      expiresIn: Math.floor(ttl / 1000),
       subject: String(user.id),
       jwtid: String(token.uuid),
     };
@@ -102,6 +103,11 @@ export class TokensService {
 
     if (token.isRevoked) {
       throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_REVOKED');
+    }
+
+    // The record holds the lifetime; a JWT `exp` may outlive it (older tokens) — session/refresh-token-lifetime.
+    if (token.expires.getTime() <= Date.now()) {
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_EXPIRED');
     }
 
     const user = await this.getUserFromRefreshTokenPayload(payload);

@@ -38,6 +38,7 @@ interface IRefreshTokenOptions extends IAccessTokenOptions {
 
 interface IMockRefreshToken {
   isRevoked: boolean;
+  expires: Date;
 }
 
 interface IAccessTokenVerifyResult extends IMockUser, IAccessTokenOptions {}
@@ -60,7 +61,21 @@ const getMockUser = (): IMockUser => {
 const getMockRefreshToken = (): IMockRefreshToken => {
   return {
     isRevoked: false,
+    expires: new Date(Date.now() + TokensService.getRefreshTokenExpiresIn()),
   };
+};
+
+const DAY_IN_MS = 24 * 60 * 60 * 1000;
+const LIFETIME_IN_DAYS = 30;
+
+/** Runs `action` with the clock at `time` (ms since the epoch): the JWT library and the service read `Date.now`. */
+const atTime = async <T>(time: number, action: () => Promise<T>): Promise<T> => {
+  const clock = jest.spyOn(Date, 'now').mockReturnValue(time);
+  try {
+    return await action();
+  } finally {
+    clock.mockRestore();
+  }
 };
 
 interface IGetRefreshTokenGeneratedData {
@@ -145,6 +160,10 @@ describe('TokensService', () => {
     refreshTokensService = module.get<RefreshTokensService>(RefreshTokensService);
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   describe('TokensService - definition', () => {
     it('TokensService - should be defined', () => {
       expect(tokensService).toBeDefined();
@@ -191,7 +210,7 @@ describe('TokensService', () => {
       expect(payload.aud).not.toBeUndefined();
       expect(payload.iss).not.toBeUndefined();
       expect(payload.jti).toBe(tokenUUID);
-      expect(payload.exp - payload.iat).toBe(expiresIn);
+      expect(payload.exp - payload.iat).toBe((LIFETIME_IN_DAYS * DAY_IN_MS) / 1000);
     });
   });
 
@@ -457,9 +476,63 @@ describe('TokensService', () => {
         expect(tokensService.generateAccessToken).toBeCalledTimes(0);
       }
     });
+    // @invariant session/refresh-token-lifetime
+    it('should answer REFRESH_TOKEN_EXPIRED for a token used after its lifetime', async () => {
+      const mockUser = getMockUser() as unknown as User;
+      const issuedAt = Date.now();
+      jest.spyOn(refreshTokensService, 'createRefreshToken').mockImplementation(async () => {
+        return Promise.resolve({ uuid: 'lifetime-uuid' } as RefreshToken);
+      });
+      const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
+      jest.spyOn(tokensService, 'generateRefreshToken');
+
+      await expect(
+        atTime(issuedAt + (LIFETIME_IN_DAYS + 1) * DAY_IN_MS, async () =>
+          tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken),
+        ),
+      ).rejects.toMatchObject({ status: HttpStatus.UNAUTHORIZED, message: ErrorMessages.REFRESH_TOKEN_EXPIRED });
+      expect(refreshTokensService.findTokenByUUId).toBeCalledTimes(0);
+      expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
+    });
+    // @invariant session/refresh-token-lifetime
+    it('should answer REFRESH_TOKEN_EXPIRED when the stored record has expired', async () => {
+      const jwtOutlivesRecordInSeconds = (2 * LIFETIME_IN_DAYS * DAY_IN_MS) / 1000;
+      const { refreshToken, tokenUUID } = getRefreshTokenGeneratedData({
+        jwtService,
+        expiresIn: jwtOutlivesRecordInSeconds,
+      });
+      jest.spyOn(refreshTokensService, 'findTokenByUUId').mockImplementation(async () => {
+        return Promise.resolve({ ...getMockRefreshToken(), expires: new Date(Date.now() - 1000) } as RefreshToken);
+      });
+      jest.spyOn(tokensService, 'generateRefreshToken');
+      jest.spyOn(tokensService, 'generateAccessToken');
+
+      await expect(tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken)).rejects.toMatchObject({
+        status: HttpStatus.UNAUTHORIZED,
+        message: ErrorMessages.REFRESH_TOKEN_EXPIRED,
+      });
+      expect(refreshTokensService.removeTokenByUUId).toBeCalledWith(tokenUUID);
+      expect(userService.getUserById).toBeCalledTimes(0);
+      expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
+      expect(tokensService.generateAccessToken).toBeCalledTimes(0);
+    });
   });
 
   describe('TokensService - revokeRefreshToken', () => {
+    // @invariant session/refresh-token-lifetime
+    it('should remove the record of a token used after its lifetime', async () => {
+      const mockUser = getMockUser() as unknown as User;
+      const issuedAt = Date.now();
+      jest.spyOn(refreshTokensService, 'createRefreshToken').mockImplementation(async () => {
+        return Promise.resolve({ uuid: 'lifetime-uuid' } as RefreshToken);
+      });
+      const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
+
+      await atTime(issuedAt + (LIFETIME_IN_DAYS + 1) * DAY_IN_MS, async () =>
+        tokensService.revokeRefreshToken(refreshToken),
+      );
+      expect(refreshTokensService.removeTokenByUUId).toBeCalledWith('lifetime-uuid');
+    });
     it('should remove the record the token names', async () => {
       const { refreshToken, tokenUUID } = getRefreshTokenGeneratedData({
         jwtService,
