@@ -1,23 +1,13 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { SignOptions, TokenExpiredError } from 'jsonwebtoken';
+import { createHash, randomBytes } from 'node:crypto';
 
-import { RefreshToken } from '@auth/refresh-tokens.model';
 import { RefreshTokensService } from '@auth/refresh-tokens.service';
 import { AppException } from '@common/exceptions';
 import { User } from '@users/users.model';
 import { UsersService } from '@users/users.service';
 
-// TODO Replace
-const BASE_OPTIONS: SignOptions = {
-  issuer: 'https://sowa-api.com',
-  audience: 'https://sowa-api.com',
-};
-
-export interface RefreshTokenPayload {
-  jti: number;
-  sub: number;
-}
+const REFRESH_TOKEN_BYTES = 32;
 
 @Injectable()
 export class TokensService {
@@ -33,30 +23,19 @@ export class TokensService {
 
   public async generateAccessToken(user: User): Promise<string> {
     const payload = { email: user.email, id: user.id, roles: user.roles };
-    const opts: SignOptions = {
-      ...BASE_OPTIONS,
-      subject: String(user.id),
-    };
-
-    return this.jwtService.signAsync(payload, opts);
+    return this.jwtService.signAsync(payload, { subject: String(user.id) });
   }
 
+  /** An opaque random value, not a JWT: only its stored record gives it meaning — session/access-token-only. */
   public async generateRefreshToken(user: User, ttl: number): Promise<string> {
-    const token = await this.refreshTokensService.createRefreshToken(user, ttl);
+    const refreshToken = randomBytes(REFRESH_TOKEN_BYTES).toString('base64url');
+    await this.refreshTokensService.createRefreshToken(user.id, TokensService.hashRefreshToken(refreshToken), ttl);
 
-    const opts: SignOptions = {
-      ...BASE_OPTIONS,
-      // `ttl` is in ms, while jsonwebtoken reads a numeric `expiresIn` as seconds.
-      expiresIn: Math.floor(ttl / 1000),
-      subject: String(user.id),
-      jwtid: String(token.uuid),
-    };
-
-    return this.jwtService.signAsync({}, opts);
+    return refreshToken;
   }
 
   public async updateAccessRefreshTokensFromRefreshToken(
-    refresh: string,
+    refresh: unknown,
   ): Promise<{ refreshToken: string; accessToken: string; user: User }> {
     const { user, newRefreshToken } = await this.updateRefreshToken(refresh);
     const accessToken = await this.generateAccessToken(user);
@@ -64,21 +43,13 @@ export class TokensService {
     return { user, accessToken, refreshToken: newRefreshToken };
   }
 
-  /**
-   * Removes the stored record the token names; an expired token still names it. Never fails: a token that is damaged,
-   * not signed by us or already removed leaves nothing to remove.
-   */
-  public async revokeRefreshToken(refreshToken: string): Promise<void> {
-    let payload: Partial<RefreshTokenPayload>;
-    try {
-      payload = await this.jwtService.verifyAsync(refreshToken, { ignoreExpiration: true });
-    } catch {
+  /** Removes the stored record of the token whatever its state; a value naming no record leaves nothing to remove. */
+  public async revokeRefreshToken(refreshToken: unknown): Promise<void> {
+    if (typeof refreshToken !== 'string') {
       return;
     }
 
-    if (payload.jti) {
-      await this.refreshTokensService.removeTokenByUUId(payload.jti);
-    }
+    await this.refreshTokensService.removeTokenByHash(TokensService.hashRefreshToken(refreshToken));
   }
 
   public static getRefreshTokenExpiresIn(): number {
@@ -91,65 +62,39 @@ export class TokensService {
     return expiration;
   }
 
-  private async updateRefreshToken(encoded: string): Promise<{ user: User; newRefreshToken: string }> {
-    const payload = await this.decodeRefreshToken(encoded);
-    const token = await this.getStoredTokenFromRefreshTokenPayload(payload);
+  /** The token carries 256 random bits, so a plain SHA-256 suffices: guessing needs no salt or slow hash to stop it. */
+  private static hashRefreshToken(refreshToken: string): string {
+    return createHash('sha256').update(refreshToken).digest('hex');
+  }
 
-    await this.revokeRefreshToken(encoded);
+  private async updateRefreshToken(refreshToken: unknown): Promise<{ user: User; newRefreshToken: string }> {
+    if (typeof refreshToken !== 'string') {
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_NOT_FOUND');
+    }
+
+    const tokenHash = TokensService.hashRefreshToken(refreshToken);
+    const token = await this.refreshTokensService.findTokenByHash(tokenHash);
 
     if (!token) {
       throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_NOT_FOUND');
     }
 
-    if (token.isRevoked) {
-      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_REVOKED');
-    }
+    // A token works once: the record goes before any further check, so a refused token is spent as well.
+    await this.refreshTokensService.removeTokenByHash(tokenHash);
 
-    // The record holds the lifetime; a JWT `exp` may outlive it (older tokens) — session/refresh-token-lifetime.
+    // session/refresh-token-lifetime
     if (token.expires.getTime() <= Date.now()) {
       throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_EXPIRED');
     }
 
-    const user = await this.getUserFromRefreshTokenPayload(payload);
+    const user = await this.usersService.getUserById(token.userId);
 
     if (!user) {
-      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_IS_MALFORMED');
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_NOT_FOUND');
     }
 
     const newRefreshToken = await this.generateRefreshToken(user, TokensService.getRefreshTokenExpiresIn());
 
     return { user, newRefreshToken };
-  }
-
-  private async decodeRefreshToken(token: string): Promise<RefreshTokenPayload> {
-    try {
-      return await this.jwtService.verifyAsync(token);
-    } catch (e) {
-      if (e instanceof TokenExpiredError) {
-        throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_EXPIRED');
-      } else {
-        throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_IS_MALFORMED');
-      }
-    }
-  }
-
-  private async getUserFromRefreshTokenPayload(payload: RefreshTokenPayload): Promise<User> {
-    const subId = payload.sub;
-
-    if (!subId) {
-      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_IS_MALFORMED');
-    }
-
-    return this.usersService.getUserById(subId);
-  }
-
-  private async getStoredTokenFromRefreshTokenPayload(payload: RefreshTokenPayload): Promise<RefreshToken | null> {
-    const tokenId = payload.jti;
-
-    if (!tokenId) {
-      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_IS_MALFORMED');
-    }
-
-    return this.refreshTokensService.findTokenByUUId(tokenId);
   }
 }

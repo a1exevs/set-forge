@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { SequelizeModule } from '@nestjs/sequelize';
 
+import { ACCESS_TOKEN_CLAIMS } from '@auth/access-token-claims';
 import { AuthController } from '@auth/auth.controller';
 import { AuthService } from '@auth/auth.service';
 import { RefreshToken } from '@auth/refresh-tokens.model';
@@ -29,7 +30,9 @@ import { UsersModule } from '@users/users.module';
           secret: secret.trim(),
           signOptions: {
             expiresIn: '600s',
+            ...ACCESS_TOKEN_CLAIMS,
           },
+          verifyOptions: { ...ACCESS_TOKEN_CLAIMS },
         };
       },
       inject: [ConfigService],

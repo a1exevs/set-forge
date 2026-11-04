@@ -2,13 +2,13 @@ import { HttpStatus } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { SignOptions } from 'jsonwebtoken';
+import { createHash } from 'node:crypto';
 
+import { ACCESS_TOKEN_CLAIMS } from '@auth/access-token-claims';
 import { RefreshToken } from '@auth/refresh-tokens.model';
 import { RefreshTokensService } from '@auth/refresh-tokens.service';
 import { TokensService } from '@auth/tokens.service';
 import { ErrorMessages } from '@common/constants';
-import { sendPseudoError } from '@test/unit/helpers';
 import { User } from '@users/users.model';
 import { UsersService } from '@users/users.service';
 
@@ -24,7 +24,7 @@ interface IMockUser {
   ];
 }
 
-interface IAccessTokenOptions {
+interface IAccessTokenVerifyResult extends IMockUser {
   iat: number;
   exp: number;
   aud: string;
@@ -32,17 +32,7 @@ interface IAccessTokenOptions {
   sub: string;
 }
 
-interface IRefreshTokenOptions extends IAccessTokenOptions {
-  jti: string;
-}
-
-interface IMockRefreshToken {
-  isRevoked: boolean;
-  expires: Date;
-}
-
-interface IAccessTokenVerifyResult extends IMockUser, IAccessTokenOptions {}
-type IRefreshTokenVerifyResult = IRefreshTokenOptions;
+type StoredToken = Pick<RefreshToken, 'userId' | 'tokenHash' | 'expires'>;
 
 const getMockUser = (): IMockUser => {
   return {
@@ -58,17 +48,12 @@ const getMockUser = (): IMockUser => {
   };
 };
 
-const getMockRefreshToken = (): IMockRefreshToken => {
-  return {
-    isRevoked: false,
-    expires: new Date(Date.now() + TokensService.getRefreshTokenExpiresIn()),
-  };
-};
-
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const LIFETIME_IN_DAYS = 30;
 
-/** Runs `action` with the clock at `time` (ms since the epoch): the JWT library and the service read `Date.now`. */
+const sha256 = (value: string): string => createHash('sha256').update(value).digest('hex');
+
+/** Runs `action` with the clock at `time` (ms since the epoch): the service reads `Date.now`. */
 const atTime = async <T>(time: number, action: () => Promise<T>): Promise<T> => {
   const clock = jest.spyOn(Date, 'now').mockReturnValue(time);
   try {
@@ -78,59 +63,41 @@ const atTime = async <T>(time: number, action: () => Promise<T>): Promise<T> => 
   }
 };
 
-interface IGetRefreshTokenGeneratedData {
-  jwtService: JwtService;
-  expiresIn: number;
-  withoutSubject?: boolean;
-  withoutJwtId?: boolean;
-}
-
-const getRefreshTokenGeneratedData = (params: IGetRefreshTokenGeneratedData) => {
-  const mockUser = getMockUser() as unknown as User;
-  const tokenUUID = 'sdfsdf';
-  const opts: SignOptions = {
-    expiresIn: params.expiresIn,
-  };
-  if (!params.withoutSubject) {
-    opts.subject = String(mockUser.id);
-  }
-  if (!params.withoutJwtId) {
-    opts.jwtid = String(tokenUUID);
-  }
-  const refreshToken = params.jwtService.sign({}, opts);
-  return {
-    refreshToken,
-    mockUser,
-    tokenUUID,
-  };
-};
-
 describe('TokensService', () => {
   let tokensService: TokensService;
   let userService: UsersService;
   let jwtService: JwtService;
   let refreshTokensService: RefreshTokensService;
+  let store: StoredToken[];
+  const mockUser = getMockUser() as unknown as User;
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    jest.clearAllTimers();
+    store = [];
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TokensService,
         {
           provide: UsersService,
           useValue: {
-            getUserByEmail: jest.fn(x => x),
-            getUserById: jest.fn(x => x),
-            createUser: jest.fn(x => x),
+            getUserById: jest.fn(async (id: number) => (id === mockUser.id ? mockUser : null)),
           },
         },
         {
+          // An in-memory table: the specs prove the service against the records it really writes.
           provide: RefreshTokensService,
           useValue: {
-            createRefreshToken: jest.fn(x => x),
-            findTokenByUUId: jest.fn(x => x),
-            removeTokenByUUId: jest.fn(x => x),
+            createRefreshToken: jest.fn(async (userId: number, tokenHash: string, ttl: number) => {
+              const token = { userId, tokenHash, expires: new Date(Date.now() + ttl) };
+              store.push(token);
+              return token;
+            }),
+            findTokenByHash: jest.fn(async (tokenHash: string) => store.find(t => t.tokenHash === tokenHash) ?? null),
+            removeTokenByHash: jest.fn(async (tokenHash: string) => {
+              const before = store.length;
+              store = store.filter(t => t.tokenHash !== tokenHash);
+              return before - store.length;
+            }),
           },
         },
       ],
@@ -146,7 +113,9 @@ describe('TokensService', () => {
               secret: secret.trim(),
               signOptions: {
                 expiresIn: '600s',
+                ...ACCESS_TOKEN_CLAIMS,
               },
+              verifyOptions: { ...ACCESS_TOKEN_CLAIMS },
             };
           },
           inject: [ConfigService],
@@ -181,7 +150,6 @@ describe('TokensService', () => {
 
   describe('TokensService - generateAccessToken', () => {
     it('GenerateAccessToken method - should be successful result', async () => {
-      const mockUser = getMockUser() as unknown as User;
       const token = await tokensService.generateAccessToken(mockUser);
       const payload: IAccessTokenVerifyResult = jwtService.verify(token);
 
@@ -189,300 +157,86 @@ describe('TokensService', () => {
       expect(payload.email).toBe(mockUser.email);
       expect(payload.roles).not.toBeUndefined();
       expect(payload.sub).toBe(`${mockUser.id}`);
-      expect(payload.aud).not.toBeUndefined();
-      expect(payload.iss).not.toBeUndefined();
+      expect(payload.aud).toBe(ACCESS_TOKEN_CLAIMS.audience);
+      expect(payload.iss).toBe(ACCESS_TOKEN_CLAIMS.issuer);
     });
   });
 
   describe('TokensService - generateRefreshToken', () => {
-    it('GenerateRefreshToken method - should be successful result', async () => {
-      const tokenUUID = 'sdfsdfsfsf';
-      const expiresIn = TokensService.getRefreshTokenExpiresIn();
-      const mockUser = getMockUser() as unknown as User;
-      jest.spyOn(refreshTokensService, 'createRefreshToken').mockImplementation(async () => {
-        return Promise.resolve({ uuid: tokenUUID } as RefreshToken);
-      });
+    it('should issue an opaque value of 256 random bits and store only its hash', async () => {
+      const ttl = TokensService.getRefreshTokenExpiresIn();
 
-      const token = await tokensService.generateRefreshToken(mockUser, expiresIn);
-      const payload: IRefreshTokenVerifyResult = jwtService.verify(token);
+      const token = await tokensService.generateRefreshToken(mockUser, ttl);
 
-      expect(payload.sub).toBe(`${mockUser.id}`);
-      expect(payload.aud).not.toBeUndefined();
-      expect(payload.iss).not.toBeUndefined();
-      expect(payload.jti).toBe(tokenUUID);
-      expect(payload.exp - payload.iat).toBe((LIFETIME_IN_DAYS * DAY_IN_MS) / 1000);
+      expect(token).toMatch(/^[A-Za-z0-9_-]{43}$/);
+      expect(jwtService.decode(token)).toBeNull();
+      expect(refreshTokensService.createRefreshToken).toBeCalledTimes(1);
+      expect(refreshTokensService.createRefreshToken).toBeCalledWith(mockUser.id, sha256(token), ttl);
+      expect(store.some(t => t.tokenHash === token)).toBe(false);
+    });
+    it('should issue a different value every time', async () => {
+      const ttl = TokensService.getRefreshTokenExpiresIn();
+
+      const first = await tokensService.generateRefreshToken(mockUser, ttl);
+      const second = await tokensService.generateRefreshToken(mockUser, ttl);
+
+      expect(first).not.toBe(second);
     });
   });
 
   describe('TokensService - updateAccessRefreshTokensFromRefreshToken', () => {
-    it('UpdateAccessRefreshTokensFromRefreshToken method - should be successful result', async () => {
-      const { refreshToken, mockUser, tokenUUID } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn: TokensService.getRefreshTokenExpiresIn(),
-      });
-
-      jest.spyOn(refreshTokensService, 'findTokenByUUId').mockImplementation(async () => {
-        return Promise.resolve(getMockRefreshToken() as RefreshToken);
-      });
-      jest.spyOn(refreshTokensService, 'removeTokenByUUId').mockImplementation(async () => {
-        return Promise.resolve(1);
-      });
-      jest.spyOn(userService, 'getUserById').mockImplementation(async () => {
-        return Promise.resolve(mockUser);
-      });
-      jest.spyOn(refreshTokensService, 'createRefreshToken').mockImplementation(async () => {
-        return Promise.resolve({ uuid: tokenUUID } as RefreshToken);
-      });
-      jest.spyOn(tokensService, 'revokeRefreshToken');
-      jest.spyOn(tokensService, 'generateRefreshToken');
-      jest.spyOn(tokensService, 'generateAccessToken');
+    it('should replace the token with a new one and issue an access token for its user', async () => {
+      const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
 
       const result = await tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken);
 
-      expect(result.accessToken).toBeDefined();
-      expect(result.refreshToken).toBeDefined();
       expect(result.user).toEqual(mockUser);
-      expect(refreshTokensService.findTokenByUUId).toBeCalledTimes(1);
-      expect(refreshTokensService.findTokenByUUId).toBeCalledWith(tokenUUID);
-      expect(refreshTokensService.removeTokenByUUId).toBeCalledTimes(1);
-      expect(refreshTokensService.removeTokenByUUId).toBeCalledWith(tokenUUID);
-      expect(tokensService.revokeRefreshToken).toBeCalledTimes(1);
-      expect(tokensService.revokeRefreshToken).toBeCalledWith(refreshToken);
-      expect(userService.getUserById).toBeCalledTimes(1);
-      expect(userService.getUserById).toBeCalledWith(`${mockUser.id}`);
-      expect(tokensService.generateRefreshToken).toBeCalledTimes(1);
-      expect(tokensService.generateRefreshToken).toBeCalledWith(mockUser, TokensService.getRefreshTokenExpiresIn());
-      expect(refreshTokensService.createRefreshToken).toBeCalledTimes(1);
-      expect(refreshTokensService.createRefreshToken).toBeCalledWith(
-        mockUser,
-        TokensService.getRefreshTokenExpiresIn(),
-      );
-      expect(tokensService.generateAccessToken).toBeCalledTimes(1);
-      expect(tokensService.generateAccessToken).toBeCalledWith(mockUser);
+      expect(jwtService.verify<IAccessTokenVerifyResult>(result.accessToken).id).toBe(mockUser.id);
+      expect(result.refreshToken).not.toBe(refreshToken);
+      expect(store.map(t => t.tokenHash)).toEqual([sha256(result.refreshToken)]);
+      expect(userService.getUserById).toBeCalledWith(mockUser.id);
     });
-    it('UpdateAccessRefreshTokensFromRefreshToken method - should be unsuccessful result (token expired)', async () => {
-      const expiresIn = 5000;
-      const { refreshToken } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn,
+    it('should answer REFRESH_TOKEN_NOT_FOUND for the token a previous refresh replaced', async () => {
+      const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
+      await tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken);
+
+      await expect(tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken)).rejects.toMatchObject({
+        status: HttpStatus.UNAUTHORIZED,
+        message: ErrorMessages.REFRESH_TOKEN_NOT_FOUND,
       });
-      jest.spyOn(tokensService, 'revokeRefreshToken');
-      jest.spyOn(tokensService, 'generateRefreshToken');
-      jest.spyOn(tokensService, 'generateAccessToken');
-      jest.useFakeTimers();
-      expect.assertions(5);
-      setTimeout(async () => {
-        try {
-          await tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken);
-          sendPseudoError();
-        } catch (err) {
-          expect(err.status).toBe(HttpStatus.UNAUTHORIZED);
-          expect(err.message).toBe(ErrorMessages.REFRESH_TOKEN_EXPIRED);
-          expect(tokensService.revokeRefreshToken).toBeCalledTimes(0);
-          expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
-          expect(tokensService.generateAccessToken).toBeCalledTimes(0);
-        }
-      }, expiresIn * 1000);
-      jest.runAllTimers();
+      expect(store).toHaveLength(1);
     });
-    it('UpdateAccessRefreshTokensFromRefreshToken method - should be unsuccessful result (token is malformed)', async () => {
-      const expiresIn = 5000;
-      const { refreshToken } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn,
-      });
-      jest.spyOn(tokensService, 'revokeRefreshToken');
+    it('should answer REFRESH_TOKEN_NOT_FOUND for a value that names no record', async () => {
       jest.spyOn(tokensService, 'generateRefreshToken');
-      jest.spyOn(tokensService, 'generateAccessToken');
-      jest.useFakeTimers();
-      expect.assertions(5);
-      setTimeout(async () => {
-        try {
-          await tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken + 'sdf');
-          sendPseudoError();
-        } catch (err) {
-          expect(err.status).toBe(HttpStatus.UNAUTHORIZED);
-          expect(err.message).toBe(ErrorMessages.REFRESH_TOKEN_IS_MALFORMED);
-          expect(tokensService.revokeRefreshToken).toBeCalledTimes(0);
-          expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
-          expect(tokensService.generateAccessToken).toBeCalledTimes(0);
-        }
-      }, expiresIn * 1000);
-      jest.runOnlyPendingTimers();
+
+      await expect(tokensService.updateAccessRefreshTokensFromRefreshToken('damaged')).rejects.toMatchObject({
+        status: HttpStatus.UNAUTHORIZED,
+        message: ErrorMessages.REFRESH_TOKEN_NOT_FOUND,
+      });
+      expect(refreshTokensService.findTokenByHash).toBeCalledWith(sha256('damaged'));
+      expect(refreshTokensService.removeTokenByHash).toBeCalledTimes(0);
+      expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
     });
-    it('UpdateAccessRefreshTokensFromRefreshToken method - should be unsuccessful result (token is malformed: without jti)', async () => {
-      const expiresIn = 5000;
-      const { refreshToken } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn,
-        withoutJwtId: true,
+    it('should answer REFRESH_TOKEN_NOT_FOUND for a value that is not a string, without a lookup', async () => {
+      await expect(tokensService.updateAccessRefreshTokensFromRefreshToken({ forged: true })).rejects.toMatchObject({
+        status: HttpStatus.UNAUTHORIZED,
+        message: ErrorMessages.REFRESH_TOKEN_NOT_FOUND,
       });
-      jest.spyOn(tokensService, 'revokeRefreshToken');
-      jest.spyOn(tokensService, 'generateRefreshToken');
-      jest.spyOn(tokensService, 'generateAccessToken');
-      try {
-        await tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken);
-        sendPseudoError();
-      } catch (err) {
-        expect(err.status).toBe(HttpStatus.UNAUTHORIZED);
-        expect(err.message).toBe(ErrorMessages.REFRESH_TOKEN_IS_MALFORMED);
-        expect(tokensService.revokeRefreshToken).toBeCalledTimes(0);
-        expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
-        expect(tokensService.generateAccessToken).toBeCalledTimes(0);
-      }
+      expect(refreshTokensService.findTokenByHash).toBeCalledTimes(0);
     });
-    it('UpdateAccessRefreshTokensFromRefreshToken method - should be unsuccessful result (token not found)', async () => {
-      const { refreshToken, tokenUUID } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn: TokensService.getRefreshTokenExpiresIn(),
-      });
+    it('should answer REFRESH_TOKEN_NOT_FOUND and spend the token when its user is gone', async () => {
+      const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
+      jest.spyOn(userService, 'getUserById').mockResolvedValue(null);
 
-      jest.spyOn(refreshTokensService, 'findTokenByUUId').mockImplementation(async () => {
-        return Promise.resolve(undefined);
+      await expect(tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken)).rejects.toMatchObject({
+        status: HttpStatus.UNAUTHORIZED,
+        message: ErrorMessages.REFRESH_TOKEN_NOT_FOUND,
       });
-      jest.spyOn(refreshTokensService, 'removeTokenByUUId').mockImplementation(async () => {
-        return Promise.resolve(0);
-      });
-      jest.spyOn(tokensService, 'revokeRefreshToken');
-      jest.spyOn(tokensService, 'generateRefreshToken');
-      jest.spyOn(tokensService, 'generateAccessToken');
-
-      try {
-        await tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken);
-        sendPseudoError();
-      } catch (error) {
-        expect(error.status).toBe(HttpStatus.UNAUTHORIZED);
-        expect(error.message).toBe(ErrorMessages.REFRESH_TOKEN_NOT_FOUND);
-        expect(refreshTokensService.findTokenByUUId).toBeCalledTimes(1);
-        expect(refreshTokensService.findTokenByUUId).toBeCalledWith(tokenUUID);
-        expect(refreshTokensService.removeTokenByUUId).toBeCalledTimes(1);
-        expect(refreshTokensService.removeTokenByUUId).toBeCalledWith(tokenUUID);
-        expect(tokensService.revokeRefreshToken).toBeCalledTimes(1);
-        expect(tokensService.revokeRefreshToken).toBeCalledWith(refreshToken);
-        expect(userService.getUserById).toBeCalledTimes(0);
-        expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
-        expect(refreshTokensService.createRefreshToken).toBeCalledTimes(0);
-        expect(tokensService.generateAccessToken).toBeCalledTimes(0);
-      }
-    });
-    it('UpdateAccessRefreshTokensFromRefreshToken method - should be unsuccessful result (token revoked)', async () => {
-      const { refreshToken, tokenUUID } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn: TokensService.getRefreshTokenExpiresIn(),
-      });
-
-      const mockRefreshToken = getMockRefreshToken();
-      mockRefreshToken.isRevoked = true;
-      jest.spyOn(refreshTokensService, 'findTokenByUUId').mockImplementation(async () => {
-        return Promise.resolve(mockRefreshToken as RefreshToken);
-      });
-      jest.spyOn(refreshTokensService, 'removeTokenByUUId').mockImplementation(async () => {
-        return Promise.resolve(1);
-      });
-      jest.spyOn(tokensService, 'revokeRefreshToken');
-      jest.spyOn(tokensService, 'generateRefreshToken');
-      jest.spyOn(tokensService, 'generateAccessToken');
-
-      try {
-        await tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken);
-        sendPseudoError();
-      } catch (error) {
-        expect(error.status).toBe(HttpStatus.UNAUTHORIZED);
-        expect(error.message).toBe(ErrorMessages.REFRESH_TOKEN_REVOKED);
-        expect(refreshTokensService.findTokenByUUId).toBeCalledTimes(1);
-        expect(refreshTokensService.findTokenByUUId).toBeCalledWith(tokenUUID);
-        expect(refreshTokensService.removeTokenByUUId).toBeCalledTimes(1);
-        expect(refreshTokensService.removeTokenByUUId).toBeCalledWith(tokenUUID);
-        expect(tokensService.revokeRefreshToken).toBeCalledTimes(1);
-        expect(tokensService.revokeRefreshToken).toBeCalledWith(refreshToken);
-        expect(userService.getUserById).toBeCalledTimes(0);
-        expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
-        expect(refreshTokensService.createRefreshToken).toBeCalledTimes(0);
-        expect(tokensService.generateAccessToken).toBeCalledTimes(0);
-      }
-    });
-    it('UpdateAccessRefreshTokensFromRefreshToken method - should be unsuccessful result (token is malformed: without sub)', async () => {
-      const { refreshToken, tokenUUID } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn: TokensService.getRefreshTokenExpiresIn(),
-        withoutSubject: true,
-      });
-
-      const mockRefreshToken = getMockRefreshToken();
-      jest.spyOn(refreshTokensService, 'findTokenByUUId').mockImplementation(() => {
-        return Promise.resolve(mockRefreshToken as RefreshToken);
-      });
-      jest.spyOn(refreshTokensService, 'removeTokenByUUId').mockImplementation(async () => {
-        return Promise.resolve(1);
-      });
-      jest.spyOn(tokensService, 'revokeRefreshToken');
-      jest.spyOn(tokensService, 'generateRefreshToken');
-      jest.spyOn(tokensService, 'generateAccessToken');
-
-      try {
-        await tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken);
-        sendPseudoError();
-      } catch (error) {
-        expect(error.status).toBe(HttpStatus.UNAUTHORIZED);
-        expect(error.message).toBe(ErrorMessages.REFRESH_TOKEN_IS_MALFORMED);
-        expect(refreshTokensService.findTokenByUUId).toBeCalledTimes(1);
-        expect(refreshTokensService.findTokenByUUId).toBeCalledWith(tokenUUID);
-        expect(refreshTokensService.removeTokenByUUId).toBeCalledTimes(1);
-        expect(refreshTokensService.removeTokenByUUId).toBeCalledWith(tokenUUID);
-        expect(tokensService.revokeRefreshToken).toBeCalledTimes(1);
-        expect(tokensService.revokeRefreshToken).toBeCalledWith(refreshToken);
-        expect(userService.getUserById).toBeCalledTimes(0);
-        expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
-        expect(refreshTokensService.createRefreshToken).toBeCalledTimes(0);
-        expect(tokensService.generateAccessToken).toBeCalledTimes(0);
-      }
-    });
-    it('UpdateAccessRefreshTokensFromRefreshToken method - should be unsuccessful result (token is malformed: user by subject not found)', async () => {
-      const { refreshToken, mockUser, tokenUUID } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn: TokensService.getRefreshTokenExpiresIn(),
-      });
-
-      const mockRefreshToken = getMockRefreshToken();
-      jest.spyOn(refreshTokensService, 'findTokenByUUId').mockImplementation(async () => {
-        return Promise.resolve(mockRefreshToken as RefreshToken);
-      });
-      jest.spyOn(refreshTokensService, 'removeTokenByUUId').mockImplementation(async () => {
-        return Promise.resolve(1);
-      });
-      jest.spyOn(userService, 'getUserById').mockImplementation(async () => {
-        return Promise.resolve(undefined);
-      });
-      jest.spyOn(tokensService, 'revokeRefreshToken');
-      jest.spyOn(tokensService, 'generateRefreshToken');
-      jest.spyOn(tokensService, 'generateAccessToken');
-
-      try {
-        await tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken);
-        sendPseudoError();
-      } catch (error) {
-        expect(error.status).toBe(HttpStatus.UNAUTHORIZED);
-        expect(error.message).toBe(ErrorMessages.REFRESH_TOKEN_IS_MALFORMED);
-        expect(refreshTokensService.findTokenByUUId).toBeCalledTimes(1);
-        expect(refreshTokensService.findTokenByUUId).toBeCalledWith(tokenUUID);
-        expect(refreshTokensService.removeTokenByUUId).toBeCalledTimes(1);
-        expect(refreshTokensService.removeTokenByUUId).toBeCalledWith(tokenUUID);
-        expect(tokensService.revokeRefreshToken).toBeCalledTimes(1);
-        expect(tokensService.revokeRefreshToken).toBeCalledWith(refreshToken);
-        expect(userService.getUserById).toBeCalledTimes(1);
-        expect(userService.getUserById).toBeCalledWith(`${mockUser.id}`);
-        expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
-        expect(refreshTokensService.createRefreshToken).toBeCalledTimes(0);
-        expect(tokensService.generateAccessToken).toBeCalledTimes(0);
-      }
+      expect(store).toHaveLength(0);
     });
     // @invariant session/refresh-token-lifetime
-    it('should answer REFRESH_TOKEN_EXPIRED for a token used after its lifetime', async () => {
-      const mockUser = getMockUser() as unknown as User;
+    it('should answer REFRESH_TOKEN_EXPIRED and spend the token used after its lifetime', async () => {
       const issuedAt = Date.now();
-      jest.spyOn(refreshTokensService, 'createRefreshToken').mockImplementation(async () => {
-        return Promise.resolve({ uuid: 'lifetime-uuid' } as RefreshToken);
-      });
       const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
       jest.spyOn(tokensService, 'generateRefreshToken');
 
@@ -491,105 +245,54 @@ describe('TokensService', () => {
           tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken),
         ),
       ).rejects.toMatchObject({ status: HttpStatus.UNAUTHORIZED, message: ErrorMessages.REFRESH_TOKEN_EXPIRED });
-      expect(refreshTokensService.findTokenByUUId).toBeCalledTimes(0);
+      expect(store).toHaveLength(0);
+      expect(userService.getUserById).toBeCalledTimes(0);
       expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
     });
     // @invariant session/refresh-token-lifetime
-    it('should answer REFRESH_TOKEN_EXPIRED when the stored record has expired', async () => {
-      const jwtOutlivesRecordInSeconds = (2 * LIFETIME_IN_DAYS * DAY_IN_MS) / 1000;
-      const { refreshToken, tokenUUID } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn: jwtOutlivesRecordInSeconds,
-      });
-      jest.spyOn(refreshTokensService, 'findTokenByUUId').mockImplementation(async () => {
-        return Promise.resolve({ ...getMockRefreshToken(), expires: new Date(Date.now() - 1000) } as RefreshToken);
-      });
-      jest.spyOn(tokensService, 'generateRefreshToken');
-      jest.spyOn(tokensService, 'generateAccessToken');
+    it('should still refresh a token used just before the end of its lifetime', async () => {
+      const issuedAt = Date.now();
+      const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
 
-      await expect(tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken)).rejects.toMatchObject({
-        status: HttpStatus.UNAUTHORIZED,
-        message: ErrorMessages.REFRESH_TOKEN_EXPIRED,
-      });
-      expect(refreshTokensService.removeTokenByUUId).toBeCalledWith(tokenUUID);
-      expect(userService.getUserById).toBeCalledTimes(0);
-      expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
-      expect(tokensService.generateAccessToken).toBeCalledTimes(0);
+      const result = await atTime(issuedAt + LIFETIME_IN_DAYS * DAY_IN_MS - 1000, async () =>
+        tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken),
+      );
+
+      expect(result.user).toEqual(mockUser);
     });
   });
 
   describe('TokensService - revokeRefreshToken', () => {
     // @invariant session/refresh-token-lifetime
     it('should remove the record of a token used after its lifetime', async () => {
-      const mockUser = getMockUser() as unknown as User;
       const issuedAt = Date.now();
-      jest.spyOn(refreshTokensService, 'createRefreshToken').mockImplementation(async () => {
-        return Promise.resolve({ uuid: 'lifetime-uuid' } as RefreshToken);
-      });
       const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
 
       await atTime(issuedAt + (LIFETIME_IN_DAYS + 1) * DAY_IN_MS, async () =>
         tokensService.revokeRefreshToken(refreshToken),
       );
-      expect(refreshTokensService.removeTokenByUUId).toBeCalledWith('lifetime-uuid');
+
+      expect(store).toHaveLength(0);
     });
-    it('should remove the record the token names', async () => {
-      const { refreshToken, tokenUUID } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn: TokensService.getRefreshTokenExpiresIn(),
-      });
+    it('should remove the record of the token', async () => {
+      const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
 
       await expect(tokensService.revokeRefreshToken(refreshToken)).resolves.toBeUndefined();
-      expect(refreshTokensService.removeTokenByUUId).toBeCalledTimes(1);
-      expect(refreshTokensService.removeTokenByUUId).toBeCalledWith(tokenUUID);
+
+      expect(refreshTokensService.removeTokenByHash).toBeCalledWith(sha256(refreshToken));
+      expect(store).toHaveLength(0);
     });
-    it('should remove the record of an expired token', async () => {
-      const tokenUUID = 'expired-uuid';
-      const issuedAt = Math.floor(Date.now() / 1000) - 120;
-      const refreshToken = jwtService.sign({ iat: issuedAt }, { expiresIn: 60, jwtid: tokenUUID, subject: '1' });
+    it('should resolve when the record is already gone or never existed', async () => {
+      const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
+      await tokensService.revokeRefreshToken(refreshToken);
 
       await expect(tokensService.revokeRefreshToken(refreshToken)).resolves.toBeUndefined();
-      expect(refreshTokensService.removeTokenByUUId).toBeCalledTimes(1);
-      expect(refreshTokensService.removeTokenByUUId).toBeCalledWith(tokenUUID);
-    });
-    it('should resolve when the record is already gone', async () => {
-      const { refreshToken } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn: TokensService.getRefreshTokenExpiresIn(),
-      });
-      jest.spyOn(refreshTokensService, 'removeTokenByUUId').mockImplementation(async () => Promise.resolve(0));
-
-      await expect(tokensService.revokeRefreshToken(refreshToken)).resolves.toBeUndefined();
-      expect(refreshTokensService.removeTokenByUUId).toBeCalledTimes(1);
-    });
-    it('should remove nothing for a damaged token', async () => {
-      const { refreshToken } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn: TokensService.getRefreshTokenExpiresIn(),
-      });
-
-      await expect(tokensService.revokeRefreshToken(refreshToken + 'sdf')).resolves.toBeUndefined();
       await expect(tokensService.revokeRefreshToken('damaged')).resolves.toBeUndefined();
-      expect(refreshTokensService.removeTokenByUUId).toBeCalledTimes(0);
     });
-    it('should remove nothing for a token signed with another secret', async () => {
-      const { refreshToken } = getRefreshTokenGeneratedData({
-        jwtService: new JwtService({ secret: 'another-secret' }),
-        expiresIn: TokensService.getRefreshTokenExpiresIn(),
-      });
+    it('should remove nothing for a value that is not a string', async () => {
+      await expect(tokensService.revokeRefreshToken({ forged: true })).resolves.toBeUndefined();
 
-      await expect(tokensService.revokeRefreshToken(refreshToken)).resolves.toBeUndefined();
-      expect(refreshTokensService.removeTokenByUUId).toBeCalledTimes(0);
-    });
-    it('should remove nothing for a token without jti', async () => {
-      const { refreshToken } = getRefreshTokenGeneratedData({
-        jwtService,
-        expiresIn: TokensService.getRefreshTokenExpiresIn(),
-        withoutJwtId: true,
-      });
-
-      await expect(tokensService.revokeRefreshToken(refreshToken)).resolves.toBeUndefined();
-      expect(refreshTokensService.removeTokenByUUId).toBeCalledTimes(0);
+      expect(refreshTokensService.removeTokenByHash).toBeCalledTimes(0);
     });
   });
 

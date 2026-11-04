@@ -1,7 +1,8 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { getModelToken } from '@nestjs/sequelize';
 import * as request from 'supertest';
 
+import { RefreshToken } from '@auth/refresh-tokens.model';
 import { Routes } from '@common/constants';
 import { createTestApp } from '@test/e2e/create-test-app';
 import { E2eAuthContext, registerAndLogin } from '@test/e2e/e2e-auth.helper';
@@ -52,7 +53,7 @@ describe('Session credential status', () => {
 
   it('answers 401 to a refresh with a damaged cookie', async () => {
     const response = await refresh('refreshToken=damaged').expect(HttpStatus.UNAUTHORIZED);
-    expectCode(response, 'REFRESH_TOKEN_IS_MALFORMED');
+    expectCode(response, 'REFRESH_TOKEN_NOT_FOUND');
   });
 
   it('answers 401 to a refresh with the cookie a previous refresh replaced', async () => {
@@ -87,15 +88,22 @@ describe('Session credential status', () => {
   it('logs out with an expired cookie and removes its record', async () => {
     const ctx = await registerAndLogin(app, 'credential-expired@example.com', password, api);
     const cookie = refreshCookie(ctx.cookies);
-    const jwtService = app.get(JwtService);
-    const { jti, sub } = jwtService.verify<{ jti: string; sub: string }>(cookie.slice('refreshToken='.length));
-    const issuedAt = Math.floor(Date.now() / 1000) - 120;
-    const expired = jwtService.sign({ iat: issuedAt }, { expiresIn: 60, jwtid: jti, subject: sub });
+    const refreshTokenModel = app.get<typeof RefreshToken>(getModelToken(RefreshToken));
+    await refreshTokenModel.update({ expires: new Date(Date.now() - 1000) }, { where: { userId: ctx.userId } });
 
-    await refresh(`refreshToken=${expired}`).expect(HttpStatus.UNAUTHORIZED);
-    expectClearedCookie(await logout(ctx, `refreshToken=${expired}`).expect(HttpStatus.OK));
-    const response = await refresh(cookie).expect(HttpStatus.UNAUTHORIZED);
+    expectClearedCookie(await logout(ctx, cookie).expect(HttpStatus.OK));
 
-    expectCode(response, 'REFRESH_TOKEN_NOT_FOUND');
+    // An expired record still there would answer REFRESH_TOKEN_EXPIRED.
+    expectCode(await refresh(cookie).expect(HttpStatus.UNAUTHORIZED), 'REFRESH_TOKEN_NOT_FOUND');
+  });
+
+  it('answers 401 to a refresh with an expired cookie and spends it', async () => {
+    const ctx = await registerAndLogin(app, 'credential-expired-refresh@example.com', password, api);
+    const cookie = refreshCookie(ctx.cookies);
+    const refreshTokenModel = app.get<typeof RefreshToken>(getModelToken(RefreshToken));
+    await refreshTokenModel.update({ expires: new Date(Date.now() - 1000) }, { where: { userId: ctx.userId } });
+
+    expectCode(await refresh(cookie).expect(HttpStatus.UNAUTHORIZED), 'REFRESH_TOKEN_EXPIRED');
+    expectCode(await refresh(cookie).expect(HttpStatus.UNAUTHORIZED), 'REFRESH_TOKEN_NOT_FOUND');
   });
 });
