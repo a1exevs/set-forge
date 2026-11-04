@@ -1,40 +1,39 @@
 import { Injectable } from '@nestjs/common';
+import { Op } from 'sequelize';
 
 import { RefreshToken } from '@auth/refresh-tokens.model';
-import { User } from '@users/users.model';
+
+/** session/signed-in-devices */
+export const MAX_SIGNED_IN_DEVICES = 5;
 
 @Injectable()
 export class RefreshTokensService {
-  public async createRefreshToken(user: User, ttl: number): Promise<RefreshToken> {
-    const maxLoginsCount = 5;
+  /**
+   * Stores the token for the user. The user's expired records go first; at the device limit the records that expire
+   * soonest — every token lives the same time, so the ones refreshed least recently — make room for the new one.
+   */
+  public async createRefreshToken(userId: number, tokenHash: string, ttl: number): Promise<RefreshToken> {
+    await RefreshToken.destroy({ where: { userId, expires: { [Op.lte]: new Date() } } });
 
-    const token = new RefreshToken();
-
-    const loginsCount: number = await RefreshToken.count({ where: { userId: user.id } });
-
-    if (loginsCount >= maxLoginsCount) {
-      await this.removeAllTokensByUserId(user.id);
+    const active = await RefreshToken.findAll({ where: { userId }, order: [['expires', 'ASC']], attributes: ['uuid'] });
+    const evicted = active.slice(0, Math.max(0, active.length - MAX_SIGNED_IN_DEVICES + 1));
+    if (evicted.length > 0) {
+      await RefreshToken.destroy({ where: { uuid: evicted.map(token => token.uuid) } });
     }
 
-    token.userId = user.id;
-    token.isRevoked = false;
-    const expiration = new Date();
-    expiration.setTime(expiration.getTime() + ttl);
-
-    token.expires = expiration;
+    const token = new RefreshToken();
+    token.userId = userId;
+    token.tokenHash = tokenHash;
+    token.expires = new Date(Date.now() + ttl);
 
     return token.save();
   }
 
-  public async findTokenByUUId(uuid: number): Promise<RefreshToken | null> {
-    return RefreshToken.findOne({ where: { uuid } });
+  public async findTokenByHash(tokenHash: string): Promise<RefreshToken | null> {
+    return RefreshToken.findOne({ where: { tokenHash } });
   }
 
-  public async removeTokenByUUId(uuid: number): Promise<number> {
-    return RefreshToken.destroy({ where: { uuid } });
-  }
-
-  private async removeAllTokensByUserId(userId: number): Promise<number> {
-    return RefreshToken.destroy({ where: { userId } });
+  public async removeTokenByHash(tokenHash: string): Promise<number> {
+    return RefreshToken.destroy({ where: { tokenHash } });
   }
 }

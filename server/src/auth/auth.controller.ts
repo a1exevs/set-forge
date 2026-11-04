@@ -124,10 +124,8 @@ export class AuthController {
     description: Docs.REFRESH_TOKENS_UNAUTHORIZED,
     cases: {
       ...ApiErrorCases.UNAUTHORIZED,
-      malformed: [{ code: 'REFRESH_TOKEN_IS_MALFORMED' }],
       expired: [{ code: 'REFRESH_TOKEN_EXPIRED' }],
       notFound: [{ code: 'REFRESH_TOKEN_NOT_FOUND' }],
-      revoked: [{ code: 'REFRESH_TOKEN_REVOKED' }],
     },
   })
   @UseGuards(RefreshTokenGuard)

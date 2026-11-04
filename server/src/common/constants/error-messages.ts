@@ -28,10 +28,8 @@ export const ErrorMessages = {
   USER_ROLE_CONFIGURATION_IS_MISSING: 'Service is unavailable: user role configuration is missing',
 
   // Refresh tokens
-  REFRESH_TOKEN_IS_MALFORMED: 'Refresh token is malformed',
   REFRESH_TOKEN_EXPIRED: 'Refresh token has expired',
   REFRESH_TOKEN_NOT_FOUND: 'Refresh token not found',
-  REFRESH_TOKEN_REVOKED: 'Refresh token revoked',
 
   // Users and roles
   USER_ALREADY_EXISTS: 'User already exists',

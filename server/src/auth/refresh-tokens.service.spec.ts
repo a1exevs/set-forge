@@ -1,52 +1,24 @@
 import { getModelToken } from '@nestjs/sequelize';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Op } from 'sequelize';
 
 import { RefreshToken } from '@auth/refresh-tokens.model';
-import { RefreshTokensService } from '@auth/refresh-tokens.service';
-import { User } from '@users/users.model';
+import { MAX_SIGNED_IN_DEVICES, RefreshTokensService } from '@auth/refresh-tokens.service';
 
 jest.mock('./refresh-tokens.model');
 
-interface IMockUser {
-  id: number;
-  email: string;
-  roles: [
-    {
-      id: number;
-      value: string;
-      description: string;
-    },
-  ];
-}
+const TOKEN_HASH = 'a'.repeat(64);
+const TTL = 24 * 60 * 60 * 1000;
 
-interface IMockRefreshToken {
-  uuid: string;
-  userId: number;
-  isRevoked: boolean;
-  expires: Date;
-}
+/** The user's active records as the model returns them, the soonest to expire first. */
+const activeRecords = (count: number): RefreshToken[] =>
+  Array.from({ length: count }, (_, index) => ({ uuid: `uuid-${index + 1}` }) as RefreshToken);
 
-const getMockUser = (): IMockUser => {
-  return {
-    id: 1,
-    email: 'user@yandex.ru',
-    roles: [
-      {
-        id: 2,
-        value: 'user',
-        description: 'User role',
-      },
-    ],
-  };
-};
-
-const getMockRefreshToken = (): IMockRefreshToken => {
-  return {
-    uuid: 'sdfsdf',
-    userId: 1,
-    isRevoked: false,
-    expires: new Date(),
-  };
+const mockStore = (activeCount: number): { destroyFn: jest.SpyInstance; findAllFn: jest.SpyInstance } => {
+  const destroyFn = jest.spyOn(RefreshToken, 'destroy').mockResolvedValue(0);
+  const findAllFn = jest.spyOn(RefreshToken, 'findAll').mockResolvedValue(activeRecords(activeCount));
+  const saveFn = jest.spyOn(RefreshToken.prototype, 'save').mockImplementation(async () => saveFn.mock.instances[0]);
+  return { destroyFn, findAllFn };
 };
 
 describe('RefreshTokensService', () => {
@@ -55,7 +27,6 @@ describe('RefreshTokensService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    jest.clearAllTimers();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -80,47 +51,77 @@ describe('RefreshTokensService', () => {
   });
 
   describe('RefreshTokensService - createRefreshToken', () => {
-    it('should be successful result', async () => {
-      const mockUser = getMockUser() as unknown as User;
-      const ttl = 24 * 60 * 60 * 1000;
-      jest.spyOn(RefreshToken, 'count').mockImplementation(() => {
-        return Promise.resolve(2);
-      });
-      const saveFn = jest.spyOn(RefreshToken.prototype, 'save').mockImplementation(async () => {
-        return saveFn.mock.instances[0];
-      });
-      const token = await refreshTokensService.createRefreshToken(mockUser, ttl);
-      expect(token.userId).toBe(mockUser.id);
-      expect(token.isRevoked).toBe(false);
-      expect(saveFn).toBeCalledTimes(1);
+    it('should store the hash for the user with the expiry ttl from now', async () => {
+      mockStore(2);
+      const before = Date.now();
+
+      const token = await refreshTokensService.createRefreshToken(1, TOKEN_HASH, TTL);
+
+      expect(token.userId).toBe(1);
+      expect(token.tokenHash).toBe(TOKEN_HASH);
+      expect(token.expires.getTime()).toBeGreaterThanOrEqual(before + TTL);
+      expect(token.expires.getTime()).toBeLessThanOrEqual(Date.now() + TTL);
+      expect(RefreshToken.prototype.save).toBeCalledTimes(1);
     });
-  });
+    it("should remove the user's expired records first", async () => {
+      const { destroyFn, findAllFn } = mockStore(0);
 
-  describe('RefreshTokensService - findTokenByUUId', () => {
-    it('should be successful result', async () => {
-      const mockToken = getMockRefreshToken();
-      jest.spyOn(RefreshToken, 'findOne').mockImplementation(() => {
-        return Promise.resolve(mockToken as RefreshToken);
-      });
+      await refreshTokensService.createRefreshToken(1, TOKEN_HASH, TTL);
 
-      const token = await refreshTokensService.findTokenByUUId(11);
-      expect(token).toEqual(mockToken);
-    });
-  });
-
-  describe('RefreshTokensService - findTokenByUUId', () => {
-    it('should be successful result', async () => {
-      const removedNumber = 1;
-      const uuid = 1111;
-      const params = { where: { uuid } };
-      const destroyFn = jest.spyOn(RefreshToken, 'destroy').mockImplementation(async () => {
-        return Promise.resolve(removedNumber);
-      });
-
-      const removed = await refreshTokensService.removeTokenByUUId(uuid);
-      expect(removed).toEqual(removedNumber);
       expect(destroyFn).toBeCalledTimes(1);
-      expect(destroyFn).toBeCalledWith(params);
+      expect(destroyFn).toBeCalledWith({ where: { userId: 1, expires: { [Op.lte]: expect.any(Date) } } });
+      expect(destroyFn.mock.invocationCallOrder[0]).toBeLessThan(findAllFn.mock.invocationCallOrder[0]);
+    });
+    // @invariant session/signed-in-devices
+    it('should keep every other device while the user is under the limit', async () => {
+      const { destroyFn } = mockStore(MAX_SIGNED_IN_DEVICES - 1);
+
+      await refreshTokensService.createRefreshToken(1, TOKEN_HASH, TTL);
+
+      expect(destroyFn).toBeCalledTimes(1);
+      expect(RefreshToken.findAll).toBeCalledWith(
+        expect.objectContaining({ where: { userId: 1 }, order: [['expires', 'ASC']] }),
+      );
+    });
+    // @invariant session/signed-in-devices
+    it('should end only the device that refreshed least recently at the limit', async () => {
+      const { destroyFn } = mockStore(MAX_SIGNED_IN_DEVICES);
+
+      await refreshTokensService.createRefreshToken(1, TOKEN_HASH, TTL);
+
+      expect(destroyFn).toBeCalledTimes(2);
+      expect(destroyFn).toHaveBeenLastCalledWith({ where: { uuid: ['uuid-1'] } });
+      expect(RefreshToken.prototype.save).toBeCalledTimes(1);
+    });
+    it('should trim back to the limit when concurrent sign-ins left more records', async () => {
+      const { destroyFn } = mockStore(MAX_SIGNED_IN_DEVICES + 1);
+
+      await refreshTokensService.createRefreshToken(1, TOKEN_HASH, TTL);
+
+      expect(destroyFn).toHaveBeenLastCalledWith({ where: { uuid: ['uuid-1', 'uuid-2'] } });
+    });
+  });
+
+  describe('RefreshTokensService - findTokenByHash', () => {
+    it('should look the record up by its hash', async () => {
+      const stored = { tokenHash: TOKEN_HASH } as RefreshToken;
+      const findOneFn = jest.spyOn(RefreshToken, 'findOne').mockResolvedValue(stored);
+
+      const token = await refreshTokensService.findTokenByHash(TOKEN_HASH);
+
+      expect(token).toBe(stored);
+      expect(findOneFn).toBeCalledWith({ where: { tokenHash: TOKEN_HASH } });
+    });
+  });
+
+  describe('RefreshTokensService - removeTokenByHash', () => {
+    it('should remove the record by its hash', async () => {
+      const destroyFn = jest.spyOn(RefreshToken, 'destroy').mockResolvedValue(1);
+
+      const removed = await refreshTokensService.removeTokenByHash(TOKEN_HASH);
+
+      expect(removed).toBe(1);
+      expect(destroyFn).toBeCalledWith({ where: { tokenHash: TOKEN_HASH } });
     });
   });
 });

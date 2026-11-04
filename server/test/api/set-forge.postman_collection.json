@@ -437,6 +437,59 @@
               ]
             },
             {
+              "name": "get current user (refresh token as access token - unauthorized)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{refresh_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "// The refresh token sent as the access token is refused, though the session cookie comes along.",
+                      "pm.test(\"401 with the error codes\", function () {",
+                      "    pm.response.to.have.status(401);",
+                      "    var body = pm.response.json();",
+                      "    pm.expect(body.resultCode).to.eql(1);",
+                      "    pm.expect(body.data).to.eql(null);",
+                      "    var errors = body.fieldsErrors.map(function (error) {",
+                      "        var item = { code: error.code, params: error.params };",
+                      "        if (error.field !== undefined) {",
+                      "            item.field = error.field;",
+                      "        }",
+                      "        return item;",
+                      "    });",
+                      "    pm.expect(errors).to.eql([{\"code\":\"UNAUTHORIZED\",\"params\":{}}]);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
               "name": "refresh access token",
               "request": {
                 "auth": {
@@ -646,7 +699,7 @@
                       "        }",
                       "        return item;",
                       "    });",
-                      "    pm.expect(errors).to.eql([{\"code\":\"REFRESH_TOKEN_IS_MALFORMED\",\"params\":{}}]);",
+                      "    pm.expect(errors).to.eql([{\"code\":\"REFRESH_TOKEN_NOT_FOUND\",\"params\":{}}]);",
                       "});"
                     ]
                   }

@@ -10,6 +10,7 @@ documents, logout and account deletion. Legal duties behind this domain: `.claud
   cache.
 - **Bootstrap** — verifying the auth session when no user is cached (an app open, or after the session-expired
   handler cleared the cache): refresh the access token and load the current user.
+- **Signed-in device** — a browser holding a refresh token of its own; every sign-in starts one, logout ends it.
 - **Consent** — agreement to personal-data processing; **terms acceptance** — agreement to the Terms of Use. Two
   separate, explicit acts at registration.
 - **Document versions** — the required Privacy Policy / Terms versions (server env); the user's accepted versions are
@@ -33,7 +34,9 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lin
 | reconsent-gate | The gate blocks app routes until accept or logout, and stays closed on `/privacy` and `/terms` |
 | deletion-cascade | Account deletion removes every user-owned row (DB cascade) |
 | refresh-single-flight | Concurrent token refreshes share one request |
-| refresh-token-lifetime | A refresh token is accepted only within its lifetime from issue — each refresh issues a new one — and refused after it even when the browser still holds it, the token's own expiry and its stored record alike; logout with it still succeeds |
+| refresh-token-lifetime | A refresh token is accepted only within its lifetime from issue — each refresh issues a new one — and refused after it even when the browser still holds it; logout with it still succeeds |
+| access-token-only | Only the access token the server issued opens a protected request; the refresh token works only to refresh and to log out |
+| signed-in-devices | Up to 5 devices stay signed in at once; signing in on one more silently ends the session of the device that refreshed least recently and keeps every other one |
 | no-open-redirect | After sign-in only an in-app `redirect` target is followed (no open redirect) |
 | captcha-counts-login-only | Only failed sign-ins lead to the captcha: after 5 in a session the login demands it, a wrong captcha keeps demanding it, a successful login starts over; a failed request elsewhere (an expired session) never counts |
 | logout-ends-on-login | Logout ends on `/login` also when the request fails; account deletion ends there once the account is deleted or the session has already ended, and keeps the user signed in on any other failure |

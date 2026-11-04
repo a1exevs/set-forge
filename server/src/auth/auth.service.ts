@@ -43,7 +43,7 @@ export class AuthService {
     return AuthService.buildResponsePayload(user, token, refresh, this.tokensService.getRefreshTokenExpiration());
   }
 
-  public async refresh(currentRefreshToken: string): Promise<IAuthenticationResult> {
+  public async refresh(currentRefreshToken: unknown): Promise<IAuthenticationResult> {
     const { user, accessToken, refreshToken } =
       await this.tokensService.updateAccessRefreshTokensFromRefreshToken(currentRefreshToken);
     return AuthService.buildResponsePayload(
@@ -88,7 +88,7 @@ export class AuthService {
     );
   }
 
-  public async logout(refreshToken: string): Promise<void> {
+  public async logout(refreshToken: unknown): Promise<void> {
     await this.tokensService.revokeRefreshToken(refreshToken);
   }
 

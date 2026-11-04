@@ -15,7 +15,7 @@ export const Docs = {
 
   REFRESH_TOKENS_ENDPOINT: 'Refresh access tokens',
   REFRESH_TOKENS_SUCCESSFUL_RESULT: 'Tokens refreshed successfully',
-  REFRESH_TOKENS_UNAUTHORIZED: 'No refresh cookie, or its token is malformed, expired, unknown or revoked',
+  REFRESH_TOKENS_UNAUTHORIZED: 'No refresh cookie, or its token is unknown or expired',
 
   GET_CURRENT_USER_ENDPOINT: 'Get current user',
   GET_CURRENT_USER_SUCCESSFUL_RESULT: 'Current user retrieved successfully',
