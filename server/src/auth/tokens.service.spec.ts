@@ -70,6 +70,9 @@ describe('TokensService', () => {
   let refreshTokensService: RefreshTokensService;
   let store: StoredToken[];
   const mockUser = getMockUser() as unknown as User;
+  // The service reads only the stored fields, so a stored row stands in for the model.
+  const lookUp = async (tokenHash: string): Promise<RefreshToken | null> =>
+    (store.find(t => t.tokenHash === tokenHash) as RefreshToken | undefined) ?? null;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -92,7 +95,7 @@ describe('TokensService', () => {
               store.push(token);
               return token;
             }),
-            findTokenByHash: jest.fn(async (tokenHash: string) => store.find(t => t.tokenHash === tokenHash) ?? null),
+            findTokenByHash: jest.fn(lookUp),
             removeTokenByHash: jest.fn(async (tokenHash: string) => {
               const before = store.length;
               store = store.filter(t => t.tokenHash !== tokenHash);
@@ -132,6 +135,23 @@ describe('TokensService', () => {
   afterEach(() => {
     jest.useRealTimers();
   });
+
+  /** Holds every lookup after it has read the table until `parties` lookups have; returns how many arrived. */
+  const holdLookupsUntil = (parties: number): (() => number) => {
+    let arrived = 0;
+    let release: () => void = () => undefined;
+    const everyone = new Promise<void>(resolve => (release = resolve));
+    jest.mocked(refreshTokensService.findTokenByHash).mockImplementation(async tokenHash => {
+      const token = await lookUp(tokenHash);
+      arrived += 1;
+      if (arrived === parties) {
+        release();
+      }
+      await everyone;
+      return token;
+    });
+    return () => arrived;
+  };
 
   describe('TokensService - definition', () => {
     it('TokensService - should be defined', () => {
@@ -173,6 +193,14 @@ describe('TokensService', () => {
       expect(refreshTokensService.createRefreshToken).toBeCalledTimes(1);
       expect(refreshTokensService.createRefreshToken).toBeCalledWith(mockUser.id, sha256(token), ttl);
       expect(store.some(t => t.tokenHash === token)).toBe(false);
+    });
+    // @invariant session/deletion-during-sign-in
+    it('should issue nothing when the user is gone', async () => {
+      jest.mocked(refreshTokensService.createRefreshToken).mockResolvedValueOnce(null);
+
+      await expect(
+        tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn()),
+      ).resolves.toBeNull();
     });
     it('should issue a different value every time', async () => {
       const ttl = TokensService.getRefreshTokenExpiresIn();
@@ -224,6 +252,17 @@ describe('TokensService', () => {
       });
       expect(refreshTokensService.findTokenByHash).toBeCalledTimes(0);
     });
+    // @invariant session/deletion-during-sign-in
+    it('should answer REFRESH_TOKEN_NOT_FOUND when the user is gone by the time the new token is stored', async () => {
+      const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
+      jest.mocked(refreshTokensService.createRefreshToken).mockResolvedValueOnce(null);
+
+      await expect(tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken)).rejects.toMatchObject({
+        status: HttpStatus.UNAUTHORIZED,
+        message: ErrorMessages.REFRESH_TOKEN_NOT_FOUND,
+      });
+      expect(store).toHaveLength(0);
+    });
     it('should answer REFRESH_TOKEN_NOT_FOUND and spend the token when its user is gone', async () => {
       const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
       jest.spyOn(userService, 'getUserById').mockResolvedValue(null);
@@ -233,6 +272,43 @@ describe('TokensService', () => {
         message: ErrorMessages.REFRESH_TOKEN_NOT_FOUND,
       });
       expect(store).toHaveLength(0);
+    });
+    // @invariant session/refresh-token-single-use
+    it('should give a new token to only one of two refreshes that read the same record', async () => {
+      const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
+      const bothRead = holdLookupsUntil(2);
+
+      const results = await Promise.allSettled([
+        tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken),
+        tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken),
+      ]);
+
+      expect(bothRead()).toBe(2);
+      expect(results.map(result => result.status).sort()).toEqual(['fulfilled', 'rejected']);
+      expect(results.find(result => result.status === 'rejected')).toMatchObject({
+        reason: { status: HttpStatus.UNAUTHORIZED, message: ErrorMessages.REFRESH_TOKEN_NOT_FOUND },
+      });
+      expect(store).toHaveLength(1);
+    });
+    // @invariant session/refresh-token-single-use
+    it('should refuse a refresh whose record a logout removed after the refresh read it', async () => {
+      const refreshToken = await tokensService.generateRefreshToken(mockUser, TokensService.getRefreshTokenExpiresIn());
+      let logout: Promise<void> = Promise.resolve();
+      jest.mocked(refreshTokensService.findTokenByHash).mockImplementationOnce(async tokenHash => {
+        const token = await lookUp(tokenHash);
+        logout = tokensService.revokeRefreshToken(refreshToken);
+        await logout;
+        return token;
+      });
+      jest.spyOn(tokensService, 'generateRefreshToken');
+
+      await expect(tokensService.updateAccessRefreshTokensFromRefreshToken(refreshToken)).rejects.toMatchObject({
+        status: HttpStatus.UNAUTHORIZED,
+        message: ErrorMessages.REFRESH_TOKEN_NOT_FOUND,
+      });
+      await logout;
+      expect(store).toHaveLength(0);
+      expect(tokensService.generateRefreshToken).toBeCalledTimes(0);
     });
     // @invariant session/refresh-token-lifetime
     it('should answer REFRESH_TOKEN_EXPIRED and spend the token used after its lifetime', async () => {

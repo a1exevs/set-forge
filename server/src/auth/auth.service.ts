@@ -30,6 +30,9 @@ export class AuthService {
 
     const token = await this.tokensService.generateAccessToken(user);
     const refresh = await this.tokensService.generateRefreshToken(user, TokensService.getRefreshTokenExpiresIn());
+    if (!refresh) {
+      throw AppException.of(HttpStatus.BAD_REQUEST, 'FAILED_TO_CREATE_USER');
+    }
 
     return AuthService.buildResponsePayload(user, token, refresh, this.tokensService.getRefreshTokenExpiration());
   }
@@ -39,6 +42,10 @@ export class AuthService {
 
     const token = await this.tokensService.generateAccessToken(user);
     const refresh = await this.tokensService.generateRefreshToken(user, TokensService.getRefreshTokenExpiresIn());
+    // session/deletion-during-sign-in: answered as a sign-in after the deletion.
+    if (!refresh) {
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'INVALID_EMAIL_OR_PASSWORD');
+    }
 
     return AuthService.buildResponsePayload(user, token, refresh, this.tokensService.getRefreshTokenExpiration());
   }

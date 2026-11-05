@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { getModelToken } from '@nestjs/sequelize';
+import { getConnectionToken, getModelToken } from '@nestjs/sequelize';
 import { Test, TestingModule } from '@nestjs/testing';
-import { FindOptions } from 'sequelize';
+import { FindOptions, UniqueConstraintError } from 'sequelize';
 
 import { ErrorMessages } from '@common/constants';
 import { ErrorItemResponse } from '@common/dto';
@@ -18,9 +18,12 @@ describe('UsersService', () => {
   let usersService: UsersService;
   let model: typeof User;
   let rolesService: RolesService;
+  let connection: { transaction: jest.Mock };
+  const transaction = { id: 'tx-1' };
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    connection = { transaction: jest.fn(async (cb: (t: unknown) => unknown) => cb(transaction)) };
 
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
@@ -40,6 +43,7 @@ describe('UsersService', () => {
             getRoleByValue: jest.fn(x => x),
           },
         },
+        { provide: getConnectionToken(), useValue: connection },
       ],
     }).compile();
     usersService = moduleRef.get<UsersService>(UsersService);
@@ -83,9 +87,42 @@ describe('UsersService', () => {
           acceptedPrivacyVersion: 1,
           acceptedAt: expect.any(Date),
         }),
+        { transaction },
       );
       expect(mockUser.$set).toBeCalledTimes(1);
-      expect(mockUser.$set).toBeCalledWith('roles', [mockRole.id]);
+      expect(mockUser.$set).toBeCalledWith('roles', [mockRole.id], { transaction });
+    });
+    // @invariant session/user-has-role
+    it('should store the user and its role in one transaction and fail as a whole when the role fails', async () => {
+      const dto: CreateUserRequest.Dto = { email: 'email', password: 'password' };
+      const mockRole: Partial<Role> = { id: 1, value: 'user' };
+      const roleFailure = new Error('roles insert failed');
+      const mockUser: Partial<User> = { $set: jest.fn(() => Promise.reject(roleFailure)), id: 1, roles: [] };
+      jest.spyOn(rolesService, 'getRoleByValue').mockResolvedValue(mockRole as Role);
+      jest.spyOn(model, 'create').mockResolvedValue(mockUser as User);
+
+      await expect(usersService.createUser(dto)).rejects.toMatchObject({
+        status: HttpStatus.BAD_REQUEST,
+        errors: [new ErrorItemResponse.Dto('FAILED_TO_CREATE_USER')],
+        cause: roleFailure,
+      });
+      expect(connection.transaction).toBeCalledTimes(1);
+      expect(model.create).toBeCalledWith(expect.anything(), { transaction });
+      expect(mockUser.$set).toBeCalledWith('roles', [mockRole.id], { transaction });
+    });
+    // @invariant session/email-unique
+    it('should answer USER_ALREADY_EXISTS when the email is taken at the insert', async () => {
+      const dto: CreateUserRequest.Dto = { email: 'email', password: 'password' };
+      const mockRole: Partial<Role> = { id: 1, value: 'user' };
+      const taken = new UniqueConstraintError({ message: 'Duplicate entry for key users.email' });
+      jest.spyOn(rolesService, 'getRoleByValue').mockResolvedValue(mockRole as Role);
+      jest.spyOn(model, 'create').mockRejectedValue(taken);
+
+      await expect(usersService.createUser(dto)).rejects.toMatchObject({
+        status: HttpStatus.CONFLICT,
+        errors: [new ErrorItemResponse.Dto('USER_ALREADY_EXISTS')],
+        cause: taken,
+      });
     });
     it('should throw exception (roles configuration was missing)', async () => {
       const dto: CreateUserRequest.Dto = { email: 'email', password: 'password' };
@@ -129,6 +166,7 @@ describe('UsersService', () => {
             acceptedPrivacyVersion: 1,
             acceptedAt: expect.any(Date),
           }),
+          { transaction },
         );
         expect(mockUser.$set).toBeCalledTimes(0);
       }

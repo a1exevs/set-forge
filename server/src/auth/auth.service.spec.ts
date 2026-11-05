@@ -160,6 +160,17 @@ describe('AuthService', () => {
         spyHashF.mockRestore();
       }
     });
+    it('Registration method: should fail when the new user is gone before its refresh token is stored', async () => {
+      const mockCreatedUser = { id: 1, email: 'user@yandex.com' };
+      jest.spyOn(userService, 'getUserByEmail').mockResolvedValue(null);
+      jest.spyOn(userService, 'createUser').mockResolvedValue(mockCreatedUser as User);
+      jest.spyOn(tokenService, 'generateRefreshToken').mockResolvedValue(null);
+
+      await expect(authService.registration({ email: mockCreatedUser.email, password: '1234' })).rejects.toMatchObject({
+        status: HttpStatus.BAD_REQUEST,
+        errors: [new ErrorItemResponse.Dto('FAILED_TO_CREATE_USER')],
+      });
+    });
   });
 
   describe('AuthService - login', () => {
@@ -203,6 +214,18 @@ describe('AuthService', () => {
       expect(tokenService.generateAccessToken).toBeCalledWith(mockUser);
       expect(tokenService.generateRefreshToken).toBeCalledTimes(1);
       expect(tokenService.generateRefreshToken).toBeCalledWith(mockUser, TokensService.getRefreshTokenExpiresIn());
+    });
+    // @invariant session/deletion-during-sign-in
+    it('Login method: should be unauthorized when the account is deleted before the refresh token is stored', async () => {
+      const password = '1234';
+      const mockUser = { id: 1, email: 'user@yandex.com', password: await bcrypt.hash(password, 5) };
+      jest.spyOn(userService, 'getUserByEmail').mockResolvedValue(mockUser as User);
+      jest.spyOn(tokenService, 'generateRefreshToken').mockResolvedValue(null);
+
+      await expect(authService.login({ email: mockUser.email, password })).rejects.toMatchObject({
+        status: HttpStatus.UNAUTHORIZED,
+        errors: [new ErrorItemResponse.Dto('INVALID_EMAIL_OR_PASSWORD')],
+      });
     });
     it('Login method: should be unauthorized (user with email not found)', async () => {
       const email = 'user@yandex.com';

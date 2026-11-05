@@ -1,6 +1,6 @@
 import { getModelToken } from '@nestjs/sequelize';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Op } from 'sequelize';
+import { ForeignKeyConstraintError, Op } from 'sequelize';
 
 import { RefreshToken } from '@auth/refresh-tokens.model';
 import { MAX_SIGNED_IN_DEVICES, RefreshTokensService } from '@auth/refresh-tokens.service';
@@ -99,6 +99,20 @@ describe('RefreshTokensService', () => {
       await refreshTokensService.createRefreshToken(1, TOKEN_HASH, TTL);
 
       expect(destroyFn).toHaveBeenLastCalledWith({ where: { uuid: ['uuid-1', 'uuid-2'] } });
+    });
+    // @invariant session/deletion-during-sign-in
+    it('should store nothing and return null when the user is gone at the insert', async () => {
+      mockStore(0);
+      jest.spyOn(RefreshToken.prototype, 'save').mockRejectedValue(new ForeignKeyConstraintError({}));
+
+      await expect(refreshTokensService.createRefreshToken(1, TOKEN_HASH, TTL)).resolves.toBeNull();
+    });
+    it('should pass any other failure of the insert on', async () => {
+      mockStore(0);
+      const failure = new Error('connection lost');
+      jest.spyOn(RefreshToken.prototype, 'save').mockRejectedValue(failure);
+
+      await expect(refreshTokensService.createRefreshToken(1, TOKEN_HASH, TTL)).rejects.toBe(failure);
     });
   });
 
