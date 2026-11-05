@@ -1,4 +1,4 @@
-FROM node:22.23.2-alpine AS deps
+FROM node:26.13.0-alpine AS deps
 WORKDIR /app
 ENV HUSKY=0
 COPY package.json package-lock.json ./
@@ -12,7 +12,7 @@ WORKDIR /app
 COPY server ./server
 RUN npm run build -w @set-forge/server
 
-FROM node:22.23.2-alpine AS production
+FROM node:26.13.0-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
 ENV HUSKY=0
