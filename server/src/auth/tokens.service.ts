@@ -26,12 +26,19 @@ export class TokensService {
     return this.jwtService.signAsync(payload, { subject: String(user.id) });
   }
 
-  /** An opaque random value, not a JWT: only its stored record gives it meaning — session/access-token-only. */
-  public async generateRefreshToken(user: User, ttl: number): Promise<string> {
+  /**
+   * An opaque random value, not a JWT: only its stored record gives it meaning — session/access-token-only.
+   * `null` when the user no longer exists, so no token is issued (session/deletion-during-sign-in).
+   */
+  public async generateRefreshToken(user: User, ttl: number): Promise<string | null> {
     const refreshToken = randomBytes(REFRESH_TOKEN_BYTES).toString('base64url');
-    await this.refreshTokensService.createRefreshToken(user.id, TokensService.hashRefreshToken(refreshToken), ttl);
+    const stored = await this.refreshTokensService.createRefreshToken(
+      user.id,
+      TokensService.hashRefreshToken(refreshToken),
+      ttl,
+    );
 
-    return refreshToken;
+    return stored ? refreshToken : null;
   }
 
   public async updateAccessRefreshTokensFromRefreshToken(
@@ -79,8 +86,11 @@ export class TokensService {
       throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_NOT_FOUND');
     }
 
-    // A token works once: the record goes before any further check, so a refused token is spent as well.
-    await this.refreshTokensService.removeTokenByHash(tokenHash);
+    // Only the request whose delete removed the record goes on, so a token racing itself or a logout is spent once
+    // (session/refresh-token-single-use); it goes before any further check, so a refused token is spent as well.
+    if ((await this.refreshTokensService.removeTokenByHash(tokenHash)) === 0) {
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_NOT_FOUND');
+    }
 
     // session/refresh-token-lifetime
     if (token.expires.getTime() <= Date.now()) {
@@ -94,6 +104,11 @@ export class TokensService {
     }
 
     const newRefreshToken = await this.generateRefreshToken(user, TokensService.getRefreshTokenExpiresIn());
+
+    // session/deletion-during-sign-in: answered as when the user was gone at the lookup above.
+    if (!newRefreshToken) {
+      throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_NOT_FOUND');
+    }
 
     return { user, newRefreshToken };
   }
