@@ -26,7 +26,8 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lin
 
 | Id | Invariant |
 |---|---|
-| email-unique | Email is unique |
+| email-unique | Email is unique: a registration with a taken email is told the email is taken — also the one that loses a race of two registrations with one email |
+| user-has-role | A user never exists without the user role: registration stores both or neither, so a failed registration leaves the email free |
 | separate-consent | Registration requires `consent` and `termsAccepted`, both explicitly true, validated separately |
 | register-password-confirmed | Registration requires the password typed twice and both values equal; the confirmation never leaves the browser |
 | pending-derived | Pending acceptance is derived from accepted vs required versions (legacy users included) |
@@ -35,6 +36,8 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lin
 | deletion-cascade | Account deletion removes every user-owned row (DB cascade) |
 | refresh-single-flight | Concurrent token refreshes share one request |
 | refresh-token-lifetime | A refresh token is accepted only within its lifetime from issue — each refresh issues a new one — and refused after it even when the browser still holds it; logout with it still succeeds |
+| refresh-token-single-use | A refresh token is spent by its first use also when requests overlap: of refreshes racing with one token only one gets a new token, and a refresh racing the logout of its token gets none, so a logged-out user stays logged out |
+| deletion-during-sign-in | A sign-in or a refresh that overlaps the deletion of its account is answered as unauthenticated and leaves no session behind |
 | access-token-only | Only the access token the server issued opens a protected request; the refresh token works only to refresh and to log out |
 | signed-in-devices | Up to 5 devices stay signed in at once; signing in on one more silently ends the session of the device that refreshed least recently and keeps every other one |
 | no-open-redirect | After sign-in only an in-app `redirect` target is followed (no open redirect) |
@@ -88,7 +91,8 @@ revoke the refresh token on the server and clear the refresh cookie, which every
 it is answered as unauthenticated — the same answer as for an expired access token — so another tab ends on `/login`
 with its next data request, without waiting for its access token to expire. Logout succeeds whatever state the refresh
 token is in — expired, damaged or already revoked: the cookie is cleared and the token's record, when the server can
-tell which one it is, removed. A refresh with such a token is answered as unauthenticated.
+tell which one it is, removed. A refresh with such a token is answered as unauthenticated. Two tabs refreshing with
+the shared cookie at the same moment get one new token between them: the other tab ends on `/login`.
 
 ## Map
 
