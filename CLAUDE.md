@@ -31,6 +31,7 @@
 | Rule | Scope |
 |------|-------|
 | [server-api](.claude/rules/server-api.md) | NestJS API, DTO, Swagger |
+| [database-migrations](.claude/rules/database-migrations.md) | Migrations keep the previous release working: expand / contract, `@contract` |
 | [domain-docs](.claude/rules/domain-docs.md) | `docs/domains/`, what domain docs hold and never duplicate |
 | [component-architecture](.claude/rules/component-architecture.md) | Client data / logic / presentation layers |
 | [fsd-architecture](.claude/rules/fsd-architecture.md) | FSD layers, slices, segments, imports |
