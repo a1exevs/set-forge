@@ -270,7 +270,7 @@ SESSION_SECRET_KEY=long_random_string_2
 # Current legal-document versions (default 1). Bump when a document changes
 # materially — users who accepted an older version are prompted to re-accept.
 TERMS_VERSION=1
-PRIVACY_VERSION=1
+PRIVACY_VERSION=2
 ```
 
 Generate secrets:
@@ -375,22 +375,105 @@ Expect HTTP 200.
 
 ## 12. Update the application
 
-After a new release (GitHub tag):
+### 12.1. Update to a release
+
+After a new release (GitHub tag), read its release notes — a release that changes a legal document says so, and
+then increment `TERMS_VERSION` / `PRIVACY_VERSION` in `server/.production.env` first ([§8.3](#83-legal-documents--privacy)).
+Then one command:
 
 ```bash
 cd ~/set-forge
-git fetch --tags
-git checkout vX.X.X          # new version
-npm run prod:down
-npm run prod:up
-npm run prod:db:migrate      # if the release includes new migrations
+npm run prod:update -- vX.X.X
 ```
 
-If needed — new seeders (rare):
+Without a version it prints the latest release and changes nothing. The steps ([`scripts/prod-update.ts`](scripts/prod-update.ts)):
+
+| # | Step | The site |
+|---|------|----------|
+| 1 | Check the checkout: the tag exists, no local changes, the stack is running | serves the running release |
+| 2 | Check out the release tag | serves the running release |
+| 3 | Build the images | serves the running release |
+| 4 | Back up the database ([§12.2](#122-backups)) | serves the running release |
+| 5 | Apply the migrations with the new image | serves the running release on the new schema |
+| 6 | Switch: recreate the changed containers and wait until they are healthy | down for the seconds of the switch |
+| 7 | Check `/api/1.0/health` through nginx | serves the new release |
+| 8 | Remove the unused (dangling) images | serves the new release |
+
+- **A failure in steps 2–5** puts the checkout back on the running release; the running containers are not touched.
+  The message names the step and the backup. A migration that failed half-way may leave part of its changes — check
+  `npm run prod:db:migrate:status` and [restore the backup](#123-restore-from-a-backup) if the schema is broken.
+- **A failure in steps 6–7** exits with an error and prints the [rollback](#124-roll-back-a-release).
+- The running release keeps serving on the new schema until the switch, and it is the rollback target — so every
+  migration keeps the previous release working (the [database-migrations rule](.claude/rules/database-migrations.md)).
+- Seeders are not run by the update; a release that adds one says so — then `npm run prod:db:seed`.
+
+**First update to a release with `prod:update`.** A checkout of an older release has no `prod:update` yet: check
+out the new release by hand once, then run the command with the same version.
 
 ```bash
-npm run prod:db:seed
+git fetch --tags
+git checkout vX.X.X
+npm run prod:update -- vX.X.X
 ```
+
+### 12.2. Backups
+
+Every update backs up the database before the migrations; `npm run prod:db:backup` takes one by hand (an optional
+label: `npm run prod:db:backup -- daily`). A backup is a gzip `mysqldump` of the database in `~/set-forge-backups/`
+(or the folder in the `BACKUP_DIR` environment variable), named `set-forge-<UTC date-time>-<label>.sql.gz` — the
+label is `before-<version>` for an update, `manual` by default. A `before-<version>` backup holds the schema and data
+of the release that ran before that version.
+
+- Each new backup removes the ones older than **30 days** and keeps at most the **10** newest
+  ([`scripts/prod-backup.ts`](scripts/prod-backup.ts)). The 30 days are what the Privacy Policy promises for the
+  personal data in backups ("Where and how long data is stored") — a change of the period is a change of the policy
+  ([personal-data-compliance rule](.claude/rules/personal-data-compliance.md)).
+- A backup holds every user's personal data: the files are readable by their owner only, and they stay on the VDS —
+  except a copy for local debugging ([§15](#15-copy-production-database-to-local-dev)), deleted after use.
+
+**Daily backup (required, once per server).** Old backups are removed only when a new one is taken, so without
+releases a backup would outlive the 30 days. A daily backup keeps the promise and bounds the data you can lose to a
+day. As the user that runs the stack (in the `docker` group), `crontab -e` and add:
+
+```bash
+15 3 * * * cd "$HOME/set-forge" && npm run prod:db:backup -- daily >> "$HOME/set-forge-backup.log" 2>&1
+```
+
+With a custom `BACKUP_DIR`, set it in the same line (`BACKUP_DIR=/path npm run …`). Check it the next day:
+`ls -lt ~/set-forge-backups/ && tail ~/set-forge-backup.log`.
+
+### 12.3. Restore from a backup
+
+> **Warning:** this replaces the whole production database with the backup; everything written after it is lost.
+
+```bash
+cd ~/set-forge
+ls -lt ~/set-forge-backups/                      # pick the backup
+docker compose --profile prod stop server-prod client-prod
+
+docker compose --profile prod exec -T mysql sh -c \
+  'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -e "DROP DATABASE \`$MYSQL_DATABASE\`; CREATE DATABASE \`$MYSQL_DATABASE\`;"'
+
+gunzip -c ~/set-forge-backups/<backup>.sql.gz | docker compose --profile prod exec -T mysql sh -c \
+  'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysql -uroot "$MYSQL_DATABASE"'
+
+npm run prod:update -- <release of the backup>
+```
+
+The last command starts the stack on the release whose schema the backup holds (for `before-vX.X.X` — the release
+that ran before `vX.X.X`); its migrations are already applied, so step 5 changes nothing.
+
+### 12.4. Roll back a release
+
+```bash
+npm run prod:update -- <previous version>
+```
+
+The previous release runs on the schema of the newer one (the migrations keep it working), so a rollback is an update
+to the older tag; the update prints this command when its health check fails. When the newer release has broken the
+data, [restore the backup](#123-restore-from-a-backup) taken before it instead. Undoing a migration by hand
+(`npm run prod:db:migrate:undo`) is the last resort. A successful update removes the images of the previous release
+(step 8), so a rollback builds them again — minutes, while the newer release keeps serving.
 
 ---
 
@@ -398,10 +481,13 @@ npm run prod:db:seed
 
 | Command | Description |
 |---------|-------------|
+| `npm run prod:update -- vX.X.X` | Update to a release: build, back up, migrate, switch, check ([§12.1](#121-update-to-a-release)) |
+| `npm run prod:db:backup` | Back up the database ([§12.2](#122-backups)) |
 | `npm run prod:up` | Build and start the stack |
 | `npm run prod:down` | Stop and remove containers |
 | `npm run prod:logs` | Logs for Caddy, API, client, MySQL |
 | `npm run prod:db:migrate` | Migrations in the prod container |
+| `npm run prod:db:migrate:status` | Applied and pending migrations |
 | `npm run prod:db:seed` | Initial data (roles) |
 | `docker compose --profile prod ps` | Container status |
 
@@ -618,40 +704,21 @@ Use this when you need real prod data on your Mac (debugging, TablePlus inspecti
 ```bash
 ssh root@185.10.20.30          # replace with your VDS IP
 cd ~/set-forge
-
-docker compose --profile prod exec mysql sh -c \
-  'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" \
-    --single-transaction \
-    --routines \
-    --triggers \
-    "$MYSQL_DATABASE"' \
-  > ~/set-forge-prod-$(date +%Y%m%d-%H%M).sql
-
-ls -lh ~/set-forge-prod-*.sql
-head -20 ~/set-forge-prod-*.sql
+npm run prod:db:backup         # prints the path of the new backup
 ```
 
-- `--single-transaction` — consistent dump without locking InnoDB tables.
-- `--routines --triggers` — stored procedures and triggers (if any).
-
-Optional — compress a large dump:
-
-```bash
-gzip ~/set-forge-prod-*.sql
-```
+The dump is a regular backup ([§12.2](#122-backups)): a consistent `mysqldump` (`--single-transaction`, with
+routines and triggers), gzip-compressed, in `~/set-forge-backups/`.
 
 ### 15.2. Download the dump to your Mac
 
 ```bash
-scp root@185.10.20.30:~/set-forge-prod-*.sql ~/Downloads/
+scp root@185.10.20.30:~/set-forge-backups/set-forge-YYYYMMDD-HHMMSSZ-manual.sql.gz ~/Downloads/
+gunzip ~/Downloads/set-forge-YYYYMMDD-HHMMSSZ-manual.sql.gz
 ```
 
-If you compressed the file:
-
-```bash
-scp root@185.10.20.30:~/set-forge-prod-*.sql.gz ~/Downloads/
-gunzip ~/Downloads/set-forge-prod-*.sql.gz
-```
+Replace the name with the one `prod:db:backup` printed. Delete the local copy when you are done — it holds every
+user's personal data.
 
 ### 15.3. Start local MySQL
 
@@ -675,7 +742,7 @@ Before importing, make sure **both** local env files use the **same** name:
 If names differ, import may fail on `USE set_forge` statements inside the dump. Either align the values or rewrite the dump:
 
 ```bash
-sed 's/set_forge/change_me_db/g' ~/Downloads/set-forge-prod-*.sql > ~/Downloads/set-forge-local.sql
+sed 's/set_forge/change_me_db/g' ~/Downloads/set-forge-*-manual.sql > ~/Downloads/set-forge-local.sql
 ```
 
 ### 15.5. Wipe local data and import
@@ -690,10 +757,10 @@ docker compose --profile dev exec mysql-dev sh -c \
 
 docker compose --profile dev exec -T mysql-dev sh -c \
   'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"' \
-  < ~/Downloads/set-forge-prod-YYYYMMDD-HHMM.sql
+  < ~/Downloads/set-forge-YYYYMMDD-HHMMSSZ-manual.sql
 ```
 
-Replace `set-forge-prod-YYYYMMDD-HHMM.sql` with the actual filename.
+Replace `set-forge-YYYYMMDD-HHMMSSZ-manual.sql` with the actual filename.
 
 Verify:
 

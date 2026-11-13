@@ -131,6 +131,8 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 
 | Command | Description |
 |--------|-------------|
+| `npm run prod:update -- vX.X.X` | Update the production stack to a release: build, back up, migrate, switch, check health ([`DEPLOY-SELECTEL.md`](DEPLOY-SELECTEL.md#12-update-the-application)) |
+| `npm run prod:db:backup` | Back up the production database (kept 30 days, at most 10) |
 | `npm run prod:up` | Production compose up (`--build -d`): Caddy + client (nginx) + server + MySQL |
 | `npm run prod:down` | Production compose down |
 | `npm run prod:logs` | Caddy + server + client + MySQL logs (`-f`) |
@@ -203,6 +205,8 @@ The browser and API use the same origin. The frontend calls `/api/1.0/...`, ngin
 npm run prod:db:migrate         # creates roles, users, users_roles, refreshTokens, user_*
 npm run prod:db:seed            # inserts default `user` / `admin` roles (idempotent)
 ```
+
+Later releases are applied with `npm run prod:update -- vX.X.X`, which runs the pending migrations itself; every migration keeps the previous release working ([database-migrations rule](.claude/rules/database-migrations.md)).
 
 For local development against `mysql-dev`, the equivalent flow is `npm run db:up` → `npm run server:db:migrate` → `npm run server:db:seed`. See [`server/README.md`](server/README.md#database-schema-sequelize-migrations) for full details and how to add new migrations.
 
