@@ -14,7 +14,7 @@ describe('LoginRequest', () => {
       expect(errors.length).toBe(0);
     });
     it('should be successful result (with captcha)', async () => {
-      const dto = new LoginRequest.Dto('test@gmail.com', '12345678', '1234');
+      const dto = new LoginRequest.Dto('test@gmail.com', '12345678', '1234', '0b6d3c2e-6f6a-4c55-9a43-2f6f3b5b1c7e');
       const errors = await validateDto(LoginRequest.Dto, dto);
       expect(errors.length).toBe(0);
     });
@@ -41,6 +41,13 @@ describe('LoginRequest', () => {
       expect(errors[1].constraints.isLength).toBeUndefined();
       expect(errors[2].property).toBe('captcha');
       expect(errors[2].constraints.isString).toBe(ErrorMessages.MUST_BE_A_STRING);
+    });
+    it('should has an error (captchaId is not a UUID)', async () => {
+      const dto = new LoginRequest.Dto('test@gmail.com', '12345678', '1234', 'not-a-uuid');
+      const errors = await validateDto(LoginRequest.Dto, dto);
+      expect(errors.length).toBe(1);
+      expect(errors[0].property).toBe('captchaId');
+      expect(errors[0].constraints.isUuid).toBe(ErrorMessages.MUST_BE_A_UUID);
     });
   });
 });

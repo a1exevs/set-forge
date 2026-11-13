@@ -23,7 +23,7 @@ const PRIVACY_OPERATOR = {
 } as const;
 
 /** Effective date of the current version. Bump when the policy text changes. */
-export const PRIVACY_EFFECTIVE_DATE = '2026-07-18';
+export const PRIVACY_EFFECTIVE_DATE = '2026-11-13';
 
 const ru: LegalContent = {
   title: 'Политика обработки персональных данных',
@@ -45,6 +45,7 @@ const ru: LegalContent = {
             'пароль — хранится в виде криптографического хеша; исходный пароль Оператор не хранит и доступа к нему не имеет;',
             'данные о тренировках, которые вы вносите сами (списки упражнений, веса, повторения, история подходов);',
             'технические данные и журналы: IP-адрес, дата и время обращения, запрошенный URL, сведения о браузере и устройстве (user-agent), идентификатор сессии — сохраняются в журналах веб-сервера и приложения для обеспечения работы и безопасности Сервиса;',
+            'сведения о неудачных попытках входа: псевдонимы адреса электронной почты и IP-адреса (необратимые хеши) и время попытки — для защиты от подбора пароля;',
             'строго необходимые cookie для поддержания авторизованной сессии.',
           ],
         },
@@ -97,6 +98,10 @@ const ru: LegalContent = {
         {
           type: 'p',
           text: 'Технические данные и журналы (IP-адрес, user-agent, идентификатор сессии и т. п.) хранятся не более 12 месяцев.',
+        },
+        {
+          type: 'p',
+          text: 'Сведения о неудачной попытке входа хранятся 15 минут с момента попытки, ответ на показанную капчу — 5 минут; затем они удаляются автоматически.',
         },
       ],
     },
@@ -172,6 +177,7 @@ const en: LegalContent = {
             'password — stored as a cryptographic hash; the Operator does not store or have access to the original password;',
             'workout data you enter yourself (exercise lists, weights, reps, set history);',
             'technical data and logs: IP address, date and time of the request, requested URL, browser and device information (user-agent), session identifier — recorded in the web-server and application logs to operate and secure the Service;',
+            'failed sign-in attempts: pseudonyms of the email address and the IP address (irreversible hashes) and the time of the attempt — to protect against password guessing;',
             'strictly necessary cookies to keep your session signed in.',
           ],
         },
@@ -220,6 +226,10 @@ const en: LegalContent = {
         {
           type: 'p',
           text: 'Technical data and logs (IP address, user-agent, session identifier, etc.) are kept for no more than 12 months.',
+        },
+        {
+          type: 'p',
+          text: 'A failed sign-in attempt is kept for 15 minutes from the attempt, the answer to a shown captcha for 5 minutes; then they are deleted automatically.',
         },
       ],
     },

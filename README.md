@@ -35,7 +35,7 @@ Without Claude, the same steps by hand: install the prerequisites, then
 ```bash
 npm install
 npm run setup:env          # .env, server/.development.env, server/.e2e.env from their examples
-npm run db:up              # wait until `docker compose --profile dev ps` shows mysql-dev healthy (~20 s on the first run)
+npm run db:up              # wait until `docker compose --profile dev ps` shows mysql-dev and redis-dev healthy (~20 s on the first run)
 npm run server:db:migrate && npm run server:db:seed
 npm run client:e2e:install # once, for the client e2e
 ```
@@ -123,7 +123,7 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 
 | Command | Description |
 |--------|-------------|
-| `npm run db:up` | `docker compose --profile dev up -d mysql-dev` |
+| `npm run db:up` | `docker compose --profile dev up -d mysql-dev redis-dev` |
 | `npm run db:down` | `docker compose --profile dev down` |
 | `npm run db:logs` | MySQL logs (`-f`) |
 
@@ -131,7 +131,7 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 
 | Command | Description |
 |--------|-------------|
-| `npm run prod:up` | Production compose up (`--build -d`): Caddy + client (nginx) + server + MySQL |
+| `npm run prod:up` | Production compose up (`--build -d`): Caddy + client (nginx) + server + MySQL + Redis |
 | `npm run prod:down` | Production compose down |
 | `npm run prod:logs` | Caddy + server + client + MySQL logs (`-f`) |
 | `npm run prod:db:migrate` / `:undo` / `:status` | Run Sequelize migrations inside the running prod `server-prod` container |
@@ -139,10 +139,11 @@ Run from the **repository root**. Names mirror `package.json` workspaces and sha
 
 #### Production topology (`--profile prod`)
 
-A single `npm run prod:up` builds and starts four containers:
+A single `npm run prod:up` builds and starts five containers:
 
 - `mysql` — no host port (API reaches it as `mysql:3306` on the compose network only).
-- **Dev:** `mysql-dev` (profile `dev`) maps `127.0.0.1:${MYSQL_PUBLIC_PORT:-3306}` for tools on the host (`npm run db:up`).
+- `redis` — no host port (API reaches it as `redis:6379`): the captcha answers and the failed sign-in counts, append-only file on the `redis_data_prod` volume.
+- **Dev:** `mysql-dev` (profile `dev`) maps `127.0.0.1:${MYSQL_PUBLIC_PORT:-3306}` and `redis-dev` maps `127.0.0.1:${REDIS_PUBLIC_PORT:-6379}` for tools on the host (`npm run db:up`).
 - `server-prod` — Nest API, **internal-only** (no host port; reachable inside the compose network as `server-prod:5000`).
 - `client-prod` — nginx (image built from [`client/Dockerfile`](client/Dockerfile)) serving the built SPA on internal port 80. nginx also reverse-proxies `/api/` to `server-prod:5000` (see [`client/nginx.conf`](client/nginx.conf)).
 - `caddy` — public TLS reverse proxy in front of `client-prod`; binds `${HTTP_PORT:-80}` and `${HTTPS_PORT:-443}` on the host and serves the whole app on one HTTPS origin.

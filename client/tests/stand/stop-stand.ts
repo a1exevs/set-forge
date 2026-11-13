@@ -5,7 +5,7 @@
  *   npm run client:stand:stop -- --slot=<k>   the stand in slot k
  *   npm run client:stand:stop -- --list       print the running stands
  *
- * The stand stops itself — Nest, Vite and MySQL through its own handles, like on Ctrl+C: macOS / Linux get a
+ * The stand stops itself — Nest, Vite, MySQL and Redis through its own handles, like on Ctrl+C: macOS / Linux get a
  * SIGTERM, Windows has no signal to send a process, so the stand polls for a stop file in `.runtime/` (see
  * `stopRequestPath`). A stand that does not exit in time is killed with its process tree, and whatever a kill may
  * miss — a listener on the stand's ports, its container — is removed afterwards from the registry's record.
@@ -65,17 +65,17 @@ function askToStop(entry: StandEntry): void {
 }
 
 /**
- * A stand asked to stop while it starts finishes the start first, and until its MySQL runs there is no container id
- * in the registry to fall back on — so the grace period begins once the container is recorded, or the stand is gone.
+ * A stand asked to stop while it starts finishes the start first, and until its containers run there are no container
+ * ids in the registry to fall back on — so the grace period begins once they are recorded, or the stand is gone.
  */
 async function waitForContainer(entry: StandEntry): Promise<void> {
-  if (entry.containerId) {
+  if (entry.containerIds.length > 0) {
     return;
   }
-  log(`Slot ${entry.slot} is still starting, waiting for its container…`);
+  log(`Slot ${entry.slot} is still starting, waiting for its containers…`);
   const deadline = Date.now() + STAND_START_TIMEOUT_MS;
   while (Date.now() < deadline && isProcessAlive(entry.pid)) {
-    if (findStand(CLIENT_ROOT, entry.slot)?.containerId !== null) {
+    if ((findStand(CLIENT_ROOT, entry.slot)?.containerIds.length ?? 1) > 0) {
       return;
     }
     await sleep(500);

@@ -4,12 +4,18 @@ import * as bcrypt from 'bcryptjs';
 
 import { GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto';
 import { IAuthenticationResult } from '@auth/interfaces';
+import { SignInAttempt, SignInAttemptsService } from '@auth/sign-in-attempts.service';
 import { TokensService } from '@auth/tokens.service';
-import { DocumentVersions } from '@common/constants';
+import { DocumentVersions, ErrorCode, ResultCodes } from '@common/constants';
+import { ErrorItemResponse } from '@common/dto';
 import { AppException } from '@common/exceptions';
+import { SecurityService } from '@security/security.service';
 import { CreateUserRequest } from '@users/dto';
 import { User } from '@users/users.model';
 import { UsersService } from '@users/users.service';
+
+// Compared against when the email names no account, so an unknown email costs the same time as a wrong password.
+const NO_ACCOUNT_PASSWORD_HASH = bcrypt.hashSync('no account has this password', 5);
 
 @Injectable()
 export class AuthService {
@@ -17,6 +23,8 @@ export class AuthService {
     private userService: UsersService,
     private jwtService: JwtService,
     private tokensService: TokensService,
+    private signInAttempts: SignInAttemptsService,
+    private securityService: SecurityService,
   ) {}
 
   public async registration(dto: RegisterRequest.Dto): Promise<IAuthenticationResult> {
@@ -37,8 +45,18 @@ export class AuthService {
     return AuthService.buildResponsePayload(user, token, refresh, this.tokensService.getRefreshTokenExpiration());
   }
 
-  async login(dto: LoginRequest.Dto): Promise<IAuthenticationResult> {
+  /** session/captcha-counts-login-only: the attempt is counted first, the password checked only after the captcha. */
+  async login(dto: LoginRequest.Dto, address: string): Promise<IAuthenticationResult> {
+    const attempt = await this.signInAttempts.reserve(dto.email, address);
+    if (attempt.demandsCaptcha && !(await this.securityService.solvesCaptcha(dto.captchaId, dto.captcha))) {
+      throw AuthService.captchaDemanded(['NEED_AUTHORIZATION_WITH_CAPTCHA']);
+    }
+
     const user = await this.validateUser(dto);
+    if (!user) {
+      throw AuthService.signInFailed(attempt);
+    }
+    await this.signInAttempts.succeeded(attempt);
 
     const token = await this.tokensService.generateAccessToken(user);
     const refresh = await this.tokensService.generateRefreshToken(user, TokensService.getRefreshTokenExpiresIn());
@@ -107,15 +125,23 @@ export class AuthService {
     return this.userService.deleteUser(userId);
   }
 
-  private async validateUser(dto: CreateUserRequest.Dto) {
+  /** The user the email and the password name, or null — an unknown email and a wrong password look the same. */
+  private async validateUser(dto: CreateUserRequest.Dto): Promise<User | null> {
     const user = await this.userService.getUserByEmail(dto.email, true);
-    if (user) {
-      const passwordsEqual = await bcrypt.compare(dto.password, user.password);
-      if (passwordsEqual) {
-        return user;
-      }
+    const passwordsEqual = await bcrypt.compare(dto.password, user?.password ?? NO_ACCOUNT_PASSWORD_HASH);
+    return user && passwordsEqual ? user : null;
+  }
+
+  private static signInFailed(attempt: SignInAttempt): AppException {
+    if (attempt.nextDemandsCaptcha) {
+      return AuthService.captchaDemanded(['INVALID_EMAIL_OR_PASSWORD', 'NEED_AUTHORIZATION_WITH_CAPTCHA']);
     }
-    throw AppException.of(HttpStatus.UNAUTHORIZED, 'INVALID_EMAIL_OR_PASSWORD');
+    return AppException.of(HttpStatus.UNAUTHORIZED, 'INVALID_EMAIL_OR_PASSWORD');
+  }
+
+  private static captchaDemanded(codes: ErrorCode[]): AppException {
+    const errors = codes.map(code => new ErrorItemResponse.Dto(code));
+    return new AppException(HttpStatus.UNAUTHORIZED, errors, undefined, ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
   }
 
   private static buildResponsePayload(

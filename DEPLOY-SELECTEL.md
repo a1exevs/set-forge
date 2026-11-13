@@ -262,15 +262,19 @@ MYSQL_DB=set_forge
 MYSQL_PASSWORD=strong_db_password
 MYSQL_PORT=3306
 
+# `redis` is the docker-compose service name.
+REDIS_HOST=redis
+REDIS_PORT=6379
+
 SERVER_STATIC=static
 SERVER_LOGS=logs
 JWT_SECRET_KEY=long_random_string_1
-SESSION_SECRET_KEY=long_random_string_2
+SIGN_IN_LIMIT_SECRET_KEY=long_random_string_2
 
 # Current legal-document versions (default 1). Bump when a document changes
 # materially — users who accepted an older version are prompted to re-accept.
 TERMS_VERSION=1
-PRIVACY_VERSION=1
+PRIVACY_VERSION=2
 ```
 
 Generate secrets:
@@ -702,7 +706,7 @@ docker compose --profile dev exec mysql-dev sh -c \
   'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" -e "SHOW TABLES;"'
 ```
 
-Expected tables include `roles`, `users`, `users_roles`, `refreshTokens`, `workout_lists`, `workout_exercises`, `SequelizeMeta`, and possibly `sessions`.
+Expected tables include `roles`, `users`, `users_roles`, `refreshTokens`, `workout_lists`, `workout_exercises`, `SequelizeMeta`.
 
 No `npm run server:db:migrate` or `server:db:seed` after a full dump — schema and data are already included.
 
@@ -763,7 +767,7 @@ Wait until `mysql-dev` is **healthy** (`docker compose --profile dev ps`), then 
 | Topic | What to expect |
 |-------|----------------|
 | Prod user passwords | Work locally — bcrypt hashes are in the dump |
-| Prod sessions / JWT | May not work — local `SESSION_SECRET_KEY` and `JWT_SECRET_KEY` differ |
+| Prod sign-ins / JWT | May not work — local `JWT_SECRET_KEY` differs; Redis (captchas, failed sign-in counts) is not in the dump |
 | Static uploads (avatars) | Not in the SQL dump — files live in the `server_static` Docker volume on the VDS |
 
 ---

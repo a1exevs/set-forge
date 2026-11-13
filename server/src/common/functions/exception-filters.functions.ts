@@ -8,6 +8,7 @@ import { AppException } from '@common/exceptions';
 export type ErrorResult = {
   status: number;
   errors: ErrorItemResponse.Dto[];
+  resultCode?: number;
 };
 
 // A Nest exception (a bare `new NotFoundException()`, routing, body parsing) has no code of its own: its status names it.
@@ -37,7 +38,7 @@ const isClientHttpError = (exception: unknown): exception is ClientHttpError =>
 /** Any thrown value as the status and the error items of the response. */
 export function toErrorResult(exception: unknown): ErrorResult {
   if (exception instanceof AppException) {
-    return { status: exception.getStatus(), errors: exception.errors };
+    return { status: exception.getStatus(), errors: exception.errors, resultCode: exception.resultCode };
   }
   if (exception instanceof HttpException) {
     const status = exception.getStatus();
@@ -63,10 +64,6 @@ export function toErrorBody(
   return new CommonResponse.Dto({ messages: errors.map(toMessage), fieldsErrors: errors, resultCode });
 }
 
-export function sendErrorResponse(
-  response: Response,
-  { status, errors }: ErrorResult,
-  resultCode: number = ResultCodes.ERROR,
-): void {
+export function sendErrorResponse(response: Response, { status, errors, resultCode }: ErrorResult): void {
   response.status(status).json(toErrorBody(errors, resultCode));
 }

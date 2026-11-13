@@ -7,10 +7,10 @@ export {
 } from './model/auth-validation';
 export { emailToAvatarLetter } from './model/avatar-letter';
 export { bootstrapSessionAndPrimeCache, getCachedCurrentUser } from './model/bootstrap-session';
-export { isNeedCaptchaEnvelope } from './model/captcha';
+export { type Captcha, isNeedCaptchaEnvelope } from './model/captcha';
 export {
   useAcceptDocumentsMutation,
-  useCaptchaUrlMutation,
+  useCaptchaMutation,
   useClearSessionCache,
   useCurrentUserQuery,
   useDeleteAccountMutation,

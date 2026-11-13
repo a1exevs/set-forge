@@ -157,7 +157,7 @@ Run in this order and stop at the first failure (fix, then continue):
 ```bash
 npm run client:build
 npm run server:build
-npm run db:up                  # mysql-dev on 127.0.0.1:3306
+npm run db:up                  # mysql-dev on 127.0.0.1:3306, redis-dev on 127.0.0.1:6379
 ```
 
 Before the migrations, wait until MySQL is healthy — the container needs ~20 s to initialize on the first run,

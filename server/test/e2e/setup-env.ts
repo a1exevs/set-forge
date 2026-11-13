@@ -15,3 +15,5 @@ process.env.MYSQL_PORT = runtimeEnv.MYSQL_PORT;
 process.env.MYSQL_USER = runtimeEnv.MYSQL_USER;
 process.env.MYSQL_PASSWORD = runtimeEnv.MYSQL_PASSWORD;
 process.env.MYSQL_DB = runtimeEnv.MYSQL_DB;
+process.env.REDIS_HOST = runtimeEnv.REDIS_HOST;
+process.env.REDIS_PORT = runtimeEnv.REDIS_PORT;
