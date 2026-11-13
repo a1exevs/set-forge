@@ -27,6 +27,7 @@ const ERROR_TEXTS: Record<ErrorCode, ErrorText> = {
   FORBIDDEN: (t, params) => t('errors.FORBIDDEN', params),
   NOT_ENOUGH_PERMISSIONS: (t, params) => t('errors.NOT_ENOUGH_PERMISSIONS', params),
   INVALID_EMAIL_OR_PASSWORD: (t, params) => t('errors.INVALID_EMAIL_OR_PASSWORD', params),
+  SIGN_IN_TEMPORARILY_UNAVAILABLE: (t, params) => t('errors.SIGN_IN_TEMPORARILY_UNAVAILABLE', params),
   USER_ROLE_CONFIGURATION_IS_MISSING: (t, params) => t('errors.USER_ROLE_CONFIGURATION_IS_MISSING', params),
   REFRESH_TOKEN_EXPIRED: (t, params) => t('errors.REFRESH_TOKEN_EXPIRED', params),
   REFRESH_TOKEN_NOT_FOUND: (t, params) => t('errors.REFRESH_TOKEN_NOT_FOUND', params),

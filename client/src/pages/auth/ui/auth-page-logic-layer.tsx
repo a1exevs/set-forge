@@ -2,6 +2,7 @@ import type { Nullable } from '@alexevs/ts-guards';
 import { FC, FormEvent, useCallback, useState } from 'react';
 
 import {
+  type Captcha,
   isNeedCaptchaEnvelope,
   validateLoginEmail,
   validateLoginPassword,
@@ -24,7 +25,7 @@ type Props = {
   onRegister: (input: RegisterInput) => Promise<void>;
   /** The next step after a successful login or registration. */
   onAuthenticated: (redirectTo: string | undefined) => Promise<void>;
-  loadCaptchaUrl: () => Promise<string>;
+  loadCaptcha: () => Promise<Captcha>;
 };
 
 const AuthPageLogicLayer: FC<Props> = ({
@@ -33,7 +34,7 @@ const AuthPageLogicLayer: FC<Props> = ({
   onLogin,
   onRegister,
   onAuthenticated,
-  loadCaptchaUrl,
+  loadCaptcha,
 }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -41,7 +42,8 @@ const AuthPageLogicLayer: FC<Props> = ({
   const [consent, setConsent] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [captcha, setCaptcha] = useState('');
-  const [captchaImageUrl, setCaptchaImageUrl] = useState<string | null>(null);
+  // The answer goes back with the id of the image it was read from
+  const [shownCaptcha, setShownCaptcha] = useState<Nullable<Captcha>>(null);
   const [showCaptcha, setShowCaptcha] = useState(false);
   // Codes and the rejected request, not texts: an error on screen follows a language switch
   const [fieldErrors, setFieldErrors] = useState<AuthFieldErrors>({});
@@ -103,7 +105,11 @@ const AuthPageLogicLayer: FC<Props> = ({
 
       try {
         const done = await run('submit', () =>
-          onLogin({ email: email.trim(), password, captcha: showCaptcha ? captcha.trim() : undefined }),
+          onLogin({
+            email: email.trim(),
+            password,
+            captcha: showCaptcha && shownCaptcha ? { id: shownCaptcha.id, answer: captcha.trim() } : undefined,
+          }),
         );
         if (!done) {
           return;
@@ -111,17 +117,16 @@ const AuthPageLogicLayer: FC<Props> = ({
         await onAuthenticated(redirectTo);
         setShowCaptcha(false);
         setCaptcha('');
-        setCaptchaImageUrl(null);
+        setShownCaptcha(null);
       } catch (err) {
         const loginFields: AuthField[] = ['email', 'password', 'captcha'];
         if (err instanceof ApiRequestError && isNeedCaptchaEnvelope(err.envelope)) {
           setShowCaptcha(true);
           setCaptcha('');
           try {
-            const url = await loadCaptchaUrl();
-            setCaptchaImageUrl(url);
+            setShownCaptcha(await loadCaptcha());
           } catch {
-            setCaptchaImageUrl(null);
+            setShownCaptcha(null);
           }
           setFailure({ error: err, fields: loginFields, fallback: 'captchaDemanded' });
           return;
@@ -136,7 +141,7 @@ const AuthPageLogicLayer: FC<Props> = ({
       consent,
       termsAccepted,
       email,
-      loadCaptchaUrl,
+      loadCaptcha,
       onAuthenticated,
       onLogin,
       onRegister,
@@ -166,7 +171,7 @@ const AuthPageLogicLayer: FC<Props> = ({
       consent={consent}
       termsAccepted={termsAccepted}
       captcha={captcha}
-      captchaImageUrl={captchaImageUrl}
+      captchaImageUrl={shownCaptcha?.imageUrl ?? null}
       showCaptcha={showCaptcha}
       emailError={errorOf('email')}
       passwordError={errorOf('password')}
