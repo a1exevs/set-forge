@@ -7,6 +7,7 @@ import { AuthService } from '@auth/auth.service';
 import { LoginRequest, RegisterRequest } from '@auth/dto';
 import { SignInAttempt, SignInAttemptsService } from '@auth/sign-in-attempts.service';
 import { TokensService } from '@auth/tokens.service';
+import { TrustedDevicesService } from '@auth/trusted-devices.service';
 import { ResultCodes } from '@common/constants';
 import { ErrorItemResponse } from '@common/dto';
 import { AppException } from '@common/exceptions';
@@ -22,8 +23,11 @@ describe('AuthService', () => {
   let tokenService: TokensService;
   let signInAttempts: { reserve: jest.Mock; succeeded: jest.Mock };
   let securityService: { solvesCaptcha: jest.Mock };
+  let trustedDevices: { isTrusted: jest.Mock; trust: jest.Mock };
 
   const ADDRESS = '203.0.113.7';
+  const DEVICE = 'device-token';
+  const DEVICE_TRUST = { token: 'device-token', expires: new Date('2027-02-16T12:00:00.000Z') };
   const attempt = (demandsCaptcha = false, nextDemandsCaptcha = false): SignInAttempt => ({
     accountAndAddressKey: 'sign-in:account-address:k',
     accountKey: 'sign-in:account:k',
@@ -36,6 +40,10 @@ describe('AuthService', () => {
     jest.clearAllMocks();
     signInAttempts = { reserve: jest.fn().mockResolvedValue(attempt()), succeeded: jest.fn() };
     securityService = { solvesCaptcha: jest.fn().mockResolvedValue(false) };
+    trustedDevices = {
+      isTrusted: jest.fn().mockResolvedValue(false),
+      trust: jest.fn().mockResolvedValue(DEVICE_TRUST),
+    };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -65,6 +73,7 @@ describe('AuthService', () => {
         },
         { provide: SignInAttemptsService, useValue: signInAttempts },
         { provide: SecurityService, useValue: securityService },
+        { provide: TrustedDevicesService, useValue: trustedDevices },
       ],
     }).compile();
 
@@ -124,7 +133,7 @@ describe('AuthService', () => {
         return hashedPassword;
       });
 
-      const result = await authService.registration(registerDto);
+      const result = await authService.registration(registerDto, DEVICE);
 
       expect(result.status).toBe('success');
       expect(result.data.payload.accessToken).toBe(accessToken);
@@ -165,7 +174,7 @@ describe('AuthService', () => {
       });
 
       try {
-        await authService.registration(registerDto);
+        await authService.registration(registerDto, DEVICE);
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(HttpStatus.CONFLICT);
@@ -184,7 +193,9 @@ describe('AuthService', () => {
       jest.spyOn(userService, 'createUser').mockResolvedValue(mockCreatedUser as User);
       jest.spyOn(tokenService, 'generateRefreshToken').mockResolvedValue(null);
 
-      await expect(authService.registration({ email: mockCreatedUser.email, password: '1234' })).rejects.toMatchObject({
+      await expect(
+        authService.registration({ email: mockCreatedUser.email, password: '1234' } as RegisterRequest.Dto, DEVICE),
+      ).rejects.toMatchObject({
         status: HttpStatus.BAD_REQUEST,
         errors: [new ErrorItemResponse.Dto('FAILED_TO_CREATE_USER')],
       });
@@ -220,7 +231,7 @@ describe('AuthService', () => {
         return expiration;
       });
 
-      const result = await authService.login(loginDto, ADDRESS);
+      const result = await authService.login(loginDto, ADDRESS, DEVICE);
 
       expect(result.status).toBe('success');
       expect(result.data.payload.accessToken).toBe(accessToken);
@@ -232,7 +243,7 @@ describe('AuthService', () => {
       expect(tokenService.generateAccessToken).toBeCalledWith(mockUser);
       expect(tokenService.generateRefreshToken).toBeCalledTimes(1);
       expect(tokenService.generateRefreshToken).toBeCalledWith(mockUser, TokensService.getRefreshTokenExpiresIn());
-      expect(signInAttempts.reserve).toBeCalledWith(email, ADDRESS);
+      expect(signInAttempts.reserve).toBeCalledWith(email, ADDRESS, false);
       expect(signInAttempts.succeeded).toBeCalledTimes(1);
     });
     // @invariant session/deletion-during-sign-in
@@ -242,7 +253,7 @@ describe('AuthService', () => {
       jest.spyOn(userService, 'getUserByEmail').mockResolvedValue(mockUser as User);
       jest.spyOn(tokenService, 'generateRefreshToken').mockResolvedValue(null);
 
-      await expect(authService.login({ email: mockUser.email, password }, ADDRESS)).rejects.toMatchObject({
+      await expect(authService.login({ email: mockUser.email, password }, ADDRESS, DEVICE)).rejects.toMatchObject({
         status: HttpStatus.UNAUTHORIZED,
         errors: [new ErrorItemResponse.Dto('INVALID_EMAIL_OR_PASSWORD')],
       });
@@ -258,7 +269,7 @@ describe('AuthService', () => {
       });
 
       try {
-        await authService.login(loginDto, ADDRESS);
+        await authService.login(loginDto, ADDRESS, DEVICE);
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(401);
@@ -286,7 +297,7 @@ describe('AuthService', () => {
       });
 
       try {
-        await authService.login(loginDto, ADDRESS);
+        await authService.login(loginDto, ADDRESS, DEVICE);
         sendPseudoError();
       } catch (error) {
         expect(error.status).toBe(401);
@@ -315,7 +326,7 @@ describe('AuthService', () => {
       const compare = jest.spyOn(bcrypt, 'compare');
 
       await expect(
-        authService.login({ email: mockUser.email, password, captcha: 'wrong', captchaId: 'id-1' }, ADDRESS),
+        authService.login({ email: mockUser.email, password, captcha: 'wrong', captchaId: 'id-1' }, ADDRESS, DEVICE),
       ).rejects.toMatchObject({
         status: HttpStatus.UNAUTHORIZED,
         errors: [new ErrorItemResponse.Dto('NEED_AUTHORIZATION_WITH_CAPTCHA')],
@@ -333,6 +344,7 @@ describe('AuthService', () => {
       const result = await authService.login(
         { email: mockUser.email, password, captcha: 'aB3d', captchaId: 'id-1' },
         ADDRESS,
+        DEVICE,
       );
 
       expect(result.status).toBe('success');
@@ -340,7 +352,7 @@ describe('AuthService', () => {
     });
 
     it('should not look at the captcha while the count is under its threshold', async () => {
-      await authService.login({ email: mockUser.email, password }, ADDRESS);
+      await authService.login({ email: mockUser.email, password }, ADDRESS, DEVICE);
 
       expect(securityService.solvesCaptcha).not.toBeCalled();
     });
@@ -348,7 +360,9 @@ describe('AuthService', () => {
     it('should announce the captcha with the failure that reaches the threshold', async () => {
       signInAttempts.reserve.mockResolvedValue(attempt(false, true));
 
-      await expect(authService.login({ email: mockUser.email, password: 'wrong' }, ADDRESS)).rejects.toMatchObject({
+      await expect(
+        authService.login({ email: mockUser.email, password: 'wrong' }, ADDRESS, DEVICE),
+      ).rejects.toMatchObject({
         status: HttpStatus.UNAUTHORIZED,
         errors: [
           new ErrorItemResponse.Dto('INVALID_EMAIL_OR_PASSWORD'),
@@ -363,24 +377,73 @@ describe('AuthService', () => {
       jest.spyOn(userService, 'getUserByEmail').mockResolvedValue(null);
       const compare = jest.spyOn(bcrypt, 'compare');
 
-      await expect(authService.login({ email: 'nobody@yandex.com', password }, ADDRESS)).rejects.toMatchObject({
+      await expect(authService.login({ email: 'nobody@yandex.com', password }, ADDRESS, DEVICE)).rejects.toMatchObject({
         status: HttpStatus.UNAUTHORIZED,
         errors: [new ErrorItemResponse.Dto('INVALID_EMAIL_OR_PASSWORD')],
         resultCode: ResultCodes.ERROR,
       });
       expect(compare).toBeCalledTimes(1);
-      expect(signInAttempts.reserve).toBeCalledWith('nobody@yandex.com', ADDRESS);
+      expect(signInAttempts.reserve).toBeCalledWith('nobody@yandex.com', ADDRESS, false);
     });
 
     it('should start the count over once the password is right, before the sign-in is stored', async () => {
       jest.spyOn(tokenService, 'generateRefreshToken').mockResolvedValue(null);
 
-      await expect(authService.login({ email: mockUser.email, password }, ADDRESS)).rejects.toMatchObject({
+      await expect(authService.login({ email: mockUser.email, password }, ADDRESS, DEVICE)).rejects.toMatchObject({
         status: HttpStatus.UNAUTHORIZED,
         errors: [new ErrorItemResponse.Dto('INVALID_EMAIL_OR_PASSWORD')],
         resultCode: ResultCodes.ERROR,
       });
       expect(signInAttempts.succeeded).toBeCalledTimes(1);
+    });
+  });
+
+  // @invariant session/trusted-device
+  describe('AuthService - login on a trusted device', () => {
+    const password = '1234';
+    let mockUser: { id: number; email: string; password: string };
+
+    beforeEach(async () => {
+      mockUser = { id: 1, email: 'user@yandex.com', password: await bcrypt.hash(password, 5) };
+      jest.spyOn(userService, 'getUserByEmail').mockResolvedValue(mockUser as User);
+      jest.spyOn(tokenService, 'generateRefreshToken').mockResolvedValue('refresh');
+    });
+
+    it('should count a trusted device apart from the account-wide count', async () => {
+      trustedDevices.isTrusted.mockResolvedValue(true);
+
+      await authService.login({ email: mockUser.email, password }, ADDRESS, DEVICE);
+
+      expect(trustedDevices.isTrusted).toBeCalledWith(DEVICE, mockUser.email);
+      expect(signInAttempts.reserve).toBeCalledWith(mockUser.email, ADDRESS, true);
+    });
+
+    it('should trust the device for the user after a sign-in and hand the trust to the answer', async () => {
+      const result = await authService.login({ email: mockUser.email, password }, ADDRESS, DEVICE);
+
+      expect(trustedDevices.trust).toBeCalledWith(mockUser.id, DEVICE);
+      expect(result.data.deviceTrust).toEqual(DEVICE_TRUST);
+    });
+
+    it('should not trust the device after a failed sign-in', async () => {
+      await expect(
+        authService.login({ email: mockUser.email, password: 'wrong' }, ADDRESS, DEVICE),
+      ).rejects.toBeInstanceOf(AppException);
+
+      expect(trustedDevices.trust).not.toBeCalled();
+    });
+
+    it('should trust the device a user registers on', async () => {
+      jest.spyOn(userService, 'getUserByEmail').mockResolvedValue(null);
+      jest.spyOn(userService, 'createUser').mockResolvedValue(mockUser as User);
+
+      const result = await authService.registration(
+        { email: mockUser.email, password, consent: true, termsAccepted: true } as RegisterRequest.Dto,
+        DEVICE,
+      );
+
+      expect(trustedDevices.trust).toBeCalledWith(mockUser.id, DEVICE);
+      expect(result.data.deviceTrust).toEqual(DEVICE_TRUST);
     });
   });
 

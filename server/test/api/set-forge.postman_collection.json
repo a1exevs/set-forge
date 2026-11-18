@@ -381,6 +381,7 @@
                       "    pm.response.to.have.status(201);",
                       "    pm.expect(pm.response.json().data.accessToken).to.be.a(\"string\");",
                       "    pm.expect(pm.cookies.has(\"refreshToken\")).to.be.true;",
+                      "    pm.expect(pm.cookies.has(\"trustedDevice\")).to.be.true;",
                       "});",
                       "var data = pm.response.json().data;",
                       "pm.collectionVariables.set(\"access_token\", data.accessToken);",

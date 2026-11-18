@@ -61,7 +61,7 @@ describe('SignInAttemptsService', () => {
       const service = await create();
       const before = Date.now();
 
-      const attempt = await service.reserve('user@example.com', '203.0.113.7');
+      const attempt = await service.reserve('user@example.com', '203.0.113.7', false);
 
       expect(redis.multi).toHaveBeenCalledTimes(1);
       const [commands] = redis.calls;
@@ -90,7 +90,7 @@ describe('SignInAttemptsService', () => {
     it('should keep no email or address in the keys', async () => {
       const service = await create();
 
-      const attempt = await service.reserve('user@example.com', '203.0.113.7');
+      const attempt = await service.reserve('user@example.com', '203.0.113.7', false);
 
       expect(attempt.accountAndAddressKey).toMatch(/^sign-in:account-address:[0-9a-f]{64}$/);
       expect(attempt.accountKey).toMatch(/^sign-in:account:[0-9a-f]{64}$/);
@@ -99,8 +99,8 @@ describe('SignInAttemptsService', () => {
     it('should count an email in any case and with spaces against one account', async () => {
       const service = await create();
 
-      const first = await service.reserve('User@Example.com ', '203.0.113.7');
-      const second = await service.reserve('user@example.com', '203.0.113.7');
+      const first = await service.reserve('User@Example.com ', '203.0.113.7', false);
+      const second = await service.reserve('user@example.com', '203.0.113.7', false);
 
       expect(first.accountKey).toBe(second.accountKey);
       expect(first.accountAndAddressKey).toBe(second.accountAndAddressKey);
@@ -109,16 +109,16 @@ describe('SignInAttemptsService', () => {
     it('should count each address of an account apart and every address against the account', async () => {
       const service = await create();
 
-      const first = await service.reserve('user@example.com', '203.0.113.7');
-      const second = await service.reserve('user@example.com', '198.51.100.9');
+      const first = await service.reserve('user@example.com', '203.0.113.7', false);
+      const second = await service.reserve('user@example.com', '198.51.100.9', false);
 
       expect(first.accountAndAddressKey).not.toBe(second.accountAndAddressKey);
       expect(first.accountKey).toBe(second.accountKey);
     });
 
     it('should make other keys with another secret', async () => {
-      const first = await (await create('one')).reserve('user@example.com', '203.0.113.7');
-      const second = await (await create('two')).reserve('user@example.com', '203.0.113.7');
+      const first = await (await create('one')).reserve('user@example.com', '203.0.113.7', false);
+      const second = await (await create('two')).reserve('user@example.com', '203.0.113.7', false);
 
       expect(first.accountKey).not.toBe(second.accountKey);
     });
@@ -135,7 +135,7 @@ describe('SignInAttemptsService', () => {
         counts = { accountAndAddress, account };
         const service = await create();
 
-        const attempt = await service.reserve('user@example.com', '203.0.113.7');
+        const attempt = await service.reserve('user@example.com', '203.0.113.7', false);
 
         expect(attempt.demandsCaptcha).toBe(demandsCaptcha);
         expect(attempt.nextDemandsCaptcha).toBe(nextDemandsCaptcha);
@@ -148,17 +148,63 @@ describe('SignInAttemptsService', () => {
       });
       const service = await create();
 
-      await expect(service.reserve('user@example.com', '203.0.113.7')).rejects.toMatchObject({
+      await expect(service.reserve('user@example.com', '203.0.113.7', false)).rejects.toMatchObject({
         status: HttpStatus.SERVICE_UNAVAILABLE,
         errors: [expect.objectContaining({ code: 'SIGN_IN_TEMPORARILY_UNAVAILABLE' })],
       });
     });
   });
 
+  // @invariant session/trusted-device
+  describe('reserve on a trusted device', () => {
+    it('should count only the account and address, leaving the account-wide window untouched', async () => {
+      const service = await create();
+
+      const attempt = await service.reserve('user@example.com', '203.0.113.7', true);
+
+      expect(attempt.accountKey).toBeNull();
+      expect(redis.calls[0]?.map(([name, key]) => [name, key])).toEqual([
+        ['zRemRangeByScore', attempt.accountAndAddressKey],
+        ['zAdd', attempt.accountAndAddressKey],
+        ['zCard', attempt.accountAndAddressKey],
+        ['pExpire', attempt.accountAndAddressKey],
+      ]);
+    });
+
+    it('should not demand the captcha for the account-wide threshold', async () => {
+      counts = { accountAndAddress: 1, account: CAPTCHA_AFTER_FAILS_PER_ACCOUNT + 10 };
+      redis = fakeRedis(() => [0, 1, counts.accountAndAddress, true]);
+      const service = await create();
+
+      const attempt = await service.reserve('user@example.com', '203.0.113.7', true);
+
+      expect(attempt.demandsCaptcha).toBe(false);
+      expect(attempt.nextDemandsCaptcha).toBe(false);
+    });
+
+    it('should still demand it for the account and address threshold', async () => {
+      redis = fakeRedis(() => [0, 1, CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS + 1, true]);
+      const service = await create();
+
+      const attempt = await service.reserve('user@example.com', '203.0.113.7', true);
+
+      expect(attempt.demandsCaptcha).toBe(true);
+    });
+
+    it('should start only the account and address over after a sign-in', async () => {
+      const service = await create();
+      const attempt = await service.reserve('user@example.com', '203.0.113.7', true);
+
+      await service.succeeded(attempt);
+
+      expect(redis.calls[1]).toEqual([['del', attempt.accountAndAddressKey]]);
+    });
+  });
+
   describe('succeeded', () => {
     it('should start the account and address over and take only this attempt from the account', async () => {
       const service = await create();
-      const attempt = await service.reserve('user@example.com', '203.0.113.7');
+      const attempt = await service.reserve('user@example.com', '203.0.113.7', false);
 
       await service.succeeded(attempt);
 

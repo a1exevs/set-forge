@@ -1,4 +1,5 @@
 export const Routes = {
+  API_PREFIX: 'api/1.0',
   ENDPOINT_AUTH: 'auth',
   ENDPOINT_SECURITY: 'security',
   ENDPOINT_WORKOUT_LISTS: 'workout-lists',

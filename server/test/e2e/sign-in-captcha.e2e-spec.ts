@@ -2,7 +2,11 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import { createClient } from 'redis';
 import * as request from 'supertest';
 
-import { CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS } from '@auth/sign-in-attempts.service';
+import {
+  CAPTCHA_AFTER_FAILS_PER_ACCOUNT,
+  CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS,
+  SignInAttemptsService,
+} from '@auth/sign-in-attempts.service';
 import { ResultCodes, Routes } from '@common/constants';
 import { CAPTCHA_LIFETIME_SECONDS } from '@security/security.service';
 import { REDIS_CLIENT, RedisClient } from '@src/redis';
@@ -115,7 +119,7 @@ describe('Sign-in captcha', () => {
     );
   });
 
-  it('checks one solved captcha against the password once, also when the attempts come at the same moment', async () => {
+  it('checks one solved captcha against the password once, also when attempts come at the same moment', async () => {
     const email = await newAccount();
     await failUntilCaptcha(email);
     const { captchaId, answer } = await newCaptcha();
@@ -164,7 +168,7 @@ describe('Sign-in captcha', () => {
     expect(ttl).toBeLessThanOrEqual(CAPTCHA_LIFETIME_SECONDS);
   });
 
-  it('sets no session cookie: a sign-in leaves only its refresh cookie and a captcha leaves none', async () => {
+  it('sets no session cookie: a sign-in sets the refresh cookie and the device mark, a captcha none', async () => {
     const email = await newAccount();
 
     const captcha = await request(app.getHttpServer()).get(`${api}/${Routes.ENDPOINT_SECURITY}/get-captcha-url`);
@@ -173,7 +177,66 @@ describe('Sign-in captcha', () => {
 
     expect(captcha.get('Set-Cookie')).toBeUndefined();
     expect(failed.get('Set-Cookie')).toBeUndefined();
-    expect(signedIn.get('Set-Cookie')?.map(cookie => cookie.split('=')[0])).toEqual(['refreshToken']);
+    expect(signedIn.get('Set-Cookie')?.map(cookie => cookie.split('=')[0])).toEqual(['refreshToken', 'trustedDevice']);
+  });
+
+  // @invariant session/trusted-device
+  describe('on a trusted device', () => {
+    const deviceCookie = (response: request.Response): string => {
+      const cookie = response.get('Set-Cookie')?.find(item => item.startsWith('trustedDevice='));
+      return cookie?.split(';')[0] ?? '';
+    };
+
+    // Failures from other addresses, the way a spread-out guessing reaches the account-wide threshold.
+    const failFromElsewhere = async (email: string): Promise<void> => {
+      const attempts = app.get(SignInAttemptsService);
+      for (let i = 0; i < CAPTCHA_AFTER_FAILS_PER_ACCOUNT; i++) {
+        await attempts.reserve(email, `198.51.100.${i}`, false);
+      }
+    };
+
+    it('signs the owner in without the captcha while an unknown device has to solve it', async () => {
+      const email = await newAccount();
+      const device = deviceCookie(await login({ email, password }).expect(HttpStatus.CREATED));
+      await failFromElsewhere(email);
+
+      await login({ email, password }).expect(response => {
+        expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
+        expect(codesOf(response)).toEqual(['NEED_AUTHORIZATION_WITH_CAPTCHA']);
+      });
+      await login({ email, password }).set('Cookie', 'trustedDevice=planted-value').expect(HttpStatus.UNAUTHORIZED);
+      await login({ email, password }).set('Cookie', device).expect(HttpStatus.CREATED);
+    });
+
+    it('keeps counting its own address', async () => {
+      const email = await newAccount();
+      const device = deviceCookie(await login({ email, password }).expect(HttpStatus.CREATED));
+      for (let i = 0; i < CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS; i++) {
+        await login({ email, password: wrongPassword }).set('Cookie', device);
+      }
+
+      await login({ email, password })
+        .set('Cookie', device)
+        .expect(response => expect(codesOf(response)).toEqual(['NEED_AUTHORIZATION_WITH_CAPTCHA']));
+    });
+
+    it('keeps the same mark after a sign-in and after a logout', async () => {
+      const email = await newAccount();
+      const first = await login({ email, password }).expect(HttpStatus.CREATED);
+      const device = deviceCookie(first);
+
+      const again = await login({ email, password }).set('Cookie', device).expect(HttpStatus.CREATED);
+      expect(deviceCookie(again)).toBe(device);
+      const logout = await request(app.getHttpServer())
+        .delete(`${api}/${Routes.ENDPOINT_AUTH}/logout`)
+        .auth(again.body.data.accessToken, { type: 'bearer' })
+        .set('Cookie', again.get('Set-Cookie') ?? []);
+      expect(logout.status).toBe(HttpStatus.OK);
+      expect(logout.get('Set-Cookie')?.some(cookie => cookie.startsWith('trustedDevice='))).toBeFalsy();
+
+      await failFromElsewhere(email);
+      await login({ email, password }).set('Cookie', device).expect(HttpStatus.CREATED);
+    });
   });
 
   describe('without its store', () => {
