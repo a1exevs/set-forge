@@ -90,6 +90,18 @@ describe('Sign-in captcha', () => {
       });
   });
 
+  it('counts each address of an account apart: failures from one demand no captcha from another', async () => {
+    const email = await newAccount();
+    for (let i = 0; i < CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS; i++) {
+      await login({ email, password: wrongPassword }).set('X-Forwarded-For', '198.51.100.20');
+    }
+
+    await login({ email, password })
+      .set('X-Forwarded-For', '198.51.100.20')
+      .expect(response => expect(codesOf(response)).toEqual(['NEED_AUTHORIZATION_WITH_CAPTCHA']));
+    await login({ email, password }).set('X-Forwarded-For', '198.51.100.21').expect(HttpStatus.CREATED);
+  });
+
   it('never counts a failed request elsewhere', async () => {
     const email = await newAccount();
     for (let i = 0; i < CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS; i++) {

@@ -254,6 +254,10 @@ export async function startApiStack({
     MYSQL_DB: container.getDatabase(),
     REDIS_HOST: redis.getHost(),
     REDIS_PORT: String(redis.getPort()),
+    // The suites sign in far more often than a person; the stand preset `rate-limit` sets the real value.
+    SIGN_IN_ATTEMPTS_PER_MINUTE: '1000',
+    // Requests may act from another address through X-Forwarded-For, as the production proxies pass it on.
+    TRUST_PROXY_HOPS: '1',
   };
 
   log('Migrating and seeding the database…');

@@ -78,6 +78,7 @@
     "SIGN_IN_TEMPORARILY_UNAVAILABLE": "Вход временно недоступен, попробуйте через минуту",
     "STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N": "Длина должна быть от {{min}} до {{max}} символов",
     "TERMS_ACCEPTANCE_IS_REQUIRED": "Нужно принять пользовательское соглашение",
+    "TOO_MANY_SIGN_IN_ATTEMPTS": "Слишком много попыток входа, повторите через {{seconds}} с",
     "UNAUTHORIZED": "Вы не авторизованы",
     "UNEXPECTED_RESPONSE": "Сервер ответил неожиданно",
     "UNPROCESSABLE_ENTITY": "Запрос не может быть обработан",

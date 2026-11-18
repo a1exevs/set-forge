@@ -785,9 +785,15 @@ Internet
    │
    ├──► [server-prod :5000]  ← Nest API
    │         │
-   │         ▼
-   └──    [mysql :3306]  ← Docker network only
+   │         ├──► [mysql :3306]  ← Docker network only
+   │         └──► [redis :6379]  ← captchas, failed sign-in counts, sign-in rate limit
 ```
+
+The API sees the client's own address because it trusts the two proxies in front of it: `TRUST_PROXY_HOPS: 2` is set
+on `server-prod` in [`docker-compose.yml`](docker-compose.yml), next to this chain. Adding or removing a proxy in front
+of the API changes that number in the same edit — otherwise every client is counted as one address and the sign-in
+rate limit (20 attempts a minute per address) refuses them all together. Caddy ignores an `X-Forwarded-For` sent by a
+client, so the address cannot be forged from outside.
 
 ---
 

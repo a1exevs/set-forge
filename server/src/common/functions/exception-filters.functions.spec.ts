@@ -50,6 +50,14 @@ describe('sendErrorResponse', () => {
 
     expect(JSON.parse(response._getData()).resultCode).toBe(ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
   });
+
+  it('should send the headers of the result', () => {
+    const response = createResponse();
+    const errors = [new ErrorItemResponse.Dto('UNAUTHORIZED')];
+    sendErrorResponse(response, { status: HttpStatus.TOO_MANY_REQUESTS, errors, headers: { 'Retry-After': '7' } });
+
+    expect(response.getHeader('Retry-After')).toBe('7');
+  });
 });
 
 describe('toErrorResult', () => {
@@ -59,6 +67,7 @@ describe('toErrorResult', () => {
       status: HttpStatus.CONFLICT,
       errors: exception.errors,
       resultCode: ResultCodes.ERROR,
+      headers: {},
     });
   });
 
@@ -66,8 +75,7 @@ describe('toErrorResult', () => {
     const exception = new AppException(
       HttpStatus.UNAUTHORIZED,
       [new ErrorItemResponse.Dto('NEED_AUTHORIZATION_WITH_CAPTCHA')],
-      undefined,
-      ResultCodes.NEED_CAPTCHA_AUTHORIZATION,
+      { resultCode: ResultCodes.NEED_CAPTCHA_AUTHORIZATION },
     );
     expect(toErrorResult(exception).resultCode).toBe(ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
   });

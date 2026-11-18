@@ -2975,6 +2975,61 @@
               ]
             }
           ]
+        },
+        {
+          "name": "rate limit",
+          "description": "The production limit of sign-in attempts per address (20 a minute) — `api` runs against a stand whose e2e env\nraises it, so the 429 is walked here, against a server with the real limit (the stand preset `rate-limit`, or\nproduction):\n\n1. Run `login (too many attempts)` 21 times within a minute (Postman Runner, 21 iterations): the 1st–20th answer\n   401, the 21st answers 429 with `TOO_MANY_SIGN_IN_ATTEMPTS`, its `seconds` and the `Retry-After` header.\n2. Wait `Retry-After` seconds: the next attempt answers 401 again.\n\nOther requests from the same address are not limited meanwhile.",
+          "item": [
+            {
+              "name": "login (too many attempts)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"401 within the limit, 429 with the wait over it\", function () {",
+                      "    pm.expect([401, 429]).to.include(pm.response.code);",
+                      "    if (pm.response.code === 429) {",
+                      "        var body = pm.response.json();",
+                      "        var seconds = Number(pm.response.headers.get(\"Retry-After\"));",
+                      "        pm.expect(body.fieldsErrors[0].code).to.eql(\"TOO_MANY_SIGN_IN_ATTEMPTS\");",
+                      "        pm.expect(body.fieldsErrors[0].params).to.eql({ seconds: seconds });",
+                      "        pm.expect(seconds).to.be.within(1, 60);",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"WrongPass123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
         }
       ]
     }

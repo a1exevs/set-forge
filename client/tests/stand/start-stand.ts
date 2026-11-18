@@ -3,7 +3,7 @@
  * ephemeral MySQL and Redis → Nest → Vite, on the ports of a free slot (`stand-registry.ts`), with the data of a
  * preset.
  *
- *   npm run client:stand -- [--preset=empty|user|data|history|reconsent]     (default: user)
+ *   npm run client:stand -- [--preset=empty|user|data|history|reconsent|rate-limit]     (default: user)
  *   npm run client:stand:stop                         (every stand of this checkout)
  *
  * Runs until Ctrl+C, SIGTERM or `client:stand:stop` (a signal, or on Windows the stop file of the slot), then stops

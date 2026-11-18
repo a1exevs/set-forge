@@ -78,6 +78,7 @@
     "SIGN_IN_TEMPORARILY_UNAVAILABLE": "Sign-in is temporarily unavailable, try again in a minute",
     "STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N": "Length must be greater than {{min}} and less than {{max}} characters",
     "TERMS_ACCEPTANCE_IS_REQUIRED": "Acceptance of the Terms of Use is required",
+    "TOO_MANY_SIGN_IN_ATTEMPTS": "Too many sign-in attempts, try again in {{seconds}} s",
     "UNAUTHORIZED": "User is not authorized",
     "UNEXPECTED_RESPONSE": "The server answered unexpectedly",
     "UNPROCESSABLE_ENTITY": "Unprocessable entity",

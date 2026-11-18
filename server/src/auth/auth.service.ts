@@ -60,6 +60,7 @@ export class AuthService {
    * trusted device is spared the account-wide count and has its trust renewed (session/trusted-device).
    */
   async login(dto: LoginRequest.Dto, address: string, deviceToken: unknown): Promise<IAuthenticationResult> {
+    await this.signInAttempts.checkRate(address);
     const trustedDevice = await this.trustedDevices.isTrusted(deviceToken, dto.email);
     const attempt = await this.signInAttempts.reserve(dto.email, address, trustedDevice);
     if (attempt.demandsCaptcha && !(await this.securityService.solvesCaptcha(dto.captchaId, dto.captcha))) {
@@ -162,7 +163,7 @@ export class AuthService {
 
   private static captchaDemanded(codes: ErrorCode[]): AppException {
     const errors = codes.map(code => new ErrorItemResponse.Dto(code));
-    return new AppException(HttpStatus.UNAUTHORIZED, errors, undefined, ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
+    return new AppException(HttpStatus.UNAUTHORIZED, errors, { resultCode: ResultCodes.NEED_CAPTCHA_AUTHORIZATION });
   }
 
   private static buildResponsePayload(

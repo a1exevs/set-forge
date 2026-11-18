@@ -21,7 +21,7 @@ describe('AuthService', () => {
   let userService: UsersService;
   let jwtService: JwtService;
   let tokenService: TokensService;
-  let signInAttempts: { reserve: jest.Mock; succeeded: jest.Mock };
+  let signInAttempts: { checkRate: jest.Mock; reserve: jest.Mock; succeeded: jest.Mock };
   let securityService: { solvesCaptcha: jest.Mock };
   let trustedDevices: { isTrusted: jest.Mock; trust: jest.Mock };
 
@@ -38,7 +38,7 @@ describe('AuthService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    signInAttempts = { reserve: jest.fn().mockResolvedValue(attempt()), succeeded: jest.fn() };
+    signInAttempts = { checkRate: jest.fn(), reserve: jest.fn().mockResolvedValue(attempt()), succeeded: jest.fn() };
     securityService = { solvesCaptcha: jest.fn().mockResolvedValue(false) };
     trustedDevices = {
       isTrusted: jest.fn().mockResolvedValue(false),
@@ -395,6 +395,29 @@ describe('AuthService', () => {
         resultCode: ResultCodes.ERROR,
       });
       expect(signInAttempts.succeeded).toBeCalledTimes(1);
+    });
+  });
+
+  // @invariant session/sign-in-rate-limit
+  describe('AuthService - login over the rate limit', () => {
+    it('should refuse before anything else: no trust lookup, no count, no password check', async () => {
+      signInAttempts.checkRate.mockRejectedValue(
+        new AppException(HttpStatus.TOO_MANY_REQUESTS, [
+          new ErrorItemResponse.Dto('TOO_MANY_SIGN_IN_ATTEMPTS', { seconds: 5 }),
+        ]),
+      );
+      const compare = jest.spyOn(bcrypt, 'compare');
+      compare.mockClear();
+
+      await expect(
+        authService.login({ email: 'user@yandex.com', password: '1234' }, ADDRESS, DEVICE),
+      ).rejects.toMatchObject({
+        status: HttpStatus.TOO_MANY_REQUESTS,
+      });
+      expect(signInAttempts.checkRate).toBeCalledWith(ADDRESS);
+      expect(trustedDevices.isTrusted).not.toBeCalled();
+      expect(signInAttempts.reserve).not.toBeCalled();
+      expect(compare).not.toBeCalled();
     });
   });
 

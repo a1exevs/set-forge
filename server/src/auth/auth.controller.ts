@@ -99,6 +99,11 @@ export class AuthController {
     },
   })
   @ApiErrorResult({
+    status: HttpStatus.TOO_MANY_REQUESTS,
+    description: Docs.AUTHORIZATION_TOO_MANY_REQUESTS,
+    cases: { tooManyAttempts: [{ code: 'TOO_MANY_SIGN_IN_ATTEMPTS', params: { seconds: 42 } }] },
+  })
+  @ApiErrorResult({
     status: HttpStatus.SERVICE_UNAVAILABLE,
     description: Docs.SIGN_IN_SERVICE_UNAVAILABLE,
     cases: { storeUnavailable: [{ code: 'SIGN_IN_TEMPORARILY_UNAVAILABLE' }] },
