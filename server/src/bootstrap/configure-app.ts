@@ -24,6 +24,15 @@ function setupCORS(app: INestApplication, whiteList: string[]) {
   });
 }
 
+// Behind proxies the socket is the nearest proxy; trusting their number makes `request.ip` the client's own address
+// (session/sign-in-rate-limit). None is trusted by default, so a client cannot claim an address of its own.
+function setupTrustProxy(app: INestApplication): void {
+  const hops = Number(process.env.TRUST_PROXY_HOPS);
+  if (Number.isInteger(hops) && hops > 0) {
+    app.getHttpAdapter().getInstance().set('trust proxy', hops);
+  }
+}
+
 function setupLogger(app: INestApplication) {
   app.useLogger(app.get(LoggerService));
 }
@@ -32,6 +41,7 @@ export async function configureApp(app: INestApplication): Promise<void> {
   const clientUrl = process.env.CLIENT_URL || undefined;
 
   setupLogger(app);
+  setupTrustProxy(app);
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ResponseInterceptor(app.get(Reflector)));
   app.useGlobalFilters(new HttpExceptionFilter());

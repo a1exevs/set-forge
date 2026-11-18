@@ -74,6 +74,10 @@ services:
       target: production
     env_file:
       - ./server/.production.env
+    environment:
+      # Caddy and client-prod (nginx) stand in front: trusting both makes request.ip the client's own address.
+      # Kept here, next to the chain it counts, so a release carries it.
+      TRUST_PROXY_HOPS: 2
     depends_on:
       mysql:
         condition: service_healthy

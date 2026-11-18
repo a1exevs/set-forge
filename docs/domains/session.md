@@ -47,6 +47,7 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lin
 | signed-in-devices | Up to 5 devices stay signed in at once; signing in on one more silently ends the session of the device that refreshed least recently and keeps every other one |
 | no-open-redirect | After sign-in only an in-app `redirect` target is followed (no open redirect) |
 | captcha-counts-login-only | Only failed sign-ins lead to the captcha, counted on the server whatever cookies the client sends: once an account has failed 5 times from one address, or 20 times from devices it does not trust, within the last 15 minutes, the login demands it before it looks at the password. An unknown email counts like a wrong password; a wrong captcha keeps demanding it and counts too; a solved captcha opens one attempt, also when attempts overlap, and lives 5 minutes; a successful sign-in starts its account-and-address count over and leaves the account-wide one to run out; a failed request elsewhere (an expired session) never counts; while the counts cannot be kept, the sign-in is refused for a while instead of going unguarded |
+| sign-in-rate-limit | At most 20 sign-in attempts a minute come from one address — every attempt counts, refused ones too — the next is refused for a while, saying how long, in the chosen language; nothing else from that address is limited, and an address is the client's own, not that of the proxies in front of the server |
 | trusted-device | A device the user signed in on — or registered on — is trusted for that account for 90 days from the last sign-in there: the account-wide count of failed sign-ins neither counts nor stops it, while its own address still counts; logout keeps the trust, deleting the account removes it, and only a mark the server issued is ever trusted |
 | logout-ends-on-login | Logout ends on `/login` also when the request fails; account deletion ends there once the account is deleted or the session has already ended, and keeps the user signed in on any other failure |
 | user-scoped | All workout data is scoped to the signed-in user |
@@ -71,7 +72,8 @@ to everyone without a bootstrap.
 
 A successful login or registration primes the current user and then follows the `redirect` target (a full page load)
 or goes home. A login answered with "captcha required" shows a captcha image and retries with the code and the id of
-that image; every new demand brings a new image. A rejected
+that image; every new demand brings a new image. Too many attempts from one address are refused for a while, and the
+form says how long to wait. A rejected
 login or registration shows the server's errors in the chosen language, each under its field when the form has it.
 
 ### Re-accepting documents

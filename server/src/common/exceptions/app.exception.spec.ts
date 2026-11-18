@@ -17,10 +17,17 @@ describe('AppException', () => {
     const exception = new AppException(
       HttpStatus.UNAUTHORIZED,
       [new ErrorItemResponse.Dto('NEED_AUTHORIZATION_WITH_CAPTCHA')],
-      undefined,
-      ResultCodes.NEED_CAPTCHA_AUTHORIZATION,
+      { resultCode: ResultCodes.NEED_CAPTCHA_AUTHORIZATION },
     );
     expect(exception.resultCode).toBe(ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
+  });
+
+  it('should carry the headers it is given and none by default', () => {
+    const limited = new AppException(HttpStatus.TOO_MANY_REQUESTS, [new ErrorItemResponse.Dto('UNAUTHORIZED')], {
+      headers: { 'Retry-After': '7' },
+    });
+    expect(limited.headers).toEqual({ 'Retry-After': '7' });
+    expect(AppException.of(HttpStatus.UNAUTHORIZED, 'UNAUTHORIZED').headers).toEqual({});
   });
 
   it('should join the texts of several items into a string message', () => {

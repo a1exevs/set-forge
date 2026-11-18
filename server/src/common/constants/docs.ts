@@ -13,6 +13,7 @@ export const Docs = {
   AUTHORIZATION_SUCCESSFUL_RESULT:
     'User authenticated successfully; sets the `refreshToken` cookie and the `trustedDevice` cookie of this device',
   AUTHORIZATION_BAD_REQUEST: 'Bad request',
+  AUTHORIZATION_TOO_MANY_REQUESTS: 'Too many sign-in attempts from this address within a minute; Retry-After says when',
   AUTHORIZATION_UNAUTHORIZED: 'Wrong email or password, or the captcha is required or wrong',
 
   REFRESH_TOKENS_ENDPOINT: 'Refresh access tokens',

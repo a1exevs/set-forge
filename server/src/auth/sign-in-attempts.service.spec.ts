@@ -6,6 +6,7 @@ import {
   CAPTCHA_AFTER_FAILS_PER_ACCOUNT,
   CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS,
   FAILED_SIGN_IN_WINDOW_MS,
+  SIGN_IN_ATTEMPTS_PER_MINUTE,
   SignInAttemptsService,
 } from '@auth/sign-in-attempts.service';
 import { REDIS_CLIENT } from '@src/redis';
@@ -212,6 +213,94 @@ describe('SignInAttemptsService', () => {
         ['del', attempt.accountAndAddressKey],
         ['zRem', attempt.accountKey, attempt.entry],
       ]);
+    });
+  });
+
+  // @invariant session/sign-in-rate-limit
+  describe('checkRate', () => {
+    const ADDRESS = '203.0.113.7';
+    let rate: { multi: jest.Mock; calls: Call[][]; zRangeWithScores: jest.Mock };
+
+    async function createWith(env: Record<string, string>): Promise<SignInAttemptsService> {
+      const moduleRef = await Test.createTestingModule({
+        providers: [
+          SignInAttemptsService,
+          { provide: REDIS_CLIENT, useValue: rate },
+          { provide: ConfigService, useValue: { get: (key: string): string | undefined => env[key] } },
+        ],
+      }).compile();
+      return moduleRef.get(SignInAttemptsService);
+    }
+
+    const withCount = (count: number, freeingScore = Date.now()): void => {
+      rate = {
+        ...fakeRedis(() => [0, 1, count, true]),
+        zRangeWithScores: jest.fn().mockResolvedValue([{ value: 'e', score: freeingScore }]),
+      };
+    };
+
+    afterEach(() => {
+      process.env.NODE_ENV = 'test';
+    });
+
+    it('should count the attempt in a one-minute window of the address pseudonym and let it pass under the limit', async () => {
+      withCount(SIGN_IN_ATTEMPTS_PER_MINUTE);
+      const service = await createWith({ SIGN_IN_LIMIT_SECRET_KEY: 'secret' });
+
+      await expect(service.checkRate(ADDRESS)).resolves.toBeUndefined();
+
+      const [commands] = rate.calls;
+      expect(commands?.map(([name]) => name)).toEqual(['zRemRangeByScore', 'zAdd', 'zCard', 'pExpire']);
+      expect(commands?.[0]?.[1]).toMatch(/^sign-in:address:[0-9a-f]{64}$/);
+      expect(commands?.[3]).toEqual(['pExpire', commands?.[0]?.[1], 60_000]);
+      expect(rate.zRangeWithScores).not.toHaveBeenCalled();
+    });
+
+    it('should refuse the attempt over the limit with 429, the seconds to wait and Retry-After', async () => {
+      const now = Date.now();
+      withCount(SIGN_IN_ATTEMPTS_PER_MINUTE + 3, now - 50_000);
+      const service = await createWith({ SIGN_IN_LIMIT_SECRET_KEY: 'secret' });
+
+      const refusal = service.checkRate(ADDRESS);
+
+      await expect(refusal).rejects.toMatchObject({
+        status: HttpStatus.TOO_MANY_REQUESTS,
+        errors: [expect.objectContaining({ code: 'TOO_MANY_SIGN_IN_ATTEMPTS', params: { seconds: 10 } })],
+        headers: { 'Retry-After': '10' },
+      });
+      // Three attempts too many: the next fits once the fourth oldest leaves the window.
+      expect(rate.zRangeWithScores).toHaveBeenCalledWith(rate.calls[0]?.[0]?.[1], 3, 3);
+    });
+
+    it('should never ask to wait less than a second', async () => {
+      withCount(SIGN_IN_ATTEMPTS_PER_MINUTE + 1, Date.now() - 60_000);
+      const service = await createWith({ SIGN_IN_LIMIT_SECRET_KEY: 'secret' });
+
+      await expect(service.checkRate(ADDRESS)).rejects.toMatchObject({ headers: { 'Retry-After': '1' } });
+    });
+
+    it('should take the limit from the environment outside production only', async () => {
+      withCount(SIGN_IN_ATTEMPTS_PER_MINUTE + 1);
+      const env = { SIGN_IN_LIMIT_SECRET_KEY: 'secret', SIGN_IN_ATTEMPTS_PER_MINUTE: '1000' };
+
+      await expect((await createWith(env)).checkRate(ADDRESS)).resolves.toBeUndefined();
+
+      process.env.NODE_ENV = 'production';
+      await expect((await createWith(env)).checkRate(ADDRESS)).rejects.toMatchObject({
+        status: HttpStatus.TOO_MANY_REQUESTS,
+      });
+    });
+
+    it('should answer 503 SIGN_IN_TEMPORARILY_UNAVAILABLE when the store does not answer', async () => {
+      rate = {
+        ...fakeRedis(() => {
+          throw new Error('The client is closed');
+        }),
+        zRangeWithScores: jest.fn(),
+      };
+      const service = await createWith({ SIGN_IN_LIMIT_SECRET_KEY: 'secret' });
+
+      await expect(service.checkRate(ADDRESS)).rejects.toMatchObject({ status: HttpStatus.SERVICE_UNAVAILABLE });
     });
   });
 });

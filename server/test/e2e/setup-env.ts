@@ -17,3 +17,7 @@ process.env.MYSQL_PASSWORD = runtimeEnv.MYSQL_PASSWORD;
 process.env.MYSQL_DB = runtimeEnv.MYSQL_DB;
 process.env.REDIS_HOST = runtimeEnv.REDIS_HOST;
 process.env.REDIS_PORT = runtimeEnv.REDIS_PORT;
+// The suites sign in far more often than a person; the rate-limit suite sets the real value for itself.
+process.env.SIGN_IN_ATTEMPTS_PER_MINUTE = '1000';
+// The suites act from other addresses through X-Forwarded-For, as the production proxies pass them on.
+process.env.TRUST_PROXY_HOPS = '1';

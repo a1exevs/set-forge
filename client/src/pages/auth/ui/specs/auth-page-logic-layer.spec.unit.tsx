@@ -259,6 +259,24 @@ describe('AuthPageLogicLayer', () => {
       expect(screen.getByText('Something new happened Must be a string')).toBeInTheDocument();
     });
 
+    it('says how long to wait when the server refuses too many attempts, in the chosen language', async () => {
+      onLogin.mockRejectedValueOnce(
+        serverFailure(429, [
+          {
+            code: 'TOO_MANY_SIGN_IN_ATTEMPTS',
+            params: { seconds: 42 },
+            message: 'Too many sign-in attempts, try again in 42 s',
+          },
+        ]),
+      );
+
+      await logIn();
+      expect(await screen.findByText('Too many sign-in attempts, try again in 42 s')).toBeInTheDocument();
+      act((): void => useLanguageStore.getState().setLanguage('ru'));
+
+      expect(await screen.findByText('Слишком много попыток входа, повторите через 42 с')).toBeInTheDocument();
+    });
+
     it('asks for the captcha with its text when the server demands it', async () => {
       onLogin.mockRejectedValueOnce(
         serverFailure(
