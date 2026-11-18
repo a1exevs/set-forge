@@ -795,6 +795,10 @@ of the API changes that number in the same edit — otherwise every client is co
 rate limit (20 attempts a minute per address) refuses them all together. Caddy ignores an `X-Forwarded-For` sent by a
 client, so the address cannot be forged from outside.
 
+Caddy also sends HSTS (`Strict-Transport-Security`, one year) for the public hostname — not for `localhost` — so no
+cookie of the app can be planted over plain HTTP. A browser that has seen it refuses plain HTTP to that hostname for
+a year: keep the hostname on HTTPS once it is served.
+
 ---
 
 ## Related documentation
