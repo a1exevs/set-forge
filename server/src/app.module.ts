@@ -4,7 +4,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { resolve } from 'node:path';
 
-import { AuthModule, RefreshToken } from '@src/auth';
+import { AuthModule, RefreshToken, TrustedDevice } from '@src/auth';
 import { HealthModule } from '@src/health/health.module';
 import { LoggerModule } from '@src/logger';
 import { RedisModule } from '@src/redis';
@@ -38,6 +38,7 @@ import { WorkoutSession, WorkoutSessionExercise, WorkoutSessionsModule } from '@
         Role,
         UserRole,
         RefreshToken,
+        TrustedDevice,
         WorkoutList,
         WorkoutExercise,
         WorkoutSession,

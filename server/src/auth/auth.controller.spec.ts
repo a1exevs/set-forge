@@ -27,6 +27,8 @@ const getValidationPipeDataForUserRegistration = function (
   return { target, metadata, registerDto };
 };
 
+const DEVICE_TRUST = { token: 'device-token', expires: new Date('2027-02-16T12:00:00.000Z') };
+
 const getMockAuthenticationResponse = function (userId, accessToken, refreshToken): IAuthenticationResult {
   return {
     status: 'success',
@@ -40,6 +42,7 @@ const getMockAuthenticationResponse = function (userId, accessToken, refreshToke
         refreshToken: refreshToken,
         refreshToken_expiration: new Date(),
       },
+      deviceTrust: DEVICE_TRUST,
     },
   };
 };
@@ -207,12 +210,14 @@ describe('AuthController', () => {
         .spyOn(authService, 'registration')
         .mockImplementation(async () => serviceRegisterResponseMock);
       const controllerRegisterResponse = new AuthenticationResponse.Dto({ userId, accessToken });
-      const response = await authController.registration(registerDto, res);
+      const req = createRequest({ cookies: { trustedDevice: 'device-token' } });
+      const response = await authController.registration(registerDto, res, req);
       expect(response).toEqual(controllerRegisterResponse);
       expect(res.cookies.refreshToken.value).toBe(refreshToken);
       expect(res.cookies.refreshToken.options.httpOnly).toBe(true);
+      expect(res.cookies.trustedDevice.value).toBe(DEVICE_TRUST.token);
       expect(mockRegistrationF).toBeCalledTimes(1);
-      expect(mockRegistrationF).toBeCalledWith(registerDto);
+      expect(mockRegistrationF).toBeCalledWith(registerDto, 'device-token');
     });
     it('Registration method: should return conflict (user already exists)', async () => {
       const res = createResponse();
@@ -222,7 +227,7 @@ describe('AuthController', () => {
         throw new HttpException(exceptionMessage, HttpStatus.CONFLICT);
       });
       try {
-        await authController.registration(registerDto, res);
+        await authController.registration(registerDto, res, createRequest());
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(HttpStatus.CONFLICT);
@@ -234,7 +239,7 @@ describe('AuthController', () => {
 
   describe('AuthController - login', () => {
     it('Login method: should be successful result', async () => {
-      const req = createRequest({ ip: '203.0.113.7' });
+      const req = createRequest({ ip: '203.0.113.7', cookies: { trustedDevice: 'device-token' } });
       const res = createResponse();
       const userId = 1;
       const accessToken = '12345fsagasdsfasdfsdf';
@@ -250,7 +255,31 @@ describe('AuthController', () => {
       expect(res.cookies.refreshToken.value).toBe(refreshToken);
       expect(res.cookies.refreshToken.options.httpOnly).toBe(true);
       expect(mockLoginF).toBeCalledTimes(1);
-      expect(mockLoginF).toBeCalledWith(loginDto, '203.0.113.7');
+      expect(mockLoginF).toBeCalledWith(loginDto, '203.0.113.7', 'device-token');
+    });
+    // @invariant session/trusted-device
+    it('Login method: should mark the device with a cookie that lives as long as its trust', async () => {
+      const res = createResponse();
+      jest.spyOn(authService, 'login').mockResolvedValue(getMockAuthenticationResponse(1, 'access', 'refresh'));
+
+      await authController.login({ email: 'user@yandex.ru', password: '0000' }, res, createRequest());
+
+      expect(res.cookies.trustedDevice.value).toBe(DEVICE_TRUST.token);
+      expect(res.cookies.trustedDevice.options).toMatchObject({
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/api/1.0/auth',
+        expires: DEVICE_TRUST.expires,
+      });
+    });
+    it('Login method: should set no device cookie when no trust could be stored', async () => {
+      const res = createResponse();
+      const answer = getMockAuthenticationResponse(1, 'access', 'refresh');
+      jest.spyOn(authService, 'login').mockResolvedValue({ ...answer, data: { ...answer.data, deviceTrust: null } });
+
+      await authController.login({ email: 'user@yandex.ru', password: '0000' }, res, createRequest());
+
+      expect(res.cookies.trustedDevice).toBeUndefined();
     });
     it('Login method: should be unauthorized', async () => {
       const req = createRequest();
@@ -336,6 +365,17 @@ describe('AuthController', () => {
       expect(res.cookies.refreshToken.value).toBe('');
       expect(mockLogoutF).toBeCalledTimes(1);
       expect(mockLogoutF).toBeCalledWith(refreshToken);
+    });
+    // @invariant session/trusted-device
+    it('Logout method: should leave the device cookie, the trust outlives the session', async () => {
+      const req = createRequest();
+      req._setCookiesVariable('trustedDevice', 'device-token');
+      const res = createResponse();
+      jest.spyOn(authService, 'logout').mockResolvedValue(undefined);
+
+      await authController.logout(req, res);
+
+      expect(res.cookies.trustedDevice).toBeUndefined();
     });
   });
 });

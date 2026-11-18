@@ -10,10 +10,17 @@ export const FAILED_SIGN_IN_WINDOW_MS = 15 * 60 * 1000;
 export const CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS = 5;
 export const CAPTCHA_AFTER_FAILS_PER_ACCOUNT = 20;
 
+// The commands `reserve` sends for one window, and where the count is among their replies.
+const WINDOW_COMMANDS = 4;
+const COUNT_REPLY = 2;
+
+type Window = { readonly key: string; readonly threshold: number };
+
 /** One sign-in attempt, counted before its outcome is known. */
 export type SignInAttempt = {
   readonly accountAndAddressKey: string;
-  readonly accountKey: string;
+  /** `null` for a trusted device: the account-wide count does not apply to it (session/trusted-device). */
+  readonly accountKey: string | null;
   readonly entry: string;
   /** The failures before this attempt reached a threshold: it may be checked only with a solved captcha. */
   readonly demandsCaptcha: boolean;
@@ -48,38 +55,37 @@ export class SignInAttemptsService {
    * Counts the attempt as a failure up front, in one atomic step per window: of attempts that overlap only as many
    * reach the password as the thresholds allow. `succeeded` takes it back.
    */
-  public async reserve(email: string, address: string): Promise<SignInAttempt> {
+  public async reserve(email: string, address: string, trustedDevice: boolean): Promise<SignInAttempt> {
     const account = SignInAttemptsService.normalizeEmail(email);
     const accountAndAddressKey = `sign-in:account-address:${this.pseudonym(`${account}\n${address}`)}`;
-    const accountKey = `sign-in:account:${this.pseudonym(account)}`;
+    const accountKey = trustedDevice ? null : `sign-in:account:${this.pseudonym(account)}`;
+    const windows: Window[] = [{ key: accountAndAddressKey, threshold: CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS }];
+    if (accountKey) {
+      windows.push({ key: accountKey, threshold: CAPTCHA_AFTER_FAILS_PER_ACCOUNT });
+    }
     const now = Date.now();
     const entry = `${now}:${randomUUID()}`;
 
-    const replies = await SignInAttemptsService.whileAvailable(() =>
-      this.redis
-        .multi()
-        .zRemRangeByScore(accountAndAddressKey, 0, now - FAILED_SIGN_IN_WINDOW_MS)
-        .zAdd(accountAndAddressKey, { score: now, value: entry })
-        .zCard(accountAndAddressKey)
-        .pExpire(accountAndAddressKey, FAILED_SIGN_IN_WINDOW_MS)
-        .zRemRangeByScore(accountKey, 0, now - FAILED_SIGN_IN_WINDOW_MS)
-        .zAdd(accountKey, { score: now, value: entry })
-        .zCard(accountKey)
-        .pExpire(accountKey, FAILED_SIGN_IN_WINDOW_MS)
-        .exec(),
-    );
-    const withThisOne = { accountAndAddress: Number(replies[2]), account: Number(replies[6]) };
+    const transaction = this.redis.multi();
+    for (const { key } of windows) {
+      transaction
+        .zRemRangeByScore(key, 0, now - FAILED_SIGN_IN_WINDOW_MS)
+        .zAdd(key, { score: now, value: entry })
+        .zCard(key)
+        .pExpire(key, FAILED_SIGN_IN_WINDOW_MS);
+    }
+    const replies = await SignInAttemptsService.whileAvailable(() => transaction.exec());
+    const withThisOne = windows.map(({ threshold }: Window, index: number) => ({
+      threshold,
+      count: Number(replies[index * WINDOW_COMMANDS + COUNT_REPLY]),
+    }));
 
     return {
       accountAndAddressKey,
       accountKey,
       entry,
-      demandsCaptcha:
-        withThisOne.accountAndAddress > CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS ||
-        withThisOne.account > CAPTCHA_AFTER_FAILS_PER_ACCOUNT,
-      nextDemandsCaptcha:
-        withThisOne.accountAndAddress >= CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS ||
-        withThisOne.account >= CAPTCHA_AFTER_FAILS_PER_ACCOUNT,
+      demandsCaptcha: withThisOne.some(({ count, threshold }) => count > threshold),
+      nextDemandsCaptcha: withThisOne.some(({ count, threshold }) => count >= threshold),
     };
   }
 
@@ -88,9 +94,11 @@ export class SignInAttemptsService {
    * never hands a guesser a fresh allowance.
    */
   public async succeeded(attempt: SignInAttempt): Promise<void> {
-    await SignInAttemptsService.whileAvailable(() =>
-      this.redis.multi().del(attempt.accountAndAddressKey).zRem(attempt.accountKey, attempt.entry).exec(),
-    );
+    const transaction = this.redis.multi().del(attempt.accountAndAddressKey);
+    if (attempt.accountKey) {
+      transaction.zRem(attempt.accountKey, attempt.entry);
+    }
+    await SignInAttemptsService.whileAvailable(() => transaction.exec());
   }
 
   private pseudonym(value: string): string {

@@ -6,6 +6,7 @@ import { GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto
 import { IAuthenticationResult } from '@auth/interfaces';
 import { SignInAttempt, SignInAttemptsService } from '@auth/sign-in-attempts.service';
 import { TokensService } from '@auth/tokens.service';
+import { DeviceTrust, TrustedDevicesService } from '@auth/trusted-devices.service';
 import { DocumentVersions, ErrorCode, ResultCodes } from '@common/constants';
 import { ErrorItemResponse } from '@common/dto';
 import { AppException } from '@common/exceptions';
@@ -25,9 +26,11 @@ export class AuthService {
     private tokensService: TokensService,
     private signInAttempts: SignInAttemptsService,
     private securityService: SecurityService,
+    private trustedDevices: TrustedDevicesService,
   ) {}
 
-  public async registration(dto: RegisterRequest.Dto): Promise<IAuthenticationResult> {
+  /** A registration signs the user in on this device, so the device is trusted from then on. */
+  public async registration(dto: RegisterRequest.Dto, deviceToken: unknown): Promise<IAuthenticationResult> {
     const candidate = await this.userService.getUserByEmail(dto.email);
     if (candidate) {
       throw AppException.of(HttpStatus.CONFLICT, 'USER_ALREADY_EXISTS');
@@ -42,12 +45,23 @@ export class AuthService {
       throw AppException.of(HttpStatus.BAD_REQUEST, 'FAILED_TO_CREATE_USER');
     }
 
-    return AuthService.buildResponsePayload(user, token, refresh, this.tokensService.getRefreshTokenExpiration());
+    const deviceTrust = await this.trustedDevices.trust(user.id, deviceToken);
+    return AuthService.buildResponsePayload(
+      user,
+      token,
+      refresh,
+      this.tokensService.getRefreshTokenExpiration(),
+      deviceTrust,
+    );
   }
 
-  /** session/captcha-counts-login-only: the attempt is counted first, the password checked only after the captcha. */
-  async login(dto: LoginRequest.Dto, address: string): Promise<IAuthenticationResult> {
-    const attempt = await this.signInAttempts.reserve(dto.email, address);
+  /**
+   * session/captcha-counts-login-only: the attempt is counted first, the password checked only after the captcha; a
+   * trusted device is spared the account-wide count and has its trust renewed (session/trusted-device).
+   */
+  async login(dto: LoginRequest.Dto, address: string, deviceToken: unknown): Promise<IAuthenticationResult> {
+    const trustedDevice = await this.trustedDevices.isTrusted(deviceToken, dto.email);
+    const attempt = await this.signInAttempts.reserve(dto.email, address, trustedDevice);
     if (attempt.demandsCaptcha && !(await this.securityService.solvesCaptcha(dto.captchaId, dto.captcha))) {
       throw AuthService.captchaDemanded(['NEED_AUTHORIZATION_WITH_CAPTCHA']);
     }
@@ -65,7 +79,14 @@ export class AuthService {
       throw AppException.of(HttpStatus.UNAUTHORIZED, 'INVALID_EMAIL_OR_PASSWORD');
     }
 
-    return AuthService.buildResponsePayload(user, token, refresh, this.tokensService.getRefreshTokenExpiration());
+    const deviceTrust = await this.trustedDevices.trust(user.id, deviceToken);
+    return AuthService.buildResponsePayload(
+      user,
+      token,
+      refresh,
+      this.tokensService.getRefreshTokenExpiration(),
+      deviceTrust,
+    );
   }
 
   public async refresh(currentRefreshToken: unknown): Promise<IAuthenticationResult> {
@@ -149,6 +170,7 @@ export class AuthService {
     accessToken: string,
     refreshToken: string,
     expiration: Date,
+    deviceTrust: DeviceTrust | null = null,
   ): IAuthenticationResult {
     return {
       status: 'success',
@@ -162,6 +184,7 @@ export class AuthService {
           refreshToken,
           refreshToken_expiration: expiration,
         },
+        deviceTrust,
       },
     };
   }
