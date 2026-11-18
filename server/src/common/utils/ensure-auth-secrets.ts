@@ -3,8 +3,8 @@ function isNonEmpty(value: string | undefined): value is string {
 }
 
 /**
- * Production only: `JWT_SECRET_KEY` and `SESSION_SECRET_KEY` must already be on `process.env` — this runs before
- * `ConfigModule` reads the env files. Elsewhere it writes nothing: dotenv never overrides a key already set.
+ * Production only: `JWT_SECRET_KEY` and `SIGN_IN_LIMIT_SECRET_KEY` must already be on `process.env` — this runs
+ * before `ConfigModule` reads the env files. Elsewhere it writes nothing: dotenv never overrides a key already set.
  */
 export function ensureAuthSecretsConfigured(): void {
   const isProduction = process.env.NODE_ENV === 'production';
@@ -17,8 +17,8 @@ export function ensureAuthSecretsConfigured(): void {
   if (!isNonEmpty(process.env.JWT_SECRET_KEY)) {
     missing.push('JWT_SECRET_KEY');
   }
-  if (!isNonEmpty(process.env.SESSION_SECRET_KEY)) {
-    missing.push('SESSION_SECRET_KEY');
+  if (!isNonEmpty(process.env.SIGN_IN_LIMIT_SECRET_KEY)) {
+    missing.push('SIGN_IN_LIMIT_SECRET_KEY');
   }
   if (missing.length > 0) {
     throw new Error(`Missing required secret(s) in production: ${missing.join(', ')}. Set them in the environment.`);

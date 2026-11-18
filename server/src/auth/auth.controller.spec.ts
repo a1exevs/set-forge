@@ -6,8 +6,6 @@ import { createRequest, createResponse } from 'node-mocks-http';
 import { AuthController } from '@auth/auth.controller';
 import { AuthService } from '@auth/auth.service';
 import { AuthenticationResponse, GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto';
-import { CaptchaCountExceptionFilter } from '@auth/exception-filters';
-import { SvgCaptchaGuard } from '@auth/guards';
 import { IAuthenticationResult } from '@auth/interfaces';
 import { TokensService } from '@auth/tokens.service';
 import { ErrorMessages } from '@common/constants';
@@ -49,10 +47,8 @@ const getMockAuthenticationResponse = function (userId, accessToken, refreshToke
 describe('AuthController', () => {
   let authController: AuthController;
   let authService: AuthService;
-  let captchaCountExceptionFilter: CaptchaCountExceptionFilter;
   let jwtAuthGuard: JwtAuthGuard;
   let refreshTokenGuard: RefreshTokenGuard;
-  let svgCaptchaGuard: SvgCaptchaGuard;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -82,10 +78,8 @@ describe('AuthController', () => {
     }).compile();
     authController = moduleRef.get<AuthController>(AuthController);
     authService = moduleRef.get<AuthService>(AuthService);
-    captchaCountExceptionFilter = moduleRef.get<CaptchaCountExceptionFilter>(CaptchaCountExceptionFilter);
     jwtAuthGuard = moduleRef.get<JwtAuthGuard>(JwtAuthGuard);
     refreshTokenGuard = moduleRef.get<RefreshTokenGuard>(RefreshTokenGuard);
-    svgCaptchaGuard = moduleRef.get<SvgCaptchaGuard>(SvgCaptchaGuard);
   });
 
   describe('AuthController - definition', () => {
@@ -95,17 +89,11 @@ describe('AuthController', () => {
     it('AuthService - should be defined', () => {
       expect(authService).toBeDefined();
     });
-    it('CaptchaCountExceptionFilter - should be defined', () => {
-      expect(captchaCountExceptionFilter).toBeDefined();
-    });
     it('JwtAuthGuard - should be defined', () => {
       expect(jwtAuthGuard).toBeDefined();
     });
     it('RefreshTokenGuard - should be defined', () => {
       expect(refreshTokenGuard).toBeDefined();
-    });
-    it('SvgCaptchaGuard - should be defined', () => {
-      expect(svgCaptchaGuard).toBeDefined();
     });
   });
 
@@ -246,8 +234,7 @@ describe('AuthController', () => {
 
   describe('AuthController - login', () => {
     it('Login method: should be successful result', async () => {
-      const req = createRequest();
-      req._setSessionVariable('authFailedCount', '5');
+      const req = createRequest({ ip: '203.0.113.7' });
       const res = createResponse();
       const userId = 1;
       const accessToken = '12345fsagasdsfasdfsdf';
@@ -262,14 +249,11 @@ describe('AuthController', () => {
       expect(response).toEqual(controllerLoginResponse);
       expect(res.cookies.refreshToken.value).toBe(refreshToken);
       expect(res.cookies.refreshToken.options.httpOnly).toBe(true);
-      expect(req.session['authFailedCount']).toBeNull();
       expect(mockLoginF).toBeCalledTimes(1);
-      expect(mockLoginF).toBeCalledWith(loginDto);
+      expect(mockLoginF).toBeCalledWith(loginDto, '203.0.113.7');
     });
     it('Login method: should be unauthorized', async () => {
       const req = createRequest();
-      const authFailedCount = '5';
-      req._setSessionVariable('authFailedCount', authFailedCount);
       const res = createResponse();
       const loginDto = { email: 'user@yandex.ru', password: '12345678' };
       const exceptionMessage = ErrorMessages.INVALID_EMAIL_OR_PASSWORD;
@@ -284,7 +268,6 @@ describe('AuthController', () => {
       } catch (err) {
         expect(err.status).toBe(401);
         expect(res.cookies.refreshToken).toBeUndefined();
-        expect(req.session['authFailedCount']).toBe(authFailedCount);
         expect(err.getResponse()).toMatchObject(errorObject);
         expect(authService.login).toBeCalledTimes(1);
       }

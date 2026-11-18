@@ -20,7 +20,37 @@ x-mysql-common: &mysql-common
     retries: 10
     start_period: 20s
 
+x-redis-common: &redis-common
+  logging: *json-file-logging
+  image: redis:7-alpine
+  restart: unless-stopped
+  command:
+    - redis-server
+    - --appendonly
+    - "yes"
+    - --appendfsync
+    - everysec
+  healthcheck:
+    test: [ "CMD", "redis-cli", "ping" ]
+    interval: 5s
+    timeout: 3s
+    retries: 5
+
 services:
+  redis:
+    <<: *redis-common
+    profiles: [ "prod" ]
+    volumes:
+      - redis_data_prod:/data
+
+  redis-dev:
+    <<: *redis-common
+    profiles: ["dev"]
+    ports:
+      - "127.0.0.1:${REDIS_PUBLIC_PORT:-6379}:6379"
+    volumes:
+      - redis_data_dev:/data
+
   mysql:
     <<: *mysql-common
     profiles: ["prod"]
@@ -46,6 +76,8 @@ services:
       - ./server/.production.env
     depends_on:
       mysql:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     expose:
       - "5000"
@@ -126,3 +158,5 @@ volumes:
   caddy_config:
   server_static:
   server_logs:
+  redis_data_prod:
+  redis_data_dev:

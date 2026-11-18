@@ -10,12 +10,12 @@ export default async function globalTeardown(): Promise<void> {
   }
 
   const runtimeEnv = JSON.parse(readFileSync(RUNTIME_ENV_PATH, 'utf8')) as {
-    containerId?: string;
+    containerIds?: string[];
   };
 
-  if (runtimeEnv.containerId) {
+  for (const containerId of runtimeEnv.containerIds ?? []) {
     try {
-      execSync(`docker stop ${runtimeEnv.containerId}`, { stdio: 'ignore' });
+      execSync(`docker stop ${containerId}`, { stdio: 'ignore' });
     } catch {
       // Container may already be stopped by Ryuk or a previous teardown.
     }

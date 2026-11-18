@@ -8,6 +8,7 @@ import {
   setAccessToken,
 } from '@shared/api';
 
+import type { Captcha } from '../model/captcha';
 import type { CurrentUser } from '../model/current-user';
 
 function toAbsoluteFromApiOrigin(pathOrUrl: string): string {
@@ -41,10 +42,15 @@ export async function postRegistration(
   return res.data;
 }
 
-export async function postLogin(email: string, password: string, captcha?: string): Promise<AuthData> {
-  const body: { email: string; password: string; captcha?: string } = { email, password };
-  if (captcha !== undefined && captcha.length > 0) {
-    body.captcha = captcha;
+export async function postLogin(
+  email: string,
+  password: string,
+  captcha?: { id: string; answer: string },
+): Promise<AuthData> {
+  const body: { email: string; password: string; captcha?: string; captchaId?: string } = { email, password };
+  if (captcha !== undefined && captcha.answer.length > 0) {
+    body.captcha = captcha.answer;
+    body.captchaId = captcha.id;
   }
   const res = await apiRequest<AuthData>('/auth/login', {
     method: 'POST',
@@ -57,14 +63,14 @@ export async function postLogin(email: string, password: string, captcha?: strin
   return res.data;
 }
 
-export async function getCaptchaUrl(): Promise<string> {
-  const res = await apiRequest<{ captchaURL: string }>('/security/get-captcha-url', {
+export async function getCaptcha(): Promise<Captcha> {
+  const res = await apiRequest<{ captchaURL: string; captchaId: string }>('/security/get-captcha-url', {
     method: 'GET',
   });
-  if (res.resultCode !== ResultCodes.OK || !res.data?.captchaURL) {
+  if (res.resultCode !== ResultCodes.OK || !res.data?.captchaURL || !res.data.captchaId) {
     throw new Error(res.messages[0] ?? 'Could not load captcha');
   }
-  return toAbsoluteFromApiOrigin(res.data.captchaURL);
+  return { id: res.data.captchaId, imageUrl: toAbsoluteFromApiOrigin(res.data.captchaURL) };
 }
 
 export async function fetchCurrentUser(): Promise<CurrentUser | null> {

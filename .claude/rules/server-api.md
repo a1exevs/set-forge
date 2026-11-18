@@ -32,8 +32,8 @@ The client shows an error in the user's language by its code, so every error car
 - Validation: every class-validator decorator takes `validationError(code, params)` from `@common/utils`;
   `ValidationPipe` turns each failed constraint into an item whose `field` is the dotted path (`exercises.0.name`).
 - `fieldsErrors` holds the items `{ code, params, field?, message }`, `messages` their texts ("field - text").
-- A route filter extends `HttpExceptionFilter` (`CaptchaCountExceptionFilter` on `/login` counts the failed
-  sign-ins).
+- An error that tells the client what to do next carries its `resultCode` in `AppException` (the captcha demand of
+  the login: `ResultCodes.NEED_CAPTCHA_AUTHORIZATION`), thrown by the service like any other error.
 
 ## Swagger per endpoint
 

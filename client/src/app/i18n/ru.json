@@ -75,6 +75,7 @@
     "PAYLOAD_TOO_LARGE": "Слишком большой запрос",
     "REFRESH_TOKEN_EXPIRED": "Сессия истекла, войдите снова",
     "REFRESH_TOKEN_NOT_FOUND": "Сессия не найдена, войдите снова",
+    "SIGN_IN_TEMPORARILY_UNAVAILABLE": "Вход временно недоступен, попробуйте через минуту",
     "STRING_LENGTH_MUST_NOT_BE_LESS_THAN_M_AND_GREATER_THAN_N": "Длина должна быть от {{min}} до {{max}} символов",
     "TERMS_ACCEPTANCE_IS_REQUIRED": "Нужно принять пользовательское соглашение",
     "UNAUTHORIZED": "Вы не авторизованы",

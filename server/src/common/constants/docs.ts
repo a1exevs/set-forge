@@ -36,6 +36,8 @@ export const Docs = {
   SECURITY_CONTROLLER: 'Security',
 
   GET_CAPTCHA_URL_ENDPOINT: 'Get captcha URL',
+  GET_CAPTCHA_URL_SUCCESSFUL_RESULT: 'A new captcha image and the id to send with its answer',
+  SIGN_IN_SERVICE_UNAVAILABLE: 'Sign-in is temporarily unavailable: its store does not answer',
 
   WORKOUT_LISTS_CONTROLLER: 'Workout lists',
 

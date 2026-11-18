@@ -110,6 +110,7 @@ describe('User workflow', () => {
           .expect(response => {
             expect(response.body.data.captchaURL).toBeDefined();
             expect(response.body.data.captchaURL.startsWith('data:image/svg+xml;base64,')).toBeTruthy();
+            expect(response.body.data.captchaId).toMatch(/^[0-9a-f-]{36}$/);
             expect(response.body.resultCode).toBe(ResultCodes.OK);
           });
       });

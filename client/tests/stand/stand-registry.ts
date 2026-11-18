@@ -31,8 +31,8 @@ export type StandEntry = {
   task: string | null;
   worktree: string;
   preset: string;
-  /** Its MySQL container, once started — removed by `client:stand:stop` when the stand was killed. */
-  containerId: string | null;
+  /** Its MySQL and Redis containers, once started — removed by `client:stand:stop` when the stand was killed. */
+  containerIds: string[];
   startedAt: string;
 };
 
@@ -116,9 +116,18 @@ export function requestStop(cwd: string, slot: number): void {
   writeFileSync(stopRequestPath(cwd, slot), `${new Date().toISOString()}\n`);
 }
 
+// An entry written before the stand had Redis names its only container in `containerId`.
+type StoredEntry = Omit<StandEntry, 'containerIds'> & { containerIds?: string[]; containerId?: string | null };
+
 function readRegistry(file: string): Registry {
   try {
-    return JSON.parse(readFileSync(file, 'utf8')) as Registry;
+    const { stands } = JSON.parse(readFileSync(file, 'utf8')) as { stands: StoredEntry[] };
+    return {
+      stands: stands.map(({ containerId, containerIds, ...entry }: StoredEntry) => ({
+        ...entry,
+        containerIds: containerIds ?? (containerId ? [containerId] : []),
+      })),
+    };
   } catch {
     return { stands: [] };
   }
@@ -165,7 +174,7 @@ async function withLock<T>(cwd: string, action: (file: string) => Promise<T>): P
 }
 
 /**
- * Removes what a killed stand leaves: listeners on its ports, its MySQL container (the reaper shared by every stand
+ * Removes what a killed stand leaves: listeners on its ports, its containers (the reaper shared by every stand
  * keeps it while another runs) and its API build in `server/.stack/<port>`. A graceful stop leaves none of it.
  */
 export function removeLeftovers(entry: StandEntry): void {
@@ -173,13 +182,13 @@ export function removeLeftovers(entry: StandEntry): void {
   if (killed.length > 0) {
     warn(`Slot ${entry.slot}: killed pid ${killed.join(', ')} still listening on its ports.`);
   }
-  if (entry.containerId) {
+  for (const containerId of entry.containerIds) {
     try {
-      execSync(`docker rm -f ${entry.containerId}`, { stdio: ['ignore', 'ignore', 'pipe'] });
+      execSync(`docker rm -f ${containerId}`, { stdio: ['ignore', 'ignore', 'pipe'] });
     } catch (err) {
       const stderr = String((err as { stderr?: Buffer | string }).stderr ?? err).trim();
       if (!stderr.includes('No such container')) {
-        warn(`Slot ${entry.slot}: \`docker rm -f ${entry.containerId.slice(0, 12)}\` failed: ${stderr}`);
+        warn(`Slot ${entry.slot}: \`docker rm -f ${containerId.slice(0, 12)}\` failed: ${stderr}`);
       }
     }
   }
@@ -189,7 +198,7 @@ export function removeLeftovers(entry: StandEntry): void {
 /** Takes the first slot whose owner is gone and whose ports are free, and records the new stand in it. */
 export function claimSlot(
   cwd: string,
-  stand: Omit<StandEntry, 'slot' | 'serverPort' | 'clientPort' | 'containerId'>,
+  stand: Omit<StandEntry, 'slot' | 'serverPort' | 'clientPort' | 'containerIds'>,
 ): Promise<StandEntry> {
   return withLock(cwd, async file => {
     const registry = readRegistry(file);
@@ -209,7 +218,7 @@ export function claimSlot(
       if (!(await isPortFree(serverPort)) || !(await isPortFree(clientPort))) {
         continue;
       }
-      const entry: StandEntry = { slot, serverPort, clientPort, containerId: null, ...stand };
+      const entry: StandEntry = { slot, serverPort, clientPort, containerIds: [], ...stand };
       writeRegistry(file, { stands: [...live, entry] });
       return entry;
     }
@@ -220,11 +229,11 @@ export function claimSlot(
   });
 }
 
-export function recordContainer(cwd: string, slot: number, containerId: string): Promise<void> {
+export function recordContainers(cwd: string, slot: number, containerIds: string[]): Promise<void> {
   return withLock(cwd, async file => {
     const registry = readRegistry(file);
     writeRegistry(file, {
-      stands: registry.stands.map(entry => (entry.slot === slot ? { ...entry, containerId } : entry)),
+      stands: registry.stands.map(entry => (entry.slot === slot ? { ...entry, containerIds } : entry)),
     });
   });
 }

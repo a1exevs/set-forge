@@ -1,8 +1,9 @@
 /**
  * The API half of a full-stack run, shared by the Playwright e2e (`start-api-stack.ts`) and the verification stand
- * (`tests/stand/start-stand.ts`): ephemeral MySQL (Testcontainers) → migrate/seed → Nest on a given port.
+ * (`tests/stand/start-stand.ts`): ephemeral MySQL and Redis (Testcontainers) → migrate/seed → Nest on a given port.
  */
 import { MySqlContainer } from '@testcontainers/mysql';
+import { RedisContainer } from '@testcontainers/redis';
 import {
   type ChildProcess,
   execSync,
@@ -28,9 +29,9 @@ const IS_WINDOWS = process.platform === 'win32';
 export type ApiStack = {
   /** The running Nest — a new process after `restartNest`. */
   readonly nest: ChildProcess;
-  /** The MySQL container — `docker rm -f <id>` removes it when the stack was killed without `stop()`. */
-  containerId: string;
-  /** Stops Nest, then the container. Safe to call more than once. */
+  /** The MySQL and Redis containers — `docker rm -f <id>` removes them when the stack was killed without `stop()`. */
+  containerIds: string[];
+  /** Stops Nest, then the containers. Safe to call more than once. */
   stop: () => Promise<void>;
   /**
    * Stops Nest and starts it again on the same database with `env` added — a state the server reaches only by its
@@ -45,17 +46,17 @@ type StartApiStackOptions = {
   clientOrigin: string;
   log: (message: string) => void;
   /**
-   * Called with the MySQL container id as soon as it runs, before the migrations and Nest: a caller that records
-   * it can remove the container even when the start is killed halfway.
+   * Called with the container ids as soon as they run, before the migrations and Nest: a caller that records
+   * them can remove the containers even when the start is killed halfway.
    */
-  onContainer?: (containerId: string) => Promise<void> | void;
+  onContainers?: (containerIds: string[]) => Promise<void> | void;
 };
 
 export function assertDockerAvailable(retryHint: string): void {
   try {
     execSync('docker info', { stdio: 'ignore' });
   } catch {
-    throw new Error(`Docker is not running. Testcontainers MySQL needs it. Start Docker and ${retryHint}.`);
+    throw new Error(`Docker is not running. Testcontainers MySQL and Redis need it. Start Docker and ${retryHint}.`);
   }
 }
 
@@ -231,33 +232,39 @@ export async function startApiStack({
   serverPort,
   clientOrigin,
   log,
-  onContainer,
+  onContainers,
 }: StartApiStackOptions): Promise<ApiStack> {
   ensureE2eEnvFile();
   const { buildDir, tsconfigPath } = writeBuildConfig(serverPort);
 
-  log('Starting MySQL 8.4 via Testcontainers…');
-  const container = await new MySqlContainer('mysql:8.4').start();
-  await onContainer?.(container.getId());
+  log('Starting MySQL 8.4 and Redis 7 via Testcontainers…');
+  const [container, redis] = await Promise.all([
+    new MySqlContainer('mysql:8.4').start(),
+    new RedisContainer('redis:7-alpine').start(),
+  ]);
+  const containerIds = [container.getId(), redis.getId()];
+  await onContainers?.(containerIds);
 
-  const mysqlEnv = {
+  const containerEnv = {
     NODE_ENV: 'e2e',
     MYSQL_HOST: container.getHost(),
     MYSQL_PORT: String(container.getPort()),
     MYSQL_USER: container.getUsername(),
     MYSQL_PASSWORD: container.getUserPassword(),
     MYSQL_DB: container.getDatabase(),
+    REDIS_HOST: redis.getHost(),
+    REDIS_PORT: String(redis.getPort()),
   };
 
   log('Migrating and seeding the database…');
   execSync('npx sequelize-cli db:migrate --env e2e', {
     cwd: SERVER_ROOT,
-    env: { ...process.env, ...mysqlEnv },
+    env: { ...process.env, ...containerEnv },
     stdio: 'inherit',
   });
   execSync('npx sequelize-cli db:seed:all --env e2e', {
     cwd: SERVER_ROOT,
-    env: { ...process.env, ...mysqlEnv },
+    env: { ...process.env, ...containerEnv },
     stdio: 'inherit',
   });
 
@@ -266,7 +273,7 @@ export async function startApiStack({
       cwd: SERVER_ROOT,
       env: {
         ...process.env,
-        ...mysqlEnv,
+        ...containerEnv,
         PORT: String(serverPort),
         CLIENT_URL: clientOrigin,
         ...env,
@@ -293,10 +300,12 @@ export async function startApiStack({
 
     await stopNest();
 
-    try {
-      await container.stop();
-    } catch {
-      // Container may already be gone (Ryuk or prior stop).
+    for (const started of [container, redis]) {
+      try {
+        await started.stop();
+      } catch {
+        // Container may already be gone (Ryuk or prior stop).
+      }
     }
 
     rmSync(buildDir, { recursive: true, force: true });
@@ -313,7 +322,7 @@ export async function startApiStack({
     get nest(): ChildProcess {
       return nest;
     },
-    containerId: container.getId(),
+    containerIds,
     stop,
     restartNest,
   };

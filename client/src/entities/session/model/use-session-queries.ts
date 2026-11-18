@@ -6,6 +6,7 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query';
 
+import type { Captcha } from './captcha';
 import type { CurrentUser } from './current-user';
 import { sessionQueryKeys } from './session-keys';
 import {
@@ -13,7 +14,7 @@ import {
   deleteAccount,
   deleteLogout,
   fetchCurrentUser,
-  getCaptchaUrl,
+  getCaptcha,
   patchDocumentsAcceptance,
   postLogin,
   postRegistration,
@@ -33,7 +34,7 @@ export function useCurrentUserQuery(enabled: boolean): UseQueryResult<CurrentUse
   });
 }
 
-type LoginVars = { email: string; password: string; captcha?: string };
+type LoginVars = { email: string; password: string; captcha?: { id: string; answer: string } };
 type RegisterVars = {
   email: string;
   password: string;
@@ -97,7 +98,7 @@ export function useClearSessionCache(): () => void {
   return (): void => qc.clear();
 }
 
-/** Loads a fresh captcha image URL (after the server answered a login with "captcha required"). */
-export function useCaptchaUrlMutation(): UseMutationResult<string, Error, void> {
-  return useMutation({ mutationFn: getCaptchaUrl });
+/** Loads a new captcha (after the server answered a login with "captcha required"). */
+export function useCaptchaMutation(): UseMutationResult<Captcha, Error, void> {
+  return useMutation({ mutationFn: getCaptcha });
 }

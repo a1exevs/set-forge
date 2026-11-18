@@ -26,6 +26,7 @@ describe('AuthPageLogicLayer', () => {
   const onLogin = jest.fn().mockResolvedValue(undefined);
   const onRegister = jest.fn().mockResolvedValue(undefined);
   const onAuthenticated = jest.fn().mockResolvedValue(undefined);
+  const loadCaptcha = jest.fn();
 
   const renderTab = (activeTab: AuthTab): void => {
     render(
@@ -35,7 +36,7 @@ describe('AuthPageLogicLayer', () => {
         onLogin={onLogin}
         onRegister={onRegister}
         onAuthenticated={onAuthenticated}
-        loadCaptchaUrl={jest.fn()}
+        loadCaptcha={loadCaptcha}
       />,
     );
   };
@@ -273,6 +274,32 @@ describe('AuthPageLogicLayer', () => {
       await logIn();
 
       expect(await screen.findByText('Invalid email or password Captcha verification required')).toBeInTheDocument();
+    });
+
+    it('sends the answer with the id of the captcha it was read from, and a new captcha brings its own id', async () => {
+      const captchaDemanded = (): ApiRequestError =>
+        serverFailure(
+          401,
+          [{ code: 'NEED_AUTHORIZATION_WITH_CAPTCHA', params: {}, message: 'Captcha verification required' }],
+          10,
+        );
+      onLogin.mockRejectedValueOnce(captchaDemanded()).mockRejectedValueOnce(captchaDemanded());
+      loadCaptcha
+        .mockResolvedValueOnce({ id: 'captcha-1', imageUrl: 'data:image/svg+xml;base64,1' })
+        .mockResolvedValueOnce({ id: 'captcha-2', imageUrl: 'data:image/svg+xml;base64,2' });
+      const user = userEvent.setup();
+
+      await logIn();
+      await user.type(await screen.findByLabelText('Captcha'), 'aB3d');
+      await user.click(screen.getByRole('button', { name: 'Log in' }));
+      await waitFor(() => expect(loadCaptcha).toHaveBeenCalledTimes(2));
+      await user.type(screen.getByLabelText('Captcha'), 'xY7z');
+      await user.click(screen.getByRole('button', { name: 'Log in' }));
+
+      await waitFor(() => expect(onLogin).toHaveBeenCalledTimes(3));
+      expect(onLogin.mock.calls[0]?.[0].captcha).toBeUndefined();
+      expect(onLogin.mock.calls[1]?.[0].captcha).toEqual({ id: 'captcha-1', answer: 'aB3d' });
+      expect(onLogin.mock.calls[2]?.[0].captcha).toEqual({ id: 'captcha-2', answer: 'xY7z' });
     });
   });
 });

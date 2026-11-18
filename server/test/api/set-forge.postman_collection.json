@@ -827,9 +827,11 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test(\"Get captcha URL: 200 with an SVG\", function () {",
+                      "pm.test(\"Get captcha URL: 200 with an SVG and its id\", function () {",
                       "    pm.response.to.have.status(200);",
-                      "    pm.expect(pm.response.json().data.captchaURL.startsWith(\"data:image/svg+xml\")).to.be.true;",
+                      "    var data = pm.response.json().data;",
+                      "    pm.expect(data.captchaURL.startsWith(\"data:image/svg+xml\")).to.be.true;",
+                      "    pm.expect(data.captchaId).to.match(/^[0-9a-f-]{36}$/);",
                       "});"
                     ]
                   }
@@ -2790,7 +2792,7 @@
       "item": [
         {
           "name": "captcha",
-          "description": "Requests that need a person: the captcha text is only in the SVG image, so CI never runs this folder\n(`newman run … --folder api`). Walk it by hand in Postman against a running server:\n\n1. Run `api` → `auth` → `registration` once (it sets `email`), or set `email` to an existing user.\n2. Run `login (wrong password)` five times: the 1st–4th answer 401 with `INVALID_EMAIL_OR_PASSWORD` and\n   `resultCode` 1, the 5th adds `NEED_AUTHORIZATION_WITH_CAPTCHA` with `resultCode` 10.\n3. Run `login (wrong captcha)`: 401, `resultCode` 10, the only error `NEED_AUTHORIZATION_WITH_CAPTCHA`.\n4. Run `get captcha URL`, open `data.captchaURL` in a browser, type the text into the `captcha_text` variable.\n5. Run `login (with captcha)`: 201 — the counter is reset, the next failed login is plain again.\n\nPostman keeps the session cookie between the requests; the counter lives in that session.",
+          "description": "Requests that need a person: the captcha text is only in the SVG image, so CI never runs this folder\n(`newman run … --folder api`). Walk it by hand in Postman against a running server:\n\n1. Run `api` → `auth` → `registration` once (it sets `email`), or set `email` to an existing user.\n2. Run `login (wrong password)` five times: the 1st–4th answer 401 with `INVALID_EMAIL_OR_PASSWORD` and\n   `resultCode` 1, the 5th adds `NEED_AUTHORIZATION_WITH_CAPTCHA` with `resultCode` 10.\n3. Run `login (wrong captcha)`: 401, `resultCode` 10, the only error `NEED_AUTHORIZATION_WITH_CAPTCHA`.\n4. Run `get captcha URL` (it sets `captcha_id`), open `data.captchaURL` in a browser, type the text into the\n   `captcha_text` variable within 5 minutes.\n5. Run `login (with captcha)`: 201 — the count of this account and address starts over, the next failed login is\n   plain again. The same captcha sent once more is refused: a solved captcha opens one attempt.\n\nThe counts live on the server, by the account and the address: no cookie is needed, and clearing them changes\nnothing.",
           "item": [
             {
               "name": "login (wrong password)",
@@ -2918,7 +2920,8 @@
                     "exec": [
                       "pm.test(\"Get captcha URL: 200\", function () {",
                       "    pm.response.to.have.status(200);",
-                      "});"
+                      "});",
+                      "pm.collectionVariables.set(\"captcha_id\", pm.response.json().data.captchaId);"
                     ]
                   }
                 }
@@ -2944,7 +2947,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"captcha\": \"{{captcha_text}}\"\n}",
+                  "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"captcha\": \"{{captcha_text}}\",\n  \"captchaId\": \"{{captcha_id}}\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -2990,6 +2993,10 @@
     },
     {
       "key": "captcha_text",
+      "value": ""
+    },
+    {
+      "key": "captcha_id",
       "value": ""
     }
   ]

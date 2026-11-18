@@ -1,6 +1,7 @@
 /**
  * The verification stand: the e2e stack kept running for a person or an agent to check a change by hand —
- * ephemeral MySQL → Nest → Vite, on the ports of a free slot (`stand-registry.ts`), with the data of a preset.
+ * ephemeral MySQL and Redis → Nest → Vite, on the ports of a free slot (`stand-registry.ts`), with the data of a
+ * preset.
  *
  *   npm run client:stand -- [--preset=empty|user|data|history|reconsent]     (default: user)
  *   npm run client:stand:stop                         (every stand of this checkout)
@@ -17,7 +18,7 @@ import {
   claimSlot,
   currentBranch,
   currentWorktree,
-  recordContainer,
+  recordContainers,
   releaseSlot,
   STAND_START_TIMEOUT_MS,
   type StandEntry,
@@ -152,7 +153,7 @@ async function main(): Promise<void> {
       clientOrigin,
       log,
       // Recorded as soon as the container runs: a stand killed during the start still leaves its id for the stop.
-      onContainer: containerId => recordContainer(CLIENT_ROOT, entry.slot, containerId),
+      onContainers: containerIds => recordContainers(CLIENT_ROOT, entry.slot, containerIds),
     });
     stack = await starting;
     if (shuttingDown) {

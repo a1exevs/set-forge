@@ -7,6 +7,7 @@ import { resolve } from 'node:path';
 import { AuthModule, RefreshToken } from '@src/auth';
 import { HealthModule } from '@src/health/health.module';
 import { LoggerModule } from '@src/logger';
+import { RedisModule } from '@src/redis';
 import { Role, RolesModule } from '@src/roles';
 import { SecurityModule } from '@src/security';
 import { User, UserRole, UsersModule } from '@src/users';
@@ -47,6 +48,7 @@ import { WorkoutSession, WorkoutSessionExercise, WorkoutSessionsModule } from '@
       // changes the database.
       synchronize: false,
     }),
+    RedisModule,
     UsersModule,
     RolesModule,
     AuthModule,

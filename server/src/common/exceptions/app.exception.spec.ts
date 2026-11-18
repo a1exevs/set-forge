@@ -1,5 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 
+import { ResultCodes } from '@common/constants';
 import { ErrorItemResponse } from '@common/dto';
 import { AppException } from '@common/exceptions';
 
@@ -9,6 +10,17 @@ describe('AppException', () => {
     expect(exception.getStatus()).toBe(HttpStatus.UNAUTHORIZED);
     expect(exception.errors).toEqual([new ErrorItemResponse.Dto('INVALID_EMAIL_OR_PASSWORD')]);
     expect(exception.message).toBe('Invalid email or password');
+    expect(exception.resultCode).toBe(ResultCodes.ERROR);
+  });
+
+  it('should carry the result code it is given', () => {
+    const exception = new AppException(
+      HttpStatus.UNAUTHORIZED,
+      [new ErrorItemResponse.Dto('NEED_AUTHORIZATION_WITH_CAPTCHA')],
+      undefined,
+      ResultCodes.NEED_CAPTCHA_AUTHORIZATION,
+    );
+    expect(exception.resultCode).toBe(ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
   });
 
   it('should join the texts of several items into a string message', () => {

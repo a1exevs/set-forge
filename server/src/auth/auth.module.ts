@@ -8,16 +8,19 @@ import { AuthController } from '@auth/auth.controller';
 import { AuthService } from '@auth/auth.service';
 import { RefreshToken } from '@auth/refresh-tokens.model';
 import { RefreshTokensService } from '@auth/refresh-tokens.service';
+import { SignInAttemptsService } from '@auth/sign-in-attempts.service';
 import { TokensService } from '@auth/tokens.service';
 import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
+import { SecurityModule } from '@security/security.module';
 import { User } from '@users/users.model';
 import { UsersModule } from '@users/users.module';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, RefreshTokensService, TokensService, JwtAuthGuard, RefreshTokenGuard],
+  providers: [AuthService, RefreshTokensService, SignInAttemptsService, TokensService, JwtAuthGuard, RefreshTokenGuard],
   imports: [
     forwardRef(() => UsersModule),
+    SecurityModule,
     JwtModule.registerAsync({
       useFactory: (config: ConfigService) => {
         const secret = config.get<string>('JWT_SECRET_KEY');
