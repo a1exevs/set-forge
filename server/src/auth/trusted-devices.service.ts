@@ -3,7 +3,6 @@ import { ForeignKeyConstraintError, Op } from 'sequelize';
 
 import { hashOpaqueToken, newOpaqueToken } from '@auth/opaque-token';
 import { TrustedDevice } from '@auth/trusted-devices.model';
-import { User } from '@users/users.model';
 
 /** session/trusted-device */
 export const TRUSTED_DEVICE_LIFETIME_MS = 90 * 24 * 60 * 60 * 1000;
@@ -19,15 +18,17 @@ const asDeviceToken = (value: unknown): string | null =>
 /** The devices a user signed in on within the trust lifetime — session/trusted-device. */
 @Injectable()
 export class TrustedDevicesService {
-  /** Whether the device of the token is trusted for the account of the email. */
-  public async isTrusted(deviceToken: unknown, email: string): Promise<boolean> {
+  /**
+   * Whether the device of the token is trusted for the user. Without a user the lookup still runs and finds nothing,
+   * so a known email and an unknown one cost the same time.
+   */
+  public async isTrusted(deviceToken: unknown, userId: number | null): Promise<boolean> {
     const token = asDeviceToken(deviceToken);
     if (!token) {
       return false;
     }
     const found = await TrustedDevice.count({
-      where: { tokenHash: hashOpaqueToken(token), expires: { [Op.gt]: new Date() } },
-      include: [{ model: User, where: { email }, attributes: [] }],
+      where: { userId, tokenHash: hashOpaqueToken(token), expires: { [Op.gt]: new Date() } },
     });
     return found > 0;
   }

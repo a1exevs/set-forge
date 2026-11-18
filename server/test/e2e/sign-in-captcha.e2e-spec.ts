@@ -12,6 +12,7 @@ import { CAPTCHA_LIFETIME_SECONDS } from '@security/security.service';
 import { REDIS_CLIENT, RedisClient } from '@src/redis';
 import { createTestApp } from '@test/e2e/create-test-app';
 import { registerAndLogin } from '@test/e2e/e2e-auth.helper';
+import { UsersService } from '@users/users.service';
 
 const api = '/api/1.0';
 const password = 'StrongPass123!';
@@ -100,6 +101,22 @@ describe('Sign-in captcha', () => {
       .set('X-Forwarded-For', '198.51.100.20')
       .expect(response => expect(codesOf(response)).toEqual(['NEED_AUTHORIZATION_WITH_CAPTCHA']));
     await login({ email, password }).set('X-Forwarded-For', '198.51.100.21').expect(HttpStatus.CREATED);
+  });
+
+  it('counts every spelling of an email the account is found by as that one account', async () => {
+    const email = await newAccount();
+    const [name, domain] = email.split('@');
+    const accented = `${name?.replace('i', 'í')}@${domain}`;
+    const upperAccented = accented.toUpperCase();
+    for (let i = 0; i < CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS; i++) {
+      await login({ email, password: wrongPassword });
+    }
+
+    for (const spelling of [accented, upperAccented]) {
+      await login({ email: spelling, password })
+        .expect(HttpStatus.UNAUTHORIZED)
+        .expect(response => expect(codesOf(response)).toEqual(['NEED_AUTHORIZATION_WITH_CAPTCHA']));
+    }
   });
 
   it('never counts a failed request elsewhere', async () => {
@@ -202,8 +219,9 @@ describe('Sign-in captcha', () => {
     // Failures from other addresses, the way a spread-out guessing reaches the account-wide threshold.
     const failFromElsewhere = async (email: string): Promise<void> => {
       const attempts = app.get(SignInAttemptsService);
+      const userId = (await app.get(UsersService).getUserByEmail(email))?.id ?? 0;
       for (let i = 0; i < CAPTCHA_AFTER_FAILS_PER_ACCOUNT; i++) {
-        await attempts.reserve(email, `198.51.100.${i}`, false);
+        await attempts.reserve({ userId }, `198.51.100.${i}`, false);
       }
     };
 

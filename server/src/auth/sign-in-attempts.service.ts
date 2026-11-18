@@ -21,6 +21,9 @@ const COUNT_REPLY = 2;
 
 type Window = { readonly key: string; readonly threshold: number };
 
+/** Whom an attempt is counted against: the account the email names, or the email itself when it names none. */
+export type SignInAccount = { readonly userId: number } | { readonly email: string };
+
 /** One sign-in attempt, counted before its outcome is known. */
 export type SignInAttempt = {
   readonly accountAndAddressKey: string;
@@ -96,8 +99,11 @@ export class SignInAttemptsService {
    * Counts the attempt as a failure up front, in one atomic step per window: of attempts that overlap only as many
    * reach the password as the thresholds allow. `succeeded` takes it back.
    */
-  public async reserve(email: string, address: string, trustedDevice: boolean): Promise<SignInAttempt> {
-    const account = SignInAttemptsService.normalizeEmail(email);
+  public async reserve(signInAccount: SignInAccount, address: string, trustedDevice: boolean): Promise<SignInAttempt> {
+    const account =
+      'userId' in signInAccount
+        ? `user:${signInAccount.userId}`
+        : `email:${SignInAttemptsService.normalizeEmail(signInAccount.email)}`;
     const accountAndAddressKey = `sign-in:account-address:${this.pseudonym(`${account}\n${address}`)}`;
     const accountKey = trustedDevice ? null : `sign-in:account:${this.pseudonym(account)}`;
     const windows: Window[] = [{ key: accountAndAddressKey, threshold: CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS }];
