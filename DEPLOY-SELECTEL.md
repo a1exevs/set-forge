@@ -799,6 +799,21 @@ Caddy also sends HSTS (`Strict-Transport-Security`, one year) for the public hos
 cookie of the app can be planted over plain HTTP. A browser that has seen it refuses plain HTTP to that hostname for
 a year: keep the hostname on HTTPS once it is served.
 
+**Check after the first deploy that clients keep their own addresses.** Over IPv4 Docker forwards a published port
+with the client's address intact; an IPv6 connection goes through Docker's userland proxy instead (IPv6 off in the
+Docker daemon), and every such client arrives as the address of the Docker gateway, sharing one sign-in rate limit.
+Clients come over IPv6 only when the hostname has an AAAA record and the VDS a public IPv6 address: an `sslip.io` name
+resolves to IPv4 only, and a domain gets an AAAA record only when you add one. The check: from one network send 21
+sign-in attempts with a wrong password within a minute (the 21st answers 429), then sign in from another network (a
+phone on mobile data) at once — it must not answer 429. If it does:
+
+1. Take no IPv6 — the simple way: remove the AAAA record of the domain, or publish the ports of `caddy` on IPv4 only
+   (`"0.0.0.0:80:80"`, `"0.0.0.0:443:443"` in `docker-compose.yml`).
+2. Or, when IPv6 clients are wanted, enable IPv6 for Docker and the compose network, so a published port keeps the
+   client's IPv6 address (Docker docs, "Use IPv6 networking").
+
+Then repeat the check.
+
 ---
 
 ## Related documentation
