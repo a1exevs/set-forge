@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
 
-import { Routes } from '@common/constants';
+import { API_PREFIX } from '@common/constants';
 import { HttpExceptionFilter } from '@common/exception-filters';
 import { ResponseInterceptor } from '@common/interceptors';
 import { ValidationPipe } from '@common/pipes';
@@ -36,6 +36,6 @@ export async function configureApp(app: INestApplication): Promise<void> {
   app.useGlobalInterceptors(new ResponseInterceptor(app.get(Reflector)));
   app.useGlobalFilters(new HttpExceptionFilter());
   app.use(cookieParser());
-  app.setGlobalPrefix(Routes.API_PREFIX);
+  app.setGlobalPrefix(API_PREFIX);
   setupCORS(app, [clientUrl]);
 }

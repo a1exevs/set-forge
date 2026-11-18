@@ -5,7 +5,7 @@ import { CookieOptions, Request, Response } from 'express';
 import { AuthService } from '@auth/auth.service';
 import { AuthenticationResponse, GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto';
 import { IAuthenticationResult } from '@auth/interfaces';
-import { Docs, ResultCodes, Routes } from '@common/constants';
+import { API_PREFIX, Docs, ResultCodes, Routes } from '@common/constants';
 import { ApiErrorCases, ApiErrorResult, ApiResult } from '@common/decorators';
 import { OperationResultResponse } from '@common/dto';
 import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
@@ -231,7 +231,7 @@ export class AuthController {
     if (data.data.deviceTrust) {
       response.cookie(TRUSTED_DEVICE_COOKIE, data.data.deviceTrust.token, {
         ...AuthController.refreshCookieBaseOptions(),
-        path: `/${Routes.API_PREFIX}/${Routes.ENDPOINT_AUTH}`,
+        path: `/${API_PREFIX}/${Routes.ENDPOINT_AUTH}`,
         expires: data.data.deviceTrust.expires,
       });
     }
