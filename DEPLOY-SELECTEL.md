@@ -811,6 +811,9 @@ phone on mobile data) at once — it must not answer 429. If it does:
    (`"0.0.0.0:80:80"`, `"0.0.0.0:443:443"` in `docker-compose.yml`).
 2. Or, when IPv6 clients are wanted, enable IPv6 for Docker and the compose network, so a published port keeps the
    client's IPv6 address (Docker docs, "Use IPv6 networking").
+   Before that, the sign-in rate limit and the account + address count have to count an IPv6 client by its /64
+   network rather than its full address: a client is usually given a whole /64 and could change its address on every
+   attempt. They count full addresses today — a task of its own.
 
 Then repeat the check.
 
