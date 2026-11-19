@@ -206,13 +206,16 @@ describe('Sign-in captcha', () => {
 
     expect(captcha.get('Set-Cookie')).toBeUndefined();
     expect(failed.get('Set-Cookie')).toBeUndefined();
-    expect(signedIn.get('Set-Cookie')?.map(cookie => cookie.split('=')[0])).toEqual(['refreshToken', 'trustedDevice']);
+    expect(signedIn.get('Set-Cookie')?.map(cookie => cookie.split('=')[0])).toEqual([
+      'refreshToken',
+      '__Host-trustedDevice',
+    ]);
   });
 
   // @invariant session/trusted-device
   describe('on a trusted device', () => {
     const deviceCookie = (response: request.Response): string => {
-      const cookie = response.get('Set-Cookie')?.find(item => item.startsWith('trustedDevice='));
+      const cookie = response.get('Set-Cookie')?.find(item => item.startsWith('__Host-trustedDevice='));
       return cookie?.split(';')[0] ?? '';
     };
 
@@ -234,7 +237,9 @@ describe('Sign-in captcha', () => {
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
         expect(codesOf(response)).toEqual(['NEED_AUTHORIZATION_WITH_CAPTCHA']);
       });
-      await login({ email, password }).set('Cookie', 'trustedDevice=planted-value').expect(HttpStatus.UNAUTHORIZED);
+      await login({ email, password })
+        .set('Cookie', '__Host-trustedDevice=planted-value')
+        .expect(HttpStatus.UNAUTHORIZED);
       await login({ email, password }).set('Cookie', device).expect(HttpStatus.CREATED);
     });
 
@@ -262,7 +267,7 @@ describe('Sign-in captcha', () => {
         .auth(again.body.data.accessToken, { type: 'bearer' })
         .set('Cookie', again.get('Set-Cookie') ?? []);
       expect(logout.status).toBe(HttpStatus.OK);
-      expect(logout.get('Set-Cookie')?.some(cookie => cookie.startsWith('trustedDevice='))).toBeFalsy();
+      expect(logout.get('Set-Cookie')?.some(cookie => cookie.startsWith('__Host-trustedDevice='))).toBeFalsy();
 
       await failFromElsewhere(email);
       await login({ email, password }).set('Cookie', device).expect(HttpStatus.CREATED);

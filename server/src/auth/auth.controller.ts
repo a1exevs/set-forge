@@ -5,13 +5,16 @@ import { CookieOptions, Request, Response } from 'express';
 import { AuthService } from '@auth/auth.service';
 import { AuthenticationResponse, GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto';
 import { IAuthenticationResult } from '@auth/interfaces';
-import { API_PREFIX, Docs, ResultCodes, Routes } from '@common/constants';
+import { Docs, ResultCodes, Routes } from '@common/constants';
 import { ApiErrorCases, ApiErrorResult, ApiResult } from '@common/decorators';
 import { OperationResultResponse } from '@common/dto';
 import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
 
-/** The cookie that marks a device the user signed in on — session/trusted-device. */
-export const TRUSTED_DEVICE_COOKIE = 'trustedDevice';
+/**
+ * The cookie that marks a device the user signed in on — session/trusted-device. `__Host-` makes the browser take it
+ * from this host only, so no sibling site or subdomain can plant a mark of its own.
+ */
+export const TRUSTED_DEVICE_COOKIE = '__Host-trustedDevice';
 
 @ApiTags(Docs.AUTHORIZATION_CONTROLLER)
 @Controller(Routes.ENDPOINT_AUTH)
@@ -234,9 +237,12 @@ export class AuthController {
     }
     // session/trusted-device: logout and account deletion leave it — the trust outlives the session.
     if (data.data.deviceTrust) {
+      // The prefix holds only with Secure, Path=/ and no Domain; localhost counts as secure, so dev keeps it too.
       response.cookie(TRUSTED_DEVICE_COOKIE, data.data.deviceTrust.token, {
-        ...AuthController.refreshCookieBaseOptions(),
-        path: `/${API_PREFIX}/${Routes.ENDPOINT_AUTH}`,
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: true,
+        path: '/',
         expires: data.data.deviceTrust.expires,
       });
     }
