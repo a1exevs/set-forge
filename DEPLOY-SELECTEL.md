@@ -795,6 +795,29 @@ of the API changes that number in the same edit — otherwise every client is co
 rate limit (20 attempts a minute per address) refuses them all together. Caddy ignores an `X-Forwarded-For` sent by a
 client, so the address cannot be forged from outside.
 
+Caddy also sends HSTS (`Strict-Transport-Security`, one year) for the public hostname — not for `localhost` — so no
+cookie of the app can be planted over plain HTTP. A browser that has seen it refuses plain HTTP to that hostname for
+a year: keep the hostname on HTTPS once it is served.
+
+**Check after the first deploy that clients keep their own addresses.** Over IPv4 Docker forwards a published port
+with the client's address intact; an IPv6 connection goes through Docker's userland proxy instead (IPv6 off in the
+Docker daemon), and every such client arrives as the address of the Docker gateway, sharing one sign-in rate limit.
+Clients come over IPv6 only when the hostname has an AAAA record and the VDS a public IPv6 address: an `sslip.io` name
+resolves to IPv4 only, and a domain gets an AAAA record only when you add one. The check: from one network send 21
+sign-in attempts with a wrong password within a minute (the 21st answers 429), then sign in from another network (a
+phone on mobile data) at once — it must not answer 429. If it does:
+
+1. Take no IPv6 — the default: `docker-compose.yml` publishes the ports of `caddy` on IPv4 only (`0.0.0.0:`), so with
+   an AAAA record IPv6 clients cannot connect and browsers fall back to IPv4. If the check still fails, the ports were
+   changed — restore `0.0.0.0:`.
+2. Or, when IPv6 clients are wanted, enable IPv6 for Docker and the compose network, so a published port keeps the
+   client's IPv6 address (Docker docs, "Use IPv6 networking").
+   Before that, the sign-in rate limit and the account + address count have to count an IPv6 client by its /64
+   network rather than its full address: a client is usually given a whole /64 and could change its address on every
+   attempt. They count full addresses today — a task of its own.
+
+Then repeat the check.
+
 ---
 
 ## Related documentation

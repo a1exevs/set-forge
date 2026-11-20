@@ -144,9 +144,11 @@ services:
       - client-prod
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
+    # IPv4 only: an IPv6 connection would reach Caddy through Docker's userland proxy as the gateway's address, and every
+    # such client would share one sign-in rate limit (DEPLOY-SELECTEL.md, the check after the first deploy).
     ports:
-      - "${HTTP_PORT:-80}:80"
-      - "${HTTPS_PORT:-443}:443"
+      - "0.0.0.0:${HTTP_PORT:-80}:80"
+      - "0.0.0.0:${HTTPS_PORT:-443}:443"
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

@@ -3,7 +3,7 @@ export const Docs = {
 
   REGISTRATION_ENDPOINT: 'Register a user',
   REGISTRATION_SUCCESSFUL_RESULT:
-    'User registered successfully; sets the `refreshToken` cookie and the `trustedDevice` cookie of this device',
+    'User registered successfully; sets the `refreshToken` cookie and the `__Host-trustedDevice` cookie of this device',
   REGISTRATION_BAD_REQUEST: 'Bad request',
   REGISTRATION_CONFLICT: 'A user with this email already exists',
   REGISTRATION_SERVICE_UNAVAILABLE: 'Service is unavailable: the user role is not configured',
@@ -11,7 +11,7 @@ export const Docs = {
 
   AUTHORIZATION_ENDPOINT: 'Log in',
   AUTHORIZATION_SUCCESSFUL_RESULT:
-    'User authenticated successfully; sets the `refreshToken` cookie and the `trustedDevice` cookie of this device',
+    'User authenticated successfully; sets the `refreshToken` cookie and the `__Host-trustedDevice` cookie of this device',
   AUTHORIZATION_BAD_REQUEST: 'Bad request',
   AUTHORIZATION_TOO_MANY_REQUESTS: 'Too many sign-in attempts from this address within a minute; Retry-After says when',
   AUTHORIZATION_UNAUTHORIZED: 'Wrong email or password, or the captcha is required or wrong',

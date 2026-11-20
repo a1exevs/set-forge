@@ -12,6 +12,7 @@ import { CAPTCHA_LIFETIME_SECONDS } from '@security/security.service';
 import { REDIS_CLIENT, RedisClient } from '@src/redis';
 import { createTestApp } from '@test/e2e/create-test-app';
 import { registerAndLogin } from '@test/e2e/e2e-auth.helper';
+import { UsersService } from '@users/users.service';
 
 const api = '/api/1.0';
 const password = 'StrongPass123!';
@@ -102,6 +103,22 @@ describe('Sign-in captcha', () => {
     await login({ email, password }).set('X-Forwarded-For', '198.51.100.21').expect(HttpStatus.CREATED);
   });
 
+  it('counts every spelling of an email the account is found by as that one account', async () => {
+    const email = await newAccount();
+    const [name, domain] = email.split('@');
+    const accented = `${name?.replace('i', 'í')}@${domain}`;
+    const upperAccented = accented.toUpperCase();
+    for (let i = 0; i < CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS; i++) {
+      await login({ email, password: wrongPassword });
+    }
+
+    for (const spelling of [accented, upperAccented]) {
+      await login({ email: spelling, password })
+        .expect(HttpStatus.UNAUTHORIZED)
+        .expect(response => expect(codesOf(response)).toEqual(['NEED_AUTHORIZATION_WITH_CAPTCHA']));
+    }
+  });
+
   it('never counts a failed request elsewhere', async () => {
     const email = await newAccount();
     for (let i = 0; i < CAPTCHA_AFTER_FAILS_PER_ACCOUNT_AND_ADDRESS; i++) {
@@ -189,21 +206,25 @@ describe('Sign-in captcha', () => {
 
     expect(captcha.get('Set-Cookie')).toBeUndefined();
     expect(failed.get('Set-Cookie')).toBeUndefined();
-    expect(signedIn.get('Set-Cookie')?.map(cookie => cookie.split('=')[0])).toEqual(['refreshToken', 'trustedDevice']);
+    expect(signedIn.get('Set-Cookie')?.map(cookie => cookie.split('=')[0])).toEqual([
+      'refreshToken',
+      '__Host-trustedDevice',
+    ]);
   });
 
   // @invariant session/trusted-device
   describe('on a trusted device', () => {
     const deviceCookie = (response: request.Response): string => {
-      const cookie = response.get('Set-Cookie')?.find(item => item.startsWith('trustedDevice='));
+      const cookie = response.get('Set-Cookie')?.find(item => item.startsWith('__Host-trustedDevice='));
       return cookie?.split(';')[0] ?? '';
     };
 
     // Failures from other addresses, the way a spread-out guessing reaches the account-wide threshold.
     const failFromElsewhere = async (email: string): Promise<void> => {
       const attempts = app.get(SignInAttemptsService);
+      const userId = (await app.get(UsersService).getUserByEmail(email))?.id ?? 0;
       for (let i = 0; i < CAPTCHA_AFTER_FAILS_PER_ACCOUNT; i++) {
-        await attempts.reserve(email, `198.51.100.${i}`, false);
+        await attempts.reserve({ userId }, `198.51.100.${i}`, false);
       }
     };
 
@@ -216,7 +237,9 @@ describe('Sign-in captcha', () => {
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
         expect(codesOf(response)).toEqual(['NEED_AUTHORIZATION_WITH_CAPTCHA']);
       });
-      await login({ email, password }).set('Cookie', 'trustedDevice=planted-value').expect(HttpStatus.UNAUTHORIZED);
+      await login({ email, password })
+        .set('Cookie', '__Host-trustedDevice=planted-value')
+        .expect(HttpStatus.UNAUTHORIZED);
       await login({ email, password }).set('Cookie', device).expect(HttpStatus.CREATED);
     });
 
@@ -244,7 +267,7 @@ describe('Sign-in captcha', () => {
         .auth(again.body.data.accessToken, { type: 'bearer' })
         .set('Cookie', again.get('Set-Cookie') ?? []);
       expect(logout.status).toBe(HttpStatus.OK);
-      expect(logout.get('Set-Cookie')?.some(cookie => cookie.startsWith('trustedDevice='))).toBeFalsy();
+      expect(logout.get('Set-Cookie')?.some(cookie => cookie.startsWith('__Host-trustedDevice='))).toBeFalsy();
 
       await failFromElsewhere(email);
       await login({ email, password }).set('Cookie', device).expect(HttpStatus.CREATED);

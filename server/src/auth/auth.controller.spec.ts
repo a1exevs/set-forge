@@ -210,12 +210,12 @@ describe('AuthController', () => {
         .spyOn(authService, 'registration')
         .mockImplementation(async () => serviceRegisterResponseMock);
       const controllerRegisterResponse = new AuthenticationResponse.Dto({ userId, accessToken });
-      const req = createRequest({ cookies: { trustedDevice: 'device-token' } });
+      const req = createRequest({ cookies: { '__Host-trustedDevice': 'device-token' } });
       const response = await authController.registration(registerDto, res, req);
       expect(response).toEqual(controllerRegisterResponse);
       expect(res.cookies.refreshToken.value).toBe(refreshToken);
       expect(res.cookies.refreshToken.options.httpOnly).toBe(true);
-      expect(res.cookies.trustedDevice.value).toBe(DEVICE_TRUST.token);
+      expect(res.cookies['__Host-trustedDevice'].value).toBe(DEVICE_TRUST.token);
       expect(mockRegistrationF).toBeCalledTimes(1);
       expect(mockRegistrationF).toBeCalledWith(registerDto, 'device-token');
     });
@@ -239,7 +239,7 @@ describe('AuthController', () => {
 
   describe('AuthController - login', () => {
     it('Login method: should be successful result', async () => {
-      const req = createRequest({ ip: '203.0.113.7', cookies: { trustedDevice: 'device-token' } });
+      const req = createRequest({ ip: '203.0.113.7', cookies: { '__Host-trustedDevice': 'device-token' } });
       const res = createResponse();
       const userId = 1;
       const accessToken = '12345fsagasdsfasdfsdf';
@@ -264,11 +264,13 @@ describe('AuthController', () => {
 
       await authController.login({ email: 'user@yandex.ru', password: '0000' }, res, createRequest());
 
-      expect(res.cookies.trustedDevice.value).toBe(DEVICE_TRUST.token);
-      expect(res.cookies.trustedDevice.options).toMatchObject({
+      expect(res.cookies['__Host-trustedDevice'].value).toBe(DEVICE_TRUST.token);
+      // The browser takes a __Host- cookie only with Secure, Path=/ and no Domain.
+      expect(res.cookies['__Host-trustedDevice'].options).toEqual({
         httpOnly: true,
         sameSite: 'lax',
-        path: '/api/1.0/auth',
+        secure: true,
+        path: '/',
         expires: DEVICE_TRUST.expires,
       });
     });
@@ -279,7 +281,7 @@ describe('AuthController', () => {
 
       await authController.login({ email: 'user@yandex.ru', password: '0000' }, res, createRequest());
 
-      expect(res.cookies.trustedDevice).toBeUndefined();
+      expect(res.cookies['__Host-trustedDevice']).toBeUndefined();
     });
     it('Login method: should be unauthorized', async () => {
       const req = createRequest();
@@ -369,13 +371,13 @@ describe('AuthController', () => {
     // @invariant session/trusted-device
     it('Logout method: should leave the device cookie, the trust outlives the session', async () => {
       const req = createRequest();
-      req._setCookiesVariable('trustedDevice', 'device-token');
+      req._setCookiesVariable('__Host-trustedDevice', 'device-token');
       const res = createResponse();
       jest.spyOn(authService, 'logout').mockResolvedValue(undefined);
 
       await authController.logout(req, res);
 
-      expect(res.cookies.trustedDevice).toBeUndefined();
+      expect(res.cookies['__Host-trustedDevice']).toBeUndefined();
     });
   });
 });

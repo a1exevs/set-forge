@@ -3,7 +3,6 @@ import { ForeignKeyConstraintError, Op } from 'sequelize';
 import { hashOpaqueToken } from '@auth/opaque-token';
 import { TrustedDevice } from '@auth/trusted-devices.model';
 import { TRUSTED_DEVICE_LIFETIME_MS, TrustedDevicesService } from '@auth/trusted-devices.service';
-import { User } from '@users/users.model';
 
 jest.mock('./trusted-devices.model');
 
@@ -22,26 +21,33 @@ describe('TrustedDevicesService', () => {
 
   // @invariant session/trusted-device
   describe('isTrusted', () => {
-    it('should look up the token hash for the user of the email among the records not yet expired', async () => {
+    it('should look up the token hash for the user among the records not yet expired', async () => {
       count.mockResolvedValue(1 as never);
       const before = Date.now();
 
-      await expect(service.isTrusted('device-token', 'user@example.com')).resolves.toBe(true);
+      await expect(service.isTrusted('device-token', 7)).resolves.toBe(true);
 
       const [options] = count.mock.calls[0];
+      expect(options.where.userId).toBe(7);
       expect(options.where.tokenHash).toBe(hashOpaqueToken('device-token'));
       expect(options.where.expires[Op.gt].getTime()).toBeGreaterThanOrEqual(before);
-      expect(options.include).toEqual([{ model: User, where: { email: 'user@example.com' }, attributes: [] }]);
     });
 
     it('should not trust a device without a live record for the account (expired, another account, none)', async () => {
-      await expect(service.isTrusted('device-token', 'user@example.com')).resolves.toBe(false);
+      await expect(service.isTrusted('device-token', 7)).resolves.toBe(false);
+    });
+
+    it('should still run the lookup for an email that names no account, so it costs the same time', async () => {
+      await expect(service.isTrusted('device-token', null)).resolves.toBe(false);
+
+      expect(count).toHaveBeenCalledTimes(1);
+      expect(count.mock.calls[0][0].where.userId).toBeNull();
     });
 
     it.each([[undefined], [''], [42], ['x'.repeat(129)]])(
       'should not trust a value that is no token of ours, without a lookup (%#)',
       async value => {
-        await expect(service.isTrusted(value, 'user@example.com')).resolves.toBe(false);
+        await expect(service.isTrusted(value, 7)).resolves.toBe(false);
         expect(count).not.toHaveBeenCalled();
       },
     );

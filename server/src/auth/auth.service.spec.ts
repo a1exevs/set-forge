@@ -212,6 +212,7 @@ describe('AuthService', () => {
 
       const loginDto: LoginRequest.Dto = { email, password };
       const mockUser = {
+        id: 3,
         email,
         password: hashedPassword,
       };
@@ -243,7 +244,7 @@ describe('AuthService', () => {
       expect(tokenService.generateAccessToken).toBeCalledWith(mockUser);
       expect(tokenService.generateRefreshToken).toBeCalledTimes(1);
       expect(tokenService.generateRefreshToken).toBeCalledWith(mockUser, TokensService.getRefreshTokenExpiresIn());
-      expect(signInAttempts.reserve).toBeCalledWith(email, ADDRESS, false);
+      expect(signInAttempts.reserve).toBeCalledWith({ userId: mockUser.id }, ADDRESS, false);
       expect(signInAttempts.succeeded).toBeCalledTimes(1);
     });
     // @invariant session/deletion-during-sign-in
@@ -383,7 +384,8 @@ describe('AuthService', () => {
         resultCode: ResultCodes.ERROR,
       });
       expect(compare).toBeCalledTimes(1);
-      expect(signInAttempts.reserve).toBeCalledWith('nobody@yandex.com', ADDRESS, false);
+      expect(signInAttempts.reserve).toBeCalledWith({ email: 'nobody@yandex.com' }, ADDRESS, false);
+      expect(trustedDevices.isTrusted).toBeCalledWith(DEVICE, null);
     });
 
     it('should start the count over once the password is right, before the sign-in is stored', async () => {
@@ -437,8 +439,8 @@ describe('AuthService', () => {
 
       await authService.login({ email: mockUser.email, password }, ADDRESS, DEVICE);
 
-      expect(trustedDevices.isTrusted).toBeCalledWith(DEVICE, mockUser.email);
-      expect(signInAttempts.reserve).toBeCalledWith(mockUser.email, ADDRESS, true);
+      expect(trustedDevices.isTrusted).toBeCalledWith(DEVICE, mockUser.id);
+      expect(signInAttempts.reserve).toBeCalledWith({ userId: mockUser.id }, ADDRESS, true);
     });
 
     it('should trust the device for the user after a sign-in and hand the trust to the answer', async () => {

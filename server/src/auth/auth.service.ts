@@ -11,7 +11,6 @@ import { DocumentVersions, ErrorCode, ResultCodes } from '@common/constants';
 import { ErrorItemResponse } from '@common/dto';
 import { AppException } from '@common/exceptions';
 import { SecurityService } from '@security/security.service';
-import { CreateUserRequest } from '@users/dto';
 import { User } from '@users/users.model';
 import { UsersService } from '@users/users.service';
 
@@ -61,13 +60,20 @@ export class AuthService {
    */
   async login(dto: LoginRequest.Dto, address: string, deviceToken: unknown): Promise<IAuthenticationResult> {
     await this.signInAttempts.checkRate(address);
-    const trustedDevice = await this.trustedDevices.isTrusted(deviceToken, dto.email);
-    const attempt = await this.signInAttempts.reserve(dto.email, address, trustedDevice);
+    // Counted by the account the lookup resolves, not by the typed email: every spelling the lookup takes for one
+    // account shares its counts.
+    const account = await this.userService.getUserByEmail(dto.email, true);
+    const trustedDevice = await this.trustedDevices.isTrusted(deviceToken, account?.id ?? null);
+    const attempt = await this.signInAttempts.reserve(
+      account ? { userId: account.id } : { email: dto.email },
+      address,
+      trustedDevice,
+    );
     if (attempt.demandsCaptcha && !(await this.securityService.solvesCaptcha(dto.captchaId, dto.captcha))) {
       throw AuthService.captchaDemanded(['NEED_AUTHORIZATION_WITH_CAPTCHA']);
     }
 
-    const user = await this.validateUser(dto);
+    const user = await AuthService.passwordMatches(dto.password, account);
     if (!user) {
       throw AuthService.signInFailed(attempt);
     }
@@ -147,11 +153,10 @@ export class AuthService {
     return this.userService.deleteUser(userId);
   }
 
-  /** The user the email and the password name, or null — an unknown email and a wrong password look the same. */
-  private async validateUser(dto: CreateUserRequest.Dto): Promise<User | null> {
-    const user = await this.userService.getUserByEmail(dto.email, true);
-    const passwordsEqual = await bcrypt.compare(dto.password, user?.password ?? NO_ACCOUNT_PASSWORD_HASH);
-    return user && passwordsEqual ? user : null;
+  /** The account when the password is its own, or null — an unknown email and a wrong password look the same. */
+  private static async passwordMatches(password: string, account: User | null): Promise<User | null> {
+    const passwordsEqual = await bcrypt.compare(password, account?.password ?? NO_ACCOUNT_PASSWORD_HASH);
+    return account && passwordsEqual ? account : null;
   }
 
   private static signInFailed(attempt: SignInAttempt): AppException {
