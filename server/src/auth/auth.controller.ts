@@ -1,28 +1,20 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpStatus,
-  Patch,
-  Post,
-  Req,
-  Res,
-  UseFilters,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CookieOptions, Request, Response } from 'express';
 
 import { AuthService } from '@auth/auth.service';
 import { AuthenticationResponse, GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto';
-import { CaptchaCountExceptionFilter } from '@auth/exception-filters';
-import { SvgCaptchaGuard } from '@auth/guards';
 import { IAuthenticationResult } from '@auth/interfaces';
 import { Docs, ResultCodes, Routes } from '@common/constants';
 import { ApiErrorCases, ApiErrorResult, ApiResult } from '@common/decorators';
 import { OperationResultResponse } from '@common/dto';
 import { JwtAuthGuard, RefreshTokenGuard } from '@common/guards';
+
+/**
+ * The cookie that marks a device the user signed in on — session/trusted-device. `__Host-` makes the browser take it
+ * from this host only, so no sibling site or subdomain can plant a mark of its own.
+ */
+export const TRUSTED_DEVICE_COOKIE = '__Host-trustedDevice';
 
 @ApiTags(Docs.AUTHORIZATION_CONTROLLER)
 @Controller(Routes.ENDPOINT_AUTH)
@@ -64,8 +56,12 @@ export class AuthController {
     cases: { roleMissing: [{ code: 'USER_ROLE_CONFIGURATION_IS_MISSING' }] },
   })
   @Post('/registration')
-  async registration(@Body() dto: RegisterRequest.Dto, @Res({ passthrough: true }) response: Response) {
-    const registerResult = await this.authService.registration(dto);
+  async registration(
+    @Body() dto: RegisterRequest.Dto,
+    @Res({ passthrough: true }) response: Response,
+    @Req() request: Request,
+  ) {
+    const registerResult = await this.authService.registration(dto, request.cookies?.[TRUSTED_DEVICE_COOKIE]);
     AuthController.setupCookies(response, registerResult);
     return new AuthenticationResponse.Dto({
       userId: registerResult.data.user.id,
@@ -98,15 +94,35 @@ export class AuthController {
   @ApiErrorResult({
     status: HttpStatus.BAD_REQUEST,
     description: Docs.AUTHORIZATION_BAD_REQUEST,
-    cases: { invalidFields: [{ code: 'MUST_BE_A_STRING', field: 'email' }] },
+    cases: {
+      invalidFields: [
+        { code: 'MUST_BE_A_STRING', field: 'email' },
+        { code: 'MUST_BE_A_UUID', field: 'captchaId' },
+      ],
+    },
   })
-  @UseGuards(SvgCaptchaGuard)
-  @UseFilters(CaptchaCountExceptionFilter)
+  @ApiErrorResult({
+    status: HttpStatus.TOO_MANY_REQUESTS,
+    description: Docs.AUTHORIZATION_TOO_MANY_REQUESTS,
+    cases: { tooManyAttempts: [{ code: 'TOO_MANY_SIGN_IN_ATTEMPTS', params: { seconds: 42 } }] },
+  })
+  @ApiErrorResult({
+    status: HttpStatus.SERVICE_UNAVAILABLE,
+    description: Docs.SIGN_IN_SERVICE_UNAVAILABLE,
+    cases: { storeUnavailable: [{ code: 'SIGN_IN_TEMPORARILY_UNAVAILABLE' }] },
+  })
   @Post('/login')
-  async login(@Body() dto: LoginRequest.Dto, @Res({ passthrough: true }) response: Response, @Req() request) {
-    const loginResult: IAuthenticationResult = await this.authService.login(dto);
+  async login(
+    @Body() dto: LoginRequest.Dto,
+    @Res({ passthrough: true }) response: Response,
+    @Req() request: Request,
+  ): Promise<AuthenticationResponse.Dto> {
+    const loginResult: IAuthenticationResult = await this.authService.login(
+      dto,
+      request.ip ?? '',
+      request.cookies?.[TRUSTED_DEVICE_COOKIE],
+    );
     AuthController.setupCookies(response, loginResult);
-    AuthController.resetAuthFailedCounter(request);
     return new AuthenticationResponse.Dto({
       userId: loginResult.data.user.id,
       accessToken: loginResult.data.payload.accessToken,
@@ -219,6 +235,17 @@ export class AuthController {
         expires: data.data.payload.refreshToken_expiration,
       }); // path: AUTH_PATH
     }
+    // session/trusted-device: logout and account deletion leave it — the trust outlives the session.
+    if (data.data.deviceTrust) {
+      // The prefix holds only with Secure, Path=/ and no Domain; localhost counts as secure, so dev keeps it too.
+      response.cookie(TRUSTED_DEVICE_COOKIE, data.data.deviceTrust.token, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: true,
+        path: '/',
+        expires: data.data.deviceTrust.expires,
+      });
+    }
   }
 
   // `secure: true` is required for SameSite policies in modern browsers; `localhost` is treated as a secure context, so dev still works.
@@ -229,10 +256,5 @@ export class AuthController {
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
     };
-  }
-
-  private static resetAuthFailedCounter(request) {
-    const { session } = request;
-    session.authFailedCount = null;
   }
 }

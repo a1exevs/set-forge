@@ -9,6 +9,11 @@
 {$SITE_ADDRESS:localhost} {
 	encode zstd gzip
 
+	# HTTPS only from the first visit on, so no cookie of the app (refreshToken, trustedDevice) can be planted through
+	# plain HTTP. Not for local names: the browser would then force HTTPS on every local project.
+	@public not host localhost *.localhost
+	header @public Strict-Transport-Security "max-age=31536000"
+
 	# Caddy v2 auto-forwards X-Forwarded-{For,Proto} and preserves Host.
 	# Only X-Real-IP is non-default and worth setting explicitly.
 	reverse_proxy client-prod:80 {

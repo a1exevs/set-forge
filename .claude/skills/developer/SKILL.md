@@ -351,7 +351,9 @@ another session's stand. Code: `client/tests/stand/`.
   `empty` (no users — for flows that start at registration), `user` (a registered user without data), `data` (a
   registered user with two lists and one completed workout session), `history` (`data` plus enough completed workout
   sessions for a second page of history), `reconsent` (the `user` user, who accepted the documents of version 1,
-  and a server restarted on the same database to require version 2 — the re-consent gate after login). A criterion
+  and a server restarted on the same database to require version 2 — the re-consent gate after login),
+  `rate-limit` (the `user` user and a server restarted with the production limit of sign-in attempts). The stand
+  trusts one proxy hop, so API requests may carry `X-Forwarded-For` to act from another address. A criterion
   that needs more (an active workout session, …)
   gets a new preset there, in the same task — never a hand-made state.
 - Stop — `npm run client:stand:stop` (every stand of this checkout) or `-- --slot=<k>`; `-- --list` shows every

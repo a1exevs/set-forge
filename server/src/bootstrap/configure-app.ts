@@ -1,14 +1,12 @@
 import { INestApplication } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
-import * as session from 'express-session';
-import { Sequelize } from 'sequelize';
 
+import { API_PREFIX } from '@common/constants';
 import { HttpExceptionFilter } from '@common/exception-filters';
 import { ResponseInterceptor } from '@common/interceptors';
 import { ValidationPipe } from '@common/pipes';
 import { LoggerService } from '@src/logger';
-import { SequelizeSessionStore } from '@src/security/sequelize-session.store';
 
 function setupCORS(app: INestApplication, whiteList: string[]) {
   app.enableCors({
@@ -26,45 +24,28 @@ function setupCORS(app: INestApplication, whiteList: string[]) {
   });
 }
 
-function setupLogger(app: INestApplication) {
-  app.useLogger(app.get(LoggerService));
+// Behind proxies the socket is the nearest proxy; trusting their number makes `request.ip` the client's own address
+// (session/sign-in-rate-limit). None is trusted by default, so a client cannot claim an address of its own.
+function setupTrustProxy(app: INestApplication): void {
+  const hops = Number(process.env.TRUST_PROXY_HOPS);
+  if (Number.isInteger(hops) && hops > 0) {
+    app.getHttpAdapter().getInstance().set('trust proxy', hops);
+  }
 }
 
-async function setupSession(app: INestApplication) {
-  // TODO(refactor): use the NestJS SequelizeModule connection for SequelizeSessionStore instead of a second Sequelize pool (duplicate MYSQL_* config and connections).
-  const sequelize = new Sequelize({
-    dialect: 'mysql',
-    host: process.env.MYSQL_HOST,
-    port: Number(process.env.MYSQL_PORT),
-    username: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DB,
-    logging: false,
-  });
-
-  const ttlMs = Number(process.env.SESSION_TTL_MS || 24 * 60 * 60 * 1000);
-  const sessionStore = new SequelizeSessionStore(sequelize, ttlMs);
-  await sessionStore.sync();
-
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET_KEY,
-      resave: false,
-      saveUninitialized: false,
-      store: sessionStore,
-    }),
-  );
+function setupLogger(app: INestApplication) {
+  app.useLogger(app.get(LoggerService));
 }
 
 export async function configureApp(app: INestApplication): Promise<void> {
   const clientUrl = process.env.CLIENT_URL || undefined;
 
   setupLogger(app);
+  setupTrustProxy(app);
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ResponseInterceptor(app.get(Reflector)));
   app.useGlobalFilters(new HttpExceptionFilter());
   app.use(cookieParser());
-  app.setGlobalPrefix('api/1.0');
+  app.setGlobalPrefix(API_PREFIX);
   setupCORS(app, [clientUrl]);
-  await setupSession(app);
 }

@@ -6,5 +6,6 @@ import { SecurityService } from '@security/security.service';
 @Module({
   controllers: [SecurityController],
   providers: [SecurityService],
+  exports: [SecurityService],
 })
 export class SecurityModule {}

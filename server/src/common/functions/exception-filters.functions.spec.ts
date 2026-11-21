@@ -42,16 +42,42 @@ describe('sendErrorResponse', () => {
   it('should send the given result code', () => {
     const response = createResponse();
     const errors = [new ErrorItemResponse.Dto('NEED_AUTHORIZATION_WITH_CAPTCHA')];
-    sendErrorResponse(response, { status: HttpStatus.UNAUTHORIZED, errors }, ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
+    sendErrorResponse(response, {
+      status: HttpStatus.UNAUTHORIZED,
+      errors,
+      resultCode: ResultCodes.NEED_CAPTCHA_AUTHORIZATION,
+    });
 
     expect(JSON.parse(response._getData()).resultCode).toBe(ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
+  });
+
+  it('should send the headers of the result', () => {
+    const response = createResponse();
+    const errors = [new ErrorItemResponse.Dto('UNAUTHORIZED')];
+    sendErrorResponse(response, { status: HttpStatus.TOO_MANY_REQUESTS, errors, headers: { 'Retry-After': '7' } });
+
+    expect(response.getHeader('Retry-After')).toBe('7');
   });
 });
 
 describe('toErrorResult', () => {
   it('should give the items of an AppException', () => {
     const exception = AppException.of(HttpStatus.CONFLICT, 'USER_ALREADY_EXISTS');
-    expect(toErrorResult(exception)).toEqual({ status: HttpStatus.CONFLICT, errors: exception.errors });
+    expect(toErrorResult(exception)).toEqual({
+      status: HttpStatus.CONFLICT,
+      errors: exception.errors,
+      resultCode: ResultCodes.ERROR,
+      headers: {},
+    });
+  });
+
+  it('should give the result code an AppException names', () => {
+    const exception = new AppException(
+      HttpStatus.UNAUTHORIZED,
+      [new ErrorItemResponse.Dto('NEED_AUTHORIZATION_WITH_CAPTCHA')],
+      { resultCode: ResultCodes.NEED_CAPTCHA_AUTHORIZATION },
+    );
+    expect(toErrorResult(exception).resultCode).toBe(ResultCodes.NEED_CAPTCHA_AUTHORIZATION);
   });
 
   it.each([

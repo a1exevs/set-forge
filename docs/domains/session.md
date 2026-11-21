@@ -11,6 +11,11 @@ documents, logout and account deletion. Legal duties behind this domain: `.claud
 - **Bootstrap** — verifying the auth session when no user is cached (an app open, or after the session-expired
   handler cleared the cache): refresh the access token and load the current user.
 - **Signed-in device** — a browser holding a refresh token of its own; every sign-in starts one, logout ends it.
+- **Refresh cookie** — the httpOnly cookie that holds the refresh token; the server keeps no other session cookie.
+- **Trusted device** — a browser the user signed in on, marked by a cookie of its own; one browser may be trusted for
+  several accounts.
+- **Failed sign-in count** — the failed sign-ins of an account over the last minutes, per address and across all, kept on
+  the server as pseudonyms of the email and the address; the captcha comes from it.
 - **Consent** — agreement to personal-data processing; **terms acceptance** — agreement to the Terms of Use. Two
   separate, explicit acts at registration.
 - **Document versions** — the required Privacy Policy / Terms versions (server env); the user's accepted versions are
@@ -41,7 +46,9 @@ Each id is proven by the tests tagged `// @invariant session/<id>`; `npm run lin
 | access-token-only | Only the access token the server issued opens a protected request; the refresh token works only to refresh and to log out |
 | signed-in-devices | Up to 5 devices stay signed in at once; signing in on one more silently ends the session of the device that refreshed least recently and keeps every other one |
 | no-open-redirect | After sign-in only an in-app `redirect` target is followed (no open redirect) |
-| captcha-counts-login-only | Only failed sign-ins lead to the captcha: after 5 in a session the login demands it, a wrong captcha keeps demanding it, a successful login starts over; a failed request elsewhere (an expired session) never counts |
+| captcha-counts-login-only | Only failed sign-ins lead to the captcha, counted on the server whatever cookies the client sends: once an account has failed 5 times from one address, or 20 times from devices it does not trust, within the last 15 minutes, the login demands it before it looks at the password. An account is counted as one whatever spelling of its email finds it, and an unknown email counts like a wrong password; a wrong captcha keeps demanding it and counts too; a solved captcha opens one attempt, also when attempts overlap, and lives 5 minutes; a successful sign-in starts its account-and-address count over and leaves the account-wide one to run out; a failed request elsewhere (an expired session) never counts; while the counts cannot be kept, the sign-in is refused for a while instead of going unguarded |
+| sign-in-rate-limit | At most 20 sign-in attempts a minute come from one address — every attempt counts, refused ones too — the next is refused for a while, saying how long, in the chosen language; nothing else from that address is limited, and an address is the client's own, not that of the proxies in front of the server |
+| trusted-device | A device the user signed in on — or registered on — is trusted for that account for 90 days from the last sign-in there: the account-wide count of failed sign-ins neither counts nor stops it, while its own address still counts; logout keeps the trust, deleting the account removes it, and only a mark the server issued is ever trusted |
 | logout-ends-on-login | Logout ends on `/login` also when the request fails; account deletion ends there once the account is deleted or the session has already ended, and keeps the user signed in on any other failure |
 | user-scoped | All workout data is scoped to the signed-in user |
 | route-guards | Guest-only (`/login`, `/register`), always-public (`/privacy`, `/terms`) and protected routes |
@@ -64,7 +71,9 @@ to everyone without a bootstrap.
 ### Sign in / register
 
 A successful login or registration primes the current user and then follows the `redirect` target (a full page load)
-or goes home. A login answered with "captcha required" shows a captcha image and retries with the code. A rejected
+or goes home. A login answered with "captcha required" shows a captcha image and retries with the code and the id of
+that image; every new demand brings a new image. Too many attempts from one address are refused for a while, and the
+form says how long to wait. A rejected
 login or registration shows the server's errors in the chosen language, each under its field when the form has it.
 
 ### Re-accepting documents
@@ -105,8 +114,8 @@ the shared cookie at the same moment get one new token between them: the other t
 | Screens | `client/src/pages/auth` · `client/src/pages/profile` · `client/src/pages/settings` · `client/src/pages/privacy` · `client/src/pages/terms` |
 | Interface language | `client/src/shared/lib/i18n` · `client/src/shared/ui/language-select` · `client/src/app/i18n` |
 | Legal UI and gate | `client/src/widgets/legal-document` · `client/src/widgets/legal-footer` · `client/src/widgets/document-reconsent` |
-| Server modules | `server/src/auth` · `server/src/users` · `server/src/roles` · `server/src/security` |
-| Models | `server/src/users/users.model.ts` · `server/src/users/users-roles.model.ts` · `server/src/roles/roles.model.ts` · `server/src/auth/refresh-tokens.model.ts` |
+| Server modules | `server/src/auth` · `server/src/users` · `server/src/roles` · `server/src/security` · `server/src/redis` |
+| Models | `server/src/users/users.model.ts` · `server/src/users/users-roles.model.ts` · `server/src/roles/roles.model.ts` · `server/src/auth/refresh-tokens.model.ts` · `server/src/auth/trusted-devices.model.ts` |
 | Document versions | `server/src/common/constants/document-versions.ts` |
 | HTTP contract | `server/src/auth/auth.controller.ts` (Swagger) |
 

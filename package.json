@@ -90,7 +90,7 @@
     "server:db:seed:undo": "npm run db:seed:undo -w @set-forge/server",
     "server:check-deps": "npm run check-deps -w @set-forge/server",
     "server:upgrade-deps": "npm run upgrade-deps -w @set-forge/server",
-    "db:up": "docker compose --profile dev up -d mysql-dev",
+    "db:up": "docker compose --profile dev up -d mysql-dev redis-dev",
     "db:down": "docker compose --profile dev down",
     "db:logs": "docker compose logs -f mysql-dev",
     "prod:up": "docker compose --profile prod up --build -d",

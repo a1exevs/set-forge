@@ -6,6 +6,9 @@
 /** Test values for a throwaway database: the stand's MySQL lives only as long as the stand. */
 export const STAND_USER = { email: 'stand-user@set-forge.test', password: 'stand-password' } as const;
 
+/** The production limit of sign-in attempts a minute; the stand's env raises it for the other presets. */
+const PRODUCTION_SIGN_IN_ATTEMPTS_PER_MINUTE = '20';
+
 /** History loads 20 sessions a page: 1 + 24 completed sessions make the second page. */
 const EXTRA_HISTORY_SESSIONS = 24;
 
@@ -15,6 +18,7 @@ export const STAND_PRESETS = {
   data: `a registered user ${STAND_USER.email} with two workout lists and one completed session`,
   history: `the data of "data" plus a one-set list finished ${EXTRA_HISTORY_SESSIONS} times — history has a second page`,
   reconsent: `the user of "user", who accepted the documents of version 1, and a server that now requires version 2 — the re-consent gate after login`,
+  'rate-limit': `the user of "user" and a server with the production limit of sign-in attempts a minute; requests may carry X-Forwarded-For`,
 } as const;
 
 export type StandPreset = keyof typeof STAND_PRESETS;
@@ -25,10 +29,16 @@ export function isStandPreset(value: string): value is StandPreset {
 
 /**
  * The server configuration a preset moves to once its data is in: a document update is a raised required version, and
- * a user who accepted the old one can be made only before it.
+ * a user who accepted the old one can be made only before it; the production limit would stop the preset's own sign-ins.
  */
 export function presetServerEnv(preset: StandPreset): Record<string, string> | null {
-  return preset === 'reconsent' ? { TERMS_VERSION: '2', PRIVACY_VERSION: '2' } : null;
+  if (preset === 'reconsent') {
+    return { TERMS_VERSION: '2', PRIVACY_VERSION: '2' };
+  }
+  if (preset === 'rate-limit') {
+    return { SIGN_IN_ATTEMPTS_PER_MINUTE: PRODUCTION_SIGN_IN_ATTEMPTS_PER_MINUTE };
+  }
+  return null;
 }
 
 type Envelope<T> = { resultCode: number; data: T | null; messages: string[] };
@@ -153,6 +163,11 @@ export async function applyPreset(preset: StandPreset, serverOrigin: string): Pr
   const notes = [`log in as ${STAND_USER.email} / ${STAND_USER.password}`];
   if (preset === 'reconsent') {
     notes.push('the documents are at version 2: the re-consent gate opens after login');
+  }
+  if (preset === 'rate-limit') {
+    notes.push(
+      `sign-in allows ${PRODUCTION_SIGN_IN_ATTEMPTS_PER_MINUTE} attempts a minute per address; the API takes the address from X-Forwarded-For`,
+    );
   }
   return notes;
 }

@@ -1,13 +1,11 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { createHash, randomBytes } from 'node:crypto';
 
+import { hashOpaqueToken, newOpaqueToken } from '@auth/opaque-token';
 import { RefreshTokensService } from '@auth/refresh-tokens.service';
 import { AppException } from '@common/exceptions';
 import { User } from '@users/users.model';
 import { UsersService } from '@users/users.service';
-
-const REFRESH_TOKEN_BYTES = 32;
 
 @Injectable()
 export class TokensService {
@@ -31,12 +29,8 @@ export class TokensService {
    * `null` when the user no longer exists, so no token is issued (session/deletion-during-sign-in).
    */
   public async generateRefreshToken(user: User, ttl: number): Promise<string | null> {
-    const refreshToken = randomBytes(REFRESH_TOKEN_BYTES).toString('base64url');
-    const stored = await this.refreshTokensService.createRefreshToken(
-      user.id,
-      TokensService.hashRefreshToken(refreshToken),
-      ttl,
-    );
+    const refreshToken = newOpaqueToken();
+    const stored = await this.refreshTokensService.createRefreshToken(user.id, hashOpaqueToken(refreshToken), ttl);
 
     return stored ? refreshToken : null;
   }
@@ -56,7 +50,7 @@ export class TokensService {
       return;
     }
 
-    await this.refreshTokensService.removeTokenByHash(TokensService.hashRefreshToken(refreshToken));
+    await this.refreshTokensService.removeTokenByHash(hashOpaqueToken(refreshToken));
   }
 
   public static getRefreshTokenExpiresIn(): number {
@@ -69,17 +63,12 @@ export class TokensService {
     return expiration;
   }
 
-  /** The token carries 256 random bits, so a plain SHA-256 suffices: guessing needs no salt or slow hash to stop it. */
-  private static hashRefreshToken(refreshToken: string): string {
-    return createHash('sha256').update(refreshToken).digest('hex');
-  }
-
   private async updateRefreshToken(refreshToken: unknown): Promise<{ user: User; newRefreshToken: string }> {
     if (typeof refreshToken !== 'string') {
       throw AppException.of(HttpStatus.UNAUTHORIZED, 'REFRESH_TOKEN_NOT_FOUND');
     }
 
-    const tokenHash = TokensService.hashRefreshToken(refreshToken);
+    const tokenHash = hashOpaqueToken(refreshToken);
     const token = await this.refreshTokensService.findTokenByHash(tokenHash);
 
     if (!token) {

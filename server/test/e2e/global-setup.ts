@@ -1,4 +1,5 @@
 import { MySqlContainer } from '@testcontainers/mysql';
+import { RedisContainer } from '@testcontainers/redis';
 import { execSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -11,7 +12,7 @@ function assertDockerAvailable(): void {
     execSync('docker info', { stdio: 'ignore' });
   } catch {
     throw new Error(
-      'Docker is not running. Server e2e tests require Docker for Testcontainers MySQL. Start Docker and run `npm run server:test:e2e` again.',
+      'Docker is not running. Server e2e tests require Docker for Testcontainers MySQL and Redis. Start Docker and run `npm run server:test:e2e` again.',
     );
   }
 }
@@ -19,7 +20,10 @@ function assertDockerAvailable(): void {
 export default async function globalSetup(): Promise<void> {
   assertDockerAvailable();
 
-  const container = await new MySqlContainer('mysql:8.4').start();
+  const [container, redis] = await Promise.all([
+    new MySqlContainer('mysql:8.4').start(),
+    new RedisContainer('redis:7-alpine').start(),
+  ]);
 
   const mysqlEnv = {
     NODE_ENV: 'e2e',
@@ -47,7 +51,9 @@ export default async function globalSetup(): Promise<void> {
     JSON.stringify(
       {
         ...mysqlEnv,
-        containerId: container.getId(),
+        REDIS_HOST: redis.getHost(),
+        REDIS_PORT: String(redis.getPort()),
+        containerIds: [container.getId(), redis.getId()],
       },
       null,
       2,

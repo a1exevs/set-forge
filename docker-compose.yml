@@ -20,7 +20,37 @@ x-mysql-common: &mysql-common
     retries: 10
     start_period: 20s
 
+x-redis-common: &redis-common
+  logging: *json-file-logging
+  image: redis:7-alpine
+  restart: unless-stopped
+  command:
+    - redis-server
+    - --appendonly
+    - "yes"
+    - --appendfsync
+    - everysec
+  healthcheck:
+    test: [ "CMD", "redis-cli", "ping" ]
+    interval: 5s
+    timeout: 3s
+    retries: 5
+
 services:
+  redis:
+    <<: *redis-common
+    profiles: [ "prod" ]
+    volumes:
+      - redis_data_prod:/data
+
+  redis-dev:
+    <<: *redis-common
+    profiles: ["dev"]
+    ports:
+      - "127.0.0.1:${REDIS_PUBLIC_PORT:-6379}:6379"
+    volumes:
+      - redis_data_dev:/data
+
   mysql:
     <<: *mysql-common
     profiles: ["prod"]
@@ -44,8 +74,14 @@ services:
       target: production
     env_file:
       - ./server/.production.env
+    environment:
+      # Caddy and client-prod (nginx) stand in front: trusting both makes request.ip the client's own address.
+      # Kept here, next to the chain it counts, so a release carries it.
+      TRUST_PROXY_HOPS: 2
     depends_on:
       mysql:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     expose:
       - "5000"
@@ -108,9 +144,11 @@ services:
       - client-prod
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
+    # IPv4 only: an IPv6 connection would reach Caddy through Docker's userland proxy as the gateway's address, and every
+    # such client would share one sign-in rate limit (DEPLOY-SELECTEL.md, the check after the first deploy).
     ports:
-      - "${HTTP_PORT:-80}:80"
-      - "${HTTPS_PORT:-443}:443"
+      - "0.0.0.0:${HTTP_PORT:-80}:80"
+      - "0.0.0.0:${HTTPS_PORT:-443}:443"
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -126,3 +164,5 @@ volumes:
   caddy_config:
   server_static:
   server_logs:
+  redis_data_prod:
+  redis_data_dev:

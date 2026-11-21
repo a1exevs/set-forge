@@ -6,8 +6,6 @@ import { createRequest, createResponse } from 'node-mocks-http';
 import { AuthController } from '@auth/auth.controller';
 import { AuthService } from '@auth/auth.service';
 import { AuthenticationResponse, GetCurrentUserResponse, LoginRequest, RegisterRequest } from '@auth/dto';
-import { CaptchaCountExceptionFilter } from '@auth/exception-filters';
-import { SvgCaptchaGuard } from '@auth/guards';
 import { IAuthenticationResult } from '@auth/interfaces';
 import { TokensService } from '@auth/tokens.service';
 import { ErrorMessages } from '@common/constants';
@@ -29,6 +27,8 @@ const getValidationPipeDataForUserRegistration = function (
   return { target, metadata, registerDto };
 };
 
+const DEVICE_TRUST = { token: 'device-token', expires: new Date('2027-02-16T12:00:00.000Z') };
+
 const getMockAuthenticationResponse = function (userId, accessToken, refreshToken): IAuthenticationResult {
   return {
     status: 'success',
@@ -42,6 +42,7 @@ const getMockAuthenticationResponse = function (userId, accessToken, refreshToke
         refreshToken: refreshToken,
         refreshToken_expiration: new Date(),
       },
+      deviceTrust: DEVICE_TRUST,
     },
   };
 };
@@ -49,10 +50,8 @@ const getMockAuthenticationResponse = function (userId, accessToken, refreshToke
 describe('AuthController', () => {
   let authController: AuthController;
   let authService: AuthService;
-  let captchaCountExceptionFilter: CaptchaCountExceptionFilter;
   let jwtAuthGuard: JwtAuthGuard;
   let refreshTokenGuard: RefreshTokenGuard;
-  let svgCaptchaGuard: SvgCaptchaGuard;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -82,10 +81,8 @@ describe('AuthController', () => {
     }).compile();
     authController = moduleRef.get<AuthController>(AuthController);
     authService = moduleRef.get<AuthService>(AuthService);
-    captchaCountExceptionFilter = moduleRef.get<CaptchaCountExceptionFilter>(CaptchaCountExceptionFilter);
     jwtAuthGuard = moduleRef.get<JwtAuthGuard>(JwtAuthGuard);
     refreshTokenGuard = moduleRef.get<RefreshTokenGuard>(RefreshTokenGuard);
-    svgCaptchaGuard = moduleRef.get<SvgCaptchaGuard>(SvgCaptchaGuard);
   });
 
   describe('AuthController - definition', () => {
@@ -95,17 +92,11 @@ describe('AuthController', () => {
     it('AuthService - should be defined', () => {
       expect(authService).toBeDefined();
     });
-    it('CaptchaCountExceptionFilter - should be defined', () => {
-      expect(captchaCountExceptionFilter).toBeDefined();
-    });
     it('JwtAuthGuard - should be defined', () => {
       expect(jwtAuthGuard).toBeDefined();
     });
     it('RefreshTokenGuard - should be defined', () => {
       expect(refreshTokenGuard).toBeDefined();
-    });
-    it('SvgCaptchaGuard - should be defined', () => {
-      expect(svgCaptchaGuard).toBeDefined();
     });
   });
 
@@ -219,12 +210,14 @@ describe('AuthController', () => {
         .spyOn(authService, 'registration')
         .mockImplementation(async () => serviceRegisterResponseMock);
       const controllerRegisterResponse = new AuthenticationResponse.Dto({ userId, accessToken });
-      const response = await authController.registration(registerDto, res);
+      const req = createRequest({ cookies: { '__Host-trustedDevice': 'device-token' } });
+      const response = await authController.registration(registerDto, res, req);
       expect(response).toEqual(controllerRegisterResponse);
       expect(res.cookies.refreshToken.value).toBe(refreshToken);
       expect(res.cookies.refreshToken.options.httpOnly).toBe(true);
+      expect(res.cookies['__Host-trustedDevice'].value).toBe(DEVICE_TRUST.token);
       expect(mockRegistrationF).toBeCalledTimes(1);
-      expect(mockRegistrationF).toBeCalledWith(registerDto);
+      expect(mockRegistrationF).toBeCalledWith(registerDto, 'device-token');
     });
     it('Registration method: should return conflict (user already exists)', async () => {
       const res = createResponse();
@@ -234,7 +227,7 @@ describe('AuthController', () => {
         throw new HttpException(exceptionMessage, HttpStatus.CONFLICT);
       });
       try {
-        await authController.registration(registerDto, res);
+        await authController.registration(registerDto, res, createRequest());
         sendPseudoError();
       } catch (err) {
         expect(err.status).toBe(HttpStatus.CONFLICT);
@@ -246,8 +239,7 @@ describe('AuthController', () => {
 
   describe('AuthController - login', () => {
     it('Login method: should be successful result', async () => {
-      const req = createRequest();
-      req._setSessionVariable('authFailedCount', '5');
+      const req = createRequest({ ip: '203.0.113.7', cookies: { '__Host-trustedDevice': 'device-token' } });
       const res = createResponse();
       const userId = 1;
       const accessToken = '12345fsagasdsfasdfsdf';
@@ -262,14 +254,37 @@ describe('AuthController', () => {
       expect(response).toEqual(controllerLoginResponse);
       expect(res.cookies.refreshToken.value).toBe(refreshToken);
       expect(res.cookies.refreshToken.options.httpOnly).toBe(true);
-      expect(req.session['authFailedCount']).toBeNull();
       expect(mockLoginF).toBeCalledTimes(1);
-      expect(mockLoginF).toBeCalledWith(loginDto);
+      expect(mockLoginF).toBeCalledWith(loginDto, '203.0.113.7', 'device-token');
+    });
+    // @invariant session/trusted-device
+    it('Login method: should mark the device with a cookie that lives as long as its trust', async () => {
+      const res = createResponse();
+      jest.spyOn(authService, 'login').mockResolvedValue(getMockAuthenticationResponse(1, 'access', 'refresh'));
+
+      await authController.login({ email: 'user@yandex.ru', password: '0000' }, res, createRequest());
+
+      expect(res.cookies['__Host-trustedDevice'].value).toBe(DEVICE_TRUST.token);
+      // The browser takes a __Host- cookie only with Secure, Path=/ and no Domain.
+      expect(res.cookies['__Host-trustedDevice'].options).toEqual({
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: true,
+        path: '/',
+        expires: DEVICE_TRUST.expires,
+      });
+    });
+    it('Login method: should set no device cookie when no trust could be stored', async () => {
+      const res = createResponse();
+      const answer = getMockAuthenticationResponse(1, 'access', 'refresh');
+      jest.spyOn(authService, 'login').mockResolvedValue({ ...answer, data: { ...answer.data, deviceTrust: null } });
+
+      await authController.login({ email: 'user@yandex.ru', password: '0000' }, res, createRequest());
+
+      expect(res.cookies['__Host-trustedDevice']).toBeUndefined();
     });
     it('Login method: should be unauthorized', async () => {
       const req = createRequest();
-      const authFailedCount = '5';
-      req._setSessionVariable('authFailedCount', authFailedCount);
       const res = createResponse();
       const loginDto = { email: 'user@yandex.ru', password: '12345678' };
       const exceptionMessage = ErrorMessages.INVALID_EMAIL_OR_PASSWORD;
@@ -284,7 +299,6 @@ describe('AuthController', () => {
       } catch (err) {
         expect(err.status).toBe(401);
         expect(res.cookies.refreshToken).toBeUndefined();
-        expect(req.session['authFailedCount']).toBe(authFailedCount);
         expect(err.getResponse()).toMatchObject(errorObject);
         expect(authService.login).toBeCalledTimes(1);
       }
@@ -353,6 +367,17 @@ describe('AuthController', () => {
       expect(res.cookies.refreshToken.value).toBe('');
       expect(mockLogoutF).toBeCalledTimes(1);
       expect(mockLogoutF).toBeCalledWith(refreshToken);
+    });
+    // @invariant session/trusted-device
+    it('Logout method: should leave the device cookie, the trust outlives the session', async () => {
+      const req = createRequest();
+      req._setCookiesVariable('__Host-trustedDevice', 'device-token');
+      const res = createResponse();
+      jest.spyOn(authService, 'logout').mockResolvedValue(undefined);
+
+      await authController.logout(req, res);
+
+      expect(res.cookies['__Host-trustedDevice']).toBeUndefined();
     });
   });
 });

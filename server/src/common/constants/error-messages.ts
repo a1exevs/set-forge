@@ -25,6 +25,8 @@ export const ErrorMessages = {
   FORBIDDEN: 'Access denied',
   NOT_ENOUGH_PERMISSIONS: 'Insufficient permissions',
   INVALID_EMAIL_OR_PASSWORD: 'Invalid email or password',
+  SIGN_IN_TEMPORARILY_UNAVAILABLE: 'Sign-in is temporarily unavailable, try again in a minute',
+  TOO_MANY_SIGN_IN_ATTEMPTS: 'Too many sign-in attempts, try again in {seconds} s',
   USER_ROLE_CONFIGURATION_IS_MISSING: 'Service is unavailable: user role configuration is missing',
 
   // Refresh tokens

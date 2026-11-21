@@ -1,9 +1,9 @@
-import { Controller, Get, Req } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, HttpStatus } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { Isession } from '@auth/interfaces';
 import { Docs, Routes } from '@common/constants';
-import { CommonResponse } from '@common/dto';
+import { ApiErrorResult, ApiResult } from '@common/decorators';
+import { CaptchaResponse } from '@security/dto';
 import { SecurityService } from '@security/security.service';
 
 @ApiTags(Docs.SECURITY_CONTROLLER)
@@ -12,16 +12,18 @@ export class SecurityController {
   constructor(private securityService: SecurityService) {}
 
   @ApiOperation({ summary: Docs.GET_CAPTCHA_URL_ENDPOINT })
-  @ApiOkResponse({ type: CommonResponse.Swagger.CommonResponseDto })
+  @ApiResult({
+    status: 200,
+    type: CaptchaResponse.Swagger.CaptchaResponseDto,
+    description: Docs.GET_CAPTCHA_URL_SUCCESSFUL_RESULT,
+  })
+  @ApiErrorResult({
+    status: HttpStatus.SERVICE_UNAVAILABLE,
+    description: Docs.SIGN_IN_SERVICE_UNAVAILABLE,
+    cases: { storeUnavailable: [{ code: 'SIGN_IN_TEMPORARILY_UNAVAILABLE' }] },
+  })
   @Get('get-captcha-url')
-  async getCaptchaURL(@Req() request) {
-    const { captchaURL, captchaText } = await this.securityService.getCaptchaURL();
-    SecurityController.setSessionCaptchaText(request, captchaText);
-    return { captchaURL };
-  }
-
-  private static setSessionCaptchaText(request, captchaText: string) {
-    const session: Isession = request.session;
-    session.captcha = captchaText;
+  async getCaptchaURL(): Promise<CaptchaResponse.Dto> {
+    return new CaptchaResponse.Dto(await this.securityService.createCaptcha());
   }
 }
