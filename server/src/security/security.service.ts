@@ -1,9 +1,8 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import * as svgCaptcha from 'svg-captcha';
 
-import { AppException } from '@common/exceptions';
-import { REDIS_CLIENT, RedisClient } from '@src/redis';
+import { failClosed, REDIS_CLIENT, RedisClient } from '@src/redis';
 
 /** session/captcha-counts-login-only */
 export const CAPTCHA_LIFETIME_SECONDS = 5 * 60;
@@ -18,8 +17,9 @@ export class SecurityService {
   public async createCaptcha(): Promise<{ captchaURL: string; captchaId: string }> {
     const captcha = svgCaptcha.create();
     const captchaId = randomUUID();
-    await SecurityService.whileAvailable(() =>
-      this.redis.set(captchaKey(captchaId), captcha.text, { EX: CAPTCHA_LIFETIME_SECONDS }),
+    await failClosed(
+      () => this.redis.set(captchaKey(captchaId), captcha.text, { EX: CAPTCHA_LIFETIME_SECONDS }),
+      'SIGN_IN_TEMPORARILY_UNAVAILABLE',
     );
 
     const captchaURL = `data:image/svg+xml;base64,${Buffer.from(captcha.data).toString('base64')}`;
@@ -34,16 +34,7 @@ export class SecurityService {
     if (!captchaId || !answer) {
       return false;
     }
-    const stored = await SecurityService.whileAvailable(() => this.redis.getDel(captchaKey(captchaId)));
+    const stored = await failClosed(() => this.redis.getDel(captchaKey(captchaId)), 'SIGN_IN_TEMPORARILY_UNAVAILABLE');
     return stored !== null && stored === answer;
-  }
-
-  // The captcha guards the sign-in, so without its store the sign-in is closed rather than left unguarded.
-  private static async whileAvailable<T>(call: () => Promise<T>): Promise<T> {
-    try {
-      return await call();
-    } catch (cause) {
-      throw AppException.of(HttpStatus.SERVICE_UNAVAILABLE, 'SIGN_IN_TEMPORARILY_UNAVAILABLE', {}, cause as Error);
-    }
   }
 }

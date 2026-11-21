@@ -4,7 +4,7 @@ import { createHmac, randomUUID } from 'node:crypto';
 
 import { ErrorItemResponse } from '@common/dto';
 import { AppException } from '@common/exceptions';
-import { REDIS_CLIENT, RedisClient } from '@src/redis';
+import { failClosed, REDIS_CLIENT, RedisClient } from '@src/redis';
 
 /** session/captcha-counts-login-only */
 export const FAILED_SIGN_IN_WINDOW_MS = 15 * 60 * 1000;
@@ -68,14 +68,16 @@ export class SignInAttemptsService {
   public async checkRate(address: string): Promise<void> {
     const key = `sign-in:address:${this.pseudonym(address)}`;
     const now = Date.now();
-    const replies = await SignInAttemptsService.whileAvailable(() =>
-      this.redis
-        .multi()
-        .zRemRangeByScore(key, 0, now - RATE_WINDOW_MS)
-        .zAdd(key, { score: now, value: `${now}:${randomUUID()}` })
-        .zCard(key)
-        .pExpire(key, RATE_WINDOW_MS)
-        .exec(),
+    const replies = await failClosed(
+      () =>
+        this.redis
+          .multi()
+          .zRemRangeByScore(key, 0, now - RATE_WINDOW_MS)
+          .zAdd(key, { score: now, value: `${now}:${randomUUID()}` })
+          .zCard(key)
+          .pExpire(key, RATE_WINDOW_MS)
+          .exec(),
+      'SIGN_IN_TEMPORARILY_UNAVAILABLE',
     );
     const count = Number(replies[2]);
     if (count <= this.attemptsPerMinute) {
@@ -84,8 +86,9 @@ export class SignInAttemptsService {
 
     // The next attempt fits once enough of the oldest ones leave the window, not just the oldest one.
     const leaving = count - this.attemptsPerMinute;
-    const [freeing] = await SignInAttemptsService.whileAvailable(() =>
-      this.redis.zRangeWithScores(key, leaving, leaving),
+    const [freeing] = await failClosed(
+      () => this.redis.zRangeWithScores(key, leaving, leaving),
+      'SIGN_IN_TEMPORARILY_UNAVAILABLE',
     );
     const seconds = Math.max(1, Math.ceil(((freeing?.score ?? now) + RATE_WINDOW_MS - now) / 1000));
     throw new AppException(
@@ -121,7 +124,7 @@ export class SignInAttemptsService {
         .zCard(key)
         .pExpire(key, FAILED_SIGN_IN_WINDOW_MS);
     }
-    const replies = await SignInAttemptsService.whileAvailable(() => transaction.exec());
+    const replies = await failClosed(() => transaction.exec(), 'SIGN_IN_TEMPORARILY_UNAVAILABLE');
     const withThisOne = windows.map(({ threshold }: Window, index: number) => ({
       threshold,
       count: Number(replies[index * WINDOW_COMMANDS + COUNT_REPLY]),
@@ -145,7 +148,7 @@ export class SignInAttemptsService {
     if (attempt.accountKey) {
       transaction.zRem(attempt.accountKey, attempt.entry);
     }
-    await SignInAttemptsService.whileAvailable(() => transaction.exec());
+    await failClosed(() => transaction.exec(), 'SIGN_IN_TEMPORARILY_UNAVAILABLE');
   }
 
   // Tests sign in far more often than a person does; production always keeps the rule.
@@ -161,14 +164,5 @@ export class SignInAttemptsService {
   // Case and surrounding spaces do not make another account to count against.
   private static normalizeEmail(email: string): string {
     return email.trim().toLowerCase();
-  }
-
-  // The counts guard the sign-in, so without their store the sign-in is closed rather than left unguarded.
-  private static async whileAvailable<T>(call: () => Promise<T>): Promise<T> {
-    try {
-      return await call();
-    } catch (cause) {
-      throw AppException.of(HttpStatus.SERVICE_UNAVAILABLE, 'SIGN_IN_TEMPORARILY_UNAVAILABLE', {}, cause as Error);
-    }
   }
 }
