@@ -803,9 +803,23 @@ a year: keep the hostname on HTTPS once it is served.
 with the client's address intact; an IPv6 connection goes through Docker's userland proxy instead (IPv6 off in the
 Docker daemon), and every such client arrives as the address of the Docker gateway, sharing one sign-in rate limit.
 Clients come over IPv6 only when the hostname has an AAAA record and the VDS a public IPv6 address: an `sslip.io` name
-resolves to IPv4 only, and a domain gets an AAAA record only when you add one. The check: from one network send 21
-sign-in attempts with a wrong password within a minute (the 21st answers 429), then sign in from another network (a
-phone on mobile data) at once — it must not answer 429. If it does:
+resolves to IPv4 only, and a domain gets an AAAA record only when you add one.
+
+Every sign-in attempt, a successful one too, keeps a key `sign-in:address:<pseudonym of the address>` in Redis for a
+minute, one key per address the API sees. The check, within one minute:
+
+1. Sign in from a computer on its usual network.
+2. Sign in from a phone on mobile data (Wi-Fi off) — another network, so another address.
+3. On the VDS, list the keys:
+
+   ```bash
+   docker compose --profile prod exec redis redis-cli --scan --pattern 'sign-in:address:*'
+   ```
+
+   Two keys (or more, when someone else signed in meanwhile) — the API tells the clients apart. One key for both
+   sign-ins — the addresses are merged into one. The keys expire by themselves after the minute.
+
+If the addresses are merged:
 
 1. Take no IPv6 — the default: `docker-compose.yml` publishes the ports of `caddy` on IPv4 only (`0.0.0.0:`), so with
    an AAAA record IPv6 clients cannot connect and browsers fall back to IPv4. If the check still fails, the ports were
