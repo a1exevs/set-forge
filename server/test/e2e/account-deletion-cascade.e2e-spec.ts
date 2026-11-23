@@ -3,6 +3,7 @@ import { getModelToken } from '@nestjs/sequelize';
 import * as request from 'supertest';
 
 import { RefreshToken } from '@auth/refresh-tokens.model';
+import { TrustedDevice } from '@auth/trusted-devices.model';
 import { ResultCodes, Routes } from '@common/constants';
 import { createTestApp } from '@test/e2e/create-test-app';
 import { UserRole } from '@users/users-roles.model';
@@ -23,6 +24,7 @@ describe('Account deletion cascade', () => {
   let userModel: typeof User;
   let userRoleModel: typeof UserRole;
   let refreshTokenModel: typeof RefreshToken;
+  let trustedDeviceModel: typeof TrustedDevice;
   let workoutListModel: typeof WorkoutList;
   let workoutExerciseModel: typeof WorkoutExercise;
   let workoutSessionModel: typeof WorkoutSession;
@@ -49,6 +51,7 @@ describe('Account deletion cascade', () => {
     userModel = app.get(getModelToken(User));
     userRoleModel = app.get(getModelToken(UserRole));
     refreshTokenModel = app.get(getModelToken(RefreshToken));
+    trustedDeviceModel = app.get(getModelToken(TrustedDevice));
     workoutListModel = app.get(getModelToken(WorkoutList));
     workoutExerciseModel = app.get(getModelToken(WorkoutExercise));
     workoutSessionModel = app.get(getModelToken(WorkoutSession));
@@ -104,6 +107,7 @@ describe('Account deletion cascade', () => {
     expect(await workoutSessionModel.count({ where: { userId } })).toBeGreaterThan(0);
     expect(await workoutSessionExerciseModel.count({ where: { workoutSessionId } })).toBeGreaterThan(0);
     expect(await refreshTokenModel.count({ where: { userId } })).toBeGreaterThan(0);
+    expect(await trustedDeviceModel.count({ where: { userId } })).toBeGreaterThan(0);
     expect(await userRoleModel.count({ where: { userId } })).toBeGreaterThan(0);
   });
 
@@ -125,6 +129,7 @@ describe('Account deletion cascade', () => {
     expect(await userModel.findByPk(userId)).toBeNull();
     expect(await userRoleModel.count({ where: { userId } })).toBe(0);
     expect(await refreshTokenModel.count({ where: { userId } })).toBe(0);
+    expect(await trustedDeviceModel.count({ where: { userId } })).toBe(0);
     expect(await workoutListModel.count({ where: { userId } })).toBe(0);
     expect(await workoutExerciseModel.count({ where: { workoutListId } })).toBe(0);
     expect(await workoutSessionModel.count({ where: { userId } })).toBe(0);

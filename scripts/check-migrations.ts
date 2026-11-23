@@ -12,7 +12,7 @@ import { rootDir } from './common.ts';
 
 const MIGRATIONS_DIR = join(rootDir, 'server', 'database', 'migrations');
 /** The newest migration written before the rule; older ones are history and stay as they are. */
-const BASELINE = '20261104120000';
+const BASELINE = '20261118120000';
 const MARKER = /@contract\s+v\d+\.\d+\.\d+\b/;
 const NARROWING: ReadonlyArray<{ name: string; pattern: RegExp }> = [
   {

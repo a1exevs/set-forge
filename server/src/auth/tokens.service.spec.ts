@@ -381,14 +381,13 @@ describe('TokensService', () => {
   });
 
   describe('TokensService - getRefreshTokenExpiration', () => {
-    it('should return ', () => {
+    it('should return the moment 30 days from now', () => {
+      const before = Date.now();
       const date = tokensService.getRefreshTokenExpiration();
-      const dayInMS = 60 * 60 * 24 * 1000;
-      const thirtyDaysInMS = dayInMS * 30;
-      const thirtyOneDaysInMS = dayInMS * 31;
-      const delta = date.getTime() - Date.now();
-      expect(delta).toBeGreaterThanOrEqual(thirtyDaysInMS);
-      expect(delta).toBeLessThanOrEqual(thirtyOneDaysInMS);
+      const after = Date.now();
+      const thirtyDaysInMS = 60 * 60 * 24 * 1000 * 30;
+      expect(date.getTime()).toBeGreaterThanOrEqual(before + thirtyDaysInMS);
+      expect(date.getTime()).toBeLessThanOrEqual(after + thirtyDaysInMS);
     });
   });
 });

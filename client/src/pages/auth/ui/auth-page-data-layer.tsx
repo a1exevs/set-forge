@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { useCaptchaUrlMutation, useLoginMutation, useRegisterMutation } from '@entities/session';
+import { type Captcha, useCaptchaMutation, useLoginMutation, useRegisterMutation } from '@entities/session';
 
 import AuthPageLogicLayer from './auth-page-logic-layer';
 import type { LoginInput, RegisterInput } from '../model/auth-input';
@@ -15,7 +15,7 @@ type Props = {
 const AuthPageDataLayer: FC<Props> = ({ activeTab, redirectSearch }) => {
   const loginMutation = useLoginMutation();
   const registerMutation = useRegisterMutation();
-  const captchaUrlMutation = useCaptchaUrlMutation();
+  const captchaMutation = useCaptchaMutation();
   const redirectAfterAuth = useRedirectAfterAuth();
 
   return (
@@ -29,7 +29,7 @@ const AuthPageDataLayer: FC<Props> = ({ activeTab, redirectSearch }) => {
         await registerMutation.mutateAsync(registration);
       }}
       onAuthenticated={redirectAfterAuth}
-      loadCaptchaUrl={async (): Promise<string> => captchaUrlMutation.mutateAsync()}
+      loadCaptcha={async (): Promise<Captcha> => captchaMutation.mutateAsync()}
     />
   );
 };

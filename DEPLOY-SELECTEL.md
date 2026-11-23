@@ -262,10 +262,14 @@ MYSQL_DB=set_forge
 MYSQL_PASSWORD=strong_db_password
 MYSQL_PORT=3306
 
+# `redis` is the docker-compose service name.
+REDIS_HOST=redis
+REDIS_PORT=6379
+
 SERVER_STATIC=static
 SERVER_LOGS=logs
 JWT_SECRET_KEY=long_random_string_1
-SESSION_SECRET_KEY=long_random_string_2
+SIGN_IN_LIMIT_SECRET_KEY=long_random_string_2
 
 # Current legal-document versions (default 1). Bump when a document changes
 # materially — users who accepted an older version are prompted to re-accept.
@@ -769,7 +773,7 @@ docker compose --profile dev exec mysql-dev sh -c \
   'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" -e "SHOW TABLES;"'
 ```
 
-Expected tables include `roles`, `users`, `users_roles`, `refreshTokens`, `workout_lists`, `workout_exercises`, `SequelizeMeta`, and possibly `sessions`.
+Expected tables include `roles`, `users`, `users_roles`, `refreshTokens`, `workout_lists`, `workout_exercises`, `SequelizeMeta`.
 
 No `npm run server:db:migrate` or `server:db:seed` after a full dump — schema and data are already included.
 
@@ -830,7 +834,7 @@ Wait until `mysql-dev` is **healthy** (`docker compose --profile dev ps`), then 
 | Topic | What to expect |
 |-------|----------------|
 | Prod user passwords | Work locally — bcrypt hashes are in the dump |
-| Prod sessions / JWT | May not work — local `SESSION_SECRET_KEY` and `JWT_SECRET_KEY` differ |
+| Prod sign-ins / JWT | May not work — local `JWT_SECRET_KEY` differs; Redis (captchas, failed sign-in counts) is not in the dump |
 | Static uploads (avatars) | Not in the SQL dump — files live in the `server_static` Docker volume on the VDS |
 
 ---
@@ -848,9 +852,52 @@ Internet
    │
    ├──► [server-prod :5000]  ← Nest API
    │         │
-   │         ▼
-   └──    [mysql :3306]  ← Docker network only
+   │         ├──► [mysql :3306]  ← Docker network only
+   │         └──► [redis :6379]  ← captchas, failed sign-in counts, sign-in rate limit
 ```
+
+The API sees the client's own address because it trusts the two proxies in front of it: `TRUST_PROXY_HOPS: 2` is set
+on `server-prod` in [`docker-compose.yml`](docker-compose.yml), next to this chain. Adding or removing a proxy in front
+of the API changes that number in the same edit — otherwise every client is counted as one address and the sign-in
+rate limit (20 attempts a minute per address) refuses them all together. Caddy ignores an `X-Forwarded-For` sent by a
+client, so the address cannot be forged from outside.
+
+Caddy also sends HSTS (`Strict-Transport-Security`, one year) for the public hostname — not for `localhost` — so no
+cookie of the app can be planted over plain HTTP. A browser that has seen it refuses plain HTTP to that hostname for
+a year: keep the hostname on HTTPS once it is served.
+
+**Check after the first deploy that clients keep their own addresses.** Over IPv4 Docker forwards a published port
+with the client's address intact; an IPv6 connection goes through Docker's userland proxy instead (IPv6 off in the
+Docker daemon), and every such client arrives as the address of the Docker gateway, sharing one sign-in rate limit.
+Clients come over IPv6 only when the hostname has an AAAA record and the VDS a public IPv6 address: an `sslip.io` name
+resolves to IPv4 only, and a domain gets an AAAA record only when you add one.
+
+Every sign-in attempt, a successful one too, keeps a key `sign-in:address:<pseudonym of the address>` in Redis for a
+minute, one key per address the API sees. The check, within one minute:
+
+1. Sign in from a computer on its usual network.
+2. Sign in from a phone on mobile data (Wi-Fi off) — another network, so another address.
+3. On the VDS, list the keys:
+
+   ```bash
+   docker compose --profile prod exec redis redis-cli --scan --pattern 'sign-in:address:*'
+   ```
+
+   Two keys (or more, when someone else signed in meanwhile) — the API tells the clients apart. One key for both
+   sign-ins — the addresses are merged into one. The keys expire by themselves after the minute.
+
+If the addresses are merged:
+
+1. Take no IPv6 — the default: `docker-compose.yml` publishes the ports of `caddy` on IPv4 only (`0.0.0.0:`), so with
+   an AAAA record IPv6 clients cannot connect and browsers fall back to IPv4. If the check still fails, the ports were
+   changed — restore `0.0.0.0:`.
+2. Or, when IPv6 clients are wanted, enable IPv6 for Docker and the compose network, so a published port keeps the
+   client's IPv6 address (Docker docs, "Use IPv6 networking").
+   Before that, the sign-in rate limit and the account + address count have to count an IPv6 client by its /64
+   network rather than its full address: a client is usually given a whole /64 and could change its address on every
+   attempt. They count full addresses today — a task of its own.
+
+Then repeat the check.
 
 ---
 

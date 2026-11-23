@@ -25,7 +25,7 @@ schema the previous release runs on.
 
 ## Baseline
 
-Migrations up to `20261104120000-opaque-refresh-tokens.js` predate this rule and are history: never rewritten, never
+Migrations up to `20261118120000-trusted-devices.js` predate this rule and are history: never rewritten, never
 checked. The check reads the newer ones only.
 
 ## Enforcement

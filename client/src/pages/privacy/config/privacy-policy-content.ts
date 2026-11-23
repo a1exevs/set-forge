@@ -23,7 +23,7 @@ const PRIVACY_OPERATOR = {
 } as const;
 
 /** Effective date of the current version. Bump when the policy text changes. */
-export const PRIVACY_EFFECTIVE_DATE = '2026-11-13';
+export const PRIVACY_EFFECTIVE_DATE = '2026-11-18';
 
 const ru: LegalContent = {
   title: 'Политика обработки персональных данных',
@@ -45,6 +45,8 @@ const ru: LegalContent = {
             'пароль — хранится в виде криптографического хеша; исходный пароль Оператор не хранит и доступа к нему не имеет;',
             'данные о тренировках, которые вы вносите сами (списки упражнений, веса, повторения, история подходов);',
             'технические данные и журналы: IP-адрес, дата и время обращения, запрошенный URL, сведения о браузере и устройстве (user-agent), идентификатор сессии — сохраняются в журналах веб-сервера и приложения для обеспечения работы и безопасности Сервиса;',
+            'сведения о попытках входа: псевдонимы адреса электронной почты и IP-адреса (необратимые хеши) и время попытки — для защиты от подбора пароля и от слишком частых попыток входа с одного адреса;',
+            'отметка доверенного устройства: случайный идентификатор в cookie браузера, на котором вы входили, и его хеш, связанный с вашей учётной записью, — чтобы защита от подбора пароля не требовала капчу на ваших устройствах;',
             'строго необходимые cookie для поддержания авторизованной сессии.',
           ],
         },
@@ -102,6 +104,14 @@ const ru: LegalContent = {
           type: 'p',
           text: 'Технические данные и журналы (IP-адрес, user-agent, идентификатор сессии и т. п.) хранятся не более 12 месяцев.',
         },
+        {
+          type: 'p',
+          text: 'Сведения о неудачной попытке входа хранятся 15 минут с момента попытки, о любой попытке входа с IP-адреса — 1 минуту, ответ на показанную капчу — 5 минут; затем они удаляются автоматически.',
+        },
+        {
+          type: 'p',
+          text: 'Отметка доверенного устройства хранится 90 дней с последнего входа на этом устройстве и удаляется вместе с учётной записью; выход из учётной записи её не удаляет.',
+        },
       ],
     },
     {
@@ -122,7 +132,7 @@ const ru: LegalContent = {
       blocks: [
         {
           type: 'p',
-          text: 'Сервис использует только строго необходимые cookie — для поддержания авторизованной сессии и обеспечения безопасности. Рекламные и аналитические cookie не используются.',
+          text: 'Сервис использует только строго необходимые cookie — для поддержания авторизованной сессии и обеспечения безопасности, в том числе cookie доверенного устройства: она отмечает браузер, на котором вы входили, и живёт 90 дней с последнего входа. Рекламные и аналитические cookie не используются.',
         },
       ],
     },
@@ -176,6 +186,8 @@ const en: LegalContent = {
             'password — stored as a cryptographic hash; the Operator does not store or have access to the original password;',
             'workout data you enter yourself (exercise lists, weights, reps, set history);',
             'technical data and logs: IP address, date and time of the request, requested URL, browser and device information (user-agent), session identifier — recorded in the web-server and application logs to operate and secure the Service;',
+            'sign-in attempts: pseudonyms of the email address and the IP address (irreversible hashes) and the time of the attempt — to protect against password guessing and against too frequent sign-in attempts from one address;',
+            'a trusted-device mark: a random identifier in a cookie of the browser you signed in on and its hash linked to your account — so that the protection against password guessing does not ask your own devices for a captcha;',
             'strictly necessary cookies to keep your session signed in.',
           ],
         },
@@ -229,6 +241,14 @@ const en: LegalContent = {
           type: 'p',
           text: 'Technical data and logs (IP address, user-agent, session identifier, etc.) are kept for no more than 12 months.',
         },
+        {
+          type: 'p',
+          text: 'A failed sign-in attempt is kept for 15 minutes from the attempt, any sign-in attempt from an IP address for 1 minute, the answer to a shown captcha for 5 minutes; then they are deleted automatically.',
+        },
+        {
+          type: 'p',
+          text: 'A trusted-device mark is kept for 90 days from the last sign-in on that device and is deleted together with the account; logging out does not delete it.',
+        },
       ],
     },
     {
@@ -249,7 +269,7 @@ const en: LegalContent = {
       blocks: [
         {
           type: 'p',
-          text: 'The Service uses only strictly necessary cookies — to maintain your authenticated session and for security. No advertising or analytics cookies are used.',
+          text: 'The Service uses only strictly necessary cookies — to maintain your authenticated session and for security, including the trusted-device cookie: it marks a browser you signed in on and lives for 90 days from the last sign-in. No advertising or analytics cookies are used.',
         },
       ],
     },
