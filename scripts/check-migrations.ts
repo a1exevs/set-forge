@@ -21,7 +21,10 @@ const NARROWING: ReadonlyArray<{ name: string; pattern: RegExp }> = [
     pattern: /\b(removeColumn|renameColumn|renameTable|dropTable|dropAllTables|changeColumn)\s*\(/,
   },
   { name: 'DROP / RENAME TABLE or VIEW', pattern: /\b(DROP|RENAME)\s+(TABLE|VIEW)\b/i },
-  { name: 'CREATE OR REPLACE / ALTER VIEW', pattern: /\b(CREATE\s+OR\s+REPLACE|ALTER)\b[^;]*?\bVIEW\b/i },
+  {
+    name: 'CREATE OR REPLACE / ALTER VIEW',
+    pattern: /\b(CREATE\s+OR\s+REPLACE|ALTER)\s+((ALGORITHM|DEFINER)\s*=\s*\S+\s+|SQL\s+SECURITY\s+\w+\s+)*VIEW\b/i,
+  },
   {
     name: 'ALTER TABLE … DROP / RENAME / MODIFY / CHANGE',
     pattern:
