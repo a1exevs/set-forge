@@ -98,6 +98,10 @@ const ru: LegalContent = {
         },
         {
           type: 'p',
+          text: 'Резервные копии базы данных хранятся на том же сервере не более 30 дней. Данные удалённого аккаунта остаются в резервных копиях до истечения этого срока и удаляются вместе с ними.',
+        },
+        {
+          type: 'p',
           text: 'Технические данные и журналы (IP-адрес, user-agent, идентификатор сессии и т. п.) хранятся не более 12 месяцев.',
         },
         {
@@ -228,6 +232,10 @@ const en: LegalContent = {
         {
           type: 'p',
           text: 'Account data is kept for as long as the account exists. When you delete your account, all related data is permanently erased.',
+        },
+        {
+          type: 'p',
+          text: 'Database backups are kept on the same server for no more than 30 days. The data of a deleted account remains in the backups until that period ends and is erased together with them.',
         },
         {
           type: 'p',

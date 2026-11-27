@@ -94,7 +94,9 @@ The CLI picks the env file via `database/config.js`: `--env <name>` flag wins, o
 
 ### Production workflow (inside the prod container)
 
-After `npm run prod:up` finishes and the server is healthy, apply migrations / seeds against the prod database **without restarting** the API:
+A release update applies the migrations itself, before the switch to the new release (`npm run prod:update -- vX.X.X`, [`DEPLOY-SELECTEL.md`](../DEPLOY-SELECTEL.md#12-update-the-application)), so a migration keeps the previous release working: expand / contract ([database-migrations rule](../.claude/rules/database-migrations.md)).
+
+On the first deploy, after `npm run prod:up` finishes and the server is healthy, apply migrations / seeds against the prod database **without restarting** the API:
 
 ```bash
 npm run prod:db:migrate
