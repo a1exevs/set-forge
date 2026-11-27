@@ -1,5 +1,5 @@
 ---
-description: Database migrations keep the previous release working — expand / contract, the @contract marker, the baseline
+description: Database migrations keep the previous release working — expand / contract, the @contract and @compatible markers, the baseline
 paths:
   - "server/database/migrations/**"
 ---
@@ -21,6 +21,10 @@ schema the previous release runs on.
   2. release N+1 — contract: the code of release N no longer reads the old shape.
 - A contract migration says so in a comment: `@contract vX.Y.Z` — the release whose code stopped using what it
   removes. The marker is the author's claim that the previous release does not need it; review checks the claim.
+- A migration that narrows the schema but keeps the old shape working in the same step says how:
+  `@compatible <how>`. The usual case is a table rename: the old name stays as an updatable view
+  (`CREATE VIEW old AS SELECT * FROM new`), and a later contract migration drops the view. Review checks that the
+  previous release really runs on it.
 - Data the previous release reads is kept the same way: moved by an expand, deleted by a contract.
 
 ## Baseline
@@ -32,5 +36,5 @@ checked. The check reads the newer ones only.
 
 | Rule | Checked by |
 |---|---|
-| A migration whose `up` narrows the schema carries `@contract vX.Y.Z` | `npm run lint:root` · `scripts/check-migrations.ts` |
-| The marked release really stopped using what the migration removes; data the previous release reads is kept | ❌ review |
+| A migration whose `up` narrows the schema carries `@contract vX.Y.Z` or `@compatible <how>` | `npm run lint:root` · `scripts/check-migrations.ts` |
+| The marked release really stopped using what the migration removes; a `@compatible` step really keeps the previous release working; data the previous release reads is kept | ❌ review |
