@@ -14,9 +14,9 @@ schema the previous release runs on.
 
 - **Expand** — a migration that only adds: a table, a nullable column or one with a default, an index, a copy of
   data into a new column. Safe in any release.
-- **Contract** — a migration that narrows the schema: drops or renames a table or a column, changes a column's type
-  or makes it stricter (`NOT NULL`, a shorter length). It goes in a later release than the code that stopped using
-  what it removes:
+- **Contract** — a migration that narrows the schema: drops or renames a table, a view or a column, redefines a view
+  (`CREATE OR REPLACE VIEW`, `ALTER VIEW`), changes a column's type or makes it stricter (`NOT NULL`, a shorter
+  length). It goes in a later release than the code that stopped using what it removes:
   1. release N — expand, and the code writes both shapes and reads the new one;
   2. release N+1 — contract: the code of release N no longer reads the old shape.
 - A contract migration says so in a comment: `@contract vX.Y.Z` — the release whose code stopped using what it
