@@ -473,11 +473,20 @@ that ran before `vX.X.X`); its migrations are already applied, so step 5 changes
 npm run prod:update -- <previous version>
 ```
 
-The previous release runs on the schema of the newer one (the migrations keep it working), so a rollback is an update
-to the older tag; the update prints this command when its health check fails. When the newer release has broken the
-data, [restore the backup](#123-restore-from-a-backup) taken before it instead. Undoing a migration by hand
-(`npm run prod:db:migrate:undo`) is the last resort. A successful update removes the images of the previous release
-(step 8), so a rollback builds them again — minutes, while the newer release keeps serving.
+The previous release runs on the schema of the newer one (the migrations keep it working —
+[database-migrations rule](.claude/rules/database-migrations.md)), so a rollback is an update to the older tag; the
+update prints this command when its health check fails. That holds for **one release back**, and only for migrations
+newer than the rule's baseline:
+
+- **Further back than one release** — a newer release may already have removed what the older one reads.
+- **A release with migrations from before the rule** (up to its baseline) may break the previous release, and its
+  release notes say so. Then, while the newer release still runs — its image has the migration files — undo its
+  migrations first, newest first, once per migration of the release: `npm run prod:db:migrate:undo`. Only then update
+  to the older tag. Or [restore the backup](#123-restore-from-a-backup) taken before the release instead.
+
+When the newer release has broken the data, restore the backup taken before it. A successful update removes the
+images of the previous release (step 8), so a rollback builds them again — minutes, while the newer release keeps
+serving.
 
 ---
 
